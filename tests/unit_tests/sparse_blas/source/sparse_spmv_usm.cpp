@@ -78,26 +78,21 @@ int test_spmv(sycl::device *dev, sparse_matrix_format_t format, intType nrows_A,
     fpType *x_usm = x_usm_uptr.get();
     fpType *y_usm = y_usm_uptr.get();
 
-    std::vector<sycl::event> mat_dependencies;
-    std::vector<sycl::event> spmv_dependencies;
+    std::vector<sycl::event> dependencies;
     // Copy host to device
-    mat_dependencies.push_back(
+    dependencies.push_back(
         main_queue.memcpy(ia_usm, ia_host.data(), ia_host.size() * sizeof(intType)));
-    mat_dependencies.push_back(
+    dependencies.push_back(
         main_queue.memcpy(ja_usm, ja_host.data(), ja_host.size() * sizeof(intType)));
-    mat_dependencies.push_back(
-        main_queue.memcpy(a_usm, a_host.data(), a_host.size() * sizeof(fpType)));
-    spmv_dependencies.push_back(
-        main_queue.memcpy(x_usm, x_host.data(), x_host.size() * sizeof(fpType)));
-    spmv_dependencies.push_back(
-        main_queue.memcpy(y_usm, y_host.data(), y_host.size() * sizeof(fpType)));
+    dependencies.push_back(main_queue.memcpy(a_usm, a_host.data(), a_host.size() * sizeof(fpType)));
+    dependencies.push_back(main_queue.memcpy(x_usm, x_host.data(), x_host.size() * sizeof(fpType)));
+    dependencies.push_back(main_queue.memcpy(y_usm, y_host.data(), y_host.size() * sizeof(fpType)));
 
     fpType *alpha_host_or_usm_ptr = &alpha;
     fpType *beta_host_or_usm_ptr = &beta;
     if (test_scalar_on_device) {
-        spmv_dependencies.push_back(
-            main_queue.memcpy(alpha_usm_uptr.get(), &alpha, sizeof(fpType)));
-        spmv_dependencies.push_back(main_queue.memcpy(beta_usm_uptr.get(), &beta, sizeof(fpType)));
+        dependencies.push_back(main_queue.memcpy(alpha_usm_uptr.get(), &alpha, sizeof(fpType)));
+        dependencies.push_back(main_queue.memcpy(beta_usm_uptr.get(), &beta, sizeof(fpType)));
         alpha_host_or_usm_ptr = alpha_usm_uptr.get();
         beta_host_or_usm_ptr = beta_usm_uptr.get();
     }
@@ -130,12 +125,11 @@ int test_spmv(sycl::device *dev, sparse_matrix_format_t format, intType nrows_A,
         sycl::event ev_opt;
         CALL_RT_OR_CT(ev_opt = oneapi::mkl::sparse::spmv_optimize, main_queue, transpose_val,
                       alpha_host_or_usm_ptr, A_view, A_handle, x_handle, beta_host_or_usm_ptr,
-                      y_handle, alg, descr, workspace_usm.get(), mat_dependencies);
+                      y_handle, alg, descr, workspace_usm.get(), dependencies);
 
-        spmv_dependencies.push_back(ev_opt);
         CALL_RT_OR_CT(ev_spmv = oneapi::mkl::sparse::spmv, main_queue, transpose_val,
                       alpha_host_or_usm_ptr, A_view, A_handle, x_handle, beta_host_or_usm_ptr,
-                      y_handle, alg, descr, spmv_dependencies);
+                      y_handle, alg, descr, { ev_opt });
 
         if (reset_data) {
             intType reset_nnz = generate_random_matrix<fpType, intType>(
@@ -155,14 +149,14 @@ int test_spmv(sycl::device *dev, sparse_matrix_format_t format, intType nrows_A,
             }
             nnz = reset_nnz;
 
-            mat_dependencies.clear();
-            mat_dependencies.push_back(main_queue.memcpy(
-                ia_usm, ia_host.data(), ia_host.size() * sizeof(intType), ev_spmv));
-            mat_dependencies.push_back(main_queue.memcpy(
-                ja_usm, ja_host.data(), ja_host.size() * sizeof(intType), ev_spmv));
-            mat_dependencies.push_back(
+            dependencies.clear();
+            dependencies.push_back(main_queue.memcpy(ia_usm, ia_host.data(),
+                                                     ia_host.size() * sizeof(intType), ev_spmv));
+            dependencies.push_back(main_queue.memcpy(ja_usm, ja_host.data(),
+                                                     ja_host.size() * sizeof(intType), ev_spmv));
+            dependencies.push_back(
                 main_queue.memcpy(a_usm, a_host.data(), a_host.size() * sizeof(fpType), ev_spmv));
-            mat_dependencies.push_back(
+            dependencies.push_back(
                 main_queue.memcpy(y_usm, y_host.data(), y_host.size() * sizeof(fpType), ev_spmv));
             set_matrix_data(main_queue, format, A_handle, nrows_A, ncols_A, nnz, index, ia_usm,
                             ja_usm, a_usm);
@@ -177,7 +171,7 @@ int test_spmv(sycl::device *dev, sparse_matrix_format_t format, intType nrows_A,
 
             CALL_RT_OR_CT(ev_opt = oneapi::mkl::sparse::spmv_optimize, main_queue, transpose_val,
                           alpha_host_or_usm_ptr, A_view, A_handle, x_handle, beta_host_or_usm_ptr,
-                          y_handle, alg, descr, workspace_usm.get(), mat_dependencies);
+                          y_handle, alg, descr, workspace_usm.get(), dependencies);
 
             CALL_RT_OR_CT(ev_spmv = oneapi::mkl::sparse::spmv, main_queue, transpose_val,
                           alpha_host_or_usm_ptr, A_view, A_handle, x_handle, beta_host_or_usm_ptr,
