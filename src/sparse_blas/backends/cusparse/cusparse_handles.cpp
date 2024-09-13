@@ -73,8 +73,6 @@ void set_dense_vector_data(sycl::queue &queue, dense_vector_handle_t dvhandle, s
     auto event = queue.submit([&](sycl::handler &cgh) {
         auto acc = val.template get_access<sycl::access::mode::read_write>(cgh);
         submit_host_task(cgh, queue, [=](CusparseScopedContextHandler &sc) {
-            // Ensure that a cusparse handle is created before any other cuSPARSE function is called.
-            sc.get_handle(queue);
             if (dvhandle->size != size) {
                 CUSPARSE_ERR_FUNC(cusparseDestroyDnVec, dvhandle->backend_handle);
                 auto cuda_value_type = CudaEnumType<fpType>::value;
@@ -177,8 +175,6 @@ void set_dense_matrix_data(sycl::queue &queue, dense_matrix_handle_t dmhandle,
     auto event = queue.submit([&](sycl::handler &cgh) {
         auto acc = val.template get_access<sycl::access::mode::read_write>(cgh);
         submit_host_task(cgh, queue, [=](CusparseScopedContextHandler &sc) {
-            // Ensure that a cusparse handle is created before any other cuSPARSE function is called.
-            sc.get_handle(queue);
             if (dmhandle->num_rows != num_rows || dmhandle->num_cols != num_cols ||
                 dmhandle->ld != ld || dmhandle->dense_layout != dense_layout) {
                 CUSPARSE_ERR_FUNC(cusparseDestroyDnMat, dmhandle->backend_handle);
@@ -302,8 +298,6 @@ void set_coo_matrix_data(sycl::queue &queue, matrix_handle_t smhandle, std::int6
         auto col_acc = col_ind.template get_access<sycl::access::mode::read_write>(cgh);
         auto val_acc = val.template get_access<sycl::access::mode::read_write>(cgh);
         submit_host_task(cgh, queue, [=](CusparseScopedContextHandler &sc) {
-            // Ensure that a cusparse handle is created before any other cuSPARSE function is called.
-            sc.get_handle(queue);
             if (smhandle->num_rows != num_rows || smhandle->num_cols != num_cols ||
                 smhandle->nnz != nnz || smhandle->index != index) {
                 CUSPARSE_ERR_FUNC(cusparseDestroySpMat, smhandle->backend_handle);
@@ -428,8 +422,6 @@ void set_csr_matrix_data(sycl::queue &queue, matrix_handle_t smhandle, std::int6
         auto col_acc = col_ind.template get_access<sycl::access::mode::read_write>(cgh);
         auto val_acc = val.template get_access<sycl::access::mode::read_write>(cgh);
         submit_host_task(cgh, queue, [=](CusparseScopedContextHandler &sc) {
-            // Ensure that a cusparse handle is created before any other cuSPARSE function is called.
-            sc.get_handle(queue);
             if (smhandle->num_rows != num_rows || smhandle->num_cols != num_cols ||
                 smhandle->nnz != nnz || smhandle->index != index) {
                 CUSPARSE_ERR_FUNC(cusparseDestroySpMat, smhandle->backend_handle);
