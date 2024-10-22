@@ -32,6 +32,12 @@ namespace oneapi::mkl::sparse {
 
 // Complete the definition of the incomplete type
 struct spmm_descr {
+    // Cache the CUstream and global handle to avoid relying on CusparseScopedContextHandler to retrieve them.
+    // cuSPARSE seem to implicitly require to use the same CUstream for a whole operation (buffer_size, optimization and computation steps).
+    // This is needed as the default SYCL queue is out-of-order which can have a different CUstream for each host_task or native_command.
+    CUstream cu_stream;
+    cusparseHandle_t cu_handle;
+
     detail::generic_container workspace;
     std::size_t temp_buffer_size = 0;
     bool buffer_size_called = false;
@@ -99,8 +105,11 @@ void spmm_buffer_size(sycl::queue& queue, oneapi::mkl::transpose opA, oneapi::mk
     bool is_beta_host_accessible = detail::is_ptr_accessible_on_host(queue, beta);
     check_valid_spmm(__func__, opA, opB, A_view, A_handle, B_handle, C_handle,
                      is_alpha_host_accessible, is_beta_host_accessible, alg);
-    auto functor = [=, &temp_buffer_size](CusparseScopedContextHandler& sc) {
-        auto cu_handle = sc.get_handle(queue);
+    auto functor = [=, &temp_buffer_size](sycl::interop_handle ih) {
+        CusparseScopedContextHandler sc(queue, ih);
+        auto [cu_handle, cu_stream] = sc.get_handle_and_stream(queue);
+        spmm_descr->cu_handle = cu_handle;
+        spmm_descr->cu_stream = cu_stream;
         auto cu_a = A_handle->backend_handle;
         auto cu_b = B_handle->backend_handle;
         auto cu_c = C_handle->backend_handle;
@@ -177,10 +186,9 @@ void spmm_optimize(sycl::queue& queue, oneapi::mkl::transpose opA, oneapi::mkl::
         // cusparseSpMM_preprocess cannot be called if the workspace is empty
         return;
     }
-    auto functor = [=](CusparseScopedContextHandler& sc,
-                       sycl::accessor<std::uint8_t> workspace_acc) {
-        auto cu_handle = sc.get_handle(queue);
-        auto workspace_ptr = sc.get_mem(workspace_acc);
+    auto functor = [=](sycl::interop_handle ih, sycl::accessor<std::uint8_t> workspace_acc) {
+        auto cu_handle = spmm_descr->cu_handle;
+        auto workspace_ptr = get_mem(ih, workspace_acc);
         spmm_optimize_impl(cu_handle, opA, opB, alpha, A_handle, B_handle, beta, C_handle, alg,
                            workspace_ptr, is_alpha_host_accessible);
     };
@@ -206,8 +214,8 @@ sycl::event spmm_optimize(sycl::queue& queue, oneapi::mkl::transpose opA,
         // cusparseSpMM_preprocess cannot be called if the workspace is empty
         return detail::collapse_dependencies(queue, dependencies);
     }
-    auto functor = [=](CusparseScopedContextHandler& sc) {
-        auto cu_handle = sc.get_handle(queue);
+    auto functor = [=](sycl::interop_handle) {
+        auto cu_handle = spmm_descr->cu_handle;
         spmm_optimize_impl(cu_handle, opA, opB, alpha, A_handle, B_handle, beta, C_handle, alg,
                            workspace, is_alpha_host_accessible);
     };
@@ -240,8 +248,8 @@ sycl::event spmm(sycl::queue& queue, oneapi::mkl::transpose opA, oneapi::mkl::tr
     CHECK_DESCR_MATCH(spmm_descr, C_handle, "spmm_optimize");
     CHECK_DESCR_MATCH(spmm_descr, alg, "spmm_optimize");
 
-    auto compute_functor = [=](CusparseScopedContextHandler& sc, void* workspace_ptr) {
-        auto [cu_handle, cu_stream] = sc.get_handle_and_stream(queue);
+    auto compute_functor = [=](void* workspace_ptr) {
+        auto cu_handle = spmm_descr->cu_handle;
         auto cu_a = A_handle->backend_handle;
         auto cu_b = B_handle->backend_handle;
         auto cu_c = C_handle->backend_handle;
@@ -255,15 +263,16 @@ sycl::event spmm(sycl::queue& queue, oneapi::mkl::transpose opA, oneapi::mkl::tr
                                    cu_type, cu_alg, workspace_ptr);
         check_status(status, __func__);
 #ifndef SYCL_EXT_ONEAPI_ENQUEUE_NATIVE_COMMAND
+        auto cu_stream = spmm_descr->cu_stream;
         CUDA_ERROR_FUNC(cuStreamSynchronize, cu_stream);
 #endif
     };
     if (A_handle->all_use_buffer() && spmm_descr->temp_buffer_size > 0) {
         // The accessor can only be created if the buffer size is greater than 0
-        auto functor_buffer = [=](CusparseScopedContextHandler& sc,
+        auto functor_buffer = [=](sycl::interop_handle ih,
                                   sycl::accessor<std::uint8_t> workspace_acc) {
-            auto workspace_ptr = sc.get_mem(workspace_acc);
-            compute_functor(sc, workspace_ptr);
+            auto workspace_ptr = get_mem(ih, workspace_acc);
+            compute_functor(workspace_ptr);
         };
         return dispatch_submit_native_ext(__func__, queue, functor_buffer, A_handle,
                                           spmm_descr->workspace.get_buffer<std::uint8_t>(),
@@ -274,8 +283,8 @@ sycl::event spmm(sycl::queue& queue, oneapi::mkl::transpose opA, oneapi::mkl::tr
         // workspace accessor is needed, workspace_ptr will be a nullptr in the
         // latter case.
         auto workspace_ptr = spmm_descr->workspace.usm_ptr;
-        auto functor_usm = [=](CusparseScopedContextHandler& sc) {
-            compute_functor(sc, workspace_ptr);
+        auto functor_usm = [=](sycl::interop_handle) {
+            compute_functor(workspace_ptr);
         };
         return dispatch_submit_native_ext(__func__, queue, dependencies, functor_usm, A_handle,
                                           B_handle, C_handle);

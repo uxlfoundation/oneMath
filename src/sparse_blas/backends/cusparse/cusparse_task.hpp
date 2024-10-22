@@ -73,8 +73,7 @@ void submit_host_task(sycl::handler &cgh, sycl::queue &queue, Functor functor,
     cgh.host_task([functor, queue, capture_only_accessors...](sycl::interop_handle ih) {
         auto unused = std::make_tuple(capture_only_accessors...);
         (void)unused;
-        auto sc = CusparseScopedContextHandler(queue, ih);
-        functor(sc);
+        functor(ih);
     });
 }
 
@@ -93,8 +92,7 @@ void submit_host_task_with_acc(sycl::handler &cgh, sycl::queue &queue, Functor f
                    capture_only_accessors...](sycl::interop_handle ih) {
         auto unused = std::make_tuple(capture_only_accessors...);
         (void)unused;
-        auto sc = CusparseScopedContextHandler(queue, ih);
-        functor(sc, workspace_placeholder_acc);
+        functor(ih, workspace_placeholder_acc);
     });
 }
 
@@ -114,7 +112,6 @@ void submit_native_command_ext(sycl::handler &cgh, sycl::queue &queue, Functor f
         [functor, queue, dependencies, capture_only_accessors...](sycl::interop_handle ih) {
             auto unused = std::make_tuple(capture_only_accessors...);
             (void)unused;
-            auto sc = CusparseScopedContextHandler(queue, ih);
             // The functor using ext_codeplay_enqueue_native_command need to
             // explicitly wait on the events for the SPARSE domain. The
             // extension ext_codeplay_enqueue_native_command is used to launch
@@ -129,7 +126,7 @@ void submit_native_command_ext(sycl::handler &cgh, sycl::queue &queue, Functor f
             for (auto event : dependencies) {
                 event.wait();
             }
-            functor(sc);
+            functor(ih);
         });
 #else
     (void)dependencies;
@@ -155,7 +152,6 @@ void submit_native_command_ext_with_acc(sycl::handler &cgh, sycl::queue &queue, 
                                              capture_only_accessors...](sycl::interop_handle ih) {
         auto unused = std::make_tuple(capture_only_accessors...);
         (void)unused;
-        auto sc = CusparseScopedContextHandler(queue, ih);
         // The functor using ext_codeplay_enqueue_native_command need to
         // explicitly wait on the events for the SPARSE domain. The
         // extension ext_codeplay_enqueue_native_command is used to launch
@@ -170,7 +166,7 @@ void submit_native_command_ext_with_acc(sycl::handler &cgh, sycl::queue &queue, 
         for (auto event : dependencies) {
             event.wait();
         }
-        functor(sc, workspace_placeholder_acc);
+        functor(ih, workspace_placeholder_acc);
     });
 #else
     (void)dependencies;

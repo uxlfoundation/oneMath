@@ -32,6 +32,12 @@ namespace oneapi::mkl::sparse {
 
 // Complete the definition of the incomplete type
 struct spsv_descr {
+    // Cache the CUstream and global handle to avoid relying on CusparseScopedContextHandler to retrieve them.
+    // cuSPARSE seem to implicitly require to use the same CUstream for a whole operation (buffer_size, optimization and computation steps).
+    // This is needed as the default SYCL queue is out-of-order which can have a different CUstream for each host_task or native_command.
+    CUstream cu_stream;
+    cusparseHandle_t cu_handle;
+
     cusparseSpSVDescr_t cu_descr;
     detail::generic_container workspace;
     bool buffer_size_called = false;
@@ -69,7 +75,7 @@ sycl::event release_spsv_descr(sycl::queue &queue, spsv_descr_t spsv_descr,
     if (spsv_descr->last_optimized_A_handle &&
         spsv_descr->last_optimized_A_handle->all_use_buffer() &&
         spsv_descr->last_optimized_x_handle && spsv_descr->last_optimized_y_handle) {
-        auto dispatch_functor = [=](CusparseScopedContextHandler &) {
+        auto dispatch_functor = [=](sycl::interop_handle) {
             release_functor();
         };
         return dispatch_submit(
@@ -77,7 +83,7 @@ sycl::event release_spsv_descr(sycl::queue &queue, spsv_descr_t spsv_descr,
             spsv_descr->last_optimized_x_handle, spsv_descr->last_optimized_y_handle);
     }
 
-    // Release used if USM is used or the descriptor has been released before spsv_optimize has succeeded
+    // Release used if USM is used or if the descriptor has been released before spsv_optimize has succeeded
     sycl::event event = queue.submit([&](sycl::handler &cgh) {
         cgh.depends_on(dependencies);
         cgh.host_task(release_functor);
@@ -103,8 +109,11 @@ void spsv_buffer_size(sycl::queue &queue, oneapi::mkl::transpose opA, const void
                       std::size_t &temp_buffer_size) {
     bool is_alpha_host_accessible = detail::is_ptr_accessible_on_host(queue, alpha);
     check_valid_spsv(__func__, A_view, A_handle, x_handle, y_handle, is_alpha_host_accessible);
-    auto functor = [=, &temp_buffer_size](CusparseScopedContextHandler &sc) {
-        auto cu_handle = sc.get_handle(queue);
+    auto functor = [=, &temp_buffer_size](sycl::interop_handle ih) {
+        CusparseScopedContextHandler sc(queue, ih);
+        auto [cu_handle, cu_stream] = sc.get_handle_and_stream(queue);
+        spsv_descr->cu_handle = cu_handle;
+        spsv_descr->cu_stream = cu_stream;
         auto cu_a = A_handle->backend_handle;
         auto cu_x = x_handle->backend_handle;
         auto cu_y = y_handle->backend_handle;
@@ -178,10 +187,9 @@ void spsv_optimize(sycl::queue &queue, oneapi::mkl::transpose opA, const void *a
     spsv_descr->workspace.set_buffer_untyped(workspace);
 
     if (workspace.size() > 0) {
-        auto functor = [=](CusparseScopedContextHandler &sc,
-                           sycl::accessor<std::uint8_t> workspace_acc) {
-            auto cu_handle = sc.get_handle(queue);
-            auto workspace_ptr = sc.get_mem(workspace_acc);
+        auto functor = [=](sycl::interop_handle ih, sycl::accessor<std::uint8_t> workspace_acc) {
+            auto cu_handle = spsv_descr->cu_handle;
+            auto workspace_ptr = get_mem(ih, workspace_acc);
             spsv_optimize_impl(cu_handle, opA, alpha, A_view, A_handle, x_handle, y_handle, alg,
                                spsv_descr, workspace_ptr, is_alpha_host_accessible);
         };
@@ -190,8 +198,8 @@ void spsv_optimize(sycl::queue &queue, oneapi::mkl::transpose opA, const void *a
         dispatch_submit(__func__, queue, functor, A_handle, workspace, x_handle, y_handle);
     }
     else {
-        auto functor = [=](CusparseScopedContextHandler &sc) {
-            auto cu_handle = sc.get_handle(queue);
+        auto functor = [=](sycl::interop_handle) {
+            auto cu_handle = spsv_descr->cu_handle;
             spsv_optimize_impl(cu_handle, opA, alpha, A_view, A_handle, x_handle, y_handle, alg,
                                spsv_descr, nullptr, is_alpha_host_accessible);
         };
@@ -212,8 +220,8 @@ sycl::event spsv_optimize(sycl::queue &queue, oneapi::mkl::transpose opA, const 
     common_spsv_optimize(opA, is_alpha_host_accessible, A_view, A_handle, x_handle, y_handle, alg,
                          spsv_descr);
     // Ignore spsv_alg::no_optimize_alg as this step is mandatory for cuSPARSE
-    auto functor = [=](CusparseScopedContextHandler &sc) {
-        auto cu_handle = sc.get_handle(queue);
+    auto functor = [=](sycl::interop_handle) {
+        auto cu_handle = spsv_descr->cu_handle;
         spsv_optimize_impl(cu_handle, opA, alpha, A_view, A_handle, x_handle, y_handle, alg,
                            spsv_descr, workspace, is_alpha_host_accessible);
     };
@@ -242,8 +250,8 @@ sycl::event spsv(sycl::queue &queue, oneapi::mkl::transpose opA, const void *alp
     CHECK_DESCR_MATCH(spsv_descr, y_handle, "spsv_optimize");
     CHECK_DESCR_MATCH(spsv_descr, alg, "spsv_optimize");
 
-    auto functor = [=](CusparseScopedContextHandler &sc) {
-        auto [cu_handle, cu_stream] = sc.get_handle_and_stream(queue);
+    auto functor = [=](sycl::interop_handle) {
+        auto cu_handle = spsv_descr->cu_handle;
         auto cu_a = A_handle->backend_handle;
         auto cu_x = x_handle->backend_handle;
         auto cu_y = y_handle->backend_handle;
@@ -258,6 +266,7 @@ sycl::event spsv(sycl::queue &queue, oneapi::mkl::transpose opA, const void *alp
                                          cu_descr);
         check_status(status, __func__);
 #ifndef SYCL_EXT_ONEAPI_ENQUEUE_NATIVE_COMMAND
+        auto cu_stream = spsv_descr->cu_stream;
         CUDA_ERROR_FUNC(cuStreamSynchronize, cu_stream);
 #endif
     };

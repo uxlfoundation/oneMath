@@ -73,15 +73,15 @@ public:
 
     /// See get_handle_and_stream
     cusparseHandle_t get_handle(const sycl::queue &queue);
-
-    // Get the native pointer from an accessor. This is a different pointer than
-    // what can be retrieved with get_multi_ptr.
-    template <typename AccT>
-    inline void *get_mem(AccT acc) {
-        auto cudaPtr = ih.get_native_mem<sycl::backend::ext_oneapi_cuda>(acc);
-        return reinterpret_cast<void *>(cudaPtr);
-    }
 };
+
+// Get the native pointer from an accessor. This is a different pointer than
+// what can be retrieved with get_multi_ptr.
+template <typename AccT>
+inline void *get_mem(sycl::interop_handle ih, AccT acc) {
+    auto cudaPtr = ih.get_native_mem<sycl::backend::ext_oneapi_cuda>(acc);
+    return reinterpret_cast<void *>(cudaPtr);
+}
 
 } // namespace oneapi::mkl::sparse::cusparse
 
