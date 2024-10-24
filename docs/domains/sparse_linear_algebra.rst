@@ -54,6 +54,11 @@ Currently known limitations:
 - Using ``spmm`` with the algorithm ``spmm_alg::csr_alg3`` and an ``opA`` other
   than ``transpose::nontrans`` or an ``opB`` ``transpose::conjtrans`` will throw
   a ``oneapi::mkl::unimplemented`` exception.
+- Using ``spmm`` with the algorithm ``spmm_alg::csr_alg3``,
+  ``opB=transpose::trans`` and real fp64 precision will throw a
+  ``oneapi::mkl::unimplemented`` exception. This configuration can fail as of
+  CUDA 12.6.2, see the related issue
+  `here<https://forums.developer.nvidia.com/t/cusparse-spmm-sample-failing-with-misaligned-address/311022>`_.
 - Using ``spmv`` with a ``type_view`` other than ``matrix_descr::general`` will
   throw a ``oneapi::mkl::unimplemented`` exception.
 - Using ``spsv`` with the algorithm ``spsv_alg::no_optimize_alg`` may still

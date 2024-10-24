@@ -126,6 +126,13 @@ void check_valid_spmm(const std::string& function_name, oneapi::mkl::transpose o
             "sparse_blas", function_name,
             "The backend does not support spmm with the algorithm `spmm_alg::csr_alg3` if `opB` is `transpose::conjtrans`.");
     }
+    if (alg == spmm_alg::csr_alg3 && opB == oneapi::mkl::transpose::trans &&
+        A_handle->get_value_type() == detail::data_type::real_fp64) {
+        // TODO: Remove once the issue is fixed: https://forums.developer.nvidia.com/t/cusparse-spmm-sample-failing-with-misaligned-address/311022
+        throw mkl::unimplemented(
+            "sparse_blas", function_name,
+            "The backend does not support spmm with the algorithm `spmm_alg::csr_alg3` if `opB` is `transpose::trans` and the real fp64 precision is used.");
+    }
 }
 
 void spmm_buffer_size(sycl::queue& queue, oneapi::mkl::transpose opA, oneapi::mkl::transpose opB,
