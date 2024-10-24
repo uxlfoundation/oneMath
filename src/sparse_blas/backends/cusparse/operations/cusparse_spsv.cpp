@@ -257,6 +257,7 @@ sycl::event spsv(sycl::queue &queue, oneapi::mkl::transpose opA, const void *alp
     CHECK_DESCR_MATCH(spsv_descr, y_handle, "spsv_optimize");
     CHECK_DESCR_MATCH(spsv_descr, alg, "spsv_optimize");
 
+    bool is_in_order_queue = queue.is_in_order();
     auto functor = [=](sycl::interop_handle) {
         auto cu_handle = spsv_descr->cu_handle;
         auto cu_a = A_handle->backend_handle;
@@ -272,10 +273,7 @@ sycl::event spsv(sycl::queue &queue, oneapi::mkl::transpose opA, const void *alp
         auto status = cusparseSpSV_solve(cu_handle, cu_op, alpha, cu_a, cu_x, cu_y, cu_type, cu_alg,
                                          cu_descr);
         check_status(status, __func__);
-#ifndef SYCL_EXT_ONEAPI_ENQUEUE_NATIVE_COMMAND
-        auto cu_stream = spsv_descr->cu_stream;
-        CUDA_ERROR_FUNC(cuStreamSynchronize, cu_stream);
-#endif
+        synchronize_if_needed(is_in_order_queue, spsv_descr->cu_stream);
     };
     return dispatch_submit_native_ext(__func__, queue, dependencies, functor, A_handle, x_handle,
                                       y_handle);

@@ -185,13 +185,18 @@ void submit_native_command_ext_with_acc(sycl::handler &cgh, sycl::queue &queue, 
 /// \p UseEnqueueNativeCommandExt controls whether host_task are used or the
 /// extension ext_codeplay_enqueue_native_command is used to launch tasks. The
 /// extension should only be used for asynchronous functions using native
-/// backend's functions.
+/// backend's functions. The extension can only be used for in-order queues as
+/// the same cuStream needs to be used for the 3 steps to run an operation:
+/// querying the buffer size, optimizing and running the computation. This means
+/// a different cuStream can be used inside the native_command than the native
+/// cuStream used by the extension.
 template <bool UseWorkspace, bool UseEnqueueNativeCommandExt, typename Functor, typename... Ts>
 sycl::event dispatch_submit_impl_fp_int(const std::string &function_name, sycl::queue queue,
                                         const std::vector<sycl::event> &dependencies,
                                         Functor functor, matrix_handle_t sm_handle,
                                         sycl::buffer<std::uint8_t> workspace_buffer,
                                         Ts... other_containers) {
+    bool is_in_order_queue = queue.is_in_order();
     if (sm_handle->all_use_buffer()) {
         detail::data_type value_type = sm_handle->get_value_type();
         detail::data_type int_type = sm_handle->get_int_type();
@@ -204,8 +209,14 @@ sycl::event dispatch_submit_impl_fp_int(const std::string &function_name, sycl::
         auto workspace_acc = workspace_buffer.get_access<sycl::access::mode::read_write>(cgh);    \
         if constexpr (UseWorkspace) {                                                             \
             if constexpr (UseEnqueueNativeCommandExt) {                                           \
-                submit_native_command_ext_with_acc(cgh, queue, functor, dependencies,             \
-                                                   workspace_acc, fp_accs, int_accs);             \
+                if (is_in_order_queue) {                                                          \
+                    submit_native_command_ext_with_acc(cgh, queue, functor, dependencies,         \
+                                                       workspace_acc, fp_accs, int_accs);         \
+                }                                                                                 \
+                else {                                                                            \
+                    submit_host_task_with_acc(cgh, queue, functor, workspace_acc, fp_accs,        \
+                                              int_accs);                                          \
+                }                                                                                 \
             }                                                                                     \
             else {                                                                                \
                 submit_host_task_with_acc(cgh, queue, functor, workspace_acc, fp_accs, int_accs); \
@@ -214,7 +225,13 @@ sycl::event dispatch_submit_impl_fp_int(const std::string &function_name, sycl::
         else {                                                                                    \
             (void)workspace_buffer;                                                               \
             if constexpr (UseEnqueueNativeCommandExt) {                                           \
-                submit_native_command_ext(cgh, queue, functor, dependencies, fp_accs, int_accs);  \
+                if (is_in_order_queue) {                                                          \
+                    submit_native_command_ext(cgh, queue, functor, dependencies, fp_accs,         \
+                                              int_accs);                                          \
+                }                                                                                 \
+                else {                                                                            \
+                    submit_host_task(cgh, queue, functor, fp_accs, int_accs);                     \
+                }                                                                                 \
             }                                                                                     \
             else {                                                                                \
                 submit_host_task(cgh, queue, functor, fp_accs, int_accs);                         \
@@ -254,7 +271,12 @@ sycl::event dispatch_submit_impl_fp_int(const std::string &function_name, sycl::
             return queue.submit([&](sycl::handler &cgh) {
                 cgh.depends_on(dependencies);
                 if constexpr (UseEnqueueNativeCommandExt) {
-                    submit_native_command_ext(cgh, queue, functor, dependencies);
+                    if (is_in_order_queue) {
+                        submit_native_command_ext(cgh, queue, functor, dependencies);
+                    }
+                    else {
+                        submit_host_task(cgh, queue, functor);
+                    }
                 }
                 else {
                     submit_host_task(cgh, queue, functor);
@@ -390,6 +412,19 @@ sycl::event dispatch_submit_native_ext(const std::string &function_name, sycl::q
     sycl::buffer<std::uint8_t> no_workspace(sycl::range<1>(0));
     return dispatch_submit_impl_fp_int<UseWorkspace, UseEnqueueNativeCommandExt>(
         function_name, queue, {}, functor, sm_handle, no_workspace, other_containers...);
+}
+
+// Helper function for functors submitted to host_task or native_command.
+// When the extension is disabled, host_task are used and the synchronization is needed to ensure the sycl::event corresponds to the end of the whole functor.
+// When the extension is enabled, host_task are still used for out-of-order queues, see description of dispatch_submit_impl_fp_int.
+inline void synchronize_if_needed(bool is_in_order_queue, CUstream cu_stream) {
+#ifndef SYCL_EXT_ONEAPI_ENQUEUE_NATIVE_COMMAND
+    CUDA_ERROR_FUNC(cuStreamSynchronize, cu_stream);
+#else
+    if (!is_in_order_queue) {
+        CUDA_ERROR_FUNC(cuStreamSynchronize, cu_stream);
+    }
+#endif
 }
 
 } // namespace oneapi::mkl::sparse::cusparse

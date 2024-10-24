@@ -287,6 +287,7 @@ sycl::event spmv(sycl::queue &queue, oneapi::mkl::transpose opA, const void *alp
     CHECK_DESCR_MATCH(spmv_descr, y_handle, "spmv_optimize");
     CHECK_DESCR_MATCH(spmv_descr, alg, "spmv_optimize");
 
+    bool is_in_order_queue = queue.is_in_order();
     auto compute_functor = [=](void *workspace_ptr) {
         auto cu_handle = spmv_descr->cu_handle;
         auto cu_a = A_handle->backend_handle;
@@ -300,10 +301,7 @@ sycl::event spmv(sycl::queue &queue, oneapi::mkl::transpose opA, const void *alp
         auto status = cusparseSpMV(cu_handle, cu_op, alpha, cu_a, cu_x, beta, cu_y, cu_type, cu_alg,
                                    workspace_ptr);
         check_status(status, __func__);
-#ifndef SYCL_EXT_ONEAPI_ENQUEUE_NATIVE_COMMAND
-        auto cu_stream = spmv_descr->cu_stream;
-        CUDA_ERROR_FUNC(cuStreamSynchronize, cu_stream);
-#endif
+        synchronize_if_needed(is_in_order_queue, spmv_descr->cu_stream);
     };
     if (A_handle->all_use_buffer() && spmv_descr->temp_buffer_size > 0) {
         // The accessor can only be created if the buffer size is greater than 0
