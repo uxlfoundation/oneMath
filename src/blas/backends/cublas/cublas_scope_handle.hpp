@@ -73,7 +73,6 @@ the handle must be destroyed when the context goes out of scope. This will bind 
 
 class CublasScopedContextHandler {
     CUcontext original_;
-    sycl::context* placedContext_;
     sycl::interop_handle& ih;
     static thread_local cublas_handle<CUcontext> handle_helper;
     CUstream get_stream(const sycl::queue& queue);
@@ -82,7 +81,6 @@ class CublasScopedContextHandler {
 public:
     CublasScopedContextHandler(sycl::queue queue, sycl::interop_handle& ih);
 
-    ~CublasScopedContextHandler() noexcept(false);
     /**
    * @brief get_handle: creates the handle by implicitly impose the advice
    * given by nvidia for creating a cublas_handle. (e.g. one cuStream per device

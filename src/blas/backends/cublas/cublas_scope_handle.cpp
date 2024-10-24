@@ -39,36 +39,7 @@ thread_local cublas_handle<CUcontext> CublasScopedContextHandler::handle_helper 
     cublas_handle<CUcontext>{};
 
 CublasScopedContextHandler::CublasScopedContextHandler(sycl::queue queue, sycl::interop_handle& ih)
-        : ih(ih) {
-    placedContext_ = new sycl::context(queue.get_context());
-    auto cudaDevice = ih.get_native_device<sycl::backend::ext_oneapi_cuda>();
-    CUresult err;
-    CUcontext desired;
-    CUDA_ERROR_FUNC(cuDevicePrimaryCtxRetain, err, &desired, cudaDevice);
-}
-
-CublasScopedContextHandler::~CublasScopedContextHandler() noexcept(false) {
-    delete placedContext_;
-}
-
-void ContextCallback(void* userData) {
-    auto* ptr = static_cast<std::atomic<cublasHandle_t>*>(userData);
-    if (!ptr) {
-        return;
-    }
-    auto handle = ptr->exchange(nullptr);
-    if (handle != nullptr) {
-        cublasStatus_t err1;
-        CUBLAS_ERROR_FUNC(cublasDestroy, err1, handle);
-        handle = nullptr;
-    }
-    else {
-        // if the handle is nullptr it means the handle was already destroyed by
-        // the cublas_handle destructor and we're free to delete the atomic
-        // object.
-        delete ptr;
-    }
-}
+        : ih(ih) {}
 
 cublasHandle_t CublasScopedContextHandler::get_handle(const sycl::queue& queue) {
     auto cudaDevice = ih.get_native_device<sycl::backend::ext_oneapi_cuda>();
@@ -105,9 +76,6 @@ cublasHandle_t CublasScopedContextHandler::get_handle(const sycl::queue& queue) 
 
     auto insert_iter = handle_helper.cublas_handle_mapper_.insert(
         std::make_pair(desiredCtx, new std::atomic<cublasHandle_t>(handle)));
-
-    sycl::detail::pi::contextSetExtendedDeleter(*placedContext_, ContextCallback,
-                                                insert_iter.first->second);
 
     return handle;
 }
