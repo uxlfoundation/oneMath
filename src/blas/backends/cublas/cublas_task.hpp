@@ -35,18 +35,6 @@
 #else
 #include "cublas_scope_handle_hipsycl.hpp"
 
-// After Plugin Interface removal in DPC++ ur.hpp is the new include
-#if __has_include(<sycl/detail/ur.hpp>)
-#include <sycl/detail/ur.hpp>
-#ifndef ONEMKL_PI_INTERFACE_REMOVED
-#define ONEMKL_PI_INTERFACE_REMOVED
-#endif
-#elif __has_include(<sycl/detail/pi.hpp>)
-#include <sycl/detail/pi.hpp>
-#else
-#include <CL/sycl/detail/pi.hpp>
-#endif
-
 namespace sycl {
 using interop_handler = sycl::interop_handle;
 }

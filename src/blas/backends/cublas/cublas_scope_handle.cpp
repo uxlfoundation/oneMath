@@ -35,13 +35,8 @@ namespace cublas {
  * takes place if no other element in the container has a key equivalent to
  * the one being emplaced (keys in a map container are unique).
  */
-#ifdef ONEMKL_PI_INTERFACE_REMOVED
-thread_local cublas_handle<ur_context_handle_t> CublasScopedContextHandler::handle_helper =
-    cublas_handle<ur_context_handle_t>{};
-#else
-thread_local cublas_handle<pi_context> CublasScopedContextHandler::handle_helper =
-    cublas_handle<pi_context>{};
-#endif
+thread_local cublas_handle<CUcontext> CublasScopedContextHandler::handle_helper =
+    cublas_handle<CUcontext>{};
 
 CublasScopedContextHandler::CublasScopedContextHandler(sycl::queue queue, sycl::interop_handle& ih)
         : ih(ih),
@@ -95,16 +90,11 @@ void ContextCallback(void* userData) {
 cublasHandle_t CublasScopedContextHandler::get_handle(const sycl::queue& queue) {
     auto cudaDevice = ih.get_native_device<sycl::backend::ext_oneapi_cuda>();
     CUresult cuErr;
-    CUcontext desired;
-    CUDA_ERROR_FUNC(cuDevicePrimaryCtxRetain, cuErr, &desired, cudaDevice);
-#ifdef ONEMKL_PI_INTERFACE_REMOVED
-    auto piPlacedContext_ = reinterpret_cast<ur_context_handle_t>(desired);
-#else
-    auto piPlacedContext_ = reinterpret_cast<pi_context>(desired);
-#endif
+    CUcontext desiredCtx;
+    CUDA_ERROR_FUNC(cuDevicePrimaryCtxRetain, cuErr, &desiredCtx, cudaDevice);
     CUstream streamId = get_stream(queue);
     cublasStatus_t err;
-    auto it = handle_helper.cublas_handle_mapper_.find(piPlacedContext_);
+    auto it = handle_helper.cublas_handle_mapper_.find(desiredCtx);
     if (it != handle_helper.cublas_handle_mapper_.end()) {
         if (it->second == nullptr) {
             handle_helper.cublas_handle_mapper_.erase(it);
@@ -131,7 +121,7 @@ cublasHandle_t CublasScopedContextHandler::get_handle(const sycl::queue& queue) 
     CUBLAS_ERROR_FUNC(cublasSetStream, err, handle, streamId);
 
     auto insert_iter = handle_helper.cublas_handle_mapper_.insert(
-        std::make_pair(piPlacedContext_, new std::atomic<cublasHandle_t>(handle)));
+        std::make_pair(desiredCtx, new std::atomic<cublasHandle_t>(handle)));
 
     sycl::detail::pi::contextSetExtendedDeleter(*placedContext_, ContextCallback,
                                                 insert_iter.first->second);
