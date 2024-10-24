@@ -152,9 +152,8 @@ int test_spmm(sycl::device *dev, sparse_matrix_format_t format, intType nrows_A,
             shuffle_sparse_matrix_if_needed(format, matrix_properties, indexing, ia_host.data(),
                                             ja_host.data(), a_host.data(), reset_nnz,
                                             static_cast<std::size_t>(nrows_A));
+            ev_spmm.wait_and_throw();
             if (reset_nnz > nnz) {
-                // Wait before freeing usm pointers
-                ev_spmm.wait_and_throw();
                 ia_usm_uptr = malloc_device_uptr<intType>(main_queue, ia_host.size());
                 ja_usm_uptr = malloc_device_uptr<intType>(main_queue, ja_host.size());
                 a_usm_uptr = malloc_device_uptr<fpType>(main_queue, a_host.size());
