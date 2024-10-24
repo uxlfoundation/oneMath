@@ -17,11 +17,6 @@
 *
 **************************************************************************/
 #include "cublas_scope_handle.hpp"
-#if __has_include(<sycl/detail/common.hpp>)
-#include <sycl/detail/common.hpp>
-#else
-#include <CL/sycl/detail/common.hpp>
-#endif
 
 namespace oneapi {
 namespace mkl {
