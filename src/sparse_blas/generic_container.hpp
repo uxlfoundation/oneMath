@@ -39,10 +39,12 @@ struct generic_container {
     // USM pointer, nullptr if the provided data is a buffer.
     void* usm_ptr;
 
-    // Buffer pointer, nullptr if the provided data is a USM pointer.
-    // The buffer is needed to properly handle the dependencies when the handle is used.
-    // Use a void* type for the buffer to avoid using template arguments in every function using data handles.
-    // Using reinterpret does not solve the issue as the returned buffer needs the type of the original buffer for the aligned_allocator.
+    // Buffer pointer, nullptr if the provided data is a USM pointer. The buffer
+    // is needed to properly handle the dependencies when the handle is used.
+    // Use a void* type for the buffer to avoid using template arguments in
+    // every function using data handles. Using `sycl::buffer::reinterpret` does
+    // not solve the issue as the returned buffer needs the type of the original
+    // buffer for the aligned_allocator.
     std::shared_ptr<void> buffer_ptr;
 
     // Underlying USM or buffer data type

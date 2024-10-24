@@ -60,7 +60,39 @@ void init_spmv_descr(sycl::queue & /*queue*/, spmv_descr_t *p_spmv_descr) {
 
 sycl::event release_spmv_descr(sycl::queue &queue, spmv_descr_t spmv_descr,
                                const std::vector<sycl::event> &dependencies) {
-    return detail::submit_release(queue, spmv_descr, dependencies);
+    if (!spmv_descr) {
+        return detail::collapse_dependencies(queue, dependencies);
+    }
+
+    auto release_functor = [=]() {
+        spmv_descr->cu_handle = nullptr;
+        spmv_descr->last_optimized_A_handle = nullptr;
+        spmv_descr->last_optimized_x_handle = nullptr;
+        spmv_descr->last_optimized_y_handle = nullptr;
+        delete spmv_descr;
+    };
+
+    // Use dispatch_submit to ensure the descriptor is kept alive as long as the buffers are used
+    // dispatch_submit can only be used if the descriptor's handles are valid
+    if (spmv_descr->last_optimized_A_handle &&
+        spmv_descr->last_optimized_A_handle->all_use_buffer() &&
+        spmv_descr->last_optimized_x_handle && spmv_descr->last_optimized_y_handle &&
+        spmv_descr->workspace.use_buffer()) {
+        auto dispatch_functor = [=](sycl::interop_handle, sycl::accessor<std::uint8_t>) {
+            release_functor();
+        };
+        return dispatch_submit(
+            __func__, queue, dispatch_functor, spmv_descr->last_optimized_A_handle,
+            spmv_descr->workspace.get_buffer<std::uint8_t>(), spmv_descr->last_optimized_x_handle,
+            spmv_descr->last_optimized_y_handle);
+    }
+
+    // Release used if USM is used or if the descriptor has been released before spmv_optimize has succeeded
+    sycl::event event = queue.submit([&](sycl::handler &cgh) {
+        cgh.depends_on(dependencies);
+        cgh.host_task(release_functor);
+    });
+    return event;
 }
 
 inline auto get_cuda_spmv_alg(spmv_alg alg) {

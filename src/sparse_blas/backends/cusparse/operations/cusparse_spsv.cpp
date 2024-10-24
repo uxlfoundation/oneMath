@@ -62,25 +62,32 @@ void init_spsv_descr(sycl::queue & /*queue*/, spsv_descr_t *p_spsv_descr) {
 sycl::event release_spsv_descr(sycl::queue &queue, spsv_descr_t spsv_descr,
                                const std::vector<sycl::event> &dependencies) {
     if (!spsv_descr) {
-        return {};
+        return detail::collapse_dependencies(queue, dependencies);
     }
 
     auto release_functor = [=]() {
         CUSPARSE_ERR_FUNC(cusparseSpSV_destroyDescr, spsv_descr->cu_descr);
+        spsv_descr->cu_handle = nullptr;
+        spsv_descr->cu_descr = nullptr;
+        spsv_descr->last_optimized_A_handle = nullptr;
+        spsv_descr->last_optimized_x_handle = nullptr;
+        spsv_descr->last_optimized_y_handle = nullptr;
         delete spsv_descr;
     };
 
-    // Use dispatch_submit to ensure the backend's descriptor is kept alive as long as the buffers are used
+    // Use dispatch_submit to ensure the descriptor is kept alive as long as the buffers are used
     // dispatch_submit can only be used if the descriptor's handles are valid
     if (spsv_descr->last_optimized_A_handle &&
         spsv_descr->last_optimized_A_handle->all_use_buffer() &&
-        spsv_descr->last_optimized_x_handle && spsv_descr->last_optimized_y_handle) {
-        auto dispatch_functor = [=](sycl::interop_handle) {
+        spsv_descr->last_optimized_x_handle && spsv_descr->last_optimized_y_handle &&
+        spsv_descr->workspace.use_buffer()) {
+        auto dispatch_functor = [=](sycl::interop_handle, sycl::accessor<std::uint8_t>) {
             release_functor();
         };
         return dispatch_submit(
-            __func__, queue, dependencies, dispatch_functor, spsv_descr->last_optimized_A_handle,
-            spsv_descr->last_optimized_x_handle, spsv_descr->last_optimized_y_handle);
+            __func__, queue, dispatch_functor, spsv_descr->last_optimized_A_handle,
+            spsv_descr->workspace.get_buffer<std::uint8_t>(), spsv_descr->last_optimized_x_handle,
+            spsv_descr->last_optimized_y_handle);
     }
 
     // Release used if USM is used or if the descriptor has been released before spsv_optimize has succeeded

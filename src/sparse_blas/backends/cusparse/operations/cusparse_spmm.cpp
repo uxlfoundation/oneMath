@@ -61,7 +61,39 @@ void init_spmm_descr(sycl::queue& /*queue*/, spmm_descr_t* p_spmm_descr) {
 
 sycl::event release_spmm_descr(sycl::queue& queue, spmm_descr_t spmm_descr,
                                const std::vector<sycl::event>& dependencies) {
-    return detail::submit_release(queue, spmm_descr, dependencies);
+    if (!spmm_descr) {
+        return detail::collapse_dependencies(queue, dependencies);
+    }
+
+    auto release_functor = [=]() {
+        spmm_descr->cu_handle = nullptr;
+        spmm_descr->last_optimized_A_handle = nullptr;
+        spmm_descr->last_optimized_B_handle = nullptr;
+        spmm_descr->last_optimized_C_handle = nullptr;
+        delete spmm_descr;
+    };
+
+    // Use dispatch_submit to ensure the descriptor is kept alive as long as the buffers are used
+    // dispatch_submit can only be used if the descriptor's handles are valid
+    if (spmm_descr->last_optimized_A_handle &&
+        spmm_descr->last_optimized_A_handle->all_use_buffer() &&
+        spmm_descr->last_optimized_B_handle && spmm_descr->last_optimized_C_handle &&
+        spmm_descr->workspace.use_buffer()) {
+        auto dispatch_functor = [=](sycl::interop_handle, sycl::accessor<std::uint8_t>) {
+            release_functor();
+        };
+        return dispatch_submit(
+            __func__, queue, dispatch_functor, spmm_descr->last_optimized_A_handle,
+            spmm_descr->workspace.get_buffer<std::uint8_t>(), spmm_descr->last_optimized_B_handle,
+            spmm_descr->last_optimized_C_handle);
+    }
+
+    // Release used if USM is used or if the descriptor has been released before spmm_optimize has succeeded
+    sycl::event event = queue.submit([&](sycl::handler& cgh) {
+        cgh.depends_on(dependencies);
+        cgh.host_task(release_functor);
+    });
+    return event;
 }
 
 inline auto get_cuda_spmm_alg(spmm_alg alg) {
