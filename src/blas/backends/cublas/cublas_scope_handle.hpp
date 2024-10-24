@@ -63,9 +63,8 @@ the handle must be destroyed when the context goes out of scope. This will bind 
 **/
 
 class CublasScopedContextHandler {
-    CUcontext original_;
     sycl::interop_handle& ih;
-    static thread_local cublas_handle<CUcontext> handle_helper;
+    static thread_local cublas_handle<CUdevice> handle_helper;
     CUstream get_stream(const sycl::queue& queue);
     sycl::context get_context(const sycl::queue& queue);
 
