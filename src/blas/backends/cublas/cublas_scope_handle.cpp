@@ -39,32 +39,15 @@ thread_local cublas_handle<CUcontext> CublasScopedContextHandler::handle_helper 
     cublas_handle<CUcontext>{};
 
 CublasScopedContextHandler::CublasScopedContextHandler(sycl::queue queue, sycl::interop_handle& ih)
-        : ih(ih),
-          needToRecover_(false) {
+        : ih(ih) {
     placedContext_ = new sycl::context(queue.get_context());
     auto cudaDevice = ih.get_native_device<sycl::backend::ext_oneapi_cuda>();
     CUresult err;
     CUcontext desired;
-    CUDA_ERROR_FUNC(cuCtxGetCurrent, err, &original_);
     CUDA_ERROR_FUNC(cuDevicePrimaryCtxRetain, err, &desired, cudaDevice);
-    if (original_ != desired) {
-        // Sets the desired context as the active one for the thread
-        CUDA_ERROR_FUNC(cuCtxSetCurrent, err, desired);
-        // No context is installed and the suggested context is primary
-        // This is the most common case. We can activate the context in the
-        // thread and leave it there until all the PI context referring to the
-        // same underlying CUDA primary context are destroyed. This emulates
-        // the behaviour of the CUDA runtime api, and avoids costly context
-        // switches. No action is required on this side of the if.
-        needToRecover_ = !(original_ == nullptr);
-    }
 }
 
 CublasScopedContextHandler::~CublasScopedContextHandler() noexcept(false) {
-    if (needToRecover_) {
-        CUresult err;
-        CUDA_ERROR_FUNC(cuCtxSetCurrent, err, original_);
-    }
     delete placedContext_;
 }
 
