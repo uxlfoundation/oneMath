@@ -176,22 +176,14 @@ int run_sparse_matrix_vector_multiply_example(selectorType& selector) {
     // Post Processing
     //
 
+    // The example assume matrices are not transposed and beta=0 for simplicity.
+    // See the tests for more in-depth verification.
     fpType* res = y;
-    fpType expected_res[size];
-    const bool isConj = (transA == oneapi::mkl::transpose::conjtrans);
-    for (intType row = 0; row < size; row++) {
-        expected_res[row] *= beta;
-    }
-    for (intType row = 0; row < size; row++) {
-        fpType tmp = alpha * x[row];
-        for (intType i = ia[row]; i < ia[row + 1]; i++) {
-            if constexpr (is_complex<fpType>()) {
-                expected_res[ja[i]] += tmp * (isConj ? std::conj(a[i]) : a[i]);
-            }
-            else {
-                expected_res[ja[i]] += tmp * a[i];
-            }
-        }
+    fpType expected_res[size] = {};
+    for (intType i = 0; i < nnz; ++i) {
+        intType row = ia[i];
+        intType col = ja[i];
+        expected_res[row] += alpha * x[col] * a[i];
     }
 
     bool good = true;
@@ -277,8 +269,12 @@ int main(int /*argc*/, char** /*argv*/) {
                   << std::endl;
         std::cout << "Running with single precision real data type:" << std::endl;
 
-        run_sparse_matrix_vector_multiply_example<float, std::int32_t>(cpu_selector);
-        run_sparse_matrix_vector_multiply_example<float, std::int32_t>(gpu_selector);
+        int err = run_sparse_matrix_vector_multiply_example<float, std::int32_t>(cpu_selector);
+        if (err)
+            return err;
+        err = run_sparse_matrix_vector_multiply_example<float, std::int32_t>(gpu_selector);
+        if (err)
+            return err;
         std::cout << "Sparse BLAS SPMV USM example ran OK on MKLCPU and CUSPARSE." << std::endl;
     }
     catch (sycl::exception const& e) {
