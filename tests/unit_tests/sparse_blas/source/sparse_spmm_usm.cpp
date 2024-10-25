@@ -28,15 +28,16 @@ extern std::vector<sycl::device *> devices;
 namespace {
 
 template <typename fpType, typename intType>
-int test_spmm(sycl::device *dev, sparse_matrix_format_t format, intType nrows_A, intType ncols_A,
-              intType ncols_C, double density_A_matrix, oneapi::mkl::index_base index,
+int test_spmm(sycl::device *dev, sycl::property_list queue_properties,
+              sparse_matrix_format_t format, intType nrows_A, intType ncols_A, intType ncols_C,
+              double density_A_matrix, oneapi::mkl::index_base index,
               oneapi::mkl::layout dense_matrix_layout, oneapi::mkl::transpose transpose_A,
               oneapi::mkl::transpose transpose_B, fpType alpha, fpType beta, intType ldb,
               intType ldc, oneapi::mkl::sparse::spmm_alg alg,
               oneapi::mkl::sparse::matrix_view A_view,
               const std::set<oneapi::mkl::sparse::matrix_property> &matrix_properties,
               bool reset_data, bool test_scalar_on_device) {
-    sycl::queue main_queue(*dev, exception_handler_t());
+    sycl::queue main_queue(*dev, exception_handler_t(), queue_properties);
 
     if (require_square_matrix(A_view, matrix_properties)) {
         ncols_A = nrows_A;

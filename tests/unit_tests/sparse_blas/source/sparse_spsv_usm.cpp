@@ -28,12 +28,13 @@ extern std::vector<sycl::device *> devices;
 namespace {
 
 template <typename fpType, typename intType>
-int test_spsv(sycl::device *dev, sparse_matrix_format_t format, intType m, double density_A_matrix,
+int test_spsv(sycl::device *dev, sycl::property_list queue_properties,
+              sparse_matrix_format_t format, intType m, double density_A_matrix,
               oneapi::mkl::index_base index, oneapi::mkl::transpose transpose_val, fpType alpha,
               oneapi::mkl::sparse::spsv_alg alg, oneapi::mkl::sparse::matrix_view A_view,
               const std::set<oneapi::mkl::sparse::matrix_property> &matrix_properties,
               bool reset_data, bool test_scalar_on_device) {
-    sycl::queue main_queue(*dev, exception_handler_t());
+    sycl::queue main_queue(*dev, exception_handler_t(), queue_properties);
 
     intType indexing = (index == oneapi::mkl::index_base::zero) ? 0 : 1;
     const std::size_t mu = static_cast<std::size_t>(m);
