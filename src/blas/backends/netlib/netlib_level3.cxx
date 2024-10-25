@@ -19,10 +19,10 @@
 
 // Buffer APIs
 
-void gemm(sycl::queue &queue, transpose transa, transpose transb, int64_t m, int64_t n, int64_t k,
-          float alpha, sycl::buffer<float, 1> &a, int64_t lda, sycl::buffer<float, 1> &b,
-          int64_t ldb, float beta, sycl::buffer<float, 1> &c, int64_t ldc) {
-    queue.submit([&](sycl::handler &cgh) {
+void gemm(sycl::queue& queue, transpose transa, transpose transb, int64_t m, int64_t n, int64_t k,
+          float alpha, sycl::buffer<float, 1>& a, int64_t lda, sycl::buffer<float, 1>& b,
+          int64_t ldb, float beta, sycl::buffer<float, 1>& c, int64_t ldc) {
+    queue.submit([&](sycl::handler& cgh) {
         auto accessor_a = a.get_access<sycl::access::mode::read>(cgh);
         auto accessor_b = b.get_access<sycl::access::mode::read>(cgh);
         auto accessor_c = c.get_access<sycl::access::mode::read_write>(cgh);
@@ -36,10 +36,10 @@ void gemm(sycl::queue &queue, transpose transa, transpose transb, int64_t m, int
     });
 }
 
-void gemm(sycl::queue &queue, transpose transa, transpose transb, int64_t m, int64_t n, int64_t k,
-          double alpha, sycl::buffer<double, 1> &a, int64_t lda, sycl::buffer<double, 1> &b,
-          int64_t ldb, double beta, sycl::buffer<double, 1> &c, int64_t ldc) {
-    queue.submit([&](sycl::handler &cgh) {
+void gemm(sycl::queue& queue, transpose transa, transpose transb, int64_t m, int64_t n, int64_t k,
+          double alpha, sycl::buffer<double, 1>& a, int64_t lda, sycl::buffer<double, 1>& b,
+          int64_t ldb, double beta, sycl::buffer<double, 1>& c, int64_t ldc) {
+    queue.submit([&](sycl::handler& cgh) {
         auto accessor_a = a.get_access<sycl::access::mode::read>(cgh);
         auto accessor_b = b.get_access<sycl::access::mode::read>(cgh);
         auto accessor_c = c.get_access<sycl::access::mode::read_write>(cgh);
@@ -53,46 +53,46 @@ void gemm(sycl::queue &queue, transpose transa, transpose transb, int64_t m, int
     });
 }
 
-void gemm(sycl::queue &queue, transpose transa, transpose transb, int64_t m, int64_t n, int64_t k,
-          std::complex<float> alpha, sycl::buffer<std::complex<float>, 1> &a, int64_t lda,
-          sycl::buffer<std::complex<float>, 1> &b, int64_t ldb, std::complex<float> beta,
-          sycl::buffer<std::complex<float>, 1> &c, int64_t ldc) {
-    queue.submit([&](sycl::handler &cgh) {
+void gemm(sycl::queue& queue, transpose transa, transpose transb, int64_t m, int64_t n, int64_t k,
+          std::complex<float> alpha, sycl::buffer<std::complex<float>, 1>& a, int64_t lda,
+          sycl::buffer<std::complex<float>, 1>& b, int64_t ldb, std::complex<float> beta,
+          sycl::buffer<std::complex<float>, 1>& c, int64_t ldc) {
+    queue.submit([&](sycl::handler& cgh) {
         auto accessor_a = a.get_access<sycl::access::mode::read>(cgh);
         auto accessor_b = b.get_access<sycl::access::mode::read>(cgh);
         auto accessor_c = c.get_access<sycl::access::mode::read_write>(cgh);
         host_task<class netlib_cgemm>(cgh, [=]() {
             ::cblas_cgemm(MAJOR, convert_to_cblas_trans(transa), convert_to_cblas_trans(transb),
-                          (const int)m, (const int)n, (const int)k, (const void *)&alpha,
+                          (const int)m, (const int)n, (const int)k, (const void*)&alpha,
                           accessor_a.GET_MULTI_PTR, (const int)lda, accessor_b.GET_MULTI_PTR,
-                          (const int)ldb, (const void *)&beta, accessor_c.GET_MULTI_PTR,
+                          (const int)ldb, (const void*)&beta, accessor_c.GET_MULTI_PTR,
                           (const int)ldc);
         });
     });
 }
 
-void gemm(sycl::queue &queue, transpose transa, transpose transb, int64_t m, int64_t n, int64_t k,
-          std::complex<double> alpha, sycl::buffer<std::complex<double>, 1> &a, int64_t lda,
-          sycl::buffer<std::complex<double>, 1> &b, int64_t ldb, std::complex<double> beta,
-          sycl::buffer<std::complex<double>, 1> &c, int64_t ldc) {
-    queue.submit([&](sycl::handler &cgh) {
+void gemm(sycl::queue& queue, transpose transa, transpose transb, int64_t m, int64_t n, int64_t k,
+          std::complex<double> alpha, sycl::buffer<std::complex<double>, 1>& a, int64_t lda,
+          sycl::buffer<std::complex<double>, 1>& b, int64_t ldb, std::complex<double> beta,
+          sycl::buffer<std::complex<double>, 1>& c, int64_t ldc) {
+    queue.submit([&](sycl::handler& cgh) {
         auto accessor_a = a.get_access<sycl::access::mode::read>(cgh);
         auto accessor_b = b.get_access<sycl::access::mode::read>(cgh);
         auto accessor_c = c.get_access<sycl::access::mode::read_write>(cgh);
         host_task<class netlib_zgemm>(cgh, [=]() {
             ::cblas_zgemm(MAJOR, convert_to_cblas_trans(transa), convert_to_cblas_trans(transb),
-                          (const int)m, (const int)n, (const int)k, (const void *)&alpha,
+                          (const int)m, (const int)n, (const int)k, (const void*)&alpha,
                           accessor_a.GET_MULTI_PTR, (const int)lda, accessor_b.GET_MULTI_PTR,
-                          (const int)ldb, (const void *)&beta, accessor_c.GET_MULTI_PTR,
+                          (const int)ldb, (const void*)&beta, accessor_c.GET_MULTI_PTR,
                           (const int)ldc);
         });
     });
 }
 
-void gemm(sycl::queue &queue, transpose transa, transpose transb, int64_t m, int64_t n, int64_t k,
-          sycl::half alpha, sycl::buffer<sycl::half, 1> &a, int64_t lda,
-          sycl::buffer<sycl::half, 1> &b, int64_t ldb, sycl::half beta,
-          sycl::buffer<sycl::half, 1> &c, int64_t ldc) {
+void gemm(sycl::queue& queue, transpose transa, transpose transb, int64_t m, int64_t n, int64_t k,
+          sycl::half alpha, sycl::buffer<sycl::half, 1>& a, int64_t lda,
+          sycl::buffer<sycl::half, 1>& b, int64_t ldb, sycl::half beta,
+          sycl::buffer<sycl::half, 1>& c, int64_t ldc) {
 #ifdef COLUMN_MAJOR
     throw unimplemented("blas", "gemm", "for column_major layout");
 #endif
@@ -101,9 +101,9 @@ void gemm(sycl::queue &queue, transpose transa, transpose transb, int64_t m, int
 #endif
 }
 
-void gemm(sycl::queue &queue, transpose transa, transpose transb, int64_t m, int64_t n, int64_t k,
-          float alpha, sycl::buffer<sycl::half, 1> &a, int64_t lda, sycl::buffer<sycl::half, 1> &b,
-          int64_t ldb, float beta, sycl::buffer<float, 1> &c, int64_t ldc) {
+void gemm(sycl::queue& queue, transpose transa, transpose transb, int64_t m, int64_t n, int64_t k,
+          float alpha, sycl::buffer<sycl::half, 1>& a, int64_t lda, sycl::buffer<sycl::half, 1>& b,
+          int64_t ldb, float beta, sycl::buffer<float, 1>& c, int64_t ldc) {
 #ifdef COLUMN_MAJOR
     throw unimplemented("blas", "gemm", "for column_major layout");
 #endif
@@ -112,9 +112,9 @@ void gemm(sycl::queue &queue, transpose transa, transpose transb, int64_t m, int
 #endif
 }
 
-void gemm(sycl::queue &queue, transpose transa, transpose transb, int64_t m, int64_t n, int64_t k,
-          float alpha, sycl::buffer<bfloat16, 1> &a, int64_t lda, sycl::buffer<bfloat16, 1> &b,
-          int64_t ldb, float beta, sycl::buffer<float, 1> &c, int64_t ldc) {
+void gemm(sycl::queue& queue, transpose transa, transpose transb, int64_t m, int64_t n, int64_t k,
+          float alpha, sycl::buffer<bfloat16, 1>& a, int64_t lda, sycl::buffer<bfloat16, 1>& b,
+          int64_t ldb, float beta, sycl::buffer<float, 1>& c, int64_t ldc) {
 #ifdef COLUMN_MAJOR
     throw unimplemented("blas", "gemm", "for column_major layout");
 #endif
@@ -123,46 +123,46 @@ void gemm(sycl::queue &queue, transpose transa, transpose transb, int64_t m, int
 #endif
 }
 
-void hemm(sycl::queue &queue, side left_right, uplo upper_lower, int64_t m, int64_t n,
-          std::complex<float> alpha, sycl::buffer<std::complex<float>, 1> &a, int64_t lda,
-          sycl::buffer<std::complex<float>, 1> &b, int64_t ldb, std::complex<float> beta,
-          sycl::buffer<std::complex<float>, 1> &c, int64_t ldc) {
-    queue.submit([&](sycl::handler &cgh) {
+void hemm(sycl::queue& queue, side left_right, uplo upper_lower, int64_t m, int64_t n,
+          std::complex<float> alpha, sycl::buffer<std::complex<float>, 1>& a, int64_t lda,
+          sycl::buffer<std::complex<float>, 1>& b, int64_t ldb, std::complex<float> beta,
+          sycl::buffer<std::complex<float>, 1>& c, int64_t ldc) {
+    queue.submit([&](sycl::handler& cgh) {
         auto accessor_a = a.get_access<sycl::access::mode::read>(cgh);
         auto accessor_b = b.get_access<sycl::access::mode::read>(cgh);
         auto accessor_c = c.get_access<sycl::access::mode::read_write>(cgh);
         host_task<class netlib_chemm>(cgh, [=]() {
             ::cblas_chemm(MAJOR, convert_to_cblas_side(left_right),
                           convert_to_cblas_uplo(upper_lower), (const int)m, (const int)n,
-                          (const void *)&alpha, accessor_a.GET_MULTI_PTR, (const int)lda,
-                          accessor_b.GET_MULTI_PTR, (const int)ldb, (const void *)&beta,
+                          (const void*)&alpha, accessor_a.GET_MULTI_PTR, (const int)lda,
+                          accessor_b.GET_MULTI_PTR, (const int)ldb, (const void*)&beta,
                           accessor_c.GET_MULTI_PTR, (const int)ldc);
         });
     });
 }
 
-void hemm(sycl::queue &queue, side left_right, uplo upper_lower, int64_t m, int64_t n,
-          std::complex<double> alpha, sycl::buffer<std::complex<double>, 1> &a, int64_t lda,
-          sycl::buffer<std::complex<double>, 1> &b, int64_t ldb, std::complex<double> beta,
-          sycl::buffer<std::complex<double>, 1> &c, int64_t ldc) {
-    queue.submit([&](sycl::handler &cgh) {
+void hemm(sycl::queue& queue, side left_right, uplo upper_lower, int64_t m, int64_t n,
+          std::complex<double> alpha, sycl::buffer<std::complex<double>, 1>& a, int64_t lda,
+          sycl::buffer<std::complex<double>, 1>& b, int64_t ldb, std::complex<double> beta,
+          sycl::buffer<std::complex<double>, 1>& c, int64_t ldc) {
+    queue.submit([&](sycl::handler& cgh) {
         auto accessor_a = a.get_access<sycl::access::mode::read>(cgh);
         auto accessor_b = b.get_access<sycl::access::mode::read>(cgh);
         auto accessor_c = c.get_access<sycl::access::mode::read_write>(cgh);
         host_task<class netlib_zhemm>(cgh, [=]() {
             ::cblas_zhemm(MAJOR, convert_to_cblas_side(left_right),
                           convert_to_cblas_uplo(upper_lower), (const int)m, (const int)n,
-                          (const void *)&alpha, accessor_a.GET_MULTI_PTR, (const int)lda,
-                          accessor_b.GET_MULTI_PTR, (const int)ldb, (const void *)&beta,
+                          (const void*)&alpha, accessor_a.GET_MULTI_PTR, (const int)lda,
+                          accessor_b.GET_MULTI_PTR, (const int)ldb, (const void*)&beta,
                           accessor_c.GET_MULTI_PTR, (const int)ldc);
         });
     });
 }
 
-void herk(sycl::queue &queue, uplo upper_lower, transpose trans, int64_t n, int64_t k, float alpha,
-          sycl::buffer<std::complex<float>, 1> &a, int64_t lda, float beta,
-          sycl::buffer<std::complex<float>, 1> &c, int64_t ldc) {
-    queue.submit([&](sycl::handler &cgh) {
+void herk(sycl::queue& queue, uplo upper_lower, transpose trans, int64_t n, int64_t k, float alpha,
+          sycl::buffer<std::complex<float>, 1>& a, int64_t lda, float beta,
+          sycl::buffer<std::complex<float>, 1>& c, int64_t ldc) {
+    queue.submit([&](sycl::handler& cgh) {
         auto accessor_a = a.get_access<sycl::access::mode::read>(cgh);
         auto accessor_c = c.get_access<sycl::access::mode::read_write>(cgh);
         host_task<class netlib_cherk>(cgh, [=]() {
@@ -174,10 +174,10 @@ void herk(sycl::queue &queue, uplo upper_lower, transpose trans, int64_t n, int6
     });
 }
 
-void herk(sycl::queue &queue, uplo upper_lower, transpose trans, int64_t n, int64_t k, double alpha,
-          sycl::buffer<std::complex<double>, 1> &a, int64_t lda, double beta,
-          sycl::buffer<std::complex<double>, 1> &c, int64_t ldc) {
-    queue.submit([&](sycl::handler &cgh) {
+void herk(sycl::queue& queue, uplo upper_lower, transpose trans, int64_t n, int64_t k, double alpha,
+          sycl::buffer<std::complex<double>, 1>& a, int64_t lda, double beta,
+          sycl::buffer<std::complex<double>, 1>& c, int64_t ldc) {
+    queue.submit([&](sycl::handler& cgh) {
         auto accessor_a = a.get_access<sycl::access::mode::read>(cgh);
         auto accessor_c = c.get_access<sycl::access::mode::read_write>(cgh);
         host_task<class netlib_zherk>(cgh, [=]() {
@@ -189,17 +189,17 @@ void herk(sycl::queue &queue, uplo upper_lower, transpose trans, int64_t n, int6
     });
 }
 
-void her2k(sycl::queue &queue, uplo upper_lower, transpose trans, int64_t n, int64_t k,
-           std::complex<float> alpha, sycl::buffer<std::complex<float>, 1> &a, int64_t lda,
-           sycl::buffer<std::complex<float>, 1> &b, int64_t ldb, float beta,
-           sycl::buffer<std::complex<float>, 1> &c, int64_t ldc) {
-    queue.submit([&](sycl::handler &cgh) {
+void her2k(sycl::queue& queue, uplo upper_lower, transpose trans, int64_t n, int64_t k,
+           std::complex<float> alpha, sycl::buffer<std::complex<float>, 1>& a, int64_t lda,
+           sycl::buffer<std::complex<float>, 1>& b, int64_t ldb, float beta,
+           sycl::buffer<std::complex<float>, 1>& c, int64_t ldc) {
+    queue.submit([&](sycl::handler& cgh) {
         auto accessor_a = a.get_access<sycl::access::mode::read>(cgh);
         auto accessor_b = b.get_access<sycl::access::mode::read>(cgh);
         auto accessor_c = c.get_access<sycl::access::mode::read_write>(cgh);
         host_task<class netlib_cher2k>(cgh, [=]() {
             ::cblas_cher2k(MAJOR, convert_to_cblas_uplo(upper_lower), convert_to_cblas_trans(trans),
-                           (const int)n, (const int)k, (const void *)&alpha,
+                           (const int)n, (const int)k, (const void*)&alpha,
                            accessor_a.GET_MULTI_PTR, (const int)lda, accessor_b.GET_MULTI_PTR,
                            (const int)ldb, (const float)beta, accessor_c.GET_MULTI_PTR,
                            (const int)ldc);
@@ -207,17 +207,17 @@ void her2k(sycl::queue &queue, uplo upper_lower, transpose trans, int64_t n, int
     });
 }
 
-void her2k(sycl::queue &queue, uplo upper_lower, transpose trans, int64_t n, int64_t k,
-           std::complex<double> alpha, sycl::buffer<std::complex<double>, 1> &a, int64_t lda,
-           sycl::buffer<std::complex<double>, 1> &b, int64_t ldb, double beta,
-           sycl::buffer<std::complex<double>, 1> &c, int64_t ldc) {
-    queue.submit([&](sycl::handler &cgh) {
+void her2k(sycl::queue& queue, uplo upper_lower, transpose trans, int64_t n, int64_t k,
+           std::complex<double> alpha, sycl::buffer<std::complex<double>, 1>& a, int64_t lda,
+           sycl::buffer<std::complex<double>, 1>& b, int64_t ldb, double beta,
+           sycl::buffer<std::complex<double>, 1>& c, int64_t ldc) {
+    queue.submit([&](sycl::handler& cgh) {
         auto accessor_a = a.get_access<sycl::access::mode::read>(cgh);
         auto accessor_b = b.get_access<sycl::access::mode::read>(cgh);
         auto accessor_c = c.get_access<sycl::access::mode::read_write>(cgh);
         host_task<class netlib_zher2k>(cgh, [=]() {
             ::cblas_zher2k(MAJOR, convert_to_cblas_uplo(upper_lower), convert_to_cblas_trans(trans),
-                           (const int)n, (const int)k, (const void *)&alpha,
+                           (const int)n, (const int)k, (const void*)&alpha,
                            accessor_a.GET_MULTI_PTR, (const int)lda, accessor_b.GET_MULTI_PTR,
                            (const int)ldb, (const double)beta, accessor_c.GET_MULTI_PTR,
                            (const int)ldc);
@@ -225,10 +225,10 @@ void her2k(sycl::queue &queue, uplo upper_lower, transpose trans, int64_t n, int
     });
 }
 
-void symm(sycl::queue &queue, side left_right, uplo upper_lower, int64_t m, int64_t n, float alpha,
-          sycl::buffer<float, 1> &a, int64_t lda, sycl::buffer<float, 1> &b, int64_t ldb,
-          float beta, sycl::buffer<float, 1> &c, int64_t ldc) {
-    queue.submit([&](sycl::handler &cgh) {
+void symm(sycl::queue& queue, side left_right, uplo upper_lower, int64_t m, int64_t n, float alpha,
+          sycl::buffer<float, 1>& a, int64_t lda, sycl::buffer<float, 1>& b, int64_t ldb,
+          float beta, sycl::buffer<float, 1>& c, int64_t ldc) {
+    queue.submit([&](sycl::handler& cgh) {
         auto accessor_a = a.get_access<sycl::access::mode::read>(cgh);
         auto accessor_b = b.get_access<sycl::access::mode::read>(cgh);
         auto accessor_c = c.get_access<sycl::access::mode::read_write>(cgh);
@@ -242,10 +242,10 @@ void symm(sycl::queue &queue, side left_right, uplo upper_lower, int64_t m, int6
     });
 }
 
-void symm(sycl::queue &queue, side left_right, uplo upper_lower, int64_t m, int64_t n, double alpha,
-          sycl::buffer<double, 1> &a, int64_t lda, sycl::buffer<double, 1> &b, int64_t ldb,
-          double beta, sycl::buffer<double, 1> &c, int64_t ldc) {
-    queue.submit([&](sycl::handler &cgh) {
+void symm(sycl::queue& queue, side left_right, uplo upper_lower, int64_t m, int64_t n, double alpha,
+          sycl::buffer<double, 1>& a, int64_t lda, sycl::buffer<double, 1>& b, int64_t ldb,
+          double beta, sycl::buffer<double, 1>& c, int64_t ldc) {
+    queue.submit([&](sycl::handler& cgh) {
         auto accessor_a = a.get_access<sycl::access::mode::read>(cgh);
         auto accessor_b = b.get_access<sycl::access::mode::read>(cgh);
         auto accessor_c = c.get_access<sycl::access::mode::read_write>(cgh);
@@ -259,46 +259,46 @@ void symm(sycl::queue &queue, side left_right, uplo upper_lower, int64_t m, int6
     });
 }
 
-void symm(sycl::queue &queue, side left_right, uplo upper_lower, int64_t m, int64_t n,
-          std::complex<float> alpha, sycl::buffer<std::complex<float>, 1> &a, int64_t lda,
-          sycl::buffer<std::complex<float>, 1> &b, int64_t ldb, std::complex<float> beta,
-          sycl::buffer<std::complex<float>, 1> &c, int64_t ldc) {
-    queue.submit([&](sycl::handler &cgh) {
+void symm(sycl::queue& queue, side left_right, uplo upper_lower, int64_t m, int64_t n,
+          std::complex<float> alpha, sycl::buffer<std::complex<float>, 1>& a, int64_t lda,
+          sycl::buffer<std::complex<float>, 1>& b, int64_t ldb, std::complex<float> beta,
+          sycl::buffer<std::complex<float>, 1>& c, int64_t ldc) {
+    queue.submit([&](sycl::handler& cgh) {
         auto accessor_a = a.get_access<sycl::access::mode::read>(cgh);
         auto accessor_b = b.get_access<sycl::access::mode::read>(cgh);
         auto accessor_c = c.get_access<sycl::access::mode::read_write>(cgh);
         host_task<class netlib_csymm>(cgh, [=]() {
             ::cblas_csymm(MAJOR, convert_to_cblas_side(left_right),
                           convert_to_cblas_uplo(upper_lower), (const int)m, (const int)n,
-                          (const void *)&alpha, accessor_a.GET_MULTI_PTR, (const int)lda,
-                          accessor_b.GET_MULTI_PTR, (const int)ldb, (const void *)&beta,
+                          (const void*)&alpha, accessor_a.GET_MULTI_PTR, (const int)lda,
+                          accessor_b.GET_MULTI_PTR, (const int)ldb, (const void*)&beta,
                           accessor_c.GET_MULTI_PTR, (const int)ldc);
         });
     });
 }
 
-void symm(sycl::queue &queue, side left_right, uplo upper_lower, int64_t m, int64_t n,
-          std::complex<double> alpha, sycl::buffer<std::complex<double>, 1> &a, int64_t lda,
-          sycl::buffer<std::complex<double>, 1> &b, int64_t ldb, std::complex<double> beta,
-          sycl::buffer<std::complex<double>, 1> &c, int64_t ldc) {
-    queue.submit([&](sycl::handler &cgh) {
+void symm(sycl::queue& queue, side left_right, uplo upper_lower, int64_t m, int64_t n,
+          std::complex<double> alpha, sycl::buffer<std::complex<double>, 1>& a, int64_t lda,
+          sycl::buffer<std::complex<double>, 1>& b, int64_t ldb, std::complex<double> beta,
+          sycl::buffer<std::complex<double>, 1>& c, int64_t ldc) {
+    queue.submit([&](sycl::handler& cgh) {
         auto accessor_a = a.get_access<sycl::access::mode::read>(cgh);
         auto accessor_b = b.get_access<sycl::access::mode::read>(cgh);
         auto accessor_c = c.get_access<sycl::access::mode::read_write>(cgh);
         host_task<class netlib_zsymm>(cgh, [=]() {
             ::cblas_zsymm(MAJOR, convert_to_cblas_side(left_right),
                           convert_to_cblas_uplo(upper_lower), (const int)m, (const int)n,
-                          (const void *)&alpha, accessor_a.GET_MULTI_PTR, (const int)lda,
-                          accessor_b.GET_MULTI_PTR, (const int)ldb, (const void *)&beta,
+                          (const void*)&alpha, accessor_a.GET_MULTI_PTR, (const int)lda,
+                          accessor_b.GET_MULTI_PTR, (const int)ldb, (const void*)&beta,
                           accessor_c.GET_MULTI_PTR, (const int)ldc);
         });
     });
 }
 
-void syrk(sycl::queue &queue, uplo upper_lower, transpose trans, int64_t n, int64_t k, float alpha,
-          sycl::buffer<float, 1> &a, int64_t lda, float beta, sycl::buffer<float, 1> &c,
+void syrk(sycl::queue& queue, uplo upper_lower, transpose trans, int64_t n, int64_t k, float alpha,
+          sycl::buffer<float, 1>& a, int64_t lda, float beta, sycl::buffer<float, 1>& c,
           int64_t ldc) {
-    queue.submit([&](sycl::handler &cgh) {
+    queue.submit([&](sycl::handler& cgh) {
         auto accessor_a = a.get_access<sycl::access::mode::read>(cgh);
         auto accessor_c = c.get_access<sycl::access::mode::read_write>(cgh);
         host_task<class netlib_ssyrk>(cgh, [=]() {
@@ -310,10 +310,10 @@ void syrk(sycl::queue &queue, uplo upper_lower, transpose trans, int64_t n, int6
     });
 }
 
-void syrk(sycl::queue &queue, uplo upper_lower, transpose trans, int64_t n, int64_t k, double alpha,
-          sycl::buffer<double, 1> &a, int64_t lda, double beta, sycl::buffer<double, 1> &c,
+void syrk(sycl::queue& queue, uplo upper_lower, transpose trans, int64_t n, int64_t k, double alpha,
+          sycl::buffer<double, 1>& a, int64_t lda, double beta, sycl::buffer<double, 1>& c,
           int64_t ldc) {
-    queue.submit([&](sycl::handler &cgh) {
+    queue.submit([&](sycl::handler& cgh) {
         auto accessor_a = a.get_access<sycl::access::mode::read>(cgh);
         auto accessor_c = c.get_access<sycl::access::mode::read_write>(cgh);
         host_task<class netlib_dsyrk>(cgh, [=]() {
@@ -325,40 +325,40 @@ void syrk(sycl::queue &queue, uplo upper_lower, transpose trans, int64_t n, int6
     });
 }
 
-void syrk(sycl::queue &queue, uplo upper_lower, transpose trans, int64_t n, int64_t k,
-          std::complex<float> alpha, sycl::buffer<std::complex<float>, 1> &a, int64_t lda,
-          std::complex<float> beta, sycl::buffer<std::complex<float>, 1> &c, int64_t ldc) {
-    queue.submit([&](sycl::handler &cgh) {
+void syrk(sycl::queue& queue, uplo upper_lower, transpose trans, int64_t n, int64_t k,
+          std::complex<float> alpha, sycl::buffer<std::complex<float>, 1>& a, int64_t lda,
+          std::complex<float> beta, sycl::buffer<std::complex<float>, 1>& c, int64_t ldc) {
+    queue.submit([&](sycl::handler& cgh) {
         auto accessor_a = a.get_access<sycl::access::mode::read>(cgh);
         auto accessor_c = c.get_access<sycl::access::mode::read_write>(cgh);
         host_task<class netlib_csyrk>(cgh, [=]() {
             ::cblas_csyrk(MAJOR, convert_to_cblas_uplo(upper_lower), convert_to_cblas_trans(trans),
-                          (const int)n, (const int)k, (const void *)&alpha,
-                          accessor_a.GET_MULTI_PTR, (const int)lda, (const void *)&beta,
-                          accessor_c.GET_MULTI_PTR, (const int)ldc);
+                          (const int)n, (const int)k, (const void*)&alpha, accessor_a.GET_MULTI_PTR,
+                          (const int)lda, (const void*)&beta, accessor_c.GET_MULTI_PTR,
+                          (const int)ldc);
         });
     });
 }
 
-void syrk(sycl::queue &queue, uplo upper_lower, transpose trans, int64_t n, int64_t k,
-          std::complex<double> alpha, sycl::buffer<std::complex<double>, 1> &a, int64_t lda,
-          std::complex<double> beta, sycl::buffer<std::complex<double>, 1> &c, int64_t ldc) {
-    queue.submit([&](sycl::handler &cgh) {
+void syrk(sycl::queue& queue, uplo upper_lower, transpose trans, int64_t n, int64_t k,
+          std::complex<double> alpha, sycl::buffer<std::complex<double>, 1>& a, int64_t lda,
+          std::complex<double> beta, sycl::buffer<std::complex<double>, 1>& c, int64_t ldc) {
+    queue.submit([&](sycl::handler& cgh) {
         auto accessor_a = a.get_access<sycl::access::mode::read>(cgh);
         auto accessor_c = c.get_access<sycl::access::mode::read_write>(cgh);
         host_task<class netlib_zsyrk>(cgh, [=]() {
             ::cblas_zsyrk(MAJOR, convert_to_cblas_uplo(upper_lower), convert_to_cblas_trans(trans),
-                          (const int)n, (const int)k, (const void *)&alpha,
-                          accessor_a.GET_MULTI_PTR, (const int)lda, (const void *)&beta,
-                          accessor_c.GET_MULTI_PTR, (const int)ldc);
+                          (const int)n, (const int)k, (const void*)&alpha, accessor_a.GET_MULTI_PTR,
+                          (const int)lda, (const void*)&beta, accessor_c.GET_MULTI_PTR,
+                          (const int)ldc);
         });
     });
 }
 
-void syr2k(sycl::queue &queue, uplo upper_lower, transpose trans, int64_t n, int64_t k, float alpha,
-           sycl::buffer<float, 1> &a, int64_t lda, sycl::buffer<float, 1> &b, int64_t ldb,
-           float beta, sycl::buffer<float, 1> &c, int64_t ldc) {
-    queue.submit([&](sycl::handler &cgh) {
+void syr2k(sycl::queue& queue, uplo upper_lower, transpose trans, int64_t n, int64_t k, float alpha,
+           sycl::buffer<float, 1>& a, int64_t lda, sycl::buffer<float, 1>& b, int64_t ldb,
+           float beta, sycl::buffer<float, 1>& c, int64_t ldc) {
+    queue.submit([&](sycl::handler& cgh) {
         auto accessor_a = a.get_access<sycl::access::mode::read>(cgh);
         auto accessor_b = b.get_access<sycl::access::mode::read>(cgh);
         auto accessor_c = c.get_access<sycl::access::mode::read_write>(cgh);
@@ -371,10 +371,10 @@ void syr2k(sycl::queue &queue, uplo upper_lower, transpose trans, int64_t n, int
     });
 }
 
-void syr2k(sycl::queue &queue, uplo upper_lower, transpose trans, int64_t n, int64_t k,
-           double alpha, sycl::buffer<double, 1> &a, int64_t lda, sycl::buffer<double, 1> &b,
-           int64_t ldb, double beta, sycl::buffer<double, 1> &c, int64_t ldc) {
-    queue.submit([&](sycl::handler &cgh) {
+void syr2k(sycl::queue& queue, uplo upper_lower, transpose trans, int64_t n, int64_t k,
+           double alpha, sycl::buffer<double, 1>& a, int64_t lda, sycl::buffer<double, 1>& b,
+           int64_t ldb, double beta, sycl::buffer<double, 1>& c, int64_t ldc) {
+    queue.submit([&](sycl::handler& cgh) {
         auto accessor_a = a.get_access<sycl::access::mode::read>(cgh);
         auto accessor_b = b.get_access<sycl::access::mode::read>(cgh);
         auto accessor_c = c.get_access<sycl::access::mode::read_write>(cgh);
@@ -388,46 +388,46 @@ void syr2k(sycl::queue &queue, uplo upper_lower, transpose trans, int64_t n, int
     });
 }
 
-void syr2k(sycl::queue &queue, uplo upper_lower, transpose trans, int64_t n, int64_t k,
-           std::complex<float> alpha, sycl::buffer<std::complex<float>, 1> &a, int64_t lda,
-           sycl::buffer<std::complex<float>, 1> &b, int64_t ldb, std::complex<float> beta,
-           sycl::buffer<std::complex<float>, 1> &c, int64_t ldc) {
-    queue.submit([&](sycl::handler &cgh) {
+void syr2k(sycl::queue& queue, uplo upper_lower, transpose trans, int64_t n, int64_t k,
+           std::complex<float> alpha, sycl::buffer<std::complex<float>, 1>& a, int64_t lda,
+           sycl::buffer<std::complex<float>, 1>& b, int64_t ldb, std::complex<float> beta,
+           sycl::buffer<std::complex<float>, 1>& c, int64_t ldc) {
+    queue.submit([&](sycl::handler& cgh) {
         auto accessor_a = a.get_access<sycl::access::mode::read>(cgh);
         auto accessor_b = b.get_access<sycl::access::mode::read>(cgh);
         auto accessor_c = c.get_access<sycl::access::mode::read_write>(cgh);
         host_task<class netlib_csyr2k>(cgh, [=]() {
             ::cblas_csyr2k(MAJOR, convert_to_cblas_uplo(upper_lower), convert_to_cblas_trans(trans),
-                           (const int)n, (const int)k, (const void *)&alpha,
+                           (const int)n, (const int)k, (const void*)&alpha,
                            accessor_a.GET_MULTI_PTR, (const int)lda, accessor_b.GET_MULTI_PTR,
-                           (const int)ldb, (const void *)&beta, accessor_c.GET_MULTI_PTR,
+                           (const int)ldb, (const void*)&beta, accessor_c.GET_MULTI_PTR,
                            (const int)ldc);
         });
     });
 }
 
-void syr2k(sycl::queue &queue, uplo upper_lower, transpose trans, int64_t n, int64_t k,
-           std::complex<double> alpha, sycl::buffer<std::complex<double>, 1> &a, int64_t lda,
-           sycl::buffer<std::complex<double>, 1> &b, int64_t ldb, std::complex<double> beta,
-           sycl::buffer<std::complex<double>, 1> &c, int64_t ldc) {
-    queue.submit([&](sycl::handler &cgh) {
+void syr2k(sycl::queue& queue, uplo upper_lower, transpose trans, int64_t n, int64_t k,
+           std::complex<double> alpha, sycl::buffer<std::complex<double>, 1>& a, int64_t lda,
+           sycl::buffer<std::complex<double>, 1>& b, int64_t ldb, std::complex<double> beta,
+           sycl::buffer<std::complex<double>, 1>& c, int64_t ldc) {
+    queue.submit([&](sycl::handler& cgh) {
         auto accessor_a = a.get_access<sycl::access::mode::read>(cgh);
         auto accessor_b = b.get_access<sycl::access::mode::read>(cgh);
         auto accessor_c = c.get_access<sycl::access::mode::read_write>(cgh);
         host_task<class netlib_zsyr2k>(cgh, [=]() {
             ::cblas_zsyr2k(MAJOR, convert_to_cblas_uplo(upper_lower), convert_to_cblas_trans(trans),
-                           (const int)n, (const int)k, (const void *)&alpha,
+                           (const int)n, (const int)k, (const void*)&alpha,
                            accessor_a.GET_MULTI_PTR, (const int)lda, accessor_b.GET_MULTI_PTR,
-                           (const int)ldb, (const void *)&beta, accessor_c.GET_MULTI_PTR,
+                           (const int)ldb, (const void*)&beta, accessor_c.GET_MULTI_PTR,
                            (const int)ldc);
         });
     });
 }
 
-void trmm(sycl::queue &queue, side left_right, uplo upper_lower, transpose transa, diag unit_diag,
-          int64_t m, int64_t n, float alpha, sycl::buffer<float, 1> &a, int64_t lda,
-          sycl::buffer<float, 1> &b, int64_t ldb) {
-    queue.submit([&](sycl::handler &cgh) {
+void trmm(sycl::queue& queue, side left_right, uplo upper_lower, transpose transa, diag unit_diag,
+          int64_t m, int64_t n, float alpha, sycl::buffer<float, 1>& a, int64_t lda,
+          sycl::buffer<float, 1>& b, int64_t ldb) {
+    queue.submit([&](sycl::handler& cgh) {
         auto accessor_a = a.get_access<sycl::access::mode::read>(cgh);
         auto accessor_b = b.get_access<sycl::access::mode::read_write>(cgh);
         host_task<class netlib_strmm>(cgh, [=]() {
@@ -440,10 +440,10 @@ void trmm(sycl::queue &queue, side left_right, uplo upper_lower, transpose trans
     });
 }
 
-void trmm(sycl::queue &queue, side left_right, uplo upper_lower, transpose transa, diag unit_diag,
-          int64_t m, int64_t n, double alpha, sycl::buffer<double, 1> &a, int64_t lda,
-          sycl::buffer<double, 1> &b, int64_t ldb) {
-    queue.submit([&](sycl::handler &cgh) {
+void trmm(sycl::queue& queue, side left_right, uplo upper_lower, transpose transa, diag unit_diag,
+          int64_t m, int64_t n, double alpha, sycl::buffer<double, 1>& a, int64_t lda,
+          sycl::buffer<double, 1>& b, int64_t ldb) {
+    queue.submit([&](sycl::handler& cgh) {
         auto accessor_a = a.get_access<sycl::access::mode::read>(cgh);
         auto accessor_b = b.get_access<sycl::access::mode::read_write>(cgh);
         host_task<class netlib_dtrmm>(cgh, [=]() {
@@ -456,43 +456,43 @@ void trmm(sycl::queue &queue, side left_right, uplo upper_lower, transpose trans
     });
 }
 
-void trmm(sycl::queue &queue, side left_right, uplo upper_lower, transpose transa, diag unit_diag,
-          int64_t m, int64_t n, std::complex<float> alpha, sycl::buffer<std::complex<float>, 1> &a,
-          int64_t lda, sycl::buffer<std::complex<float>, 1> &b, int64_t ldb) {
-    queue.submit([&](sycl::handler &cgh) {
+void trmm(sycl::queue& queue, side left_right, uplo upper_lower, transpose transa, diag unit_diag,
+          int64_t m, int64_t n, std::complex<float> alpha, sycl::buffer<std::complex<float>, 1>& a,
+          int64_t lda, sycl::buffer<std::complex<float>, 1>& b, int64_t ldb) {
+    queue.submit([&](sycl::handler& cgh) {
         auto accessor_a = a.get_access<sycl::access::mode::read>(cgh);
         auto accessor_b = b.get_access<sycl::access::mode::read_write>(cgh);
         host_task<class netlib_ctrmm>(cgh, [=]() {
             ::cblas_ctrmm(MAJOR, convert_to_cblas_side(left_right),
                           convert_to_cblas_uplo(upper_lower), convert_to_cblas_trans(transa),
                           convert_to_cblas_diag(unit_diag), (const int)m, (const int)n,
-                          (const void *)&alpha, accessor_a.GET_MULTI_PTR, (const int)lda,
+                          (const void*)&alpha, accessor_a.GET_MULTI_PTR, (const int)lda,
                           accessor_b.GET_MULTI_PTR, (const int)ldb);
         });
     });
 }
 
-void trmm(sycl::queue &queue, side left_right, uplo upper_lower, transpose transa, diag unit_diag,
+void trmm(sycl::queue& queue, side left_right, uplo upper_lower, transpose transa, diag unit_diag,
           int64_t m, int64_t n, std::complex<double> alpha,
-          sycl::buffer<std::complex<double>, 1> &a, int64_t lda,
-          sycl::buffer<std::complex<double>, 1> &b, int64_t ldb) {
-    queue.submit([&](sycl::handler &cgh) {
+          sycl::buffer<std::complex<double>, 1>& a, int64_t lda,
+          sycl::buffer<std::complex<double>, 1>& b, int64_t ldb) {
+    queue.submit([&](sycl::handler& cgh) {
         auto accessor_a = a.get_access<sycl::access::mode::read>(cgh);
         auto accessor_b = b.get_access<sycl::access::mode::read_write>(cgh);
         host_task<class netlib_ztrmm>(cgh, [=]() {
             ::cblas_ztrmm(MAJOR, convert_to_cblas_side(left_right),
                           convert_to_cblas_uplo(upper_lower), convert_to_cblas_trans(transa),
                           convert_to_cblas_diag(unit_diag), (const int)m, (const int)n,
-                          (const void *)&alpha, accessor_a.GET_MULTI_PTR, (const int)lda,
+                          (const void*)&alpha, accessor_a.GET_MULTI_PTR, (const int)lda,
                           accessor_b.GET_MULTI_PTR, (const int)ldb);
         });
     });
 }
 
-void trsm(sycl::queue &queue, side left_right, uplo upper_lower, transpose transa, diag unit_diag,
-          int64_t m, int64_t n, float alpha, sycl::buffer<float, 1> &a, int64_t lda,
-          sycl::buffer<float, 1> &b, int64_t ldb) {
-    queue.submit([&](sycl::handler &cgh) {
+void trsm(sycl::queue& queue, side left_right, uplo upper_lower, transpose transa, diag unit_diag,
+          int64_t m, int64_t n, float alpha, sycl::buffer<float, 1>& a, int64_t lda,
+          sycl::buffer<float, 1>& b, int64_t ldb) {
+    queue.submit([&](sycl::handler& cgh) {
         auto accessor_a = a.get_access<sycl::access::mode::read>(cgh);
         auto accessor_b = b.get_access<sycl::access::mode::read_write>(cgh);
         host_task<class netlib_strsm>(cgh, [=]() {
@@ -505,10 +505,10 @@ void trsm(sycl::queue &queue, side left_right, uplo upper_lower, transpose trans
     });
 }
 
-void trsm(sycl::queue &queue, side left_right, uplo upper_lower, transpose transa, diag unit_diag,
-          int64_t m, int64_t n, double alpha, sycl::buffer<double, 1> &a, int64_t lda,
-          sycl::buffer<double, 1> &b, int64_t ldb) {
-    queue.submit([&](sycl::handler &cgh) {
+void trsm(sycl::queue& queue, side left_right, uplo upper_lower, transpose transa, diag unit_diag,
+          int64_t m, int64_t n, double alpha, sycl::buffer<double, 1>& a, int64_t lda,
+          sycl::buffer<double, 1>& b, int64_t ldb) {
+    queue.submit([&](sycl::handler& cgh) {
         auto accessor_a = a.get_access<sycl::access::mode::read>(cgh);
         auto accessor_b = b.get_access<sycl::access::mode::read_write>(cgh);
         host_task<class netlib_dtrsm>(cgh, [=]() {
@@ -521,34 +521,34 @@ void trsm(sycl::queue &queue, side left_right, uplo upper_lower, transpose trans
     });
 }
 
-void trsm(sycl::queue &queue, side left_right, uplo upper_lower, transpose transa, diag unit_diag,
-          int64_t m, int64_t n, std::complex<float> alpha, sycl::buffer<std::complex<float>, 1> &a,
-          int64_t lda, sycl::buffer<std::complex<float>, 1> &b, int64_t ldb) {
-    queue.submit([&](sycl::handler &cgh) {
+void trsm(sycl::queue& queue, side left_right, uplo upper_lower, transpose transa, diag unit_diag,
+          int64_t m, int64_t n, std::complex<float> alpha, sycl::buffer<std::complex<float>, 1>& a,
+          int64_t lda, sycl::buffer<std::complex<float>, 1>& b, int64_t ldb) {
+    queue.submit([&](sycl::handler& cgh) {
         auto accessor_a = a.get_access<sycl::access::mode::read>(cgh);
         auto accessor_b = b.get_access<sycl::access::mode::read_write>(cgh);
         host_task<class netlib_ctrsm>(cgh, [=]() {
             ::cblas_ctrsm(MAJOR, convert_to_cblas_side(left_right),
                           convert_to_cblas_uplo(upper_lower), convert_to_cblas_trans(transa),
                           convert_to_cblas_diag(unit_diag), (const int)m, (const int)n,
-                          (const void *)&alpha, accessor_a.GET_MULTI_PTR, (const int)lda,
+                          (const void*)&alpha, accessor_a.GET_MULTI_PTR, (const int)lda,
                           accessor_b.GET_MULTI_PTR, (const int)ldb);
         });
     });
 }
 
-void trsm(sycl::queue &queue, side left_right, uplo upper_lower, transpose transa, diag unit_diag,
+void trsm(sycl::queue& queue, side left_right, uplo upper_lower, transpose transa, diag unit_diag,
           int64_t m, int64_t n, std::complex<double> alpha,
-          sycl::buffer<std::complex<double>, 1> &a, int64_t lda,
-          sycl::buffer<std::complex<double>, 1> &b, int64_t ldb) {
-    queue.submit([&](sycl::handler &cgh) {
+          sycl::buffer<std::complex<double>, 1>& a, int64_t lda,
+          sycl::buffer<std::complex<double>, 1>& b, int64_t ldb) {
+    queue.submit([&](sycl::handler& cgh) {
         auto accessor_a = a.get_access<sycl::access::mode::read>(cgh);
         auto accessor_b = b.get_access<sycl::access::mode::read_write>(cgh);
         host_task<class netlib_ztrsm>(cgh, [=]() {
             ::cblas_ztrsm(MAJOR, convert_to_cblas_side(left_right),
                           convert_to_cblas_uplo(upper_lower), convert_to_cblas_trans(transa),
                           convert_to_cblas_diag(unit_diag), (const int)m, (const int)n,
-                          (const void *)&alpha, accessor_a.GET_MULTI_PTR, (const int)lda,
+                          (const void*)&alpha, accessor_a.GET_MULTI_PTR, (const int)lda,
                           accessor_b.GET_MULTI_PTR, (const int)ldb);
         });
     });
@@ -556,10 +556,10 @@ void trsm(sycl::queue &queue, side left_right, uplo upper_lower, transpose trans
 
 // USM APIs
 
-sycl::event gemm(sycl::queue &queue, transpose transa, transpose transb, int64_t m, int64_t n,
-                 int64_t k, float alpha, const float *a, int64_t lda, const float *b, int64_t ldb,
-                 float beta, float *c, int64_t ldc, const std::vector<sycl::event> &dependencies) {
-    auto done = queue.submit([&](sycl::handler &cgh) {
+sycl::event gemm(sycl::queue& queue, transpose transa, transpose transb, int64_t m, int64_t n,
+                 int64_t k, float alpha, const float* a, int64_t lda, const float* b, int64_t ldb,
+                 float beta, float* c, int64_t ldc, const std::vector<sycl::event>& dependencies) {
+    auto done = queue.submit([&](sycl::handler& cgh) {
         int64_t num_events = dependencies.size();
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
@@ -573,11 +573,11 @@ sycl::event gemm(sycl::queue &queue, transpose transa, transpose transb, int64_t
     return done;
 }
 
-sycl::event gemm(sycl::queue &queue, transpose transa, transpose transb, int64_t m, int64_t n,
-                 int64_t k, double alpha, const double *a, int64_t lda, const double *b,
-                 int64_t ldb, double beta, double *c, int64_t ldc,
-                 const std::vector<sycl::event> &dependencies) {
-    auto done = queue.submit([&](sycl::handler &cgh) {
+sycl::event gemm(sycl::queue& queue, transpose transa, transpose transb, int64_t m, int64_t n,
+                 int64_t k, double alpha, const double* a, int64_t lda, const double* b,
+                 int64_t ldb, double beta, double* c, int64_t ldc,
+                 const std::vector<sycl::event>& dependencies) {
+    auto done = queue.submit([&](sycl::handler& cgh) {
         int64_t num_events = dependencies.size();
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
@@ -591,50 +591,48 @@ sycl::event gemm(sycl::queue &queue, transpose transa, transpose transb, int64_t
     return done;
 }
 
-sycl::event gemm(sycl::queue &queue, transpose transa, transpose transb, int64_t m, int64_t n,
-                 int64_t k, std::complex<float> alpha, const std::complex<float> *a, int64_t lda,
-                 const std::complex<float> *b, int64_t ldb, std::complex<float> beta,
-                 std::complex<float> *c, int64_t ldc,
-                 const std::vector<sycl::event> &dependencies) {
-    auto done = queue.submit([&](sycl::handler &cgh) {
+sycl::event gemm(sycl::queue& queue, transpose transa, transpose transb, int64_t m, int64_t n,
+                 int64_t k, std::complex<float> alpha, const std::complex<float>* a, int64_t lda,
+                 const std::complex<float>* b, int64_t ldb, std::complex<float> beta,
+                 std::complex<float>* c, int64_t ldc,
+                 const std::vector<sycl::event>& dependencies) {
+    auto done = queue.submit([&](sycl::handler& cgh) {
         int64_t num_events = dependencies.size();
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
         host_task<class netlib_cgemm_usm>(cgh, [=]() {
             ::cblas_cgemm(MAJOR, convert_to_cblas_trans(transa), convert_to_cblas_trans(transb),
-                          (const int)m, (const int)n, (const int)k, (const void *)&alpha, a,
-                          (const int)lda, b, (const int)ldb, (const void *)&beta, c,
-                          (const int)ldc);
+                          (const int)m, (const int)n, (const int)k, (const void*)&alpha, a,
+                          (const int)lda, b, (const int)ldb, (const void*)&beta, c, (const int)ldc);
         });
     });
     return done;
 }
 
-sycl::event gemm(sycl::queue &queue, transpose transa, transpose transb, int64_t m, int64_t n,
-                 int64_t k, std::complex<double> alpha, const std::complex<double> *a, int64_t lda,
-                 const std::complex<double> *b, int64_t ldb, std::complex<double> beta,
-                 std::complex<double> *c, int64_t ldc,
-                 const std::vector<sycl::event> &dependencies) {
-    auto done = queue.submit([&](sycl::handler &cgh) {
+sycl::event gemm(sycl::queue& queue, transpose transa, transpose transb, int64_t m, int64_t n,
+                 int64_t k, std::complex<double> alpha, const std::complex<double>* a, int64_t lda,
+                 const std::complex<double>* b, int64_t ldb, std::complex<double> beta,
+                 std::complex<double>* c, int64_t ldc,
+                 const std::vector<sycl::event>& dependencies) {
+    auto done = queue.submit([&](sycl::handler& cgh) {
         int64_t num_events = dependencies.size();
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
         host_task<class netlib_zgemm_usm>(cgh, [=]() {
             ::cblas_zgemm(MAJOR, convert_to_cblas_trans(transa), convert_to_cblas_trans(transb),
-                          (const int)m, (const int)n, (const int)k, (const void *)&alpha, a,
-                          (const int)lda, b, (const int)ldb, (const void *)&beta, c,
-                          (const int)ldc);
+                          (const int)m, (const int)n, (const int)k, (const void*)&alpha, a,
+                          (const int)lda, b, (const int)ldb, (const void*)&beta, c, (const int)ldc);
         });
     });
     return done;
 }
 
-sycl::event gemm(sycl::queue &queue, transpose transa, transpose transb, int64_t m, int64_t n,
-                 int64_t k, sycl::half alpha, const sycl::half *a, int64_t lda, const sycl::half *b,
-                 int64_t ldb, sycl::half beta, sycl::half *c, int64_t ldc,
-                 const std::vector<sycl::event> &dependencies) {
+sycl::event gemm(sycl::queue& queue, transpose transa, transpose transb, int64_t m, int64_t n,
+                 int64_t k, sycl::half alpha, const sycl::half* a, int64_t lda, const sycl::half* b,
+                 int64_t ldb, sycl::half beta, sycl::half* c, int64_t ldc,
+                 const std::vector<sycl::event>& dependencies) {
 #ifdef COLUMN_MAJOR
     throw unimplemented("blas", "gemm", "for column_major layout");
 #endif
@@ -643,10 +641,10 @@ sycl::event gemm(sycl::queue &queue, transpose transa, transpose transb, int64_t
 #endif
 }
 
-sycl::event gemm(sycl::queue &queue, transpose transa, transpose transb, int64_t m, int64_t n,
-                 int64_t k, float alpha, const sycl::half *a, int64_t lda, const sycl::half *b,
-                 int64_t ldb, float beta, float *c, int64_t ldc,
-                 const std::vector<sycl::event> &dependencies) {
+sycl::event gemm(sycl::queue& queue, transpose transa, transpose transb, int64_t m, int64_t n,
+                 int64_t k, float alpha, const sycl::half* a, int64_t lda, const sycl::half* b,
+                 int64_t ldb, float beta, float* c, int64_t ldc,
+                 const std::vector<sycl::event>& dependencies) {
 #ifdef COLUMN_MAJOR
     throw unimplemented("blas", "gemm", "for column_major layout");
 #endif
@@ -655,10 +653,10 @@ sycl::event gemm(sycl::queue &queue, transpose transa, transpose transb, int64_t
 #endif
 }
 
-sycl::event gemm(sycl::queue &queue, transpose transa, transpose transb, int64_t m, int64_t n,
-                 int64_t k, float alpha, const bfloat16 *a, int64_t lda, const bfloat16 *b,
-                 int64_t ldb, float beta, float *c, int64_t ldc,
-                 const std::vector<sycl::event> &dependencies) {
+sycl::event gemm(sycl::queue& queue, transpose transa, transpose transb, int64_t m, int64_t n,
+                 int64_t k, float alpha, const bfloat16* a, int64_t lda, const bfloat16* b,
+                 int64_t ldb, float beta, float* c, int64_t ldc,
+                 const std::vector<sycl::event>& dependencies) {
 #ifdef COLUMN_MAJOR
     throw unimplemented("blas", "gemm", "for column_major layout");
 #endif
@@ -667,12 +665,12 @@ sycl::event gemm(sycl::queue &queue, transpose transa, transpose transb, int64_t
 #endif
 }
 
-sycl::event hemm(sycl::queue &queue, side left_right, uplo upper_lower, int64_t m, int64_t n,
-                 std::complex<float> alpha, const std::complex<float> *a, int64_t lda,
-                 const std::complex<float> *b, int64_t ldb, std::complex<float> beta,
-                 std::complex<float> *c, int64_t ldc,
-                 const std::vector<sycl::event> &dependencies) {
-    auto done = queue.submit([&](sycl::handler &cgh) {
+sycl::event hemm(sycl::queue& queue, side left_right, uplo upper_lower, int64_t m, int64_t n,
+                 std::complex<float> alpha, const std::complex<float>* a, int64_t lda,
+                 const std::complex<float>* b, int64_t ldb, std::complex<float> beta,
+                 std::complex<float>* c, int64_t ldc,
+                 const std::vector<sycl::event>& dependencies) {
+    auto done = queue.submit([&](sycl::handler& cgh) {
         int64_t num_events = dependencies.size();
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
@@ -680,19 +678,19 @@ sycl::event hemm(sycl::queue &queue, side left_right, uplo upper_lower, int64_t 
         host_task<class netlib_chemm_usm>(cgh, [=]() {
             ::cblas_chemm(MAJOR, convert_to_cblas_side(left_right),
                           convert_to_cblas_uplo(upper_lower), (const int)m, (const int)n,
-                          (const void *)&alpha, a, (const int)lda, b, (const int)ldb,
-                          (const void *)&beta, c, (const int)ldc);
+                          (const void*)&alpha, a, (const int)lda, b, (const int)ldb,
+                          (const void*)&beta, c, (const int)ldc);
         });
     });
     return done;
 }
 
-sycl::event hemm(sycl::queue &queue, side left_right, uplo upper_lower, int64_t m, int64_t n,
-                 std::complex<double> alpha, const std::complex<double> *a, int64_t lda,
-                 const std::complex<double> *b, int64_t ldb, std::complex<double> beta,
-                 std::complex<double> *c, int64_t ldc,
-                 const std::vector<sycl::event> &dependencies) {
-    auto done = queue.submit([&](sycl::handler &cgh) {
+sycl::event hemm(sycl::queue& queue, side left_right, uplo upper_lower, int64_t m, int64_t n,
+                 std::complex<double> alpha, const std::complex<double>* a, int64_t lda,
+                 const std::complex<double>* b, int64_t ldb, std::complex<double> beta,
+                 std::complex<double>* c, int64_t ldc,
+                 const std::vector<sycl::event>& dependencies) {
+    auto done = queue.submit([&](sycl::handler& cgh) {
         int64_t num_events = dependencies.size();
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
@@ -700,18 +698,18 @@ sycl::event hemm(sycl::queue &queue, side left_right, uplo upper_lower, int64_t 
         host_task<class netlib_zhemm_usm>(cgh, [=]() {
             ::cblas_zhemm(MAJOR, convert_to_cblas_side(left_right),
                           convert_to_cblas_uplo(upper_lower), (const int)m, (const int)n,
-                          (const void *)&alpha, a, (const int)lda, b, (const int)ldb,
-                          (const void *)&beta, c, (const int)ldc);
+                          (const void*)&alpha, a, (const int)lda, b, (const int)ldb,
+                          (const void*)&beta, c, (const int)ldc);
         });
     });
     return done;
 }
 
-sycl::event herk(sycl::queue &queue, uplo upper_lower, transpose trans, int64_t n, int64_t k,
-                 float alpha, const std::complex<float> *a, int64_t lda, float beta,
-                 std::complex<float> *c, int64_t ldc,
-                 const std::vector<sycl::event> &dependencies) {
-    auto done = queue.submit([&](sycl::handler &cgh) {
+sycl::event herk(sycl::queue& queue, uplo upper_lower, transpose trans, int64_t n, int64_t k,
+                 float alpha, const std::complex<float>* a, int64_t lda, float beta,
+                 std::complex<float>* c, int64_t ldc,
+                 const std::vector<sycl::event>& dependencies) {
+    auto done = queue.submit([&](sycl::handler& cgh) {
         int64_t num_events = dependencies.size();
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
@@ -725,11 +723,11 @@ sycl::event herk(sycl::queue &queue, uplo upper_lower, transpose trans, int64_t 
     return done;
 }
 
-sycl::event herk(sycl::queue &queue, uplo upper_lower, transpose trans, int64_t n, int64_t k,
-                 double alpha, const std::complex<double> *a, int64_t lda, double beta,
-                 std::complex<double> *c, int64_t ldc,
-                 const std::vector<sycl::event> &dependencies) {
-    auto done = queue.submit([&](sycl::handler &cgh) {
+sycl::event herk(sycl::queue& queue, uplo upper_lower, transpose trans, int64_t n, int64_t k,
+                 double alpha, const std::complex<double>* a, int64_t lda, double beta,
+                 std::complex<double>* c, int64_t ldc,
+                 const std::vector<sycl::event>& dependencies) {
+    auto done = queue.submit([&](sycl::handler& cgh) {
         int64_t num_events = dependencies.size();
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
@@ -743,46 +741,46 @@ sycl::event herk(sycl::queue &queue, uplo upper_lower, transpose trans, int64_t 
     return done;
 }
 
-sycl::event her2k(sycl::queue &queue, uplo upper_lower, transpose trans, int64_t n, int64_t k,
-                  std::complex<float> alpha, const std::complex<float> *a, int64_t lda,
-                  const std::complex<float> *b, int64_t ldb, float beta, std::complex<float> *c,
-                  int64_t ldc, const std::vector<sycl::event> &dependencies) {
-    auto done = queue.submit([&](sycl::handler &cgh) {
+sycl::event her2k(sycl::queue& queue, uplo upper_lower, transpose trans, int64_t n, int64_t k,
+                  std::complex<float> alpha, const std::complex<float>* a, int64_t lda,
+                  const std::complex<float>* b, int64_t ldb, float beta, std::complex<float>* c,
+                  int64_t ldc, const std::vector<sycl::event>& dependencies) {
+    auto done = queue.submit([&](sycl::handler& cgh) {
         int64_t num_events = dependencies.size();
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
         host_task<class netlib_cher2k_usm>(cgh, [=]() {
             ::cblas_cher2k(MAJOR, convert_to_cblas_uplo(upper_lower), convert_to_cblas_trans(trans),
-                           (const int)n, (const int)k, (const void *)&alpha, a, (const int)lda, b,
+                           (const int)n, (const int)k, (const void*)&alpha, a, (const int)lda, b,
                            (const int)ldb, (const float)beta, c, (const int)ldc);
         });
     });
     return done;
 }
 
-sycl::event her2k(sycl::queue &queue, uplo upper_lower, transpose trans, int64_t n, int64_t k,
-                  std::complex<double> alpha, const std::complex<double> *a, int64_t lda,
-                  const std::complex<double> *b, int64_t ldb, double beta, std::complex<double> *c,
-                  int64_t ldc, const std::vector<sycl::event> &dependencies) {
-    auto done = queue.submit([&](sycl::handler &cgh) {
+sycl::event her2k(sycl::queue& queue, uplo upper_lower, transpose trans, int64_t n, int64_t k,
+                  std::complex<double> alpha, const std::complex<double>* a, int64_t lda,
+                  const std::complex<double>* b, int64_t ldb, double beta, std::complex<double>* c,
+                  int64_t ldc, const std::vector<sycl::event>& dependencies) {
+    auto done = queue.submit([&](sycl::handler& cgh) {
         int64_t num_events = dependencies.size();
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
         host_task<class netlib_zher2k_usm>(cgh, [=]() {
             ::cblas_zher2k(MAJOR, convert_to_cblas_uplo(upper_lower), convert_to_cblas_trans(trans),
-                           (const int)n, (const int)k, (const void *)&alpha, a, (const int)lda, b,
+                           (const int)n, (const int)k, (const void*)&alpha, a, (const int)lda, b,
                            (const int)ldb, (const double)beta, c, (const int)ldc);
         });
     });
     return done;
 }
 
-sycl::event symm(sycl::queue &queue, side left_right, uplo upper_lower, int64_t m, int64_t n,
-                 float alpha, const float *a, int64_t lda, const float *b, int64_t ldb, float beta,
-                 float *c, int64_t ldc, const std::vector<sycl::event> &dependencies) {
-    auto done = queue.submit([&](sycl::handler &cgh) {
+sycl::event symm(sycl::queue& queue, side left_right, uplo upper_lower, int64_t m, int64_t n,
+                 float alpha, const float* a, int64_t lda, const float* b, int64_t ldb, float beta,
+                 float* c, int64_t ldc, const std::vector<sycl::event>& dependencies) {
+    auto done = queue.submit([&](sycl::handler& cgh) {
         int64_t num_events = dependencies.size();
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
@@ -797,11 +795,11 @@ sycl::event symm(sycl::queue &queue, side left_right, uplo upper_lower, int64_t 
     return done;
 }
 
-sycl::event symm(sycl::queue &queue, side left_right, uplo upper_lower, int64_t m, int64_t n,
-                 double alpha, const double *a, int64_t lda, const double *b, int64_t ldb,
-                 double beta, double *c, int64_t ldc,
-                 const std::vector<sycl::event> &dependencies) {
-    auto done = queue.submit([&](sycl::handler &cgh) {
+sycl::event symm(sycl::queue& queue, side left_right, uplo upper_lower, int64_t m, int64_t n,
+                 double alpha, const double* a, int64_t lda, const double* b, int64_t ldb,
+                 double beta, double* c, int64_t ldc,
+                 const std::vector<sycl::event>& dependencies) {
+    auto done = queue.submit([&](sycl::handler& cgh) {
         int64_t num_events = dependencies.size();
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
@@ -816,12 +814,12 @@ sycl::event symm(sycl::queue &queue, side left_right, uplo upper_lower, int64_t 
     return done;
 }
 
-sycl::event symm(sycl::queue &queue, side left_right, uplo upper_lower, int64_t m, int64_t n,
-                 std::complex<float> alpha, const std::complex<float> *a, int64_t lda,
-                 const std::complex<float> *b, int64_t ldb, std::complex<float> beta,
-                 std::complex<float> *c, int64_t ldc,
-                 const std::vector<sycl::event> &dependencies) {
-    auto done = queue.submit([&](sycl::handler &cgh) {
+sycl::event symm(sycl::queue& queue, side left_right, uplo upper_lower, int64_t m, int64_t n,
+                 std::complex<float> alpha, const std::complex<float>* a, int64_t lda,
+                 const std::complex<float>* b, int64_t ldb, std::complex<float> beta,
+                 std::complex<float>* c, int64_t ldc,
+                 const std::vector<sycl::event>& dependencies) {
+    auto done = queue.submit([&](sycl::handler& cgh) {
         int64_t num_events = dependencies.size();
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
@@ -829,19 +827,19 @@ sycl::event symm(sycl::queue &queue, side left_right, uplo upper_lower, int64_t 
         host_task<class netlib_csymm_usm>(cgh, [=]() {
             ::cblas_csymm(MAJOR, convert_to_cblas_side(left_right),
                           convert_to_cblas_uplo(upper_lower), (const int)m, (const int)n,
-                          (const void *)&alpha, a, (const int)lda, b, (const int)ldb,
-                          (const void *)&beta, c, (const int)ldc);
+                          (const void*)&alpha, a, (const int)lda, b, (const int)ldb,
+                          (const void*)&beta, c, (const int)ldc);
         });
     });
     return done;
 }
 
-sycl::event symm(sycl::queue &queue, side left_right, uplo upper_lower, int64_t m, int64_t n,
-                 std::complex<double> alpha, const std::complex<double> *a, int64_t lda,
-                 const std::complex<double> *b, int64_t ldb, std::complex<double> beta,
-                 std::complex<double> *c, int64_t ldc,
-                 const std::vector<sycl::event> &dependencies) {
-    auto done = queue.submit([&](sycl::handler &cgh) {
+sycl::event symm(sycl::queue& queue, side left_right, uplo upper_lower, int64_t m, int64_t n,
+                 std::complex<double> alpha, const std::complex<double>* a, int64_t lda,
+                 const std::complex<double>* b, int64_t ldb, std::complex<double> beta,
+                 std::complex<double>* c, int64_t ldc,
+                 const std::vector<sycl::event>& dependencies) {
+    auto done = queue.submit([&](sycl::handler& cgh) {
         int64_t num_events = dependencies.size();
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
@@ -849,17 +847,17 @@ sycl::event symm(sycl::queue &queue, side left_right, uplo upper_lower, int64_t 
         host_task<class netlib_zsymm_usm>(cgh, [=]() {
             ::cblas_zsymm(MAJOR, convert_to_cblas_side(left_right),
                           convert_to_cblas_uplo(upper_lower), (const int)m, (const int)n,
-                          (const void *)&alpha, a, (const int)lda, b, (const int)ldb,
-                          (const void *)&beta, c, (const int)ldc);
+                          (const void*)&alpha, a, (const int)lda, b, (const int)ldb,
+                          (const void*)&beta, c, (const int)ldc);
         });
     });
     return done;
 }
 
-sycl::event syrk(sycl::queue &queue, uplo upper_lower, transpose trans, int64_t n, int64_t k,
-                 float alpha, const float *a, int64_t lda, float beta, float *c, int64_t ldc,
-                 const std::vector<sycl::event> &dependencies) {
-    auto done = queue.submit([&](sycl::handler &cgh) {
+sycl::event syrk(sycl::queue& queue, uplo upper_lower, transpose trans, int64_t n, int64_t k,
+                 float alpha, const float* a, int64_t lda, float beta, float* c, int64_t ldc,
+                 const std::vector<sycl::event>& dependencies) {
+    auto done = queue.submit([&](sycl::handler& cgh) {
         int64_t num_events = dependencies.size();
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
@@ -873,10 +871,10 @@ sycl::event syrk(sycl::queue &queue, uplo upper_lower, transpose trans, int64_t 
     return done;
 }
 
-sycl::event syrk(sycl::queue &queue, uplo upper_lower, transpose trans, int64_t n, int64_t k,
-                 double alpha, const double *a, int64_t lda, double beta, double *c, int64_t ldc,
-                 const std::vector<sycl::event> &dependencies) {
-    auto done = queue.submit([&](sycl::handler &cgh) {
+sycl::event syrk(sycl::queue& queue, uplo upper_lower, transpose trans, int64_t n, int64_t k,
+                 double alpha, const double* a, int64_t lda, double beta, double* c, int64_t ldc,
+                 const std::vector<sycl::event>& dependencies) {
+    auto done = queue.submit([&](sycl::handler& cgh) {
         int64_t num_events = dependencies.size();
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
@@ -890,46 +888,46 @@ sycl::event syrk(sycl::queue &queue, uplo upper_lower, transpose trans, int64_t 
     return done;
 }
 
-sycl::event syrk(sycl::queue &queue, uplo upper_lower, transpose trans, int64_t n, int64_t k,
-                 std::complex<float> alpha, const std::complex<float> *a, int64_t lda,
-                 std::complex<float> beta, std::complex<float> *c, int64_t ldc,
-                 const std::vector<sycl::event> &dependencies) {
-    auto done = queue.submit([&](sycl::handler &cgh) {
+sycl::event syrk(sycl::queue& queue, uplo upper_lower, transpose trans, int64_t n, int64_t k,
+                 std::complex<float> alpha, const std::complex<float>* a, int64_t lda,
+                 std::complex<float> beta, std::complex<float>* c, int64_t ldc,
+                 const std::vector<sycl::event>& dependencies) {
+    auto done = queue.submit([&](sycl::handler& cgh) {
         int64_t num_events = dependencies.size();
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
         host_task<class netlib_csyrk_usm>(cgh, [=]() {
             ::cblas_csyrk(MAJOR, convert_to_cblas_uplo(upper_lower), convert_to_cblas_trans(trans),
-                          (const int)n, (const int)k, (const void *)&alpha, a, (const int)lda,
-                          (const void *)&beta, c, (const int)ldc);
+                          (const int)n, (const int)k, (const void*)&alpha, a, (const int)lda,
+                          (const void*)&beta, c, (const int)ldc);
         });
     });
     return done;
 }
 
-sycl::event syrk(sycl::queue &queue, uplo upper_lower, transpose trans, int64_t n, int64_t k,
-                 std::complex<double> alpha, const std::complex<double> *a, int64_t lda,
-                 std::complex<double> beta, std::complex<double> *c, int64_t ldc,
-                 const std::vector<sycl::event> &dependencies) {
-    auto done = queue.submit([&](sycl::handler &cgh) {
+sycl::event syrk(sycl::queue& queue, uplo upper_lower, transpose trans, int64_t n, int64_t k,
+                 std::complex<double> alpha, const std::complex<double>* a, int64_t lda,
+                 std::complex<double> beta, std::complex<double>* c, int64_t ldc,
+                 const std::vector<sycl::event>& dependencies) {
+    auto done = queue.submit([&](sycl::handler& cgh) {
         int64_t num_events = dependencies.size();
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
         host_task<class netlib_zsyrk_usm>(cgh, [=]() {
             ::cblas_zsyrk(MAJOR, convert_to_cblas_uplo(upper_lower), convert_to_cblas_trans(trans),
-                          (const int)n, (const int)k, (const void *)&alpha, a, (const int)lda,
-                          (const void *)&beta, c, (const int)ldc);
+                          (const int)n, (const int)k, (const void*)&alpha, a, (const int)lda,
+                          (const void*)&beta, c, (const int)ldc);
         });
     });
     return done;
 }
 
-sycl::event syr2k(sycl::queue &queue, uplo upper_lower, transpose trans, int64_t n, int64_t k,
-                  float alpha, const float *a, int64_t lda, const float *b, int64_t ldb, float beta,
-                  float *c, int64_t ldc, const std::vector<sycl::event> &dependencies) {
-    auto done = queue.submit([&](sycl::handler &cgh) {
+sycl::event syr2k(sycl::queue& queue, uplo upper_lower, transpose trans, int64_t n, int64_t k,
+                  float alpha, const float* a, int64_t lda, const float* b, int64_t ldb, float beta,
+                  float* c, int64_t ldc, const std::vector<sycl::event>& dependencies) {
+    auto done = queue.submit([&](sycl::handler& cgh) {
         int64_t num_events = dependencies.size();
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
@@ -943,11 +941,11 @@ sycl::event syr2k(sycl::queue &queue, uplo upper_lower, transpose trans, int64_t
     return done;
 }
 
-sycl::event syr2k(sycl::queue &queue, uplo upper_lower, transpose trans, int64_t n, int64_t k,
-                  double alpha, const double *a, int64_t lda, const double *b, int64_t ldb,
-                  double beta, double *c, int64_t ldc,
-                  const std::vector<sycl::event> &dependencies) {
-    auto done = queue.submit([&](sycl::handler &cgh) {
+sycl::event syr2k(sycl::queue& queue, uplo upper_lower, transpose trans, int64_t n, int64_t k,
+                  double alpha, const double* a, int64_t lda, const double* b, int64_t ldb,
+                  double beta, double* c, int64_t ldc,
+                  const std::vector<sycl::event>& dependencies) {
+    auto done = queue.submit([&](sycl::handler& cgh) {
         int64_t num_events = dependencies.size();
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
@@ -961,48 +959,48 @@ sycl::event syr2k(sycl::queue &queue, uplo upper_lower, transpose trans, int64_t
     return done;
 }
 
-sycl::event syr2k(sycl::queue &queue, uplo upper_lower, transpose trans, int64_t n, int64_t k,
-                  std::complex<float> alpha, const std::complex<float> *a, int64_t lda,
-                  const std::complex<float> *b, int64_t ldb, std::complex<float> beta,
-                  std::complex<float> *c, int64_t ldc,
-                  const std::vector<sycl::event> &dependencies) {
-    auto done = queue.submit([&](sycl::handler &cgh) {
+sycl::event syr2k(sycl::queue& queue, uplo upper_lower, transpose trans, int64_t n, int64_t k,
+                  std::complex<float> alpha, const std::complex<float>* a, int64_t lda,
+                  const std::complex<float>* b, int64_t ldb, std::complex<float> beta,
+                  std::complex<float>* c, int64_t ldc,
+                  const std::vector<sycl::event>& dependencies) {
+    auto done = queue.submit([&](sycl::handler& cgh) {
         int64_t num_events = dependencies.size();
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
         host_task<class netlib_csyr2k_usm>(cgh, [=]() {
             ::cblas_csyr2k(MAJOR, convert_to_cblas_uplo(upper_lower), convert_to_cblas_trans(trans),
-                           (const int)n, (const int)k, (const void *)&alpha, a, (const int)lda, b,
-                           (const int)ldb, (const void *)&beta, c, (const int)ldc);
+                           (const int)n, (const int)k, (const void*)&alpha, a, (const int)lda, b,
+                           (const int)ldb, (const void*)&beta, c, (const int)ldc);
         });
     });
     return done;
 }
 
-sycl::event syr2k(sycl::queue &queue, uplo upper_lower, transpose trans, int64_t n, int64_t k,
-                  std::complex<double> alpha, const std::complex<double> *a, int64_t lda,
-                  const std::complex<double> *b, int64_t ldb, std::complex<double> beta,
-                  std::complex<double> *c, int64_t ldc,
-                  const std::vector<sycl::event> &dependencies) {
-    auto done = queue.submit([&](sycl::handler &cgh) {
+sycl::event syr2k(sycl::queue& queue, uplo upper_lower, transpose trans, int64_t n, int64_t k,
+                  std::complex<double> alpha, const std::complex<double>* a, int64_t lda,
+                  const std::complex<double>* b, int64_t ldb, std::complex<double> beta,
+                  std::complex<double>* c, int64_t ldc,
+                  const std::vector<sycl::event>& dependencies) {
+    auto done = queue.submit([&](sycl::handler& cgh) {
         int64_t num_events = dependencies.size();
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
         host_task<class netlib_zsyr2k_usm>(cgh, [=]() {
             ::cblas_zsyr2k(MAJOR, convert_to_cblas_uplo(upper_lower), convert_to_cblas_trans(trans),
-                           (const int)n, (const int)k, (const void *)&alpha, a, (const int)lda, b,
-                           (const int)ldb, (const void *)&beta, c, (const int)ldc);
+                           (const int)n, (const int)k, (const void*)&alpha, a, (const int)lda, b,
+                           (const int)ldb, (const void*)&beta, c, (const int)ldc);
         });
     });
     return done;
 }
 
-sycl::event trmm(sycl::queue &queue, side left_right, uplo upper_lower, transpose transa,
-                 diag unit_diag, int64_t m, int64_t n, float alpha, const float *a, int64_t lda,
-                 float *b, int64_t ldb, const std::vector<sycl::event> &dependencies) {
-    auto done = queue.submit([&](sycl::handler &cgh) {
+sycl::event trmm(sycl::queue& queue, side left_right, uplo upper_lower, transpose transa,
+                 diag unit_diag, int64_t m, int64_t n, float alpha, const float* a, int64_t lda,
+                 float* b, int64_t ldb, const std::vector<sycl::event>& dependencies) {
+    auto done = queue.submit([&](sycl::handler& cgh) {
         int64_t num_events = dependencies.size();
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
@@ -1017,10 +1015,10 @@ sycl::event trmm(sycl::queue &queue, side left_right, uplo upper_lower, transpos
     return done;
 }
 
-sycl::event trmm(sycl::queue &queue, side left_right, uplo upper_lower, transpose transa,
-                 diag unit_diag, int64_t m, int64_t n, double alpha, const double *a, int64_t lda,
-                 double *b, int64_t ldb, const std::vector<sycl::event> &dependencies) {
-    auto done = queue.submit([&](sycl::handler &cgh) {
+sycl::event trmm(sycl::queue& queue, side left_right, uplo upper_lower, transpose transa,
+                 diag unit_diag, int64_t m, int64_t n, double alpha, const double* a, int64_t lda,
+                 double* b, int64_t ldb, const std::vector<sycl::event>& dependencies) {
+    auto done = queue.submit([&](sycl::handler& cgh) {
         int64_t num_events = dependencies.size();
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
@@ -1035,11 +1033,11 @@ sycl::event trmm(sycl::queue &queue, side left_right, uplo upper_lower, transpos
     return done;
 }
 
-sycl::event trmm(sycl::queue &queue, side left_right, uplo upper_lower, transpose transa,
+sycl::event trmm(sycl::queue& queue, side left_right, uplo upper_lower, transpose transa,
                  diag unit_diag, int64_t m, int64_t n, std::complex<float> alpha,
-                 const std::complex<float> *a, int64_t lda, std::complex<float> *b, int64_t ldb,
-                 const std::vector<sycl::event> &dependencies) {
-    auto done = queue.submit([&](sycl::handler &cgh) {
+                 const std::complex<float>* a, int64_t lda, std::complex<float>* b, int64_t ldb,
+                 const std::vector<sycl::event>& dependencies) {
+    auto done = queue.submit([&](sycl::handler& cgh) {
         int64_t num_events = dependencies.size();
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
@@ -1048,17 +1046,17 @@ sycl::event trmm(sycl::queue &queue, side left_right, uplo upper_lower, transpos
             ::cblas_ctrmm(MAJOR, convert_to_cblas_side(left_right),
                           convert_to_cblas_uplo(upper_lower), convert_to_cblas_trans(transa),
                           convert_to_cblas_diag(unit_diag), (const int)m, (const int)n,
-                          (const void *)&alpha, a, (const int)lda, b, (const int)ldb);
+                          (const void*)&alpha, a, (const int)lda, b, (const int)ldb);
         });
     });
     return done;
 }
 
-sycl::event trmm(sycl::queue &queue, side left_right, uplo upper_lower, transpose transa,
+sycl::event trmm(sycl::queue& queue, side left_right, uplo upper_lower, transpose transa,
                  diag unit_diag, int64_t m, int64_t n, std::complex<double> alpha,
-                 const std::complex<double> *a, int64_t lda, std::complex<double> *b, int64_t ldb,
-                 const std::vector<sycl::event> &dependencies) {
-    auto done = queue.submit([&](sycl::handler &cgh) {
+                 const std::complex<double>* a, int64_t lda, std::complex<double>* b, int64_t ldb,
+                 const std::vector<sycl::event>& dependencies) {
+    auto done = queue.submit([&](sycl::handler& cgh) {
         int64_t num_events = dependencies.size();
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
@@ -1067,16 +1065,16 @@ sycl::event trmm(sycl::queue &queue, side left_right, uplo upper_lower, transpos
             ::cblas_ztrmm(MAJOR, convert_to_cblas_side(left_right),
                           convert_to_cblas_uplo(upper_lower), convert_to_cblas_trans(transa),
                           convert_to_cblas_diag(unit_diag), (const int)m, (const int)n,
-                          (const void *)&alpha, a, (const int)lda, b, (const int)ldb);
+                          (const void*)&alpha, a, (const int)lda, b, (const int)ldb);
         });
     });
     return done;
 }
 
-sycl::event trsm(sycl::queue &queue, side left_right, uplo upper_lower, transpose transa,
-                 diag unit_diag, int64_t m, int64_t n, float alpha, const float *a, int64_t lda,
-                 float *b, int64_t ldb, const std::vector<sycl::event> &dependencies) {
-    auto done = queue.submit([&](sycl::handler &cgh) {
+sycl::event trsm(sycl::queue& queue, side left_right, uplo upper_lower, transpose transa,
+                 diag unit_diag, int64_t m, int64_t n, float alpha, const float* a, int64_t lda,
+                 float* b, int64_t ldb, const std::vector<sycl::event>& dependencies) {
+    auto done = queue.submit([&](sycl::handler& cgh) {
         int64_t num_events = dependencies.size();
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
@@ -1091,10 +1089,10 @@ sycl::event trsm(sycl::queue &queue, side left_right, uplo upper_lower, transpos
     return done;
 }
 
-sycl::event trsm(sycl::queue &queue, side left_right, uplo upper_lower, transpose transa,
-                 diag unit_diag, int64_t m, int64_t n, double alpha, const double *a, int64_t lda,
-                 double *b, int64_t ldb, const std::vector<sycl::event> &dependencies) {
-    auto done = queue.submit([&](sycl::handler &cgh) {
+sycl::event trsm(sycl::queue& queue, side left_right, uplo upper_lower, transpose transa,
+                 diag unit_diag, int64_t m, int64_t n, double alpha, const double* a, int64_t lda,
+                 double* b, int64_t ldb, const std::vector<sycl::event>& dependencies) {
+    auto done = queue.submit([&](sycl::handler& cgh) {
         int64_t num_events = dependencies.size();
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
@@ -1109,11 +1107,11 @@ sycl::event trsm(sycl::queue &queue, side left_right, uplo upper_lower, transpos
     return done;
 }
 
-sycl::event trsm(sycl::queue &queue, side left_right, uplo upper_lower, transpose transa,
+sycl::event trsm(sycl::queue& queue, side left_right, uplo upper_lower, transpose transa,
                  diag unit_diag, int64_t m, int64_t n, std::complex<float> alpha,
-                 const std::complex<float> *a, int64_t lda, std::complex<float> *b, int64_t ldb,
-                 const std::vector<sycl::event> &dependencies) {
-    auto done = queue.submit([&](sycl::handler &cgh) {
+                 const std::complex<float>* a, int64_t lda, std::complex<float>* b, int64_t ldb,
+                 const std::vector<sycl::event>& dependencies) {
+    auto done = queue.submit([&](sycl::handler& cgh) {
         int64_t num_events = dependencies.size();
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
@@ -1122,17 +1120,17 @@ sycl::event trsm(sycl::queue &queue, side left_right, uplo upper_lower, transpos
             ::cblas_ctrsm(MAJOR, convert_to_cblas_side(left_right),
                           convert_to_cblas_uplo(upper_lower), convert_to_cblas_trans(transa),
                           convert_to_cblas_diag(unit_diag), (const int)m, (const int)n,
-                          (const void *)&alpha, a, (const int)lda, b, (const int)ldb);
+                          (const void*)&alpha, a, (const int)lda, b, (const int)ldb);
         });
     });
     return done;
 }
 
-sycl::event trsm(sycl::queue &queue, side left_right, uplo upper_lower, transpose transa,
+sycl::event trsm(sycl::queue& queue, side left_right, uplo upper_lower, transpose transa,
                  diag unit_diag, int64_t m, int64_t n, std::complex<double> alpha,
-                 const std::complex<double> *a, int64_t lda, std::complex<double> *b, int64_t ldb,
-                 const std::vector<sycl::event> &dependencies) {
-    auto done = queue.submit([&](sycl::handler &cgh) {
+                 const std::complex<double>* a, int64_t lda, std::complex<double>* b, int64_t ldb,
+                 const std::vector<sycl::event>& dependencies) {
+    auto done = queue.submit([&](sycl::handler& cgh) {
         int64_t num_events = dependencies.size();
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
@@ -1141,7 +1139,7 @@ sycl::event trsm(sycl::queue &queue, side left_right, uplo upper_lower, transpos
             ::cblas_ztrsm(MAJOR, convert_to_cblas_side(left_right),
                           convert_to_cblas_uplo(upper_lower), convert_to_cblas_trans(transa),
                           convert_to_cblas_diag(unit_diag), (const int)m, (const int)n,
-                          (const void *)&alpha, a, (const int)lda, b, (const int)ldb);
+                          (const void*)&alpha, a, (const int)lda, b, (const int)ldb);
         });
     });
     return done;

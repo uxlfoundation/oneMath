@@ -88,7 +88,7 @@ fp rand_scalar() {
 }
 
 template <typename vec>
-void rand_matrix(vec &M, oneapi::mkl::transpose trans, int m, int n, int ld) {
+void rand_matrix(vec& M, oneapi::mkl::transpose trans, int m, int n, int ld) {
     using fp = typename vec::value_type;
 
     if (trans == oneapi::mkl::transpose::nontrans) {
@@ -104,7 +104,7 @@ void rand_matrix(vec &M, oneapi::mkl::transpose trans, int m, int n, int ld) {
 }
 
 template <typename fp, typename intType>
-intType generate_sparse_matrix(const intType nx, intType *ia, intType *ja, fp *a,
+intType generate_sparse_matrix(const intType nx, intType* ia, intType* ja, fp* a,
                                const intType index = 0) {
     intType nz = nx, ny = nx;
     intType nnz = 0;
@@ -172,7 +172,7 @@ bool check_result(fp res, fp ref, intType nFlops, intType index) {
 }
 
 template <typename T>
-void free_vec(std::vector<T *> &ptr_vec, sycl::queue queue) {
+void free_vec(std::vector<T*>& ptr_vec, sycl::queue queue) {
     for (auto ptr : ptr_vec) {
         sycl::free(ptr, queue);
     }

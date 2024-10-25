@@ -43,19 +43,19 @@
 using namespace sycl;
 using std::vector;
 
-extern std::vector<sycl::device *> devices;
+extern std::vector<sycl::device*> devices;
 
 namespace {
 
 template <typename fp>
-int test(device *dev, oneapi::mkl::layout layout, int64_t group_count) {
+int test(device* dev, oneapi::mkl::layout layout, int64_t group_count) {
     // Catch asynchronous exceptions.
     auto exception_handler = [](exception_list exceptions) {
-        for (std::exception_ptr const &e : exceptions) {
+        for (std::exception_ptr const& e : exceptions) {
             try {
                 std::rethrow_exception(e);
             }
-            catch (exception const &e) {
+            catch (exception const& e) {
                 std::cout << "Caught asynchronous SYCL exception during TRSM_BATCH:\n"
                           << e.what() << std::endl;
                 print_error_code(e);
@@ -128,8 +128,8 @@ int test(device *dev, oneapi::mkl::layout layout, int64_t group_count) {
         total_batch_count += group_size[i];
     }
 
-    auto uafpp = usm_allocator<fp *, usm::alloc::shared, 64>(cxt, *dev);
-    vector<fp *, decltype(uafpp)> a_array(uafpp), b_array(uafpp), b_ref_array(uafpp);
+    auto uafpp = usm_allocator<fp*, usm::alloc::shared, 64>(cxt, *dev);
+    vector<fp*, decltype(uafpp)> a_array(uafpp), b_array(uafpp), b_ref_array(uafpp);
 
     a_array.resize(total_batch_count);
     b_array.resize(total_batch_count);
@@ -141,9 +141,9 @@ int test(device *dev, oneapi::mkl::layout layout, int64_t group_count) {
         Arank = left_right[i] == oneapi::mkl::side::left ? m[i] : n[i];
         size_b = ldb[i] * ((layout == oneapi::mkl::layout::col_major) ? n[i] : m[i]);
         for (j = 0; j < group_size[i]; j++) {
-            a_array[idx] = (fp *)oneapi::mkl::malloc_shared(64, sizeof(fp) * size_a, *dev, cxt);
-            b_array[idx] = (fp *)oneapi::mkl::malloc_shared(64, sizeof(fp) * size_b, *dev, cxt);
-            b_ref_array[idx] = (fp *)oneapi::mkl::malloc_shared(64, sizeof(fp) * size_b, *dev, cxt);
+            a_array[idx] = (fp*)oneapi::mkl::malloc_shared(64, sizeof(fp) * size_a, *dev, cxt);
+            b_array[idx] = (fp*)oneapi::mkl::malloc_shared(64, sizeof(fp) * size_b, *dev, cxt);
+            b_ref_array[idx] = (fp*)oneapi::mkl::malloc_shared(64, sizeof(fp) * size_b, *dev, cxt);
             rand_trsm_matrix(a_array[idx], layout, trans[i], Arank, Arank, lda[i]);
             rand_matrix(b_array[idx], layout, oneapi::mkl::transpose::nontrans, m[i], n[i], ldb[i]);
             copy_matrix(b_array[idx], layout, oneapi::mkl::transpose::nontrans, m[i], n[i], ldb[i],
@@ -154,20 +154,20 @@ int test(device *dev, oneapi::mkl::layout layout, int64_t group_count) {
 
     // Call reference TRSM_BATCH.
     using fp_ref = typename ref_type_info<fp>::type;
-    int *m_ref = (int *)oneapi::mkl::aligned_alloc(64, sizeof(int) * group_count);
-    int *n_ref = (int *)oneapi::mkl::aligned_alloc(64, sizeof(int) * group_count);
-    int *lda_ref = (int *)oneapi::mkl::aligned_alloc(64, sizeof(int) * group_count);
-    int *ldb_ref = (int *)oneapi::mkl::aligned_alloc(64, sizeof(int) * group_count);
-    int *group_size_ref = (int *)oneapi::mkl::aligned_alloc(64, sizeof(int) * group_count);
+    int* m_ref = (int*)oneapi::mkl::aligned_alloc(64, sizeof(int) * group_count);
+    int* n_ref = (int*)oneapi::mkl::aligned_alloc(64, sizeof(int) * group_count);
+    int* lda_ref = (int*)oneapi::mkl::aligned_alloc(64, sizeof(int) * group_count);
+    int* ldb_ref = (int*)oneapi::mkl::aligned_alloc(64, sizeof(int) * group_count);
+    int* group_size_ref = (int*)oneapi::mkl::aligned_alloc(64, sizeof(int) * group_count);
 
-    CBLAS_TRANSPOSE *trans_ref =
-        (CBLAS_TRANSPOSE *)oneapi::mkl::aligned_alloc(64, sizeof(CBLAS_TRANSPOSE) * group_count);
-    CBLAS_SIDE *left_right_ref =
-        (CBLAS_SIDE *)oneapi::mkl::aligned_alloc(64, sizeof(CBLAS_SIDE) * group_count);
-    CBLAS_UPLO *upper_lower_ref =
-        (CBLAS_UPLO *)oneapi::mkl::aligned_alloc(64, sizeof(CBLAS_UPLO) * group_count);
-    CBLAS_DIAG *unit_nonunit_ref =
-        (CBLAS_DIAG *)oneapi::mkl::aligned_alloc(64, sizeof(CBLAS_DIAG) * group_count);
+    CBLAS_TRANSPOSE* trans_ref =
+        (CBLAS_TRANSPOSE*)oneapi::mkl::aligned_alloc(64, sizeof(CBLAS_TRANSPOSE) * group_count);
+    CBLAS_SIDE* left_right_ref =
+        (CBLAS_SIDE*)oneapi::mkl::aligned_alloc(64, sizeof(CBLAS_SIDE) * group_count);
+    CBLAS_UPLO* upper_lower_ref =
+        (CBLAS_UPLO*)oneapi::mkl::aligned_alloc(64, sizeof(CBLAS_UPLO) * group_count);
+    CBLAS_DIAG* unit_nonunit_ref =
+        (CBLAS_DIAG*)oneapi::mkl::aligned_alloc(64, sizeof(CBLAS_DIAG) * group_count);
 
     if ((m_ref == NULL) || (n_ref == NULL) || (lda_ref == NULL) || (ldb_ref == NULL) ||
         (trans_ref == NULL) || (left_right_ref == NULL) || (upper_lower_ref == NULL) ||
@@ -206,9 +206,9 @@ int test(device *dev, oneapi::mkl::layout layout, int64_t group_count) {
         group_size_ref[i] = (int)group_size[i];
         for (j = 0; j < group_size_ref[i]; j++) {
             ::trsm(convert_to_cblas_layout(layout), left_right_ref[i], upper_lower_ref[i],
-                   trans_ref[i], unit_nonunit_ref[i], (const int *)&m_ref[i],
-                   (const int *)&n_ref[i], (const fp_ref *)&alpha[i], (const fp_ref *)a_array[idx],
-                   (const int *)&lda_ref[i], b_ref_array[idx], (const int *)&ldb_ref[i]);
+                   trans_ref[i], unit_nonunit_ref[i], (const int*)&m_ref[i], (const int*)&n_ref[i],
+                   (const fp_ref*)&alpha[i], (const fp_ref*)a_array[idx], (const int*)&lda_ref[i],
+                   b_ref_array[idx], (const int*)&ldb_ref[i]);
             idx++;
         }
     }
@@ -221,13 +221,13 @@ int test(device *dev, oneapi::mkl::layout layout, int64_t group_count) {
             case oneapi::mkl::layout::col_major:
                 done = oneapi::mkl::blas::column_major::trsm_batch(
                     main_queue, &left_right[0], &upper_lower[0], &trans[0], &unit_nonunit[0], &m[0],
-                    &n[0], &alpha[0], (const fp **)&a_array[0], &lda[0], &b_array[0], &ldb[0],
+                    &n[0], &alpha[0], (const fp**)&a_array[0], &lda[0], &b_array[0], &ldb[0],
                     group_count, &group_size[0], dependencies);
                 break;
             case oneapi::mkl::layout::row_major:
                 done = oneapi::mkl::blas::row_major::trsm_batch(
                     main_queue, &left_right[0], &upper_lower[0], &trans[0], &unit_nonunit[0], &m[0],
-                    &n[0], &alpha[0], (const fp **)&a_array[0], &lda[0], &b_array[0], &ldb[0],
+                    &n[0], &alpha[0], (const fp**)&a_array[0], &lda[0], &b_array[0], &ldb[0],
                     group_count, &group_size[0], dependencies);
                 break;
             default: break;
@@ -239,14 +239,14 @@ int test(device *dev, oneapi::mkl::layout layout, int64_t group_count) {
                 TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::mkl::blas::column_major::trsm_batch,
                                         &left_right[0], &upper_lower[0], &trans[0],
                                         &unit_nonunit[0], &m[0], &n[0], &alpha[0],
-                                        (const fp **)&a_array[0], &lda[0], &b_array[0], &ldb[0],
+                                        (const fp**)&a_array[0], &lda[0], &b_array[0], &ldb[0],
                                         group_count, &group_size[0], dependencies);
                 break;
             case oneapi::mkl::layout::row_major:
                 TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::mkl::blas::row_major::trsm_batch,
                                         &left_right[0], &upper_lower[0], &trans[0],
                                         &unit_nonunit[0], &m[0], &n[0], &alpha[0],
-                                        (const fp **)&a_array[0], &lda[0], &b_array[0], &ldb[0],
+                                        (const fp**)&a_array[0], &lda[0], &b_array[0], &ldb[0],
                                         group_count, &group_size[0], dependencies);
                 break;
             default: break;
@@ -254,13 +254,13 @@ int test(device *dev, oneapi::mkl::layout layout, int64_t group_count) {
         main_queue.wait();
 #endif
     }
-    catch (exception const &e) {
+    catch (exception const& e) {
         std::cout << "Caught synchronous SYCL exception during TRSM_BATCH:\n"
                   << e.what() << std::endl;
         print_error_code(e);
     }
 
-    catch (const oneapi::mkl::unimplemented &e) {
+    catch (const oneapi::mkl::unimplemented& e) {
         oneapi::mkl::aligned_free(m_ref);
         oneapi::mkl::aligned_free(n_ref);
         oneapi::mkl::aligned_free(lda_ref);
@@ -282,7 +282,7 @@ int test(device *dev, oneapi::mkl::layout layout, int64_t group_count) {
         return test_skipped;
     }
 
-    catch (const std::runtime_error &error) {
+    catch (const std::runtime_error& error) {
         std::cout << "Error raised during execution of TRSM_BATCH:\n" << error.what() << std::endl;
     }
 
@@ -319,7 +319,7 @@ int test(device *dev, oneapi::mkl::layout layout, int64_t group_count) {
 }
 
 class TrsmBatchUsmTests
-        : public ::testing::TestWithParam<std::tuple<sycl::device *, oneapi::mkl::layout>> {};
+        : public ::testing::TestWithParam<std::tuple<sycl::device*, oneapi::mkl::layout>> {};
 
 TEST_P(TrsmBatchUsmTests, RealSinglePrecision) {
     EXPECT_TRUEORSKIP(test<float>(std::get<0>(GetParam()), std::get<1>(GetParam()), 5));

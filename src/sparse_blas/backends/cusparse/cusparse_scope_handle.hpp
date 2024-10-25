@@ -44,8 +44,8 @@ namespace oneapi::mkl::sparse::cusparse {
 
 class CusparseScopedContextHandler {
     CUcontext original_;
-    sycl::context *placedContext_;
-    sycl::interop_handle &ih;
+    sycl::context* placedContext_;
+    sycl::interop_handle& ih;
     bool needToRecover_;
 
 #ifdef ONEAPI_ONEMKL_PI_INTERFACE_REMOVED
@@ -54,11 +54,11 @@ class CusparseScopedContextHandler {
     static thread_local cusparse_global_handle<pi_context> handle_helper;
 #endif
 
-    CUstream get_stream(const sycl::queue &queue);
-    sycl::context get_context(const sycl::queue &queue);
+    CUstream get_stream(const sycl::queue& queue);
+    sycl::context get_context(const sycl::queue& queue);
 
 public:
-    CusparseScopedContextHandler(sycl::queue queue, sycl::interop_handle &ih);
+    CusparseScopedContextHandler(sycl::queue queue, sycl::interop_handle& ih);
 
     ~CusparseScopedContextHandler() noexcept(false);
 
@@ -69,18 +69,18 @@ public:
      * @param queue sycl queue.
      * @return a pair of: cusparseHandle_t a handle to construct cusparse routines; and a CUDA stream
      */
-    std::pair<cusparseHandle_t, CUstream> get_handle_and_stream(const sycl::queue &queue);
+    std::pair<cusparseHandle_t, CUstream> get_handle_and_stream(const sycl::queue& queue);
 
     /// See get_handle_and_stream
-    cusparseHandle_t get_handle(const sycl::queue &queue);
+    cusparseHandle_t get_handle(const sycl::queue& queue);
 };
 
 // Get the native pointer from an accessor. This is a different pointer than
 // what can be retrieved with get_multi_ptr.
 template <typename AccT>
-inline void *get_mem(sycl::interop_handle ih, AccT acc) {
+inline void* get_mem(sycl::interop_handle ih, AccT acc) {
     auto cudaPtr = ih.get_native_mem<sycl::backend::ext_oneapi_cuda>(acc);
-    return reinterpret_cast<void *>(cudaPtr);
+    return reinterpret_cast<void*>(cudaPtr);
 }
 
 } // namespace oneapi::mkl::sparse::cusparse

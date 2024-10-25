@@ -42,12 +42,12 @@
 using namespace sycl;
 using std::vector;
 
-extern std::vector<sycl::device *> devices;
+extern std::vector<sycl::device*> devices;
 
 namespace {
 
 template <typename fp, typename fp_scalar>
-int test(device *dev, oneapi::mkl::layout layout, oneapi::mkl::uplo upper_lower, int n,
+int test(device* dev, oneapi::mkl::layout layout, oneapi::mkl::uplo upper_lower, int n,
          fp_scalar alpha, int incx, int lda) {
     // Prepare data.
     vector<fp> x, A_ref, A;
@@ -61,17 +61,17 @@ int test(device *dev, oneapi::mkl::layout layout, oneapi::mkl::uplo upper_lower,
     using fp_scalar_mkl = typename ref_type_info<fp_scalar>::type;
 
     ::her(convert_to_cblas_layout(layout), convert_to_cblas_uplo(upper_lower), &n_ref,
-          (fp_scalar_mkl *)&alpha, (fp_ref *)x.data(), &incx_ref, (fp_ref *)A_ref.data(), &lda_ref);
+          (fp_scalar_mkl*)&alpha, (fp_ref*)x.data(), &incx_ref, (fp_ref*)A_ref.data(), &lda_ref);
 
     // Call DPC++ HER.
 
     // Catch asynchronous exceptions.
     auto exception_handler = [](exception_list exceptions) {
-        for (std::exception_ptr const &e : exceptions) {
+        for (std::exception_ptr const& e : exceptions) {
             try {
                 std::rethrow_exception(e);
             }
-            catch (exception const &e) {
+            catch (exception const& e) {
                 std::cout << "Caught asynchronous SYCL exception during HER:\n"
                           << e.what() << std::endl;
                 print_error_code(e);
@@ -111,16 +111,16 @@ int test(device *dev, oneapi::mkl::layout layout, oneapi::mkl::uplo upper_lower,
         }
 #endif
     }
-    catch (exception const &e) {
+    catch (exception const& e) {
         std::cout << "Caught synchronous SYCL exception during HER:\n" << e.what() << std::endl;
         print_error_code(e);
     }
 
-    catch (const oneapi::mkl::unimplemented &e) {
+    catch (const oneapi::mkl::unimplemented& e) {
         return test_skipped;
     }
 
-    catch (const std::runtime_error &error) {
+    catch (const std::runtime_error& error) {
         std::cout << "Error raised during execution of HER:\n" << error.what() << std::endl;
     }
 
@@ -131,8 +131,7 @@ int test(device *dev, oneapi::mkl::layout layout, oneapi::mkl::uplo upper_lower,
     return (int)good;
 }
 
-class HerTests : public ::testing::TestWithParam<std::tuple<sycl::device *, oneapi::mkl::layout>> {
-};
+class HerTests : public ::testing::TestWithParam<std::tuple<sycl::device*, oneapi::mkl::layout>> {};
 
 TEST_P(HerTests, ComplexSinglePrecision) {
     float alpha(2.0);

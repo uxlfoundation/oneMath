@@ -38,7 +38,7 @@ class exception : public std::exception {
     std::string msg_;
 
 public:
-    exception(const std::string &domain, const std::string &function, const std::string &info = "")
+    exception(const std::string& domain, const std::string& function, const std::string& info = "")
             : std::exception() {
         msg_ = std::string("oneMKL: ") + domain +
                ((domain.length() != 0 && function.length() != 0) ? "/" : "") + function +
@@ -47,15 +47,15 @@ public:
                     : "");
     }
 
-    const char *what() const noexcept override {
+    const char* what() const noexcept override {
         return msg_.c_str();
     }
 };
 
 class unsupported_device : public oneapi::mkl::exception {
 public:
-    unsupported_device(const std::string &domain, const std::string &function,
-                       const sycl::device &device)
+    unsupported_device(const std::string& domain, const std::string& function,
+                       const sycl::device& device)
             : oneapi::mkl::exception(
                   domain, function,
                   device.get_info<sycl::info::device::name>() + " is not supported") {}
@@ -63,14 +63,14 @@ public:
 
 class host_bad_alloc : public oneapi::mkl::exception {
 public:
-    host_bad_alloc(const std::string &domain, const std::string &function)
+    host_bad_alloc(const std::string& domain, const std::string& function)
             : oneapi::mkl::exception(domain, function, "cannot allocate memory on host") {}
 };
 
 class device_bad_alloc : public oneapi::mkl::exception {
 public:
-    device_bad_alloc(const std::string &domain, const std::string &function,
-                     const sycl::device &device)
+    device_bad_alloc(const std::string& domain, const std::string& function,
+                     const sycl::device& device)
             : oneapi::mkl::exception(
                   domain, function,
                   "cannot allocate memory on " + device.get_info<sycl::info::device::name>()) {}
@@ -78,30 +78,30 @@ public:
 
 class unimplemented : public oneapi::mkl::exception {
 public:
-    unimplemented(const std::string &domain, const std::string &function,
-                  const std::string &info = "")
+    unimplemented(const std::string& domain, const std::string& function,
+                  const std::string& info = "")
             : oneapi::mkl::exception(domain, function, "function is not implemented " + info) {}
 };
 
 class invalid_argument : public oneapi::mkl::exception {
 public:
-    invalid_argument(const std::string &domain, const std::string &function,
-                     const std::string &info = "")
+    invalid_argument(const std::string& domain, const std::string& function,
+                     const std::string& info = "")
             : oneapi::mkl::exception(domain, function, "invalid argument " + info) {}
 };
 
 class uninitialized : public oneapi::mkl::exception {
 public:
-    uninitialized(const std::string &domain, const std::string &function,
-                  const std::string &info = "")
+    uninitialized(const std::string& domain, const std::string& function,
+                  const std::string& info = "")
             : oneapi::mkl::exception(domain, function,
                                      "handle/descriptor is not initialized " + info) {}
 };
 
 class computation_error : public oneapi::mkl::exception {
 public:
-    computation_error(const std::string &domain, const std::string &function,
-                      const std::string &info = "")
+    computation_error(const std::string& domain, const std::string& function,
+                      const std::string& info = "")
             : oneapi::mkl::exception(
                   domain, function,
                   "computation error" + ((info.length() != 0) ? (": " + info) : "")) {}
@@ -109,16 +109,16 @@ public:
 
 class batch_error : public oneapi::mkl::exception {
 public:
-    batch_error(const std::string &domain, const std::string &function,
-                const std::string &info = "")
+    batch_error(const std::string& domain, const std::string& function,
+                const std::string& info = "")
             : oneapi::mkl::exception(domain, function,
                                      "batch error" + ((info.length() != 0) ? (": " + info) : "")) {}
 };
 
 class library_not_found : public oneapi::mkl::exception {
 public:
-    library_not_found(const std::string &domain, const std::string &function,
-                      const std::string &info = "")
+    library_not_found(const std::string& domain, const std::string& function,
+                      const std::string& info = "")
             : oneapi::mkl::exception(
                   domain, function,
                   "library not found" + ((info.length() != 0) ? (": " + info) : "")) {}

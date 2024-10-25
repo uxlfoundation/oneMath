@@ -30,10 +30,10 @@ namespace rocsolver {
 
 template <typename T>
 struct rocsolver_handle {
-    using handle_container_t = std::unordered_map<T, std::atomic<rocblas_handle> *>;
+    using handle_container_t = std::unordered_map<T, std::atomic<rocblas_handle>*>;
     handle_container_t rocsolver_handle_mapper_{};
     ~rocsolver_handle() noexcept(false) {
-        for (auto &handle_pair : rocsolver_handle_mapper_) {
+        for (auto& handle_pair : rocsolver_handle_mapper_) {
             rocblas_status err;
             if (handle_pair.second != nullptr) {
                 auto handle = handle_pair.second->exchange(nullptr);

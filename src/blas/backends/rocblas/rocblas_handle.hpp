@@ -30,10 +30,10 @@ namespace rocblas {
 
 template <typename T>
 struct rocblas_handle_ {
-    using handle_container_t = std::unordered_map<T, std::atomic<rocblas_handle> *>;
+    using handle_container_t = std::unordered_map<T, std::atomic<rocblas_handle>*>;
     handle_container_t rocblas_handle_mapper_{};
     ~rocblas_handle_() noexcept(false) {
-        for (auto &handle_pair : rocblas_handle_mapper_) {
+        for (auto& handle_pair : rocblas_handle_mapper_) {
             rocblas_status err;
             if (handle_pair.second != nullptr) {
                 auto handle = handle_pair.second->exchange(nullptr);

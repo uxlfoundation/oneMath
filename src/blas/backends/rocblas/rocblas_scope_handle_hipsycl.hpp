@@ -35,7 +35,7 @@ namespace blas {
 namespace rocblas {
 
 struct rocblas_handle_container {
-    using handle_container_t = std::unordered_map<int, std::atomic<rocblas_handle> *>;
+    using handle_container_t = std::unordered_map<int, std::atomic<rocblas_handle>*>;
     handle_container_t rocblas_handle_mapper_{};
     ~rocblas_handle_container() noexcept(false);
 };
@@ -43,13 +43,13 @@ struct rocblas_handle_container {
 class RocblasScopedContextHandler {
     sycl::interop_handle interop_h;
     static thread_local rocblas_handle_container handle_helper;
-    sycl::context get_context(const sycl::queue &queue);
-    hipStream_t get_stream(const sycl::queue &queue);
+    sycl::context get_context(const sycl::queue& queue);
+    hipStream_t get_stream(const sycl::queue& queue);
 
 public:
-    RocblasScopedContextHandler(sycl::queue queue, sycl::interop_handle &ih);
+    RocblasScopedContextHandler(sycl::queue queue, sycl::interop_handle& ih);
 
-    rocblas_handle get_handle(const sycl::queue &queue);
+    rocblas_handle get_handle(const sycl::queue& queue);
 
     // This is a work-around function for reinterpret_casting the memory. This
     // will be fixed when SYCL-2020 has been implemented for Pi backend.

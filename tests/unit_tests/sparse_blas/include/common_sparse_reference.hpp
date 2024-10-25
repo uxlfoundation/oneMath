@@ -55,9 +55,9 @@ inline T opVal(const T t, const bool isConj) {
 };
 
 template <typename fpType, typename intType, typename accIntType, typename accFpType>
-void do_csr_transpose(const oneapi::mkl::transpose opA, intType *ia_t, intType *ja_t, fpType *a_t,
-                      intType a_nrows, intType a_ncols, intType indexing, accIntType &ia,
-                      accIntType &ja, accFpType &a, const bool structOnlyFlag = false) {
+void do_csr_transpose(const oneapi::mkl::transpose opA, intType* ia_t, intType* ja_t, fpType* a_t,
+                      intType a_nrows, intType a_ncols, intType indexing, accIntType& ia,
+                      accIntType& ja, accFpType& a, const bool structOnlyFlag = false) {
     const bool isConj = (opA == oneapi::mkl::transpose::conjtrans);
 
     // initialize ia_t to zero
@@ -105,7 +105,7 @@ void do_csr_transpose(const oneapi::mkl::transpose opA, intType *ia_t, intType *
 
 // Transpose the given sparse matrix if needed
 template <typename fpType, typename intType>
-auto sparse_transpose_if_needed(const intType *ia, const intType *ja, const fpType *a,
+auto sparse_transpose_if_needed(const intType* ia, const intType* ja, const fpType* a,
                                 intType a_nrows, intType a_ncols, std::size_t nnz, intType indexing,
                                 oneapi::mkl::transpose transpose_val) {
     std::vector<intType> iopa;
@@ -134,7 +134,7 @@ auto sparse_transpose_if_needed(const intType *ia, const intType *ja, const fpTy
 /// Reduce the leading dimension to the minimum and transpose the matrix if needed
 /// The outputted matrix always uses row major layout
 template <typename fpType>
-auto extract_dense_matrix(const fpType *x, std::size_t nrows, std::size_t ncols, std::size_t ld,
+auto extract_dense_matrix(const fpType* x, std::size_t nrows, std::size_t ncols, std::size_t ld,
                           oneapi::mkl::transpose transpose_val,
                           oneapi::mkl::layout dense_matrix_layout) {
     const bool is_row_major = dense_matrix_layout == oneapi::mkl::layout::row_major;
@@ -161,8 +161,8 @@ auto extract_dense_matrix(const fpType *x, std::size_t nrows, std::size_t ncols,
 
 /// Convert the sparse matrix in the given format to a dense matrix A in row major layout applied with A_view.
 template <typename fpType, typename intType>
-std::vector<fpType> sparse_to_dense(sparse_matrix_format_t format, const intType *ia,
-                                    const intType *ja, const fpType *a, std::size_t a_nrows,
+std::vector<fpType> sparse_to_dense(sparse_matrix_format_t format, const intType* ia,
+                                    const intType* ja, const fpType* a, std::size_t a_nrows,
                                     std::size_t a_ncols, std::size_t nnz, intType indexing,
                                     oneapi::mkl::transpose transpose_val,
                                     oneapi::mkl::sparse::matrix_view A_view) {

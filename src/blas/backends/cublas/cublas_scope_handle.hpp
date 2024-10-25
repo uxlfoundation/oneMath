@@ -85,19 +85,19 @@ the handle must be destroyed when the context goes out of scope. This will bind 
 
 class CublasScopedContextHandler {
     CUcontext original_;
-    sycl::context *placedContext_;
+    sycl::context* placedContext_;
     bool needToRecover_;
-    sycl::interop_handle &ih;
+    sycl::interop_handle& ih;
 #ifdef ONEAPI_ONEMKL_PI_INTERFACE_REMOVED
     static thread_local cublas_handle<ur_context_handle_t> handle_helper;
 #else
     static thread_local cublas_handle<pi_context> handle_helper;
 #endif
-    CUstream get_stream(const sycl::queue &queue);
-    sycl::context get_context(const sycl::queue &queue);
+    CUstream get_stream(const sycl::queue& queue);
+    sycl::context get_context(const sycl::queue& queue);
 
 public:
-    CublasScopedContextHandler(sycl::queue queue, sycl::interop_handle &ih);
+    CublasScopedContextHandler(sycl::queue queue, sycl::interop_handle& ih);
 
     ~CublasScopedContextHandler() noexcept(false);
     /**
@@ -107,7 +107,7 @@ public:
    * @param queue sycl queue.
    * @return cublasHandle_t a handle to construct cublas routines
    */
-    cublasHandle_t get_handle(const sycl::queue &queue);
+    cublasHandle_t get_handle(const sycl::queue& queue);
     // This is a work-around function for reinterpret_casting the memory. This
     // will be fixed when SYCL-2020 has been implemented for Pi backend.
     template <typename T, typename U>
@@ -116,7 +116,7 @@ public:
         return reinterpret_cast<T>(cudaPtr);
     }
 
-    void wait_stream(const sycl::queue &queue) {
+    void wait_stream(const sycl::queue& queue) {
         cuStreamSynchronize(get_stream(queue));
     }
 };

@@ -37,8 +37,8 @@
 namespace oneapi::mkl::dft::cufft::detail {
 
 template <dft::precision prec, dft::domain dom>
-inline dft::detail::commit_impl<prec, dom> *checked_get_commit(
-    dft::detail::descriptor<prec, dom> &desc) {
+inline dft::detail::commit_impl<prec, dom>* checked_get_commit(
+    dft::detail::descriptor<prec, dom>& desc) {
     auto commit_handle = dft::detail::get_commit(desc);
     if (commit_handle == nullptr || commit_handle->get_backend() != backend::cufft) {
         throw mkl::invalid_argument("dft/backends/cufft", "get_commit",
@@ -50,7 +50,7 @@ inline dft::detail::commit_impl<prec, dom> *checked_get_commit(
 /// Throw an mkl::invalid_argument if the runtime param in the descriptor does not match
 /// the expected value.
 template <dft::config_param Param, dft::config_value Expected, typename DescT>
-inline auto expect_config(DescT &desc, const char *message) {
+inline auto expect_config(DescT& desc, const char* message) {
     dft::config_value actual{ 0 };
     desc.get_value(Param, &actual);
     if (actual != Expected) {
@@ -61,8 +61,8 @@ inline auto expect_config(DescT &desc, const char *message) {
 enum class Direction { Forward = CUFFT_FORWARD, Backward = CUFFT_INVERSE };
 
 template <Direction dir, typename forward_data_type>
-void cufft_execute(const std::string &func, CUstream stream, cufftHandle plan, void *input,
-                   void *output) {
+void cufft_execute(const std::string& func, CUstream stream, cufftHandle plan, void* input,
+                   void* output) {
     constexpr bool is_real = std::is_floating_point_v<forward_data_type>;
     using single_type = std::conditional_t<is_real, float, std::complex<float>>;
     constexpr bool is_single = std::is_same_v<forward_data_type, single_type>;
@@ -70,16 +70,16 @@ void cufft_execute(const std::string &func, CUstream stream, cufftHandle plan, v
     if constexpr (is_real) {
         if constexpr (dir == Direction::Forward) {
             if constexpr (is_single) {
-                auto result = cufftExecR2C(plan, reinterpret_cast<cufftReal *>(input),
-                                           reinterpret_cast<cufftComplex *>(output));
+                auto result = cufftExecR2C(plan, reinterpret_cast<cufftReal*>(input),
+                                           reinterpret_cast<cufftComplex*>(output));
                 if (result != CUFFT_SUCCESS) {
                     throw oneapi::mkl::exception("dft/backends/cufft", func,
                                                  "cufftExecR2C returned " + std::to_string(result));
                 }
             }
             else {
-                auto result = cufftExecD2Z(plan, reinterpret_cast<cufftDoubleReal *>(input),
-                                           reinterpret_cast<cufftDoubleComplex *>(output));
+                auto result = cufftExecD2Z(plan, reinterpret_cast<cufftDoubleReal*>(input),
+                                           reinterpret_cast<cufftDoubleComplex*>(output));
                 if (result != CUFFT_SUCCESS) {
                     throw oneapi::mkl::exception("dft/backends/cufft", func,
                                                  "cufftExecD2Z returned " + std::to_string(result));
@@ -88,16 +88,16 @@ void cufft_execute(const std::string &func, CUstream stream, cufftHandle plan, v
         }
         else {
             if constexpr (is_single) {
-                auto result = cufftExecC2R(plan, reinterpret_cast<cufftComplex *>(input),
-                                           reinterpret_cast<cufftReal *>(output));
+                auto result = cufftExecC2R(plan, reinterpret_cast<cufftComplex*>(input),
+                                           reinterpret_cast<cufftReal*>(output));
                 if (result != CUFFT_SUCCESS) {
                     throw oneapi::mkl::exception("dft/backends/cufft", func,
                                                  "cufftExecC2R returned " + std::to_string(result));
                 }
             }
             else {
-                auto result = cufftExecZ2D(plan, reinterpret_cast<cufftDoubleComplex *>(input),
-                                           reinterpret_cast<cufftDoubleReal *>(output));
+                auto result = cufftExecZ2D(plan, reinterpret_cast<cufftDoubleComplex*>(input),
+                                           reinterpret_cast<cufftDoubleReal*>(output));
                 if (result != CUFFT_SUCCESS) {
                     throw oneapi::mkl::exception("dft/backends/cufft", func,
                                                  "cufftExecZ2D returned " + std::to_string(result));
@@ -108,8 +108,8 @@ void cufft_execute(const std::string &func, CUstream stream, cufftHandle plan, v
     else {
         if constexpr (is_single) {
             auto result =
-                cufftExecC2C(plan, reinterpret_cast<cufftComplex *>(input),
-                             reinterpret_cast<cufftComplex *>(output), static_cast<int>(dir));
+                cufftExecC2C(plan, reinterpret_cast<cufftComplex*>(input),
+                             reinterpret_cast<cufftComplex*>(output), static_cast<int>(dir));
             if (result != CUFFT_SUCCESS) {
                 throw oneapi::mkl::exception("dft/backends/cufft", func,
                                              "cufftExecC2C returned " + std::to_string(result));
@@ -117,8 +117,8 @@ void cufft_execute(const std::string &func, CUstream stream, cufftHandle plan, v
         }
         else {
             auto result =
-                cufftExecZ2Z(plan, reinterpret_cast<cufftDoubleComplex *>(input),
-                             reinterpret_cast<cufftDoubleComplex *>(output), static_cast<int>(dir));
+                cufftExecZ2Z(plan, reinterpret_cast<cufftDoubleComplex*>(input),
+                             reinterpret_cast<cufftDoubleComplex*>(output), static_cast<int>(dir));
             if (result != CUFFT_SUCCESS) {
                 throw oneapi::mkl::exception("dft/backends/cufft", func,
                                              "cufftExecZ2Z returned " + std::to_string(result));
@@ -133,7 +133,7 @@ void cufft_execute(const std::string &func, CUstream stream, cufftHandle plan, v
     }
 }
 
-inline CUstream setup_stream(const std::string &func, sycl::interop_handle ih, cufftHandle plan) {
+inline CUstream setup_stream(const std::string& func, sycl::interop_handle ih, cufftHandle plan) {
     auto stream = ih.get_native_queue<sycl::backend::ext_oneapi_cuda>();
     auto result = cufftSetStream(plan, stream);
     if (result != CUFFT_SUCCESS) {

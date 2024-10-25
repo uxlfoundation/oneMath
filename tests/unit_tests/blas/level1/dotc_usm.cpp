@@ -41,19 +41,19 @@
 using namespace sycl;
 using std::vector;
 
-extern std::vector<sycl::device *> devices;
+extern std::vector<sycl::device*> devices;
 
 namespace {
 
 template <typename fp>
-int test(device *dev, oneapi::mkl::layout layout, int N, int incx, int incy) {
+int test(device* dev, oneapi::mkl::layout layout, int N, int incx, int incy) {
     // Catch asynchronous exceptions.
     auto exception_handler = [](exception_list exceptions) {
-        for (std::exception_ptr const &e : exceptions) {
+        for (std::exception_ptr const& e : exceptions) {
             try {
                 std::rethrow_exception(e);
             }
-            catch (exception const &e) {
+            catch (exception const& e) {
                 std::cout << "Caught asynchronous SYCL exception during DOTC:\n"
                           << e.what() << std::endl;
                 print_error_code(e);
@@ -78,12 +78,12 @@ int test(device *dev, oneapi::mkl::layout layout, int N, int incx, int incy) {
     using fp_ref = typename ref_type_info<fp>::type;
     const int N_ref = N, incx_ref = incx, incy_ref = incy;
 
-    ::dotc((fp_ref *)&result_reference, &N_ref, (fp_ref *)x.data(), &incx_ref, (fp_ref *)y.data(),
+    ::dotc((fp_ref*)&result_reference, &N_ref, (fp_ref*)x.data(), &incx_ref, (fp_ref*)y.data(),
            &incy_ref);
 
     // Call DPC++ DOTC.
 
-    auto result_p = (fp *)oneapi::mkl::malloc_shared(64, sizeof(fp), *dev, cxt);
+    auto result_p = (fp*)oneapi::mkl::malloc_shared(64, sizeof(fp), *dev, cxt);
 
     try {
 #ifdef CALL_RT_API
@@ -114,16 +114,16 @@ int test(device *dev, oneapi::mkl::layout layout, int N, int incx, int incy) {
         main_queue.wait();
 #endif
     }
-    catch (exception const &e) {
+    catch (exception const& e) {
         std::cout << "Caught synchronous SYCL exception during DOTC:\n" << e.what() << std::endl;
         print_error_code(e);
     }
 
-    catch (const oneapi::mkl::unimplemented &e) {
+    catch (const oneapi::mkl::unimplemented& e) {
         return test_skipped;
     }
 
-    catch (const std::runtime_error &error) {
+    catch (const std::runtime_error& error) {
         std::cout << "Error raised during execution of DOTC:\n" << error.what() << std::endl;
     }
 
@@ -137,7 +137,7 @@ int test(device *dev, oneapi::mkl::layout layout, int N, int incx, int incy) {
 }
 
 class DotcUsmTests
-        : public ::testing::TestWithParam<std::tuple<sycl::device *, oneapi::mkl::layout>> {};
+        : public ::testing::TestWithParam<std::tuple<sycl::device*, oneapi::mkl::layout>> {};
 
 TEST_P(DotcUsmTests, ComplexSinglePrecision) {
     EXPECT_TRUEORSKIP(

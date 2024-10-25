@@ -19,72 +19,72 @@
 
 // Buffer APIs
 
-void gemm_bias(sycl::queue &queue, oneapi::mkl::transpose transa, oneapi::mkl::transpose transb,
+void gemm_bias(sycl::queue& queue, oneapi::mkl::transpose transa, oneapi::mkl::transpose transb,
                oneapi::mkl::offset offsetc, std::int64_t m, std::int64_t n, std::int64_t k,
-               float alpha, sycl::buffer<int8_t, 1> &a, std::int64_t lda, int8_t ao,
-               sycl::buffer<uint8_t, 1> &b, std::int64_t ldb, uint8_t bo, float beta,
-               sycl::buffer<int32_t, 1> &c, std::int64_t ldc, sycl::buffer<int32_t, 1> &co) {
+               float alpha, sycl::buffer<int8_t, 1>& a, std::int64_t lda, int8_t ao,
+               sycl::buffer<uint8_t, 1>& b, std::int64_t ldb, uint8_t bo, float beta,
+               sycl::buffer<int32_t, 1>& c, std::int64_t ldc, sycl::buffer<int32_t, 1>& co) {
     throw unimplemented("blas", "gemm_bias", "");
 }
 
-void gemm_bias(sycl::queue &queue, oneapi::mkl::transpose transa, oneapi::mkl::transpose transb,
+void gemm_bias(sycl::queue& queue, oneapi::mkl::transpose transa, oneapi::mkl::transpose transb,
                oneapi::mkl::offset offsetc, std::int64_t m, std::int64_t n, std::int64_t k,
-               float alpha, sycl::buffer<int8_t, 1> &a, std::int64_t lda, int8_t ao,
-               sycl::buffer<int8_t, 1> &b, std::int64_t ldb, int8_t bo, float beta,
-               sycl::buffer<int32_t, 1> &c, std::int64_t ldc, sycl::buffer<int32_t, 1> &co) {
+               float alpha, sycl::buffer<int8_t, 1>& a, std::int64_t lda, int8_t ao,
+               sycl::buffer<int8_t, 1>& b, std::int64_t ldb, int8_t bo, float beta,
+               sycl::buffer<int32_t, 1>& c, std::int64_t ldc, sycl::buffer<int32_t, 1>& co) {
     throw unimplemented("blas", "gemm_bias", "");
 }
 
-void gemm_bias(sycl::queue &queue, oneapi::mkl::transpose transa, oneapi::mkl::transpose transb,
+void gemm_bias(sycl::queue& queue, oneapi::mkl::transpose transa, oneapi::mkl::transpose transb,
                oneapi::mkl::offset offsetc, std::int64_t m, std::int64_t n, std::int64_t k,
-               float alpha, sycl::buffer<uint8_t, 1> &a, std::int64_t lda, uint8_t ao,
-               sycl::buffer<int8_t, 1> &b, std::int64_t ldb, int8_t bo, float beta,
-               sycl::buffer<int32_t, 1> &c, std::int64_t ldc, sycl::buffer<int32_t, 1> &co) {
+               float alpha, sycl::buffer<uint8_t, 1>& a, std::int64_t lda, uint8_t ao,
+               sycl::buffer<int8_t, 1>& b, std::int64_t ldb, int8_t bo, float beta,
+               sycl::buffer<int32_t, 1>& c, std::int64_t ldc, sycl::buffer<int32_t, 1>& co) {
     throw unimplemented("blas", "gemm_bias", "");
 }
 
-void gemm_bias(sycl::queue &queue, oneapi::mkl::transpose transa, oneapi::mkl::transpose transb,
+void gemm_bias(sycl::queue& queue, oneapi::mkl::transpose transa, oneapi::mkl::transpose transb,
                oneapi::mkl::offset offsetc, std::int64_t m, std::int64_t n, std::int64_t k,
-               float alpha, sycl::buffer<uint8_t, 1> &a, std::int64_t lda, uint8_t ao,
-               sycl::buffer<uint8_t, 1> &b, std::int64_t ldb, uint8_t bo, float beta,
-               sycl::buffer<int32_t, 1> &c, std::int64_t ldc, sycl::buffer<int32_t, 1> &co) {
+               float alpha, sycl::buffer<uint8_t, 1>& a, std::int64_t lda, uint8_t ao,
+               sycl::buffer<uint8_t, 1>& b, std::int64_t ldb, uint8_t bo, float beta,
+               sycl::buffer<int32_t, 1>& c, std::int64_t ldc, sycl::buffer<int32_t, 1>& co) {
     throw unimplemented("blas", "gemm_bias", "");
 }
 
 // USM APIs
 
-sycl::event gemm_bias(sycl::queue &queue, oneapi::mkl::transpose transa,
+sycl::event gemm_bias(sycl::queue& queue, oneapi::mkl::transpose transa,
                       oneapi::mkl::transpose transb, oneapi::mkl::offset offsetc, std::int64_t m,
-                      std::int64_t n, std::int64_t k, float alpha, const std::int8_t *a,
-                      std::int64_t lda, std::int8_t ao, const std::uint8_t *b, std::int64_t ldb,
-                      std::uint8_t bo, float beta, std::int32_t *c, std::int64_t ldc,
-                      const std::int32_t *co, const std::vector<sycl::event> &dependencies) {
+                      std::int64_t n, std::int64_t k, float alpha, const std::int8_t* a,
+                      std::int64_t lda, std::int8_t ao, const std::uint8_t* b, std::int64_t ldb,
+                      std::uint8_t bo, float beta, std::int32_t* c, std::int64_t ldc,
+                      const std::int32_t* co, const std::vector<sycl::event>& dependencies) {
     throw unimplemented("blas", "gemm_bias", " for USM");
 }
 
-sycl::event gemm_bias(sycl::queue &queue, oneapi::mkl::transpose transa,
+sycl::event gemm_bias(sycl::queue& queue, oneapi::mkl::transpose transa,
                       oneapi::mkl::transpose transb, oneapi::mkl::offset offsetc, std::int64_t m,
-                      std::int64_t n, std::int64_t k, float alpha, const std::int8_t *a,
-                      std::int64_t lda, std::int8_t ao, const std::int8_t *b, std::int64_t ldb,
-                      std::int8_t bo, float beta, std::int32_t *c, std::int64_t ldc,
-                      const std::int32_t *co, const std::vector<sycl::event> &dependencies) {
+                      std::int64_t n, std::int64_t k, float alpha, const std::int8_t* a,
+                      std::int64_t lda, std::int8_t ao, const std::int8_t* b, std::int64_t ldb,
+                      std::int8_t bo, float beta, std::int32_t* c, std::int64_t ldc,
+                      const std::int32_t* co, const std::vector<sycl::event>& dependencies) {
     throw unimplemented("blas", "gemm_bias", " for USM");
 }
 
-sycl::event gemm_bias(sycl::queue &queue, oneapi::mkl::transpose transa,
+sycl::event gemm_bias(sycl::queue& queue, oneapi::mkl::transpose transa,
                       oneapi::mkl::transpose transb, oneapi::mkl::offset offsetc, std::int64_t m,
-                      std::int64_t n, std::int64_t k, float alpha, const std::uint8_t *a,
-                      std::int64_t lda, std::uint8_t ao, const std::int8_t *b, std::int64_t ldb,
-                      std::int8_t bo, float beta, std::int32_t *c, std::int64_t ldc,
-                      const std::int32_t *co, const std::vector<sycl::event> &dependencies) {
+                      std::int64_t n, std::int64_t k, float alpha, const std::uint8_t* a,
+                      std::int64_t lda, std::uint8_t ao, const std::int8_t* b, std::int64_t ldb,
+                      std::int8_t bo, float beta, std::int32_t* c, std::int64_t ldc,
+                      const std::int32_t* co, const std::vector<sycl::event>& dependencies) {
     throw unimplemented("blas", "gemm_bias", " for USM");
 }
 
-sycl::event gemm_bias(sycl::queue &queue, oneapi::mkl::transpose transa,
+sycl::event gemm_bias(sycl::queue& queue, oneapi::mkl::transpose transa,
                       oneapi::mkl::transpose transb, oneapi::mkl::offset offsetc, std::int64_t m,
-                      std::int64_t n, std::int64_t k, float alpha, const std::uint8_t *a,
-                      std::int64_t lda, std::uint8_t ao, const std::uint8_t *b, std::int64_t ldb,
-                      std::uint8_t bo, float beta, std::int32_t *c, std::int64_t ldc,
-                      const std::int32_t *co, const std::vector<sycl::event> &dependencies) {
+                      std::int64_t n, std::int64_t k, float alpha, const std::uint8_t* a,
+                      std::int64_t lda, std::uint8_t ao, const std::uint8_t* b, std::int64_t ldb,
+                      std::uint8_t bo, float beta, std::int32_t* c, std::int64_t ldc,
+                      const std::int32_t* co, const std::vector<sycl::event>& dependencies) {
     throw unimplemented("blas", "gemm_bias", " for USM");
 }

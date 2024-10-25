@@ -33,11 +33,11 @@ namespace oneapi::mkl::sparse::cusparse {
 
 template <typename T>
 struct cusparse_global_handle {
-    using handle_container_t = std::unordered_map<T, std::atomic<cusparseHandle_t> *>;
+    using handle_container_t = std::unordered_map<T, std::atomic<cusparseHandle_t>*>;
     handle_container_t cusparse_global_handle_mapper_{};
 
     ~cusparse_global_handle() noexcept(false) {
-        for (auto &handle_pair : cusparse_global_handle_mapper_) {
+        for (auto& handle_pair : cusparse_global_handle_mapper_) {
             if (handle_pair.second != nullptr) {
                 auto handle = handle_pair.second->exchange(nullptr);
                 if (handle != nullptr) {

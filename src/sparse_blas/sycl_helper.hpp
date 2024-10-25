@@ -30,7 +30,7 @@ namespace oneapi::mkl::sparse::detail {
 
 /// Return whether a pointer is accessible on the host
 template <typename T>
-inline bool is_ptr_accessible_on_host(sycl::queue queue, const T *host_or_device_ptr) {
+inline bool is_ptr_accessible_on_host(sycl::queue queue, const T* host_or_device_ptr) {
     auto alloc_type = sycl::get_pointer_type(host_or_device_ptr, queue.get_context());
     return alloc_type == sycl::usm::alloc::host || alloc_type == sycl::usm::alloc::shared ||
            alloc_type == sycl::usm::alloc::unknown;
@@ -38,7 +38,7 @@ inline bool is_ptr_accessible_on_host(sycl::queue queue, const T *host_or_device
 
 /// Return a scalar on the host from a pointer to host or device memory
 template <typename T>
-inline T get_scalar_on_host(sycl::queue &queue, const T *host_or_device_ptr,
+inline T get_scalar_on_host(sycl::queue& queue, const T* host_or_device_ptr,
                             bool is_ptr_accessible_on_host) {
     if (is_ptr_accessible_on_host) {
         return *host_or_device_ptr;
@@ -51,17 +51,17 @@ inline T get_scalar_on_host(sycl::queue &queue, const T *host_or_device_ptr,
 
 /// Submit the release of \p ptr in a host_task waiting on the dependencies
 template <typename T>
-sycl::event submit_release(sycl::queue &queue, T *ptr,
-                           const std::vector<sycl::event> &dependencies) {
-    return queue.submit([&](sycl::handler &cgh) {
+sycl::event submit_release(sycl::queue& queue, T* ptr,
+                           const std::vector<sycl::event>& dependencies) {
+    return queue.submit([&](sycl::handler& cgh) {
         cgh.depends_on(dependencies);
         cgh.host_task([=]() { delete ptr; });
     });
 }
 
 /// Merge multiple event dependencies into one
-inline sycl::event collapse_dependencies(sycl::queue &queue,
-                                         const std::vector<sycl::event> &dependencies) {
+inline sycl::event collapse_dependencies(sycl::queue& queue,
+                                         const std::vector<sycl::event>& dependencies) {
     if (dependencies.empty()) {
         return {};
     }
@@ -69,7 +69,7 @@ inline sycl::event collapse_dependencies(sycl::queue &queue,
         return dependencies[0];
     }
 
-    return queue.submit([&](sycl::handler &cgh) {
+    return queue.submit([&](sycl::handler& cgh) {
         cgh.depends_on(dependencies);
         cgh.host_task([=]() {});
     });

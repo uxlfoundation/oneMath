@@ -36,16 +36,16 @@ struct spsv_descr {
 
 namespace oneapi::mkl::sparse::BACKEND {
 
-void init_spsv_descr(sycl::queue & /*queue*/, spsv_descr_t *p_spsv_descr) {
+void init_spsv_descr(sycl::queue& /*queue*/, spsv_descr_t* p_spsv_descr) {
     *p_spsv_descr = new spsv_descr();
 }
 
-sycl::event release_spsv_descr(sycl::queue &queue, spsv_descr_t spsv_descr,
-                               const std::vector<sycl::event> &dependencies) {
+sycl::event release_spsv_descr(sycl::queue& queue, spsv_descr_t spsv_descr,
+                               const std::vector<sycl::event>& dependencies) {
     return detail::submit_release(queue, spsv_descr, dependencies);
 }
 
-void check_valid_spsv(const std::string &function_name, oneapi::mkl::transpose opA,
+void check_valid_spsv(const std::string& function_name, oneapi::mkl::transpose opA,
                       matrix_view A_view, matrix_handle_t A_handle, dense_vector_handle_t x_handle,
                       dense_vector_handle_t y_handle, bool is_alpha_host_accessible, spsv_alg alg) {
     auto internal_A_handle = detail::get_internal_handle(A_handle);
@@ -72,10 +72,10 @@ void check_valid_spsv(const std::string &function_name, oneapi::mkl::transpose o
 #endif // BACKEND
 }
 
-void spsv_buffer_size(sycl::queue &queue, oneapi::mkl::transpose opA, const void *alpha,
+void spsv_buffer_size(sycl::queue& queue, oneapi::mkl::transpose opA, const void* alpha,
                       matrix_view A_view, matrix_handle_t A_handle, dense_vector_handle_t x_handle,
                       dense_vector_handle_t y_handle, spsv_alg alg, spsv_descr_t spsv_descr,
-                      std::size_t &temp_buffer_size) {
+                      std::size_t& temp_buffer_size) {
     // TODO: Add support for external workspace once the close-source oneMKL backend supports it.
     bool is_alpha_host_accessible = detail::is_ptr_accessible_on_host(queue, alpha);
     check_valid_spsv(__func__, opA, A_view, A_handle, x_handle, y_handle, is_alpha_host_accessible,
@@ -84,7 +84,7 @@ void spsv_buffer_size(sycl::queue &queue, oneapi::mkl::transpose opA, const void
     spsv_descr->buffer_size_called = true;
 }
 
-inline void common_spsv_optimize(sycl::queue &queue, oneapi::mkl::transpose opA, const void *alpha,
+inline void common_spsv_optimize(sycl::queue& queue, oneapi::mkl::transpose opA, const void* alpha,
                                  matrix_view A_view, matrix_handle_t A_handle,
                                  dense_vector_handle_t x_handle, dense_vector_handle_t y_handle,
                                  spsv_alg alg, spsv_descr_t spsv_descr) {
@@ -104,7 +104,7 @@ inline void common_spsv_optimize(sycl::queue &queue, oneapi::mkl::transpose opA,
     spsv_descr->last_optimized_alg = alg;
 }
 
-void spsv_optimize(sycl::queue &queue, oneapi::mkl::transpose opA, const void *alpha,
+void spsv_optimize(sycl::queue& queue, oneapi::mkl::transpose opA, const void* alpha,
                    matrix_view A_view, matrix_handle_t A_handle, dense_vector_handle_t x_handle,
                    dense_vector_handle_t y_handle, spsv_alg alg, spsv_descr_t spsv_descr,
                    sycl::buffer<std::uint8_t, 1> /*workspace*/) {
@@ -121,11 +121,11 @@ void spsv_optimize(sycl::queue &queue, oneapi::mkl::transpose opA, const void *a
                                        internal_A_handle->backend_handle);
 }
 
-sycl::event spsv_optimize(sycl::queue &queue, oneapi::mkl::transpose opA, const void *alpha,
+sycl::event spsv_optimize(sycl::queue& queue, oneapi::mkl::transpose opA, const void* alpha,
                           matrix_view A_view, matrix_handle_t A_handle,
                           dense_vector_handle_t x_handle, dense_vector_handle_t y_handle,
-                          spsv_alg alg, spsv_descr_t spsv_descr, void * /*workspace*/,
-                          const std::vector<sycl::event> &dependencies) {
+                          spsv_alg alg, spsv_descr_t spsv_descr, void* /*workspace*/,
+                          const std::vector<sycl::event>& dependencies) {
     auto internal_A_handle = detail::get_internal_handle(A_handle);
     if (internal_A_handle->all_use_buffer()) {
         detail::throw_incompatible_container(__func__);
@@ -140,14 +140,14 @@ sycl::event spsv_optimize(sycl::queue &queue, oneapi::mkl::transpose opA, const 
 }
 
 template <typename T>
-sycl::event internal_spsv(sycl::queue &queue, oneapi::mkl::transpose opA, const void *alpha,
+sycl::event internal_spsv(sycl::queue& queue, oneapi::mkl::transpose opA, const void* alpha,
                           matrix_view A_view, matrix_handle_t A_handle,
                           dense_vector_handle_t x_handle, dense_vector_handle_t y_handle,
                           spsv_alg /*alg*/, spsv_descr_t /*spsv_descr*/,
-                          const std::vector<sycl::event> &dependencies,
+                          const std::vector<sycl::event>& dependencies,
                           bool is_alpha_host_accessible) {
     T host_alpha =
-        detail::get_scalar_on_host(queue, static_cast<const T *>(alpha), is_alpha_host_accessible);
+        detail::get_scalar_on_host(queue, static_cast<const T*>(alpha), is_alpha_host_accessible);
     auto internal_A_handle = detail::get_internal_handle(A_handle);
     internal_A_handle->can_be_reset = false;
     if (internal_A_handle->all_use_buffer()) {
@@ -165,10 +165,10 @@ sycl::event internal_spsv(sycl::queue &queue, oneapi::mkl::transpose opA, const 
     }
 }
 
-sycl::event spsv(sycl::queue &queue, oneapi::mkl::transpose opA, const void *alpha,
+sycl::event spsv(sycl::queue& queue, oneapi::mkl::transpose opA, const void* alpha,
                  matrix_view A_view, matrix_handle_t A_handle, dense_vector_handle_t x_handle,
                  dense_vector_handle_t y_handle, spsv_alg alg, spsv_descr_t spsv_descr,
-                 const std::vector<sycl::event> &dependencies) {
+                 const std::vector<sycl::event>& dependencies) {
     bool is_alpha_host_accessible = detail::is_ptr_accessible_on_host(queue, alpha);
     check_valid_spsv(__func__, opA, A_view, A_handle, x_handle, y_handle, is_alpha_host_accessible,
                      alg);

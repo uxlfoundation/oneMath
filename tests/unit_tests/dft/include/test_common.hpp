@@ -58,7 +58,7 @@ inline std::size_t cast_unsigned(std::int64_t i) {
 }
 
 template <typename fp>
-bool check_equal(fp x, fp x_ref, double abs_error_mag, double rel_error_mag, std::ostream &out) {
+bool check_equal(fp x, fp x_ref, double abs_error_mag, double rel_error_mag, std::ostream& out) {
     using fp_real = typename complex_info<fp>::real_type;
     static_assert(std::is_floating_point_v<fp_real>,
                   "Expected floating-point real or complex type.");
@@ -88,8 +88,8 @@ bool check_equal(fp x, fp x_ref, double abs_error_mag, double rel_error_mag, std
 }
 
 template <typename vec1, typename vec2>
-bool check_equal_vector(vec1 &&v, vec2 &&v_ref, std::size_t n, double abs_error_mag,
-                        double rel_error_mag, std::ostream &out) {
+bool check_equal_vector(vec1&& v, vec2&& v_ref, std::size_t n, double abs_error_mag,
+                        double rel_error_mag, std::ostream& out) {
     constexpr int max_print = 20;
     int count = 0;
     bool good = true;
@@ -131,7 +131,7 @@ inline t rand_scalar() {
 }
 
 template <typename vec>
-void rand_vector(vec &v, std::size_t n) {
+void rand_vector(vec& v, std::size_t n) {
     using fp = typename vec::value_type;
     v.resize(n);
     for (std::size_t i = 0; i < n; i++) {
@@ -141,7 +141,7 @@ void rand_vector(vec &v, std::size_t n) {
 
 // Catch asynchronous exceptions.
 auto exception_handler = [](sycl::exception_list exceptions) {
-    for (std::exception_ptr const &e : exceptions) {
+    for (std::exception_ptr const& e : exceptions) {
         try {
             std::rethrow_exception(e);
         }
@@ -153,7 +153,7 @@ auto exception_handler = [](sycl::exception_list exceptions) {
 };
 
 template <oneapi::mkl::dft::precision precision, oneapi::mkl::dft::domain domain>
-void commit_descriptor(oneapi::mkl::dft::descriptor<precision, domain> &descriptor,
+void commit_descriptor(oneapi::mkl::dft::descriptor<precision, domain>& descriptor,
                        sycl::queue queue) {
 #ifdef CALL_RT_API
     descriptor.commit(queue);
@@ -164,7 +164,7 @@ void commit_descriptor(oneapi::mkl::dft::descriptor<precision, domain> &descript
 
 // is it assumed that the unused elements of the array are ignored
 inline std::array<std::int64_t, 4> get_conjugate_even_complex_strides(
-    const std::vector<std::int64_t> &sizes) {
+    const std::vector<std::int64_t>& sizes) {
     switch (sizes.size()) {
         case 1: return { 0, 1 };
         case 2: return { 0, sizes[1] / 2 + 1, 1 };
@@ -178,7 +178,7 @@ inline std::array<std::int64_t, 4> get_conjugate_even_complex_strides(
 }
 
 // is it assumed that the unused elements of the array are ignored
-inline std::array<std::int64_t, 4> get_default_strides(const std::vector<std::int64_t> &sizes) {
+inline std::array<std::int64_t, 4> get_default_strides(const std::vector<std::int64_t>& sizes) {
     if (sizes.size() > 3) {
         throw oneapi::mkl::unimplemented(
             "dft/test_common", __FUNCTION__,
@@ -207,8 +207,8 @@ T get_default(const std::vector<T> vec, std::size_t idx, T default_) {
 
 template <oneapi::mkl::dft::domain domain, bool in_place = false>
 std::pair<std::int64_t, std::int64_t> get_default_distances(
-    const std::vector<std::int64_t> &sizes, const std::vector<std::int64_t> &strides_fwd,
-    const std::vector<std::int64_t> &strides_bwd) {
+    const std::vector<std::int64_t>& sizes, const std::vector<std::int64_t>& strides_fwd,
+    const std::vector<std::int64_t>& strides_bwd) {
     std::int64_t size0 = sizes[0];
     std::int64_t size1 = get_default(sizes, 1, 1l);
     std::int64_t size2 = get_default(sizes, 2, 1l);
@@ -241,8 +241,8 @@ std::pair<std::int64_t, std::int64_t> get_default_distances(
 //up to 3 dimensions, empty strides = default
 template <typename T_vec, typename Allocator = std::allocator<typename T_vec::value_type>>
 std::vector<typename T_vec::value_type, Allocator> strided_copy(
-    const T_vec &contiguous, const std::vector<std::int64_t> &sizes,
-    const std::vector<std::int64_t> &strides, std::int64_t batches, std::int64_t distance,
+    const T_vec& contiguous, const std::vector<std::int64_t>& sizes,
+    const std::vector<std::int64_t>& strides, std::int64_t batches, std::int64_t distance,
     Allocator alloc = {}) {
     if (strides.size() == 0) {
         return { contiguous.begin(), contiguous.end(), alloc };
@@ -273,9 +273,9 @@ std::vector<typename T_vec::value_type, Allocator> strided_copy(
 
 //up to 3 dimensions, empty strides = default
 template <bool ConjugateEvenStrides, typename vec1, typename vec2>
-bool check_equal_strided(const vec1 &v, const vec2 &v_ref, std::vector<int64_t> sizes,
+bool check_equal_strided(const vec1& v, const vec2& v_ref, std::vector<int64_t> sizes,
                          std::vector<int64_t> strides, double abs_error_mag, double rel_error_mag,
-                         std::ostream &out) {
+                         std::ostream& out) {
     if (strides.size() == 0) {
         std::array<std::int64_t, 4> strides_arr;
         if constexpr (ConjugateEvenStrides) {
@@ -344,8 +344,7 @@ struct DFTParams {
 
 class DFTParamsPrint {
 public:
-    std::string operator()(
-        testing::TestParamInfo<std::tuple<sycl::device *, DFTParams>> dev) const {
+    std::string operator()(testing::TestParamInfo<std::tuple<sycl::device*, DFTParams>> dev) const {
         auto [device, params] = dev.param;
         std::string info_name;
 
@@ -377,7 +376,7 @@ public:
         info_name.append("_batches_").append(std::to_string(params.batches));
 
         std::string dev_name = device->get_info<sycl::info::device::name>();
-        std::for_each(dev_name.begin(), dev_name.end(), [](auto &c) {
+        std::for_each(dev_name.begin(), dev_name.end(), [](auto& c) {
             if (!isalnum(c))
                 c = '_';
         });

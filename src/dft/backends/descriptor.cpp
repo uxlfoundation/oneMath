@@ -25,7 +25,7 @@
 namespace oneapi::mkl::dft::detail {
 
 template <precision prec, domain dom>
-void descriptor<prec, dom>::commit(sycl::queue &queue) {
+void descriptor<prec, dom>::commit(sycl::queue& queue) {
     if (!pimpl_ || pimpl_->get_queue() != queue) {
         if (pimpl_) {
             pimpl_->get_queue().wait();
@@ -34,9 +34,9 @@ void descriptor<prec, dom>::commit(sycl::queue &queue) {
     }
     pimpl_->commit(values_);
 }
-template void descriptor<precision::SINGLE, domain::COMPLEX>::commit(sycl::queue &);
-template void descriptor<precision::SINGLE, domain::REAL>::commit(sycl::queue &);
-template void descriptor<precision::DOUBLE, domain::COMPLEX>::commit(sycl::queue &);
-template void descriptor<precision::DOUBLE, domain::REAL>::commit(sycl::queue &);
+template void descriptor<precision::SINGLE, domain::COMPLEX>::commit(sycl::queue&);
+template void descriptor<precision::SINGLE, domain::REAL>::commit(sycl::queue&);
+template void descriptor<precision::DOUBLE, domain::COMPLEX>::commit(sycl::queue&);
+template void descriptor<precision::DOUBLE, domain::REAL>::commit(sycl::queue&);
 
 } //namespace oneapi::mkl::dft::detail

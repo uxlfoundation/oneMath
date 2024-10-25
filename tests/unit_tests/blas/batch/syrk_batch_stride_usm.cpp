@@ -43,19 +43,19 @@
 using namespace sycl;
 using std::vector;
 
-extern std::vector<sycl::device *> devices;
+extern std::vector<sycl::device*> devices;
 
 namespace {
 
 template <typename fp>
-int test(device *dev, oneapi::mkl::layout layout, int64_t batch_size) {
+int test(device* dev, oneapi::mkl::layout layout, int64_t batch_size) {
     // Catch asynchronous exceptions.
     auto exception_handler = [](exception_list exceptions) {
-        for (std::exception_ptr const &e : exceptions) {
+        for (std::exception_ptr const& e : exceptions) {
             try {
                 std::rethrow_exception(e);
             }
-            catch (exception const &e) {
+            catch (exception const& e) {
                 std::cout << "Caught asynchronous SYCL exception during SYRK_BATCH_STRIDE:\n"
                           << e.what() << std::endl;
                 print_error_code(e);
@@ -86,9 +86,9 @@ int test(device *dev, oneapi::mkl::layout layout, int64_t batch_size) {
     beta = rand_scalar<fp>();
     upper_lower = (oneapi::mkl::uplo)(std::rand() % 2);
     if ((std::is_same<fp, float>::value) || (std::is_same<fp, double>::value)) {
-        trans = (std::rand() % 2) == 0 ? oneapi::mkl::transpose::nontrans
-                                       : (std::rand() % 2) == 0 ? oneapi::mkl::transpose::trans
-                                                                : oneapi::mkl::transpose::conjtrans;
+        trans = (std::rand() % 2) == 0   ? oneapi::mkl::transpose::nontrans
+                : (std::rand() % 2) == 0 ? oneapi::mkl::transpose::trans
+                                         : oneapi::mkl::transpose::conjtrans;
     }
     else {
         trans = (std::rand() % 2) == 0 ? oneapi::mkl::transpose::nontrans
@@ -116,9 +116,9 @@ int test(device *dev, oneapi::mkl::layout layout, int64_t batch_size) {
     C.resize(stride_c * batch_size);
     C_ref.resize(stride_c * batch_size);
 
-    fp **a_array = (fp **)oneapi::mkl::malloc_shared(64, sizeof(fp *) * batch_size, *dev, cxt);
-    fp **c_array = (fp **)oneapi::mkl::malloc_shared(64, sizeof(fp *) * batch_size, *dev, cxt);
-    fp **c_ref_array = (fp **)oneapi::mkl::malloc_shared(64, sizeof(fp *) * batch_size, *dev, cxt);
+    fp** a_array = (fp**)oneapi::mkl::malloc_shared(64, sizeof(fp*) * batch_size, *dev, cxt);
+    fp** c_array = (fp**)oneapi::mkl::malloc_shared(64, sizeof(fp*) * batch_size, *dev, cxt);
+    fp** c_ref_array = (fp**)oneapi::mkl::malloc_shared(64, sizeof(fp*) * batch_size, *dev, cxt);
 
     if ((a_array == NULL) || (c_array == NULL) || (c_ref_array == NULL)) {
         std::cout << "Error cannot allocate arrays of pointers\n";
@@ -150,10 +150,10 @@ int test(device *dev, oneapi::mkl::layout layout, int64_t batch_size) {
     int batch_size_ref = (int)batch_size;
     for (i = 0; i < batch_size_ref; i++) {
         ::syrk(convert_to_cblas_layout(layout), convert_to_cblas_uplo(upper_lower),
-               convert_to_cblas_trans(trans), (const int *)&n_ref, (const int *)&k_ref,
-               (const fp_ref *)&alpha, (const fp_ref *)(A.data() + stride_a * i),
-               (const int *)&lda_ref, (const fp_ref *)&beta,
-               (fp_ref *)(C_ref.data() + stride_c * i), (const int *)&ldc_ref);
+               convert_to_cblas_trans(trans), (const int*)&n_ref, (const int*)&k_ref,
+               (const fp_ref*)&alpha, (const fp_ref*)(A.data() + stride_a * i),
+               (const int*)&lda_ref, (const fp_ref*)&beta, (fp_ref*)(C_ref.data() + stride_c * i),
+               (const int*)&ldc_ref);
     }
 
     // Call DPC++ SYRK_BATCH_STRIDE.
@@ -191,20 +191,20 @@ int test(device *dev, oneapi::mkl::layout layout, int64_t batch_size) {
         main_queue.wait();
 #endif
     }
-    catch (exception const &e) {
+    catch (exception const& e) {
         std::cout << "Caught synchronous SYCL exception during SYRK_BATCH_STRIDE:\n"
                   << e.what() << std::endl;
         print_error_code(e);
     }
 
-    catch (const oneapi::mkl::unimplemented &e) {
+    catch (const oneapi::mkl::unimplemented& e) {
         oneapi::mkl::free_shared(a_array, cxt);
         oneapi::mkl::free_shared(c_array, cxt);
         oneapi::mkl::free_shared(c_ref_array, cxt);
         return test_skipped;
     }
 
-    catch (const std::runtime_error &error) {
+    catch (const std::runtime_error& error) {
         std::cout << "Error raised during execution of SYRK_BATCH_STRIDE:\n"
                   << error.what() << std::endl;
     }
@@ -221,7 +221,7 @@ int test(device *dev, oneapi::mkl::layout layout, int64_t batch_size) {
 }
 
 class SyrkBatchStrideUsmTests
-        : public ::testing::TestWithParam<std::tuple<sycl::device *, oneapi::mkl::layout>> {};
+        : public ::testing::TestWithParam<std::tuple<sycl::device*, oneapi::mkl::layout>> {};
 
 TEST_P(SyrkBatchStrideUsmTests, RealSinglePrecision) {
     EXPECT_TRUEORSKIP(test<float>(std::get<0>(GetParam()), std::get<1>(GetParam()), 5));

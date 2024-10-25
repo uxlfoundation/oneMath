@@ -70,7 +70,7 @@ struct bfloat16 {
     inline bfloat16(float f);
     bfloat16(double d) : bfloat16(float(d)) {}
     template <typename T>
-    bfloat16(T i, typename std::enable_if<std::is_integral<T>::value>::type *_ = nullptr)
+    bfloat16(T i, typename std::enable_if<std::is_integral<T>::value>::type* _ = nullptr)
             : bfloat16(float(i)) {}
 
     inline operator float() const;
@@ -101,115 +101,115 @@ struct bfloat16 {
         return h;
     }
 
-    friend float operator+(const bfloat16 &h1, const bfloat16 &h2) {
+    friend float operator+(const bfloat16& h1, const bfloat16& h2) {
         return float(h1) + float(h2);
     }
-    friend float operator-(const bfloat16 &h1, const bfloat16 &h2) {
+    friend float operator-(const bfloat16& h1, const bfloat16& h2) {
         return float(h1) - float(h2);
     }
-    friend float operator*(const bfloat16 &h1, const bfloat16 &h2) {
+    friend float operator*(const bfloat16& h1, const bfloat16& h2) {
         return float(h1) * float(h2);
     }
-    friend float operator/(const bfloat16 &h1, const bfloat16 &h2) {
+    friend float operator/(const bfloat16& h1, const bfloat16& h2) {
         return float(h1) / float(h2);
     }
 
     template <typename T>
     friend typename std::enable_if<std::is_integral<T>::value, float>::type operator+(
-        const bfloat16 &h, const T &o) {
+        const bfloat16& h, const T& o) {
         return float(h) + float(o);
     }
     template <typename T>
     friend typename std::enable_if<std::is_integral<T>::value, float>::type operator-(
-        const bfloat16 &h, const T &o) {
+        const bfloat16& h, const T& o) {
         return float(h) - float(o);
     }
     template <typename T>
     friend typename std::enable_if<std::is_integral<T>::value, float>::type operator*(
-        const bfloat16 &h, const T &o) {
+        const bfloat16& h, const T& o) {
         return float(h) * float(o);
     }
     template <typename T>
     friend typename std::enable_if<std::is_integral<T>::value, float>::type operator/(
-        const bfloat16 &h, const T &o) {
+        const bfloat16& h, const T& o) {
         return float(h) / float(o);
     }
     template <typename T>
     friend typename std::enable_if<std::is_integral<T>::value, float>::type operator+(
-        const T &o, const bfloat16 &h) {
+        const T& o, const bfloat16& h) {
         return float(o) + float(h);
     }
     template <typename T>
     friend typename std::enable_if<std::is_integral<T>::value, float>::type operator-(
-        const T &o, const bfloat16 &h) {
+        const T& o, const bfloat16& h) {
         return float(o) - float(h);
     }
     template <typename T>
     friend typename std::enable_if<std::is_integral<T>::value, float>::type operator*(
-        const T &o, const bfloat16 &h) {
+        const T& o, const bfloat16& h) {
         return float(o) * float(h);
     }
     template <typename T>
     friend typename std::enable_if<std::is_integral<T>::value, float>::type operator/(
-        const T &o, const bfloat16 &h) {
+        const T& o, const bfloat16& h) {
         return float(o) / float(h);
     }
 
     template <typename T>
     friend typename std::enable_if<bfloat16_impl::is_float_double<T>::value, T>::type operator+(
-        const bfloat16 &h, const T &o) {
+        const bfloat16& h, const T& o) {
         return float(h) + o;
     }
     template <typename T>
     friend typename std::enable_if<bfloat16_impl::is_float_double<T>::value, T>::type operator-(
-        const bfloat16 &h, const T &o) {
+        const bfloat16& h, const T& o) {
         return float(h) - o;
     }
     template <typename T>
     friend typename std::enable_if<bfloat16_impl::is_float_double<T>::value, T>::type operator*(
-        const bfloat16 &h, const T &o) {
+        const bfloat16& h, const T& o) {
         return float(h) * o;
     }
     template <typename T>
     friend typename std::enable_if<bfloat16_impl::is_float_double<T>::value, T>::type operator/(
-        const bfloat16 &h, const T &o) {
+        const bfloat16& h, const T& o) {
         return float(h) / o;
     }
     template <typename T>
     friend typename std::enable_if<bfloat16_impl::is_float_double<T>::value, T>::type operator+(
-        const T &o, const bfloat16 &h) {
+        const T& o, const bfloat16& h) {
         return o + float(h);
     }
     template <typename T>
     friend typename std::enable_if<bfloat16_impl::is_float_double<T>::value, T>::type operator-(
-        const T &o, const bfloat16 &h) {
+        const T& o, const bfloat16& h) {
         return o - float(h);
     }
     template <typename T>
     friend typename std::enable_if<bfloat16_impl::is_float_double<T>::value, T>::type operator*(
-        const T &o, const bfloat16 &h) {
+        const T& o, const bfloat16& h) {
         return o * float(h);
     }
     template <typename T>
     friend typename std::enable_if<bfloat16_impl::is_float_double<T>::value, T>::type operator/(
-        const T &o, const bfloat16 &h) {
+        const T& o, const bfloat16& h) {
         return o / float(h);
     }
 
     template <typename T>
-    bfloat16 operator+=(const T &o) {
+    bfloat16 operator+=(const T& o) {
         return *this = bfloat16(*this + o);
     }
     template <typename T>
-    bfloat16 operator-=(const T &o) {
+    bfloat16 operator-=(const T& o) {
         return *this = bfloat16(*this - o);
     }
     template <typename T>
-    bfloat16 operator*=(const T &o) {
+    bfloat16 operator*=(const T& o) {
         return *this = bfloat16(*this * o);
     }
     template <typename T>
-    bfloat16 operator/=(const T &o) {
+    bfloat16 operator/=(const T& o) {
         return *this = bfloat16(*this / o);
     }
 };

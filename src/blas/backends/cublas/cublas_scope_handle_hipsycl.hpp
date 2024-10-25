@@ -61,13 +61,13 @@ the handle must be destroyed when the context goes out of scope. This will bind 
 class CublasScopedContextHandler {
     sycl::interop_handle interop_h;
     static thread_local cublas_handle<int> handle_helper;
-    sycl::context get_context(const sycl::queue &queue);
-    CUstream get_stream(const sycl::queue &queue);
+    sycl::context get_context(const sycl::queue& queue);
+    CUstream get_stream(const sycl::queue& queue);
 
 public:
-    CublasScopedContextHandler(sycl::queue queue, sycl::interop_handle &ih);
+    CublasScopedContextHandler(sycl::queue queue, sycl::interop_handle& ih);
 
-    cublasHandle_t get_handle(const sycl::queue &queue);
+    cublasHandle_t get_handle(const sycl::queue& queue);
 
     // This is a work-around function for reinterpret_casting the memory. This
     // will be fixed when SYCL-2020 has been implemented for Pi backend.

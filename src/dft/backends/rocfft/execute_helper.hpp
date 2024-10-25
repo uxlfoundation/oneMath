@@ -37,8 +37,8 @@
 namespace oneapi::mkl::dft::rocfft::detail {
 
 template <dft::precision prec, dft::domain dom>
-inline dft::detail::commit_impl<prec, dom> *checked_get_commit(
-    dft::detail::descriptor<prec, dom> &desc) {
+inline dft::detail::commit_impl<prec, dom>* checked_get_commit(
+    dft::detail::descriptor<prec, dom>& desc) {
     auto commit_handle = dft::detail::get_commit(desc);
     if (commit_handle == nullptr || commit_handle->get_backend() != backend::rocfft) {
         throw mkl::invalid_argument("dft/backends/rocfft", "get_commit",
@@ -50,7 +50,7 @@ inline dft::detail::commit_impl<prec, dom> *checked_get_commit(
 /// Throw an mkl::invalid_argument if the runtime param in the descriptor does not match
 /// the expected value.
 template <dft::config_param Param, dft::config_value Expected, typename DescT>
-inline auto expect_config(DescT &desc, const char *message) {
+inline auto expect_config(DescT& desc, const char* message) {
     dft::config_value actual{ 0 };
     desc.get_value(Param, &actual);
     if (actual != Expected) {
@@ -59,11 +59,11 @@ inline auto expect_config(DescT &desc, const char *message) {
 }
 
 template <typename Acc>
-inline void *native_mem(sycl::interop_handle &ih, Acc &buf) {
+inline void* native_mem(sycl::interop_handle& ih, Acc& buf) {
     return ih.get_native_mem<sycl::backend::ext_oneapi_hip>(buf);
 }
 
-inline hipStream_t setup_stream(const std::string &func, sycl::interop_handle &ih,
+inline hipStream_t setup_stream(const std::string& func, sycl::interop_handle& ih,
                                 rocfft_execution_info info) {
     auto stream = ih.get_native_queue<sycl::backend::ext_oneapi_hip>();
     auto result = rocfft_execution_info_set_stream(info, stream);
@@ -75,7 +75,7 @@ inline hipStream_t setup_stream(const std::string &func, sycl::interop_handle &i
     return stream;
 }
 
-inline void sync_checked(const std::string &func, hipStream_t stream) {
+inline void sync_checked(const std::string& func, hipStream_t stream) {
     auto result = hipStreamSynchronize(stream);
     if (result != hipSuccess) {
         throw oneapi::mkl::exception("dft/backends/rocfft", func,
@@ -83,8 +83,8 @@ inline void sync_checked(const std::string &func, hipStream_t stream) {
     }
 }
 
-inline void execute_checked(const std::string &func, const rocfft_plan plan, void *in_buffer[],
-                            void *out_buffer[], rocfft_execution_info info) {
+inline void execute_checked(const std::string& func, const rocfft_plan plan, void* in_buffer[],
+                            void* out_buffer[], rocfft_execution_info info) {
     auto result = rocfft_execute(plan, in_buffer, out_buffer, info);
     if (result != rocfft_status_success) {
         throw oneapi::mkl::exception("dft/backends/rocfft", func,

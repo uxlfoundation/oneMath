@@ -43,12 +43,12 @@
 using namespace sycl;
 using std::vector;
 
-extern std::vector<sycl::device *> devices;
+extern std::vector<sycl::device*> devices;
 
 namespace {
 
 template <typename fp>
-int test(device *dev, oneapi::mkl::layout layout) {
+int test(device* dev, oneapi::mkl::layout layout) {
     // Prepare data.
     int64_t m, n;
     int64_t lda, ldb;
@@ -116,21 +116,20 @@ int test(device *dev, oneapi::mkl::layout layout) {
     for (i = 0; i < batch_size_ref; i++) {
         ::trsm(convert_to_cblas_layout(layout), convert_to_cblas_side(left_right),
                convert_to_cblas_uplo(upper_lower), convert_to_cblas_trans(trans),
-               convert_to_cblas_diag(unit_nonunit), (const int *)&m_ref, (const int *)&n_ref,
-               (const fp_ref *)&alpha, (const fp_ref *)(A.data() + stride_a * i),
-               (const int *)&lda_ref, (fp_ref *)(B_ref.data() + stride_b * i),
-               (const int *)&ldb_ref);
+               convert_to_cblas_diag(unit_nonunit), (const int*)&m_ref, (const int*)&n_ref,
+               (const fp_ref*)&alpha, (const fp_ref*)(A.data() + stride_a * i),
+               (const int*)&lda_ref, (fp_ref*)(B_ref.data() + stride_b * i), (const int*)&ldb_ref);
     }
 
     // Call DPC++ TRSM_BATCH_STRIDE.
 
     // Catch asynchronous exceptions.
     auto exception_handler = [](exception_list exceptions) {
-        for (std::exception_ptr const &e : exceptions) {
+        for (std::exception_ptr const& e : exceptions) {
             try {
                 std::rethrow_exception(e);
             }
-            catch (exception const &e) {
+            catch (exception const& e) {
                 std::cout << "Caught asynchronous SYCL exception during TRSM_BATCH_STRIDE:\n"
                           << e.what() << std::endl;
                 print_error_code(e);
@@ -176,17 +175,17 @@ int test(device *dev, oneapi::mkl::layout layout) {
         }
 #endif
     }
-    catch (exception const &e) {
+    catch (exception const& e) {
         std::cout << "Caught synchronous SYCL exception during TRSM_BATCH_STRIDE:\n"
                   << e.what() << std::endl;
         print_error_code(e);
     }
 
-    catch (const oneapi::mkl::unimplemented &e) {
+    catch (const oneapi::mkl::unimplemented& e) {
         return test_skipped;
     }
 
-    catch (const std::runtime_error &error) {
+    catch (const std::runtime_error& error) {
         std::cout << "Error raised during execution of TRSM_BATCH_STRIDE:\n"
                   << error.what() << std::endl;
     }
@@ -201,7 +200,7 @@ int test(device *dev, oneapi::mkl::layout layout) {
 }
 
 class TrsmBatchStrideTests
-        : public ::testing::TestWithParam<std::tuple<sycl::device *, oneapi::mkl::layout>> {};
+        : public ::testing::TestWithParam<std::tuple<sycl::device*, oneapi::mkl::layout>> {};
 
 TEST_P(TrsmBatchStrideTests, RealSinglePrecision) {
     EXPECT_TRUEORSKIP(test<float>(std::get<0>(GetParam()), std::get<1>(GetParam())));

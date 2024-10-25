@@ -40,7 +40,7 @@
 namespace oneapi {
 namespace mkl {
 
-inline oneapi::mkl::device get_device_id(sycl::queue &queue) {
+inline oneapi::mkl::device get_device_id(sycl::queue& queue) {
     oneapi::mkl::device device_id;
     if (queue.get_device().is_cpu())
         device_id = device::x86cpu;

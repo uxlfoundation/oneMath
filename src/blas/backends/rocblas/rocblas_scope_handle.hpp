@@ -45,29 +45,29 @@ namespace rocblas {
 
 template <typename T>
 struct rocblas_handle_container {
-    using handle_container_t = std::unordered_map<T, std::atomic<rocblas_handle> *>;
+    using handle_container_t = std::unordered_map<T, std::atomic<rocblas_handle>*>;
     handle_container_t rocblas_handle_container_mapper_{};
     ~rocblas_handle_container() noexcept(false);
 };
 
 class RocblasScopedContextHandler {
     HIPcontext original_;
-    sycl::context *placedContext_;
+    sycl::context* placedContext_;
     bool needToRecover_;
-    sycl::interop_handle &interop_h;
+    sycl::interop_handle& interop_h;
 #ifdef ONEAPI_ONEMKL_PI_INTERFACE_REMOVED
     static thread_local rocblas_handle_container<ur_context_handle_t> handle_helper;
 #else
     static thread_local rocblas_handle_container<pi_context> handle_helper;
 #endif
-    sycl::context get_context(const sycl::queue &queue);
-    hipStream_t get_stream(const sycl::queue &queue);
+    sycl::context get_context(const sycl::queue& queue);
+    hipStream_t get_stream(const sycl::queue& queue);
 
 public:
-    RocblasScopedContextHandler(sycl::queue queue, sycl::interop_handle &ih);
+    RocblasScopedContextHandler(sycl::queue queue, sycl::interop_handle& ih);
     ~RocblasScopedContextHandler() noexcept(false);
 
-    rocblas_handle get_handle(const sycl::queue &queue);
+    rocblas_handle get_handle(const sycl::queue& queue);
 
     // This is a work-around function for reinterpret_casting the memory. This
     // will be fixed when SYCL-2020 has been implemented for Pi backend.

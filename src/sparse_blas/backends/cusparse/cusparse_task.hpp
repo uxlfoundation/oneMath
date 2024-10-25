@@ -28,40 +28,40 @@
 namespace oneapi::mkl::sparse::cusparse {
 
 template <typename T, typename Container>
-auto get_value_accessor(sycl::handler &cgh, Container container) {
+auto get_value_accessor(sycl::handler& cgh, Container container) {
     auto buffer_ptr =
-        reinterpret_cast<sycl::buffer<T, 1> *>(container->value_container.buffer_ptr.get());
+        reinterpret_cast<sycl::buffer<T, 1>*>(container->value_container.buffer_ptr.get());
     return buffer_ptr->template get_access<sycl::access::mode::read_write>(cgh);
 }
 
 template <typename T, typename... Ts>
-auto get_fp_accessors(sycl::handler &cgh, Ts... containers) {
+auto get_fp_accessors(sycl::handler& cgh, Ts... containers) {
     return std::array<sycl::accessor<T, 1>, sizeof...(containers)>{ get_value_accessor<T>(
         cgh, containers)... };
 }
 
 template <typename T>
-auto get_row_accessor(sycl::handler &cgh, matrix_handle_t smhandle) {
+auto get_row_accessor(sycl::handler& cgh, matrix_handle_t smhandle) {
     auto buffer_ptr =
-        reinterpret_cast<sycl::buffer<T, 1> *>(smhandle->row_container.buffer_ptr.get());
+        reinterpret_cast<sycl::buffer<T, 1>*>(smhandle->row_container.buffer_ptr.get());
     return buffer_ptr->template get_access<sycl::access::mode::read_write>(cgh);
 }
 
 template <typename T>
-auto get_col_accessor(sycl::handler &cgh, matrix_handle_t smhandle) {
+auto get_col_accessor(sycl::handler& cgh, matrix_handle_t smhandle) {
     auto buffer_ptr =
-        reinterpret_cast<sycl::buffer<T, 1> *>(smhandle->col_container.buffer_ptr.get());
+        reinterpret_cast<sycl::buffer<T, 1>*>(smhandle->col_container.buffer_ptr.get());
     return buffer_ptr->template get_access<sycl::access::mode::read_write>(cgh);
 }
 
 template <typename T>
-auto get_int_accessors(sycl::handler &cgh, matrix_handle_t smhandle) {
+auto get_int_accessors(sycl::handler& cgh, matrix_handle_t smhandle) {
     return std::array<sycl::accessor<T, 1>, 2>{ get_row_accessor<T>(cgh, smhandle),
                                                 get_col_accessor<T>(cgh, smhandle) };
 }
 
 template <typename Functor, typename... CaptureOnlyAcc>
-void submit_host_task(sycl::handler &cgh, sycl::queue &queue, Functor functor,
+void submit_host_task(sycl::handler& cgh, sycl::queue& queue, Functor functor,
                       CaptureOnlyAcc... capture_only_accessors) {
     // Only capture the accessors to ensure the dependencies are properly
     // handled. The accessors's pointer have already been set to the native
@@ -78,7 +78,7 @@ void submit_host_task(sycl::handler &cgh, sycl::queue &queue, Functor functor,
 }
 
 template <typename Functor, typename... CaptureOnlyAcc>
-void submit_host_task_with_acc(sycl::handler &cgh, sycl::queue &queue, Functor functor,
+void submit_host_task_with_acc(sycl::handler& cgh, sycl::queue& queue, Functor functor,
                                sycl::accessor<std::uint8_t> workspace_placeholder_acc,
                                CaptureOnlyAcc... capture_only_accessors) {
     // Only capture the accessors to ensure the dependencies are properly
@@ -97,8 +97,8 @@ void submit_host_task_with_acc(sycl::handler &cgh, sycl::queue &queue, Functor f
 }
 
 template <typename Functor, typename... CaptureOnlyAcc>
-void submit_native_command_ext(sycl::handler &cgh, sycl::queue &queue, Functor functor,
-                               const std::vector<sycl::event> &dependencies,
+void submit_native_command_ext(sycl::handler& cgh, sycl::queue& queue, Functor functor,
+                               const std::vector<sycl::event>& dependencies,
                                CaptureOnlyAcc... capture_only_accessors) {
     // Only capture the accessors to ensure the dependencies are properly
     // handled. The accessors's pointer have already been set to the native
@@ -135,8 +135,8 @@ void submit_native_command_ext(sycl::handler &cgh, sycl::queue &queue, Functor f
 }
 
 template <typename Functor, typename... CaptureOnlyAcc>
-void submit_native_command_ext_with_acc(sycl::handler &cgh, sycl::queue &queue, Functor functor,
-                                        const std::vector<sycl::event> &dependencies,
+void submit_native_command_ext_with_acc(sycl::handler& cgh, sycl::queue& queue, Functor functor,
+                                        const std::vector<sycl::event>& dependencies,
                                         sycl::accessor<std::uint8_t> workspace_placeholder_acc,
                                         CaptureOnlyAcc... capture_only_accessors) {
     // Only capture the accessors to ensure the dependencies are properly
@@ -191,8 +191,8 @@ void submit_native_command_ext_with_acc(sycl::handler &cgh, sycl::queue &queue, 
 /// a different cuStream can be used inside the native_command than the native
 /// cuStream used by the extension.
 template <bool UseWorkspace, bool UseEnqueueNativeCommandExt, typename Functor, typename... Ts>
-sycl::event dispatch_submit_impl_fp_int(const std::string &function_name, sycl::queue queue,
-                                        const std::vector<sycl::event> &dependencies,
+sycl::event dispatch_submit_impl_fp_int(const std::string& function_name, sycl::queue queue,
+                                        const std::vector<sycl::event>& dependencies,
                                         Functor functor, matrix_handle_t sm_handle,
                                         sycl::buffer<std::uint8_t> workspace_buffer,
                                         Ts... other_containers) {
@@ -202,7 +202,7 @@ sycl::event dispatch_submit_impl_fp_int(const std::string &function_name, sycl::
         detail::data_type int_type = sm_handle->get_int_type();
 
 #define ONEMKL_CUSPARSE_SUBMIT(FP_TYPE, INT_TYPE)                                                 \
-    return queue.submit([&](sycl::handler &cgh) {                                                 \
+    return queue.submit([&](sycl::handler& cgh) {                                                 \
         cgh.depends_on(dependencies);                                                             \
         auto fp_accs = get_fp_accessors<FP_TYPE>(cgh, sm_handle, other_containers...);            \
         auto int_accs = get_int_accessors<INT_TYPE>(cgh, sm_handle);                              \
@@ -268,7 +268,7 @@ sycl::event dispatch_submit_impl_fp_int(const std::string &function_name, sycl::
     else {
         // USM submit does not need to capture accessors
         if constexpr (!UseWorkspace) {
-            return queue.submit([&](sycl::handler &cgh) {
+            return queue.submit([&](sycl::handler& cgh) {
                 cgh.depends_on(dependencies);
                 if constexpr (UseEnqueueNativeCommandExt) {
                     if (is_in_order_queue) {
@@ -292,14 +292,14 @@ sycl::event dispatch_submit_impl_fp_int(const std::string &function_name, sycl::
 
 /// Similar to dispatch_submit_impl_fp_int but only dispatches the host_task based on the floating point value type.
 template <typename Functor, typename ContainerT>
-sycl::event dispatch_submit_impl_fp(const std::string &function_name, sycl::queue queue,
-                                    const std::vector<sycl::event> &dependencies, Functor functor,
+sycl::event dispatch_submit_impl_fp(const std::string& function_name, sycl::queue queue,
+                                    const std::vector<sycl::event>& dependencies, Functor functor,
                                     ContainerT container_handle) {
     if (container_handle->all_use_buffer()) {
         detail::data_type value_type = container_handle->get_value_type();
 
 #define ONEMKL_CUSPARSE_SUBMIT(FP_TYPE)                                  \
-    return queue.submit([&](sycl::handler &cgh) {                        \
+    return queue.submit([&](sycl::handler& cgh) {                        \
         cgh.depends_on(dependencies);                                    \
         auto fp_accs = get_fp_accessors<FP_TYPE>(cgh, container_handle); \
         submit_host_task(cgh, queue, functor, fp_accs);                  \
@@ -324,7 +324,7 @@ sycl::event dispatch_submit_impl_fp(const std::string &function_name, sycl::queu
                                      "Could not dispatch buffer kernel to a supported type");
     }
     else {
-        return queue.submit([&](sycl::handler &cgh) {
+        return queue.submit([&](sycl::handler& cgh) {
             cgh.depends_on(dependencies);
             submit_host_task(cgh, queue, functor);
         });
@@ -333,7 +333,7 @@ sycl::event dispatch_submit_impl_fp(const std::string &function_name, sycl::queu
 
 /// Helper function for dispatch_submit_impl_fp_int
 template <typename Functor, typename... Ts>
-sycl::event dispatch_submit(const std::string &function_name, sycl::queue queue, Functor functor,
+sycl::event dispatch_submit(const std::string& function_name, sycl::queue queue, Functor functor,
                             matrix_handle_t sm_handle, sycl::buffer<std::uint8_t> workspace_buffer,
                             Ts... other_containers) {
     constexpr bool UseWorkspace = true;
@@ -344,8 +344,8 @@ sycl::event dispatch_submit(const std::string &function_name, sycl::queue queue,
 
 /// Helper function for dispatch_submit_impl_fp_int
 template <typename Functor, typename... Ts>
-sycl::event dispatch_submit(const std::string &function_name, sycl::queue queue,
-                            const std::vector<sycl::event> &dependencies, Functor functor,
+sycl::event dispatch_submit(const std::string& function_name, sycl::queue queue,
+                            const std::vector<sycl::event>& dependencies, Functor functor,
                             matrix_handle_t sm_handle, Ts... other_containers) {
     constexpr bool UseWorkspace = false;
     constexpr bool UseEnqueueNativeCommandExt = false;
@@ -356,7 +356,7 @@ sycl::event dispatch_submit(const std::string &function_name, sycl::queue queue,
 
 /// Helper function for dispatch_submit_impl_fp_int
 template <typename Functor, typename... Ts>
-sycl::event dispatch_submit(const std::string &function_name, sycl::queue queue, Functor functor,
+sycl::event dispatch_submit(const std::string& function_name, sycl::queue queue, Functor functor,
                             matrix_handle_t sm_handle, Ts... other_containers) {
     constexpr bool UseWorkspace = false;
     constexpr bool UseEnqueueNativeCommandExt = false;
@@ -367,7 +367,7 @@ sycl::event dispatch_submit(const std::string &function_name, sycl::queue queue,
 
 /// Helper function for dispatch_submit_impl_fp_int
 template <typename Functor, typename... Ts>
-sycl::event dispatch_submit_native_ext(const std::string &function_name, sycl::queue queue,
+sycl::event dispatch_submit_native_ext(const std::string& function_name, sycl::queue queue,
                                        Functor functor, matrix_handle_t sm_handle,
                                        sycl::buffer<std::uint8_t> workspace_buffer,
                                        Ts... other_containers) {
@@ -383,8 +383,8 @@ sycl::event dispatch_submit_native_ext(const std::string &function_name, sycl::q
 
 /// Helper function for dispatch_submit_impl_fp_int
 template <typename Functor, typename... Ts>
-sycl::event dispatch_submit_native_ext(const std::string &function_name, sycl::queue queue,
-                                       const std::vector<sycl::event> &dependencies,
+sycl::event dispatch_submit_native_ext(const std::string& function_name, sycl::queue queue,
+                                       const std::vector<sycl::event>& dependencies,
                                        Functor functor, matrix_handle_t sm_handle,
                                        Ts... other_containers) {
     constexpr bool UseWorkspace = false;
@@ -400,7 +400,7 @@ sycl::event dispatch_submit_native_ext(const std::string &function_name, sycl::q
 
 /// Helper function for dispatch_submit_impl_fp_int
 template <typename Functor, typename... Ts>
-sycl::event dispatch_submit_native_ext(const std::string &function_name, sycl::queue queue,
+sycl::event dispatch_submit_native_ext(const std::string& function_name, sycl::queue queue,
                                        Functor functor, matrix_handle_t sm_handle,
                                        Ts... other_containers) {
     constexpr bool UseWorkspace = false;

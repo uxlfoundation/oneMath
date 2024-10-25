@@ -82,7 +82,7 @@ void overflow_check(Index index, Next... indices) {
 
 class cusolver_error : virtual public std::runtime_error {
 protected:
-    inline const char *cusolver_error_map(cusolverStatus_t error) {
+    inline const char* cusolver_error_map(cusolverStatus_t error) {
         switch (error) {
             case CUSOLVER_STATUS_SUCCESS: return "CUSOLVER_STATUS_SUCCESS";
 
@@ -131,7 +131,7 @@ public:
 
 class cuda_error : virtual public std::runtime_error {
 protected:
-    inline const char *cuda_error_map(CUresult result) {
+    inline const char* cuda_error_map(CUresult result) {
         switch (result) {
             case CUDA_SUCCESS: return "CUDA_SUCCESS";
             case CUDA_ERROR_NOT_PERMITTED: return "CUDA_ERROR_NOT_PERMITTED";
@@ -280,25 +280,25 @@ struct CudaEquivalentType<std::complex<double>> {
 
 /* devinfo */
 
-inline void get_cusolver_devinfo(sycl::queue &queue, sycl::buffer<int> &devInfo,
-                                 std::vector<int> &dev_info_) {
+inline void get_cusolver_devinfo(sycl::queue& queue, sycl::buffer<int>& devInfo,
+                                 std::vector<int>& dev_info_) {
     sycl::host_accessor<int, 1, sycl::access::mode::read> dev_info_acc{ devInfo };
     for (unsigned int i = 0; i < dev_info_.size(); ++i)
         dev_info_[i] = dev_info_acc[i];
 }
 
-inline void get_cusolver_devinfo(sycl::queue &queue, const int *devInfo,
-                                 std::vector<int> &dev_info_) {
+inline void get_cusolver_devinfo(sycl::queue& queue, const int* devInfo,
+                                 std::vector<int>& dev_info_) {
     queue.wait();
     queue.memcpy(dev_info_.data(), devInfo, sizeof(int));
 }
 
 template <typename DEVINFO_T>
-inline void lapack_info_check(sycl::queue &queue, DEVINFO_T devinfo, const char *func_name,
-                              const char *cufunc_name, int dev_info_size = 1) {
+inline void lapack_info_check(sycl::queue& queue, DEVINFO_T devinfo, const char* func_name,
+                              const char* cufunc_name, int dev_info_size = 1) {
     std::vector<int> dev_info_(dev_info_size);
     get_cusolver_devinfo(queue, devinfo, dev_info_);
-    for (const auto &val : dev_info_) {
+    for (const auto& val : dev_info_) {
         if (val > 0)
             throw oneapi::mkl::lapack::computation_error(
                 func_name, std::string(cufunc_name) + " failed with info = " + std::to_string(val),
@@ -311,8 +311,8 @@ inline void lapack_info_check(sycl::queue &queue, DEVINFO_T devinfo, const char 
 // Creates list of matrix/vector pointers from initial ptr and stride
 // Note: user is responsible for deallocating memory
 template <typename T>
-T **create_ptr_list_from_stride(T *ptr, int64_t ptr_stride, int64_t batch_size) {
-    T **ptr_list = (T **)malloc(sizeof(T *) * batch_size);
+T** create_ptr_list_from_stride(T* ptr, int64_t ptr_stride, int64_t batch_size) {
+    T** ptr_list = (T**)malloc(sizeof(T*) * batch_size);
     for (int64_t i = 0; i < batch_size; i++)
         ptr_list[i] = ptr + i * ptr_stride;
 

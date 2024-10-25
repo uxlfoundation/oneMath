@@ -34,8 +34,8 @@
 namespace oneapi::mkl::sparse::detail {
 
 /// Throw an exception if the scalar is not accessible in the host
-inline void check_ptr_is_host_accessible(const std::string &function_name,
-                                         const std::string &scalar_name,
+inline void check_ptr_is_host_accessible(const std::string& function_name,
+                                         const std::string& scalar_name,
                                          bool is_ptr_accessible_on_host) {
     if (!is_ptr_accessible_on_host) {
         throw mkl::invalid_argument(
@@ -45,7 +45,7 @@ inline void check_ptr_is_host_accessible(const std::string &function_name,
 }
 
 template <typename InternalSparseMatHandleT>
-void check_valid_spmm_common(const std::string &function_name, matrix_view A_view,
+void check_valid_spmm_common(const std::string& function_name, matrix_view A_view,
                              InternalSparseMatHandleT internal_A_handle,
                              dense_matrix_handle_t B_handle, dense_matrix_handle_t C_handle,
                              bool is_alpha_host_accessible, bool is_beta_host_accessible) {
@@ -80,7 +80,7 @@ void check_valid_spmm_common(const std::string &function_name, matrix_view A_vie
 }
 
 template <typename InternalSparseMatHandleT>
-void check_valid_spmv_common(const std::string &function_name, oneapi::mkl::transpose /*opA*/,
+void check_valid_spmv_common(const std::string& function_name, oneapi::mkl::transpose /*opA*/,
                              matrix_view A_view, InternalSparseMatHandleT internal_A_handle,
                              dense_vector_handle_t x_handle, dense_vector_handle_t y_handle,
                              bool is_alpha_host_accessible, bool is_beta_host_accessible) {
@@ -112,7 +112,7 @@ void check_valid_spmv_common(const std::string &function_name, oneapi::mkl::tran
 }
 
 template <typename InternalSparseMatHandleT>
-void check_valid_spsv_common(const std::string &function_name, matrix_view A_view,
+void check_valid_spsv_common(const std::string& function_name, matrix_view A_view,
                              InternalSparseMatHandleT internal_A_handle,
                              dense_vector_handle_t x_handle, dense_vector_handle_t y_handle,
                              bool is_alpha_host_accessible) {

@@ -26,7 +26,7 @@ namespace rocblas {
 
 template <typename T>
 rocblas_handle_container<T>::~rocblas_handle_container() noexcept(false) {
-    for (auto &handle_pair : rocblas_handle_container_mapper_) {
+    for (auto& handle_pair : rocblas_handle_container_mapper_) {
         rocblas_status err;
         if (handle_pair.second != nullptr) {
             auto handle = handle_pair.second->exchange(nullptr);
@@ -59,7 +59,7 @@ thread_local rocblas_handle_container<pi_context> RocblasScopedContextHandler::h
 #endif
 
 RocblasScopedContextHandler::RocblasScopedContextHandler(sycl::queue queue,
-                                                         sycl::interop_handle &ih)
+                                                         sycl::interop_handle& ih)
         : interop_h(ih),
           needToRecover_(false) {
     placedContext_ = new sycl::context(queue.get_context());
@@ -89,8 +89,8 @@ RocblasScopedContextHandler::~RocblasScopedContextHandler() noexcept(false) {
     delete placedContext_;
 }
 
-void ContextCallback(void *userData) {
-    auto *ptr = static_cast<std::atomic<rocblas_handle> *>(userData);
+void ContextCallback(void* userData) {
+    auto* ptr = static_cast<std::atomic<rocblas_handle>*>(userData);
     if (!ptr) {
         return;
     }
@@ -108,7 +108,7 @@ void ContextCallback(void *userData) {
     }
 }
 
-rocblas_handle RocblasScopedContextHandler::get_handle(const sycl::queue &queue) {
+rocblas_handle RocblasScopedContextHandler::get_handle(const sycl::queue& queue) {
     auto hipDevice = interop_h.get_native_device<sycl::backend::ext_oneapi_hip>();
     hipError_t hipErr;
     hipCtx_t desired;
@@ -154,10 +154,10 @@ rocblas_handle RocblasScopedContextHandler::get_handle(const sycl::queue &queue)
     return handle;
 }
 
-hipStream_t RocblasScopedContextHandler::get_stream(const sycl::queue &queue) {
+hipStream_t RocblasScopedContextHandler::get_stream(const sycl::queue& queue) {
     return sycl::get_native<sycl::backend::ext_oneapi_hip>(queue);
 }
-sycl::context RocblasScopedContextHandler::get_context(const sycl::queue &queue) {
+sycl::context RocblasScopedContextHandler::get_context(const sycl::queue& queue) {
     return queue.get_context();
 }
 

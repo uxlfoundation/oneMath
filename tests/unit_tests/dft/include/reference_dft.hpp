@@ -32,7 +32,7 @@
 namespace detail {
 using ref_t = long double; /* Do the calculations using long double */
 template <typename TypeIn, typename TypeOut>
-void reference_forward_dft_impl(const TypeIn *in, TypeOut *out, std::size_t N, std::size_t stride) {
+void reference_forward_dft_impl(const TypeIn* in, TypeOut* out, std::size_t N, std::size_t stride) {
     static_assert(is_complex<TypeOut>(), "Output type of DFT must be complex");
 
     constexpr ref_t TWOPI = 2.0L * 3.141592653589793238462643383279502884197L;
@@ -54,14 +54,14 @@ struct reference {};
 
 template <typename TypeIn, typename TypeOut>
 struct reference<TypeIn, TypeOut, 1> {
-    static void forward_dft(const std::vector<std::size_t> &sizes, const TypeIn *in, TypeOut *out) {
+    static void forward_dft(const std::vector<std::size_t>& sizes, const TypeIn* in, TypeOut* out) {
         reference_forward_dft_impl(in, out, sizes[0], 1);
     }
 };
 
 template <typename TypeIn, typename TypeOut>
 struct reference<TypeIn, TypeOut, 2> {
-    static void forward_dft(const std::vector<std::size_t> &sizes, const TypeIn *in, TypeOut *out) {
+    static void forward_dft(const std::vector<std::size_t>& sizes, const TypeIn* in, TypeOut* out) {
         const auto elements = std::accumulate(sizes.begin(), sizes.end(), 1U, std::multiplies<>{});
         std::vector<std::complex<ref_t>> tmp(elements);
         for (std::size_t i = 0; i < elements; i += sizes[1]) {
@@ -75,7 +75,7 @@ struct reference<TypeIn, TypeOut, 2> {
 
 template <typename TypeIn, typename TypeOut>
 struct reference<TypeIn, TypeOut, 3> {
-    static void forward_dft(const std::vector<std::size_t> &sizes, const TypeIn *in, TypeOut *out) {
+    static void forward_dft(const std::vector<std::size_t>& sizes, const TypeIn* in, TypeOut* out) {
         const auto elements = std::accumulate(sizes.begin(), sizes.end(), 1U, std::multiplies<>{});
         std::vector<std::complex<ref_t>> tmp1(elements);
         std::vector<std::complex<ref_t>> tmp2(elements);
@@ -112,7 +112,7 @@ struct reference<TypeIn, TypeOut, 3> {
  * @param stride the stride between elements in the data set, measured in elements.
 **/
 template <typename TypeIn, typename TypeOut>
-void reference_forward_dft(const std::vector<std::int64_t> &sizes, const TypeIn *in, TypeOut *out) {
+void reference_forward_dft(const std::vector<std::int64_t>& sizes, const TypeIn* in, TypeOut* out) {
     std::vector<std::size_t> unsigned_sizes(sizes.size());
     std::transform(sizes.begin(), sizes.end(), unsigned_sizes.begin(),
                    [](std::int64_t size) { return cast_unsigned(size); });

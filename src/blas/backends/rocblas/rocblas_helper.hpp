@@ -77,7 +77,7 @@ void overflow_check(Index index, Next... indices) {
 
 class rocblas_error : virtual public std::runtime_error {
 protected:
-    inline const char *rocblas_error_map(rocblas_status error) {
+    inline const char* rocblas_error_map(rocblas_status error) {
         switch (error) {
             case rocblas_status_success: return "rocblas_status_success";
             case rocblas_status_invalid_handle: return "rocblas_status_invalid_handle";
@@ -124,7 +124,7 @@ public:
 
 class hip_error : virtual public std::runtime_error {
 protected:
-    inline const char *hip_error_map(hipError_t result) {
+    inline const char* hip_error_map(hipError_t result) {
         return hipGetErrorName(result);
     }
     int error_number; ///< error number

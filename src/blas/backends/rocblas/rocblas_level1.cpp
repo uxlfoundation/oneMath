@@ -34,16 +34,16 @@ namespace column_major {
 // Buffer APIs
 
 template <typename Func, typename T1, typename T2>
-inline void asum(Func func, sycl::queue &queue, int64_t n, sycl::buffer<T1, 1> &x,
-                 const int64_t incx, sycl::buffer<T2, 1> &result) {
+inline void asum(Func func, sycl::queue& queue, int64_t n, sycl::buffer<T1, 1>& x,
+                 const int64_t incx, sycl::buffer<T2, 1>& result) {
     using rocDataType1 = typename RocEquivalentType<T1>::Type;
     using rocDataType2 = typename RocEquivalentType<T2>::Type;
     overflow_check(n, incx);
 
-    queue.submit([&](sycl::handler &cgh) {
+    queue.submit([&](sycl::handler& cgh) {
         auto x_acc = x.template get_access<sycl::access::mode::read>(cgh);
         auto res_acc = result.template get_access<sycl::access::mode::write>(cgh);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler &sc) {
+        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             // By default the pointer mode is the rocblas_pointer_mode_host
             // when the data is on buffer, it must be set to
@@ -51,8 +51,8 @@ inline void asum(Func func, sycl::queue &queue, int64_t n, sycl::buffer<T1, 1> &
             // fault. When it is set to device it is users responsibility to
             // synchronise as the function is completely asynchronous.
             rocblas_set_pointer_mode(handle, rocblas_pointer_mode_device);
-            auto x_ = sc.get_mem<rocDataType1 *>(x_acc);
-            auto res_ = sc.get_mem<rocDataType2 *>(res_acc);
+            auto x_ = sc.get_mem<rocDataType1*>(x_acc);
+            auto res_ = sc.get_mem<rocDataType2*>(res_acc);
             rocblas_status err;
             // ASUM does not support negative index
             ROCBLAS_ERROR_FUNC_SYNC(func, err, handle, n, x_, std::abs(incx), res_);
@@ -65,8 +65,8 @@ inline void asum(Func func, sycl::queue &queue, int64_t n, sycl::buffer<T1, 1> &
 }
 
 #define ASUM_LAUNCHER(TYPE1, TYPE2, ROCBLAS_ROUTINE)                                        \
-    void asum(sycl::queue &queue, int64_t n, sycl::buffer<TYPE1, 1> &x, const int64_t incx, \
-              sycl::buffer<TYPE2, 1> &result) {                                             \
+    void asum(sycl::queue& queue, int64_t n, sycl::buffer<TYPE1, 1>& x, const int64_t incx, \
+              sycl::buffer<TYPE2, 1>& result) {                                             \
         asum(ROCBLAS_ROUTINE, queue, n, x, incx, result);                                   \
     }
 
@@ -78,26 +78,26 @@ ASUM_LAUNCHER(std::complex<double>, double, rocblas_dzasum)
 #undef ASUM_LAUNCHER
 
 template <typename Func, typename T1, typename T2>
-inline void scal(Func func, sycl::queue &queue, int64_t n, T1 a, sycl::buffer<T2, 1> &x,
+inline void scal(Func func, sycl::queue& queue, int64_t n, T1 a, sycl::buffer<T2, 1>& x,
                  int64_t incx) {
     using rocDataType1 = typename RocEquivalentType<T1>::Type;
     using rocDataType2 = typename RocEquivalentType<T2>::Type;
     overflow_check(n, incx);
 
-    queue.submit([&](sycl::handler &cgh) {
+    queue.submit([&](sycl::handler& cgh) {
         auto x_acc = x.template get_access<sycl::access::mode::read_write>(cgh);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler &sc) {
+        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
-            auto x_ = sc.get_mem<rocDataType2 *>(x_acc);
+            auto x_ = sc.get_mem<rocDataType2*>(x_acc);
             rocblas_status err;
             // SCAL does not support negative incx
-            ROCBLAS_ERROR_FUNC_SYNC(func, err, handle, n, (rocDataType1 *)&a, x_, std::abs(incx));
+            ROCBLAS_ERROR_FUNC_SYNC(func, err, handle, n, (rocDataType1*)&a, x_, std::abs(incx));
         });
     });
 }
 
 #define SCAL_LAUNCHER(TYPE1, TYPE2, ROCBLAS_ROUTINE)                                             \
-    void scal(sycl::queue &queue, int64_t n, TYPE1 a, sycl::buffer<TYPE2, 1> &x, int64_t incx) { \
+    void scal(sycl::queue& queue, int64_t n, TYPE1 a, sycl::buffer<TYPE2, 1>& x, int64_t incx) { \
         scal(ROCBLAS_ROUTINE, queue, n, a, x, incx);                                             \
     }
 
@@ -111,29 +111,28 @@ SCAL_LAUNCHER(double, std::complex<double>, rocblas_zdscal)
 #undef SCAL_LAUNCHER
 
 template <typename Func, typename T>
-inline void axpy(Func func, sycl::queue &queue, int64_t n, T alpha, sycl::buffer<T, 1> &x,
-                 int64_t incx, sycl::buffer<T, 1> &y, int64_t incy) {
+inline void axpy(Func func, sycl::queue& queue, int64_t n, T alpha, sycl::buffer<T, 1>& x,
+                 int64_t incx, sycl::buffer<T, 1>& y, int64_t incy) {
     using rocDataType = typename RocEquivalentType<T>::Type;
     overflow_check(n, incx, incy);
 
-    queue.submit([&](sycl::handler &cgh) {
+    queue.submit([&](sycl::handler& cgh) {
         auto x_acc = x.template get_access<sycl::access::mode::read>(cgh);
         auto y_acc = y.template get_access<sycl::access::mode::read_write>(cgh);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler &sc) {
+        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
 
-            auto x_ = sc.get_mem<rocDataType *>(x_acc);
-            auto y_ = sc.get_mem<rocDataType *>(y_acc);
+            auto x_ = sc.get_mem<rocDataType*>(x_acc);
+            auto y_ = sc.get_mem<rocDataType*>(y_acc);
             rocblas_status err;
-            ROCBLAS_ERROR_FUNC_SYNC(func, err, handle, n, (rocDataType *)&alpha, x_, incx, y_,
-                                    incy);
+            ROCBLAS_ERROR_FUNC_SYNC(func, err, handle, n, (rocDataType*)&alpha, x_, incx, y_, incy);
         });
     });
 }
 
 #define AXPY_LAUNCHER(TYPE, ROCBLAS_ROUTINE)                                                     \
-    void axpy(sycl::queue &queue, int64_t n, TYPE alpha, sycl::buffer<TYPE, 1> &x, int64_t incx, \
-              sycl::buffer<TYPE, 1> &y, int64_t incy) {                                          \
+    void axpy(sycl::queue& queue, int64_t n, TYPE alpha, sycl::buffer<TYPE, 1>& x, int64_t incx, \
+              sycl::buffer<TYPE, 1>& y, int64_t incy) {                                          \
         axpy(ROCBLAS_ROUTINE, queue, n, alpha, x, incx, y, incy);                                \
     }
 
@@ -144,40 +143,40 @@ AXPY_LAUNCHER(std::complex<double>, rocblas_zaxpy)
 
 #undef AXPY_LAUNCHER
 
-void axpby(sycl::queue &queue, int64_t n, float alpha, sycl::buffer<float, 1> &x, int64_t incx,
-           float beta, sycl::buffer<float, 1> &y, int64_t incy) {
+void axpby(sycl::queue& queue, int64_t n, float alpha, sycl::buffer<float, 1>& x, int64_t incx,
+           float beta, sycl::buffer<float, 1>& y, int64_t incy) {
     throw unimplemented("blas", "axpby", "for column_major layout");
 }
 
-void axpby(sycl::queue &queue, int64_t n, double alpha, sycl::buffer<double, 1> &x, int64_t incx,
-           double beta, sycl::buffer<double, 1> &y, int64_t incy) {
+void axpby(sycl::queue& queue, int64_t n, double alpha, sycl::buffer<double, 1>& x, int64_t incx,
+           double beta, sycl::buffer<double, 1>& y, int64_t incy) {
     throw unimplemented("blas", "axpby", "for column_major layout");
 }
 
-void axpby(sycl::queue &queue, int64_t n, std::complex<float> alpha,
-           sycl::buffer<std::complex<float>, 1> &x, int64_t incx, std::complex<float> beta,
-           sycl::buffer<std::complex<float>, 1> &y, int64_t incy) {
+void axpby(sycl::queue& queue, int64_t n, std::complex<float> alpha,
+           sycl::buffer<std::complex<float>, 1>& x, int64_t incx, std::complex<float> beta,
+           sycl::buffer<std::complex<float>, 1>& y, int64_t incy) {
     throw unimplemented("blas", "axpby", "for column_major layout");
 }
 
-void axpby(sycl::queue &queue, int64_t n, std::complex<double> alpha,
-           sycl::buffer<std::complex<double>, 1> &x, int64_t incx, std::complex<double> beta,
-           sycl::buffer<std::complex<double>, 1> &y, int64_t incy) {
+void axpby(sycl::queue& queue, int64_t n, std::complex<double> alpha,
+           sycl::buffer<std::complex<double>, 1>& x, int64_t incx, std::complex<double> beta,
+           sycl::buffer<std::complex<double>, 1>& y, int64_t incy) {
     throw unimplemented("blas", "axpby", "for column_major layout");
 }
 
 template <typename Func, typename T1, typename T2>
-inline void rotg(Func func, sycl::queue &queue, sycl::buffer<T1, 1> &a, sycl::buffer<T1, 1> &b,
-                 sycl::buffer<T2, 1> &c, sycl::buffer<T1, 1> &s) {
+inline void rotg(Func func, sycl::queue& queue, sycl::buffer<T1, 1>& a, sycl::buffer<T1, 1>& b,
+                 sycl::buffer<T2, 1>& c, sycl::buffer<T1, 1>& s) {
     using rocDataType1 = typename RocEquivalentType<T1>::Type;
     using rocDataType2 = typename RocEquivalentType<T2>::Type;
 
-    queue.submit([&](sycl::handler &cgh) {
+    queue.submit([&](sycl::handler& cgh) {
         auto a_acc = a.template get_access<sycl::access::mode::read_write>(cgh);
         auto b_acc = b.template get_access<sycl::access::mode::read_write>(cgh);
         auto c_acc = c.template get_access<sycl::access::mode::read_write>(cgh);
         auto s_acc = s.template get_access<sycl::access::mode::read_write>(cgh);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler &sc) {
+        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             // By default the pointer mode is the rocblas_pointer_mode_host
             // when the data is on buffer, it must be set to
@@ -185,10 +184,10 @@ inline void rotg(Func func, sycl::queue &queue, sycl::buffer<T1, 1> &a, sycl::bu
             // fault. When it is set to device it is users responsibility to
             // synchronise as the function is completely asynchronous.
             rocblas_set_pointer_mode(handle, rocblas_pointer_mode_device);
-            auto a_ = sc.get_mem<rocDataType1 *>(a_acc);
-            auto b_ = sc.get_mem<rocDataType1 *>(b_acc);
-            auto c_ = sc.get_mem<rocDataType2 *>(c_acc);
-            auto s_ = sc.get_mem<rocDataType1 *>(s_acc);
+            auto a_ = sc.get_mem<rocDataType1*>(a_acc);
+            auto b_ = sc.get_mem<rocDataType1*>(b_acc);
+            auto c_ = sc.get_mem<rocDataType2*>(c_acc);
+            auto s_ = sc.get_mem<rocDataType1*>(s_acc);
             rocblas_status err;
             ROCBLAS_ERROR_FUNC_SYNC(func, err, handle, a_, b_, c_, s_);
             // Higher level BLAS functions expect rocblas_pointer_mode_host
@@ -200,8 +199,8 @@ inline void rotg(Func func, sycl::queue &queue, sycl::buffer<T1, 1> &a, sycl::bu
 }
 
 #define ROTG_LAUNCHER(TYPE1, TYPE2, ROCBLAS_ROUTINE)                                    \
-    void rotg(sycl::queue &queue, sycl::buffer<TYPE1, 1> &a, sycl::buffer<TYPE1, 1> &b, \
-              sycl::buffer<TYPE2, 1> &c, sycl::buffer<TYPE1, 1> &s) {                   \
+    void rotg(sycl::queue& queue, sycl::buffer<TYPE1, 1>& a, sycl::buffer<TYPE1, 1>& b, \
+              sycl::buffer<TYPE2, 1>& c, sycl::buffer<TYPE1, 1>& s) {                   \
         rotg(ROCBLAS_ROUTINE, queue, a, b, c, s);                                       \
     }
 
@@ -213,16 +212,16 @@ ROTG_LAUNCHER(std::complex<double>, double, rocblas_zrotg)
 #undef ROTG_LAUNCHER
 
 template <typename Func, typename T>
-inline void rotm(Func func, sycl::queue &queue, int64_t n, sycl::buffer<T, 1> &x, int64_t incx,
-                 sycl::buffer<T, 1> &y, int64_t incy, sycl::buffer<T, 1> &param) {
+inline void rotm(Func func, sycl::queue& queue, int64_t n, sycl::buffer<T, 1>& x, int64_t incx,
+                 sycl::buffer<T, 1>& y, int64_t incy, sycl::buffer<T, 1>& param) {
     using rocDataType = typename RocEquivalentType<T>::Type;
     overflow_check(n, incx, incy);
 
-    queue.submit([&](sycl::handler &cgh) {
+    queue.submit([&](sycl::handler& cgh) {
         auto x_acc = x.template get_access<sycl::access::mode::read_write>(cgh);
         auto y_acc = y.template get_access<sycl::access::mode::read_write>(cgh);
         auto param_acc = param.template get_access<sycl::access::mode::read>(cgh);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler &sc) {
+        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
 
             // By default the pointer mode is the rocblas_pointer_mode_host
@@ -231,9 +230,9 @@ inline void rotm(Func func, sycl::queue &queue, int64_t n, sycl::buffer<T, 1> &x
             // fault. When it is set to device it is users responsibility to
             // synchronise as the function is completely asynchronous.
             rocblas_set_pointer_mode(handle, rocblas_pointer_mode_device);
-            auto x_ = sc.get_mem<rocDataType *>(x_acc);
-            auto y_ = sc.get_mem<rocDataType *>(y_acc);
-            auto param_ = sc.get_mem<rocDataType *>(param_acc);
+            auto x_ = sc.get_mem<rocDataType*>(x_acc);
+            auto y_ = sc.get_mem<rocDataType*>(y_acc);
+            auto param_ = sc.get_mem<rocDataType*>(param_acc);
             rocblas_status err;
             ROCBLAS_ERROR_FUNC_SYNC(func, err, handle, n, x_, incx, y_, incy, param_);
             // Higher level BLAS functions expect rocblas_pointer_mode_host
@@ -245,8 +244,8 @@ inline void rotm(Func func, sycl::queue &queue, int64_t n, sycl::buffer<T, 1> &x
 }
 
 #define ROTM_LAUNCHER(TYPE, ROCBLAS_ROUTINE)                                          \
-    void rotm(sycl::queue &queue, int64_t n, sycl::buffer<TYPE, 1> &x, int64_t incx,  \
-              sycl::buffer<TYPE, 1> &y, int64_t incy, sycl::buffer<TYPE, 1> &param) { \
+    void rotm(sycl::queue& queue, int64_t n, sycl::buffer<TYPE, 1>& x, int64_t incx,  \
+              sycl::buffer<TYPE, 1>& y, int64_t incy, sycl::buffer<TYPE, 1>& param) { \
         rotm(ROCBLAS_ROUTINE, queue, n, x, incx, y, incy, param);                     \
     }
 
@@ -256,19 +255,19 @@ ROTM_LAUNCHER(double, rocblas_drotm)
 #undef ROTM_LAUNCHER
 
 template <typename Func, typename T>
-inline void copy(Func func, sycl::queue &queue, int64_t n, sycl::buffer<T, 1> &x, int64_t incx,
-                 sycl::buffer<T, 1> &y, int64_t incy) {
+inline void copy(Func func, sycl::queue& queue, int64_t n, sycl::buffer<T, 1>& x, int64_t incx,
+                 sycl::buffer<T, 1>& y, int64_t incy) {
     using rocDataType = typename RocEquivalentType<T>::Type;
     overflow_check(n, incx, incy);
 
-    queue.submit([&](sycl::handler &cgh) {
+    queue.submit([&](sycl::handler& cgh) {
         auto x_acc = x.template get_access<sycl::access::mode::read>(cgh);
         auto y_acc = y.template get_access<sycl::access::mode::read_write>(cgh);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler &sc) {
+        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
 
-            auto x_ = sc.get_mem<rocDataType *>(x_acc);
-            auto y_ = sc.get_mem<rocDataType *>(y_acc);
+            auto x_ = sc.get_mem<rocDataType*>(x_acc);
+            auto y_ = sc.get_mem<rocDataType*>(y_acc);
             rocblas_status err;
             ROCBLAS_ERROR_FUNC_SYNC(func, err, handle, n, x_, incx, y_, incy);
         });
@@ -276,8 +275,8 @@ inline void copy(Func func, sycl::queue &queue, int64_t n, sycl::buffer<T, 1> &x
 }
 
 #define COPY_LAUNCHER(TYPE, ROCBLAS_ROUTINE)                                         \
-    void copy(sycl::queue &queue, int64_t n, sycl::buffer<TYPE, 1> &x, int64_t incx, \
-              sycl::buffer<TYPE, 1> &y, int64_t incy) {                              \
+    void copy(sycl::queue& queue, int64_t n, sycl::buffer<TYPE, 1>& x, int64_t incx, \
+              sycl::buffer<TYPE, 1>& y, int64_t incy) {                              \
         copy(ROCBLAS_ROUTINE, queue, n, x, incx, y, incy);                           \
     }
 
@@ -289,16 +288,16 @@ COPY_LAUNCHER(std::complex<double>, rocblas_zcopy)
 #undef COPY_LAUNCHER
 
 template <typename Func, typename T>
-inline void dot(Func func, sycl::queue &queue, int64_t n, sycl::buffer<T, 1> &x, const int64_t incx,
-                sycl::buffer<T, 1> &y, int64_t incy, sycl::buffer<T, 1> &result) {
+inline void dot(Func func, sycl::queue& queue, int64_t n, sycl::buffer<T, 1>& x, const int64_t incx,
+                sycl::buffer<T, 1>& y, int64_t incy, sycl::buffer<T, 1>& result) {
     using rocDataType = typename RocEquivalentType<T>::Type;
     overflow_check(n, incx, incy);
 
-    queue.submit([&](sycl::handler &cgh) {
+    queue.submit([&](sycl::handler& cgh) {
         auto x_acc = x.template get_access<sycl::access::mode::read>(cgh);
         auto y_acc = y.template get_access<sycl::access::mode::read>(cgh);
         auto res_acc = result.template get_access<sycl::access::mode::write>(cgh);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler &sc) {
+        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
 
             // By default the pointer mode is the rocblas_pointer_mode_host
@@ -307,9 +306,9 @@ inline void dot(Func func, sycl::queue &queue, int64_t n, sycl::buffer<T, 1> &x,
             // fault. When it is set to device it is users responsibility to
             // synchronise as the function is completely asynchronous.
             rocblas_set_pointer_mode(handle, rocblas_pointer_mode_device);
-            auto x_ = sc.get_mem<rocDataType *>(x_acc);
-            auto y_ = sc.get_mem<rocDataType *>(y_acc);
-            auto res_ = sc.get_mem<rocDataType *>(res_acc);
+            auto x_ = sc.get_mem<rocDataType*>(x_acc);
+            auto y_ = sc.get_mem<rocDataType*>(y_acc);
+            auto res_ = sc.get_mem<rocDataType*>(res_acc);
             rocblas_status err;
             ROCBLAS_ERROR_FUNC_SYNC(func, err, handle, n, x_, incx, y_, incy, res_);
             // Higher level BLAS functions expect rocblas_pointer_mode_host
@@ -321,8 +320,8 @@ inline void dot(Func func, sycl::queue &queue, int64_t n, sycl::buffer<T, 1> &x,
 }
 
 #define DOT_LAUNCHER(EXT, TYPE, ROCBLAS_ROUTINE)                                                 \
-    void dot##EXT(sycl::queue &queue, int64_t n, sycl::buffer<TYPE, 1> &x, const int64_t incx,   \
-                  sycl::buffer<TYPE, 1> &y, const int64_t incy, sycl::buffer<TYPE, 1> &result) { \
+    void dot##EXT(sycl::queue& queue, int64_t n, sycl::buffer<TYPE, 1>& x, const int64_t incx,   \
+                  sycl::buffer<TYPE, 1>& y, const int64_t incy, sycl::buffer<TYPE, 1>& result) { \
         dot(ROCBLAS_ROUTINE, queue, n, x, incx, y, incy, result);                                \
     }
 
@@ -335,23 +334,23 @@ DOT_LAUNCHER(c, std::complex<double>, rocblas_zdotc)
 
 #undef DOT_LAUNCHER
 
-void dot(sycl::queue &queue, int64_t n, sycl::buffer<float, 1> &x, int64_t incx,
-         sycl::buffer<float, 1> &y, int64_t incy, sycl::buffer<double, 1> &result) {
+void dot(sycl::queue& queue, int64_t n, sycl::buffer<float, 1>& x, int64_t incx,
+         sycl::buffer<float, 1>& y, int64_t incy, sycl::buffer<double, 1>& result) {
     throw unimplemented("blas", "dot", "for column_major layout");
 }
 
 template <typename Func, typename T1, typename T2, typename T3>
-inline void rot(Func func, sycl::queue &queue, int64_t n, sycl::buffer<T1, 1> &x,
-                const int64_t incx, sycl::buffer<T1, 1> &y, int64_t incy, T2 c, T3 s) {
+inline void rot(Func func, sycl::queue& queue, int64_t n, sycl::buffer<T1, 1>& x,
+                const int64_t incx, sycl::buffer<T1, 1>& y, int64_t incy, T2 c, T3 s) {
     using rocDataType1 = typename RocEquivalentType<T1>::Type;
     using rocDataType2 = typename RocEquivalentType<T2>::Type;
     using rocDataType3 = typename RocEquivalentType<T3>::Type;
     overflow_check(n, incx, incy);
 
-    queue.submit([&](sycl::handler &cgh) {
+    queue.submit([&](sycl::handler& cgh) {
         auto x_acc = x.template get_access<sycl::access::mode::read_write>(cgh);
         auto y_acc = y.template get_access<sycl::access::mode::read_write>(cgh);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler &sc) {
+        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             // By default the pointer mode is the rocblas_pointer_mode_host
             // when the data is on buffer, it must be set to
@@ -359,18 +358,18 @@ inline void rot(Func func, sycl::queue &queue, int64_t n, sycl::buffer<T1, 1> &x
             // fault. When it is set to device it is users responsibility to
             // synchronise as the function is completely asynchronous.
             // rocblas_set_pointer_mode(handle, rocblas_set_pointer_mode);
-            auto x_ = sc.get_mem<rocDataType1 *>(x_acc);
-            auto y_ = sc.get_mem<rocDataType1 *>(y_acc);
+            auto x_ = sc.get_mem<rocDataType1*>(x_acc);
+            auto y_ = sc.get_mem<rocDataType1*>(y_acc);
             rocblas_status err;
-            ROCBLAS_ERROR_FUNC_SYNC(func, err, handle, n, x_, incx, y_, incy, (rocDataType2 *)&c,
-                                    (rocDataType3 *)&s);
+            ROCBLAS_ERROR_FUNC_SYNC(func, err, handle, n, x_, incx, y_, incy, (rocDataType2*)&c,
+                                    (rocDataType3*)&s);
         });
     });
 }
 
 #define ROT_LAUNCHER(TYPE1, TYPE2, TYPE3, ROCBLAS_ROUTINE)                                 \
-    void rot(sycl::queue &queue, int64_t n, sycl::buffer<TYPE1, 1> &x, const int64_t incx, \
-             sycl::buffer<TYPE1, 1> &y, int64_t incy, TYPE2 c, TYPE3 s) {                  \
+    void rot(sycl::queue& queue, int64_t n, sycl::buffer<TYPE1, 1>& x, const int64_t incx, \
+             sycl::buffer<TYPE1, 1>& y, int64_t incy, TYPE2 c, TYPE3 s) {                  \
         rot(ROCBLAS_ROUTINE, queue, n, x, incx, y, incy, c, s);                            \
     }
 
@@ -381,16 +380,16 @@ ROT_LAUNCHER(std::complex<double>, double, double, rocblas_zdrot)
 
 #undef ROT_LAUNCHER
 
-void sdsdot(sycl::queue &queue, int64_t n, float sb, sycl::buffer<float, 1> &x, int64_t incx,
-            sycl::buffer<float, 1> &y, int64_t incy, sycl::buffer<float, 1> &result) {
+void sdsdot(sycl::queue& queue, int64_t n, float sb, sycl::buffer<float, 1>& x, int64_t incx,
+            sycl::buffer<float, 1>& y, int64_t incy, sycl::buffer<float, 1>& result) {
     overflow_check(n, incx, incy);
 
     // rocBLAS does not support sdot so we need to mimic sdot.
-    queue.submit([&](sycl::handler &cgh) {
+    queue.submit([&](sycl::handler& cgh) {
         auto x_acc = x.get_access<sycl::access::mode::read>(cgh);
         auto y_acc = y.get_access<sycl::access::mode::read>(cgh);
         auto res_acc = result.get_access<sycl::access::mode::write>(cgh);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler &sc) {
+        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
 
             // By default the pointer mode is the rocblas_pointer_mode_host
@@ -399,9 +398,9 @@ void sdsdot(sycl::queue &queue, int64_t n, float sb, sycl::buffer<float, 1> &x, 
             // fault. When it is set to device it is users responsibility to
             // synchronise as the function is completely asynchronous.
             rocblas_set_pointer_mode(handle, rocblas_pointer_mode_device);
-            auto x_ = sc.get_mem<float *>(x_acc);
-            auto y_ = sc.get_mem<float *>(y_acc);
-            auto res_ = sc.get_mem<float *>(res_acc);
+            auto x_ = sc.get_mem<float*>(x_acc);
+            auto y_ = sc.get_mem<float*>(y_acc);
+            auto res_ = sc.get_mem<float*>(res_acc);
             rocblas_status err;
             ROCBLAS_ERROR_FUNC_SYNC(rocblas_sdot, err, handle, n, x_, incx, y_, incy, res_);
             // Higher level BLAS functions expect rocblas_pointer_mode_host
@@ -417,18 +416,18 @@ void sdsdot(sycl::queue &queue, int64_t n, float sb, sycl::buffer<float, 1> &x, 
 }
 
 template <typename Func, typename T>
-inline void rotmg(Func func, sycl::queue &queue, sycl::buffer<T, 1> &d1, sycl::buffer<T, 1> &d2,
-                  sycl::buffer<T, 1> &x1, T y1, sycl::buffer<T, 1> &param) {
+inline void rotmg(Func func, sycl::queue& queue, sycl::buffer<T, 1>& d1, sycl::buffer<T, 1>& d2,
+                  sycl::buffer<T, 1>& x1, T y1, sycl::buffer<T, 1>& param) {
     using rocDataType = typename RocEquivalentType<T>::Type;
     sycl::buffer<T, 1> y1_buff(&y1, sycl::range<1>(1));
 
-    queue.submit([&](sycl::handler &cgh) {
+    queue.submit([&](sycl::handler& cgh) {
         auto d1_acc = d1.template get_access<sycl::access::mode::read_write>(cgh);
         auto d2_acc = d2.template get_access<sycl::access::mode::read_write>(cgh);
         auto x1_acc = x1.template get_access<sycl::access::mode::read_write>(cgh);
         auto y1_acc = y1_buff.template get_access<sycl::access::mode::read>(cgh);
         auto param_acc = param.template get_access<sycl::access::mode::read_write>(cgh);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler &sc) {
+        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
 
             // By default the pointer mode is the rocblas_pointer_mode_host
@@ -437,11 +436,11 @@ inline void rotmg(Func func, sycl::queue &queue, sycl::buffer<T, 1> &d1, sycl::b
             // fault. When it is set to device it is users responsibility to
             // synchronise as the function is completely asynchronous.
             rocblas_set_pointer_mode(handle, rocblas_pointer_mode_device);
-            auto d1_ = sc.get_mem<rocDataType *>(d1_acc);
-            auto d2_ = sc.get_mem<rocDataType *>(d2_acc);
-            auto x1_ = sc.get_mem<rocDataType *>(x1_acc);
-            auto y1_ = sc.get_mem<rocDataType *>(y1_acc);
-            auto param_ = sc.get_mem<rocDataType *>(param_acc);
+            auto d1_ = sc.get_mem<rocDataType*>(d1_acc);
+            auto d2_ = sc.get_mem<rocDataType*>(d2_acc);
+            auto x1_ = sc.get_mem<rocDataType*>(x1_acc);
+            auto y1_ = sc.get_mem<rocDataType*>(y1_acc);
+            auto param_ = sc.get_mem<rocDataType*>(param_acc);
             rocblas_status err;
             ROCBLAS_ERROR_FUNC_SYNC(func, err, handle, d1_, d2_, x1_, y1_, param_);
             // Higher level BLAS functions expect rocblas_pointer_mode_host
@@ -453,8 +452,8 @@ inline void rotmg(Func func, sycl::queue &queue, sycl::buffer<T, 1> &d1, sycl::b
 }
 
 #define ROTMG_LAUNCHER(TYPE, ROCBLAS_ROUTINE)                                            \
-    void rotmg(sycl::queue &queue, sycl::buffer<TYPE, 1> &d1, sycl::buffer<TYPE, 1> &d2, \
-               sycl::buffer<TYPE, 1> &x1, TYPE y1, sycl::buffer<TYPE, 1> &param) {       \
+    void rotmg(sycl::queue& queue, sycl::buffer<TYPE, 1>& d1, sycl::buffer<TYPE, 1>& d2, \
+               sycl::buffer<TYPE, 1>& x1, TYPE y1, sycl::buffer<TYPE, 1>& param) {       \
         rotmg(ROCBLAS_ROUTINE, queue, d1, d2, x1, y1, param);                            \
     }
 
@@ -464,8 +463,8 @@ ROTMG_LAUNCHER(double, rocblas_drotmg)
 #undef ROTMG_LAUNCHER
 
 template <typename Func, typename T>
-inline void iamax(Func func, sycl::queue &queue, int64_t n, sycl::buffer<T, 1> &x,
-                  const int64_t incx, sycl::buffer<int64_t, 1> &result) {
+inline void iamax(Func func, sycl::queue& queue, int64_t n, sycl::buffer<T, 1>& x,
+                  const int64_t incx, sycl::buffer<int64_t, 1>& result) {
     using rocDataType = typename RocEquivalentType<T>::Type;
     overflow_check(n, incx);
 
@@ -477,10 +476,10 @@ inline void iamax(Func func, sycl::queue &queue, int64_t n, sycl::buffer<T, 1> &
     // to elementwise copy the data between two buffer, or allow reinterpret cast
     // to convert to different type with different typesize size.
     sycl::buffer<int, 1> int_res_buff{ sycl::range<1>(1) };
-    queue.submit([&](sycl::handler &cgh) {
+    queue.submit([&](sycl::handler& cgh) {
         auto x_acc = x.template get_access<sycl::access::mode::read>(cgh);
         auto int_res_acc = int_res_buff.template get_access<sycl::access::mode::write>(cgh);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler &sc) {
+        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
 
             // By default the pointer mode is the rocblas_pointer_mode_host
@@ -489,8 +488,8 @@ inline void iamax(Func func, sycl::queue &queue, int64_t n, sycl::buffer<T, 1> &
             // fault. When it is set to device it is users responsibility to
             // synchronise as the function is completely asynchronous.
             rocblas_set_pointer_mode(handle, rocblas_pointer_mode_device);
-            auto x_ = sc.get_mem<rocDataType *>(x_acc);
-            auto int_res_ = sc.get_mem<int *>(int_res_acc);
+            auto x_ = sc.get_mem<rocDataType*>(x_acc);
+            auto int_res_ = sc.get_mem<int*>(int_res_acc);
             rocblas_status err;
             // For negative incx, iamax returns 0. This behaviour is similar to that of
             // reference netlib BLAS.
@@ -502,7 +501,7 @@ inline void iamax(Func func, sycl::queue &queue, int64_t n, sycl::buffer<T, 1> &
         });
     });
 
-    queue.submit([&](sycl::handler &cgh) {
+    queue.submit([&](sycl::handler& cgh) {
         auto int_res_acc = int_res_buff.template get_access<sycl::access::mode::read>(cgh);
         auto result_acc = result.template get_access<sycl::access::mode::write>(cgh);
         cgh.single_task(
@@ -511,8 +510,8 @@ inline void iamax(Func func, sycl::queue &queue, int64_t n, sycl::buffer<T, 1> &
 }
 
 #define IAMAX_LAUNCHER(TYPE, ROCBLAS_ROUTINE)                                               \
-    void iamax(sycl::queue &queue, int64_t n, sycl::buffer<TYPE, 1> &x, const int64_t incx, \
-               sycl::buffer<int64_t, 1> &result) {                                          \
+    void iamax(sycl::queue& queue, int64_t n, sycl::buffer<TYPE, 1>& x, const int64_t incx, \
+               sycl::buffer<int64_t, 1>& result) {                                          \
         iamax(ROCBLAS_ROUTINE, queue, n, x, incx, result);                                  \
     }
 
@@ -524,19 +523,19 @@ IAMAX_LAUNCHER(std::complex<double>, rocblas_izamax)
 #undef IAMAX_LAUNCHER
 
 template <typename Func, typename T>
-inline void swap(Func func, sycl::queue &queue, int64_t n, sycl::buffer<T, 1> &x, int64_t incx,
-                 sycl::buffer<T, 1> &y, int64_t incy) {
+inline void swap(Func func, sycl::queue& queue, int64_t n, sycl::buffer<T, 1>& x, int64_t incx,
+                 sycl::buffer<T, 1>& y, int64_t incy) {
     using rocDataType = typename RocEquivalentType<T>::Type;
     overflow_check(n, incx, incy);
 
-    queue.submit([&](sycl::handler &cgh) {
+    queue.submit([&](sycl::handler& cgh) {
         auto x_acc = x.template get_access<sycl::access::mode::read_write>(cgh);
         auto y_acc = y.template get_access<sycl::access::mode::read_write>(cgh);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler &sc) {
+        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
 
-            auto x_ = sc.get_mem<rocDataType *>(x_acc);
-            auto y_ = sc.get_mem<rocDataType *>(y_acc);
+            auto x_ = sc.get_mem<rocDataType*>(x_acc);
+            auto y_ = sc.get_mem<rocDataType*>(y_acc);
             rocblas_status err;
             ROCBLAS_ERROR_FUNC_SYNC(func, err, handle, n, x_, incx, y_, incy);
         });
@@ -544,8 +543,8 @@ inline void swap(Func func, sycl::queue &queue, int64_t n, sycl::buffer<T, 1> &x
 }
 
 #define SWAP_LAUNCHER(TYPE, ROCBLAS_ROUTINE)                                         \
-    void swap(sycl::queue &queue, int64_t n, sycl::buffer<TYPE, 1> &x, int64_t incx, \
-              sycl::buffer<TYPE, 1> &y, int64_t incy) {                              \
+    void swap(sycl::queue& queue, int64_t n, sycl::buffer<TYPE, 1>& x, int64_t incx, \
+              sycl::buffer<TYPE, 1>& y, int64_t incy) {                              \
         swap(ROCBLAS_ROUTINE, queue, n, x, incx, y, incy);                           \
     }
 
@@ -557,8 +556,8 @@ SWAP_LAUNCHER(std::complex<double>, rocblas_zswap)
 #undef SWAP_LAUNCHER
 
 template <typename Func, typename T>
-inline void iamin(Func func, sycl::queue &queue, int64_t n, sycl::buffer<T, 1> &x,
-                  const int64_t incx, sycl::buffer<int64_t, 1> &result) {
+inline void iamin(Func func, sycl::queue& queue, int64_t n, sycl::buffer<T, 1>& x,
+                  const int64_t incx, sycl::buffer<int64_t, 1>& result) {
     using rocDataType = typename RocEquivalentType<T>::Type;
     overflow_check(n, incx);
 
@@ -570,10 +569,10 @@ inline void iamin(Func func, sycl::queue &queue, int64_t n, sycl::buffer<T, 1> &
     // to elementwise copy the data between two buffer, or allow reinterpret cast
     // to convert to different type with different typesize size.
     sycl::buffer<int, 1> int_res_buff{ sycl::range<1>(1) };
-    queue.submit([&](sycl::handler &cgh) {
+    queue.submit([&](sycl::handler& cgh) {
         auto x_acc = x.template get_access<sycl::access::mode::read>(cgh);
         auto int_res_acc = int_res_buff.template get_access<sycl::access::mode::write>(cgh);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler &sc) {
+        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
 
             // By default the pointer mode is the rocblas_pointer_mode_host
@@ -582,8 +581,8 @@ inline void iamin(Func func, sycl::queue &queue, int64_t n, sycl::buffer<T, 1> &
             // fault. When it is set to device it is users responsibility to
             // synchronise as the function is completely asynchronous.
             rocblas_set_pointer_mode(handle, rocblas_pointer_mode_device);
-            auto x_ = sc.get_mem<rocDataType *>(x_acc);
-            auto int_res_ = sc.get_mem<int *>(int_res_acc);
+            auto x_ = sc.get_mem<rocDataType*>(x_acc);
+            auto int_res_ = sc.get_mem<int*>(int_res_acc);
             rocblas_status err;
             // For negative incx, iamin returns 0. This behaviour is similar to that of
             // implemented as a reference IAMIN.
@@ -595,7 +594,7 @@ inline void iamin(Func func, sycl::queue &queue, int64_t n, sycl::buffer<T, 1> &
         });
     });
 
-    queue.submit([&](sycl::handler &cgh) {
+    queue.submit([&](sycl::handler& cgh) {
         auto int_res_acc = int_res_buff.template get_access<sycl::access::mode::read>(cgh);
         auto result_acc = result.template get_access<sycl::access::mode::write>(cgh);
         cgh.single_task(
@@ -604,8 +603,8 @@ inline void iamin(Func func, sycl::queue &queue, int64_t n, sycl::buffer<T, 1> &
 }
 
 #define IAMIN_LAUNCHER(TYPE, ROCBLAS_ROUTINE)                                               \
-    void iamin(sycl::queue &queue, int64_t n, sycl::buffer<TYPE, 1> &x, const int64_t incx, \
-               sycl::buffer<int64_t, 1> &result) {                                          \
+    void iamin(sycl::queue& queue, int64_t n, sycl::buffer<TYPE, 1>& x, const int64_t incx, \
+               sycl::buffer<int64_t, 1>& result) {                                          \
         iamin(ROCBLAS_ROUTINE, queue, n, x, incx, result);                                  \
     }
 
@@ -617,16 +616,16 @@ IAMIN_LAUNCHER(std::complex<double>, rocblas_izamin)
 #undef IAMIN_LAUNCHER
 
 template <typename Func, typename T1, typename T2>
-inline void nrm2(Func func, sycl::queue &queue, int64_t n, sycl::buffer<T1, 1> &x,
-                 const int64_t incx, sycl::buffer<T2, 1> &result) {
+inline void nrm2(Func func, sycl::queue& queue, int64_t n, sycl::buffer<T1, 1>& x,
+                 const int64_t incx, sycl::buffer<T2, 1>& result) {
     using rocDataType1 = typename RocEquivalentType<T1>::Type;
     using rocDataType2 = typename RocEquivalentType<T2>::Type;
     overflow_check(n, incx);
 
-    queue.submit([&](sycl::handler &cgh) {
+    queue.submit([&](sycl::handler& cgh) {
         auto x_acc = x.template get_access<sycl::access::mode::read>(cgh);
         auto res_acc = result.template get_access<sycl::access::mode::write>(cgh);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler &sc) {
+        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
 
             // By default the pointer mode is the rocblas_pointer_mode_host
@@ -635,8 +634,8 @@ inline void nrm2(Func func, sycl::queue &queue, int64_t n, sycl::buffer<T1, 1> &
             // fault. When it is set to device it is users responsibility to
             // synchronise as the function is completely asynchronous.
             rocblas_set_pointer_mode(handle, rocblas_pointer_mode_device);
-            auto x_ = sc.get_mem<rocDataType1 *>(x_acc);
-            auto res_ = sc.get_mem<rocDataType2 *>(res_acc);
+            auto x_ = sc.get_mem<rocDataType1*>(x_acc);
+            auto res_ = sc.get_mem<rocDataType2*>(res_acc);
             rocblas_status err;
             // NRM2 does not support negative index
             ROCBLAS_ERROR_FUNC_SYNC(func, err, handle, n, x_, std::abs(incx), res_);
@@ -649,8 +648,8 @@ inline void nrm2(Func func, sycl::queue &queue, int64_t n, sycl::buffer<T1, 1> &
 }
 
 #define NRM2_LAUNCHER(TYPE1, TYPE2, ROCBLAS_ROUTINE)                                        \
-    void nrm2(sycl::queue &queue, int64_t n, sycl::buffer<TYPE1, 1> &x, const int64_t incx, \
-              sycl::buffer<TYPE2, 1> &result) {                                             \
+    void nrm2(sycl::queue& queue, int64_t n, sycl::buffer<TYPE1, 1>& x, const int64_t incx, \
+              sycl::buffer<TYPE2, 1>& result) {                                             \
         nrm2(ROCBLAS_ROUTINE, queue, n, x, incx, result);                                   \
     }
 
@@ -664,20 +663,20 @@ NRM2_LAUNCHER(std::complex<double>, double, rocblas_dznrm2)
 // USM APIs
 
 template <typename Func, typename T1, typename T2>
-inline sycl::event asum(Func func, sycl::queue &queue, int64_t n, const T1 *x, const int64_t incx,
-                        T2 *result, const std::vector<sycl::event> &dependencies) {
+inline sycl::event asum(Func func, sycl::queue& queue, int64_t n, const T1* x, const int64_t incx,
+                        T2* result, const std::vector<sycl::event>& dependencies) {
     using rocDataType1 = typename RocEquivalentType<T1>::Type;
     using rocDataType2 = typename RocEquivalentType<T2>::Type;
     overflow_check(n, incx);
 
-    auto done = queue.submit([&](sycl::handler &cgh) {
+    auto done = queue.submit([&](sycl::handler& cgh) {
         cgh.depends_on(dependencies);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler &sc) {
+        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             rocblas_set_pointer_mode(handle, rocblas_pointer_mode_device);
 
-            auto x_ = reinterpret_cast<const rocDataType1 *>(x);
-            auto res_ = reinterpret_cast<rocDataType2 *>(result);
+            auto x_ = reinterpret_cast<const rocDataType1*>(x);
+            auto res_ = reinterpret_cast<rocDataType2*>(result);
             rocblas_status err;
             // ASUM does not support negative index
             ROCBLAS_ERROR_FUNC_SYNC(func, err, handle, n, x_, std::abs(incx), res_);
@@ -689,8 +688,8 @@ inline sycl::event asum(Func func, sycl::queue &queue, int64_t n, const T1 *x, c
 }
 
 #define ASUM_LAUNCHER_USM(TYPE1, TYPE2, ROCBLAS_ROUTINE)                                \
-    sycl::event asum(sycl::queue &queue, int64_t n, const TYPE1 *x, const int64_t incx, \
-                     TYPE2 *result, const std::vector<sycl::event> &dependencies) {     \
+    sycl::event asum(sycl::queue& queue, int64_t n, const TYPE1* x, const int64_t incx, \
+                     TYPE2* result, const std::vector<sycl::event>& dependencies) {     \
         return asum(ROCBLAS_ROUTINE, queue, n, x, incx, result, dependencies);          \
     }
 
@@ -702,21 +701,21 @@ ASUM_LAUNCHER_USM(std::complex<double>, double, rocblas_dzasum)
 #undef ASUM_LAUNCHER_USM
 
 template <typename Func, typename T1, typename T2>
-inline sycl::event scal(Func func, sycl::queue &queue, int64_t n, T1 a, T2 *x, int64_t incx,
-                        const std::vector<sycl::event> &dependencies) {
+inline sycl::event scal(Func func, sycl::queue& queue, int64_t n, T1 a, T2* x, int64_t incx,
+                        const std::vector<sycl::event>& dependencies) {
     using rocDataType1 = typename RocEquivalentType<T1>::Type;
     using rocDataType2 = typename RocEquivalentType<T2>::Type;
     overflow_check(n, incx);
 
-    auto done = queue.submit([&](sycl::handler &cgh) {
+    auto done = queue.submit([&](sycl::handler& cgh) {
         cgh.depends_on(dependencies);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler &sc) {
+        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
 
-            auto x_ = reinterpret_cast<rocDataType2 *>(x);
+            auto x_ = reinterpret_cast<rocDataType2*>(x);
             rocblas_status err;
             // SCAL does not support negative incx
-            ROCBLAS_ERROR_FUNC_SYNC(func, err, handle, n, (rocDataType1 *)&a, x_, std::abs(incx));
+            ROCBLAS_ERROR_FUNC_SYNC(func, err, handle, n, (rocDataType1*)&a, x_, std::abs(incx));
         });
     });
 
@@ -724,8 +723,8 @@ inline sycl::event scal(Func func, sycl::queue &queue, int64_t n, T1 a, T2 *x, i
 }
 
 #define SCAL_LAUNCHER_USM(TYPE1, TYPE2, ROCBLAS_ROUTINE)                             \
-    sycl::event scal(sycl::queue &queue, int64_t n, TYPE1 a, TYPE2 *x, int64_t incx, \
-                     const std::vector<sycl::event> &dependencies) {                 \
+    sycl::event scal(sycl::queue& queue, int64_t n, TYPE1 a, TYPE2* x, int64_t incx, \
+                     const std::vector<sycl::event>& dependencies) {                 \
         return scal(ROCBLAS_ROUTINE, queue, n, a, x, incx, dependencies);            \
     }
 
@@ -739,21 +738,20 @@ SCAL_LAUNCHER_USM(double, std::complex<double>, rocblas_zdscal)
 #undef SCAL_LAUNCHER_USM
 
 template <typename Func, typename T>
-inline sycl::event axpy(Func func, sycl::queue &queue, int64_t n, T alpha, const T *x, int64_t incx,
-                        T *y, int64_t incy, const std::vector<sycl::event> &dependencies) {
+inline sycl::event axpy(Func func, sycl::queue& queue, int64_t n, T alpha, const T* x, int64_t incx,
+                        T* y, int64_t incy, const std::vector<sycl::event>& dependencies) {
     using rocDataType = typename RocEquivalentType<T>::Type;
     overflow_check(n, incx, incy);
 
-    auto done = queue.submit([&](sycl::handler &cgh) {
+    auto done = queue.submit([&](sycl::handler& cgh) {
         cgh.depends_on(dependencies);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler &sc) {
+        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
 
-            auto x_ = reinterpret_cast<const rocDataType *>(x);
-            auto y_ = reinterpret_cast<rocDataType *>(y);
+            auto x_ = reinterpret_cast<const rocDataType*>(x);
+            auto y_ = reinterpret_cast<rocDataType*>(y);
             rocblas_status err;
-            ROCBLAS_ERROR_FUNC_SYNC(func, err, handle, n, (rocDataType *)&alpha, x_, incx, y_,
-                                    incy);
+            ROCBLAS_ERROR_FUNC_SYNC(func, err, handle, n, (rocDataType*)&alpha, x_, incx, y_, incy);
         });
     });
 
@@ -761,8 +759,8 @@ inline sycl::event axpy(Func func, sycl::queue &queue, int64_t n, T alpha, const
 }
 
 #define AXPY_LAUNCHER_USM(TYPE, ROCBLAS_ROUTINE)                                             \
-    sycl::event axpy(sycl::queue &queue, int64_t n, TYPE alpha, const TYPE *x, int64_t incx, \
-                     TYPE *y, int64_t incy, const std::vector<sycl::event> &dependencies) {  \
+    sycl::event axpy(sycl::queue& queue, int64_t n, TYPE alpha, const TYPE* x, int64_t incx, \
+                     TYPE* y, int64_t incy, const std::vector<sycl::event>& dependencies) {  \
         return axpy(ROCBLAS_ROUTINE, queue, n, alpha, x, incx, y, incy, dependencies);       \
     }
 
@@ -773,44 +771,44 @@ AXPY_LAUNCHER_USM(std::complex<double>, rocblas_zaxpy)
 
 #undef AXPY_LAUNCHER_USM
 
-sycl::event axpby(sycl::queue &queue, int64_t n, float alpha, const float *x, int64_t incx,
-                  float beta, float *y, int64_t incy,
-                  const std::vector<sycl::event> &dependencies) {
+sycl::event axpby(sycl::queue& queue, int64_t n, float alpha, const float* x, int64_t incx,
+                  float beta, float* y, int64_t incy,
+                  const std::vector<sycl::event>& dependencies) {
     throw unimplemented("blas", "axpby", "for column_major layout");
 }
-sycl::event axpby(sycl::queue &queue, int64_t n, double alpha, const double *x, int64_t incx,
-                  double beta, double *y, int64_t incy,
-                  const std::vector<sycl::event> &dependencies) {
+sycl::event axpby(sycl::queue& queue, int64_t n, double alpha, const double* x, int64_t incx,
+                  double beta, double* y, int64_t incy,
+                  const std::vector<sycl::event>& dependencies) {
     throw unimplemented("blas", "axpby", "for column_major layout");
 }
-sycl::event axpby(sycl::queue &queue, int64_t n, std::complex<float> alpha,
-                  const std::complex<float> *x, int64_t incx, std::complex<float> beta,
-                  std::complex<float> *y, int64_t incy,
-                  const std::vector<sycl::event> &dependencies) {
+sycl::event axpby(sycl::queue& queue, int64_t n, std::complex<float> alpha,
+                  const std::complex<float>* x, int64_t incx, std::complex<float> beta,
+                  std::complex<float>* y, int64_t incy,
+                  const std::vector<sycl::event>& dependencies) {
     throw unimplemented("blas", "axpby", "for column_major layout");
 }
-sycl::event axpby(sycl::queue &queue, int64_t n, std::complex<double> alpha,
-                  const std::complex<double> *x, int64_t incx, std::complex<double> beta,
-                  std::complex<double> *y, int64_t incy,
-                  const std::vector<sycl::event> &dependencies) {
+sycl::event axpby(sycl::queue& queue, int64_t n, std::complex<double> alpha,
+                  const std::complex<double>* x, int64_t incx, std::complex<double> beta,
+                  std::complex<double>* y, int64_t incy,
+                  const std::vector<sycl::event>& dependencies) {
     throw unimplemented("blas", "axpby", "for column_major layout");
 }
 
 template <typename Func, typename T1, typename T2>
-inline sycl::event rotg(Func func, sycl::queue &queue, T1 *a, T1 *b, T2 *c, T1 *s,
-                        const std::vector<sycl::event> &dependencies) {
+inline sycl::event rotg(Func func, sycl::queue& queue, T1* a, T1* b, T2* c, T1* s,
+                        const std::vector<sycl::event>& dependencies) {
     using rocDataType1 = typename RocEquivalentType<T1>::Type;
     using rocDataType2 = typename RocEquivalentType<T2>::Type;
 
-    auto done = queue.submit([&](sycl::handler &cgh) {
+    auto done = queue.submit([&](sycl::handler& cgh) {
         cgh.depends_on(dependencies);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler &sc) {
+        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
 
-            auto a_ = reinterpret_cast<rocDataType1 *>(a);
-            auto b_ = reinterpret_cast<rocDataType1 *>(b);
-            auto c_ = reinterpret_cast<rocDataType2 *>(c);
-            auto s_ = reinterpret_cast<rocDataType1 *>(s);
+            auto a_ = reinterpret_cast<rocDataType1*>(a);
+            auto b_ = reinterpret_cast<rocDataType1*>(b);
+            auto c_ = reinterpret_cast<rocDataType2*>(c);
+            auto s_ = reinterpret_cast<rocDataType1*>(s);
             rocblas_status err;
             ROCBLAS_ERROR_FUNC_SYNC(func, err, handle, a_, b_, c_, s_);
         });
@@ -820,8 +818,8 @@ inline sycl::event rotg(Func func, sycl::queue &queue, T1 *a, T1 *b, T2 *c, T1 *
 }
 
 #define ROTG_LAUNCHER_USM(TYPE1, TYPE2, ROCBLAS_ROUTINE)                         \
-    sycl::event rotg(sycl::queue &queue, TYPE1 *a, TYPE1 *b, TYPE2 *c, TYPE1 *s, \
-                     const std::vector<sycl::event> &dependencies) {             \
+    sycl::event rotg(sycl::queue& queue, TYPE1* a, TYPE1* b, TYPE2* c, TYPE1* s, \
+                     const std::vector<sycl::event>& dependencies) {             \
         return rotg(ROCBLAS_ROUTINE, queue, a, b, c, s, dependencies);           \
     }
 
@@ -833,19 +831,19 @@ ROTG_LAUNCHER_USM(std::complex<double>, double, rocblas_zrotg)
 #undef ROTG_LAUNCHER_USM
 
 template <typename Func, typename T>
-inline sycl::event rotm(Func func, sycl::queue &queue, int64_t n, T *x, int64_t incx, T *y,
-                        int64_t incy, T *param, const std::vector<sycl::event> &dependencies) {
+inline sycl::event rotm(Func func, sycl::queue& queue, int64_t n, T* x, int64_t incx, T* y,
+                        int64_t incy, T* param, const std::vector<sycl::event>& dependencies) {
     using rocDataType = typename RocEquivalentType<T>::Type;
     overflow_check(n, incx, incy);
 
-    auto done = queue.submit([&](sycl::handler &cgh) {
+    auto done = queue.submit([&](sycl::handler& cgh) {
         cgh.depends_on(dependencies);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler &sc) {
+        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
 
-            auto x_ = reinterpret_cast<rocDataType *>(x);
-            auto y_ = reinterpret_cast<rocDataType *>(y);
-            auto param_ = reinterpret_cast<rocDataType *>(param);
+            auto x_ = reinterpret_cast<rocDataType*>(x);
+            auto y_ = reinterpret_cast<rocDataType*>(y);
+            auto param_ = reinterpret_cast<rocDataType*>(param);
             rocblas_status err;
             ROCBLAS_ERROR_FUNC_SYNC(func, err, handle, n, x_, incx, y_, incy, param_);
         });
@@ -855,8 +853,8 @@ inline sycl::event rotm(Func func, sycl::queue &queue, int64_t n, T *x, int64_t 
 }
 
 #define ROTM_LAUNCHER_USM(TYPE, ROCBLAS_ROUTINE)                                                  \
-    sycl::event rotm(sycl::queue &queue, int64_t n, TYPE *x, int64_t incx, TYPE *y, int64_t incy, \
-                     TYPE *param, const std::vector<sycl::event> &dependencies) {                 \
+    sycl::event rotm(sycl::queue& queue, int64_t n, TYPE* x, int64_t incx, TYPE* y, int64_t incy, \
+                     TYPE* param, const std::vector<sycl::event>& dependencies) {                 \
         return rotm(ROCBLAS_ROUTINE, queue, n, x, incx, y, incy, param, dependencies);            \
     }
 
@@ -866,18 +864,18 @@ ROTM_LAUNCHER_USM(double, rocblas_drotm)
 #undef ROTM_LAUNCHER_USM
 
 template <typename Func, typename T>
-inline sycl::event copy(Func func, sycl::queue &queue, int64_t n, const T *x, int64_t incx, T *y,
-                        int64_t incy, const std::vector<sycl::event> &dependencies) {
+inline sycl::event copy(Func func, sycl::queue& queue, int64_t n, const T* x, int64_t incx, T* y,
+                        int64_t incy, const std::vector<sycl::event>& dependencies) {
     using rocDataType = typename RocEquivalentType<T>::Type;
     overflow_check(n, incx, incy);
 
-    auto done = queue.submit([&](sycl::handler &cgh) {
+    auto done = queue.submit([&](sycl::handler& cgh) {
         cgh.depends_on(dependencies);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler &sc) {
+        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
 
-            auto x_ = reinterpret_cast<const rocDataType *>(x);
-            auto y_ = reinterpret_cast<rocDataType *>(y);
+            auto x_ = reinterpret_cast<const rocDataType*>(x);
+            auto y_ = reinterpret_cast<rocDataType*>(y);
             rocblas_status err;
             ROCBLAS_ERROR_FUNC_SYNC(func, err, handle, n, x_, incx, y_, incy);
         });
@@ -887,8 +885,8 @@ inline sycl::event copy(Func func, sycl::queue &queue, int64_t n, const T *x, in
 }
 
 #define COPY_LAUNCHER_USM(TYPE, ROCBLAS_ROUTINE)                                          \
-    sycl::event copy(sycl::queue &queue, int64_t n, const TYPE *x, int64_t incx, TYPE *y, \
-                     int64_t incy, const std::vector<sycl::event> &dependencies) {        \
+    sycl::event copy(sycl::queue& queue, int64_t n, const TYPE* x, int64_t incx, TYPE* y, \
+                     int64_t incy, const std::vector<sycl::event>& dependencies) {        \
         return copy(ROCBLAS_ROUTINE, queue, n, x, incx, y, incy, dependencies);           \
     }
 
@@ -900,20 +898,20 @@ COPY_LAUNCHER_USM(std::complex<double>, rocblas_zcopy)
 #undef COPY_LAUNCHER_USM
 
 template <typename Func, typename T>
-inline sycl::event dot(Func func, sycl::queue &queue, int64_t n, const T *x, const int64_t incx,
-                       const T *y, int64_t incy, T *result,
-                       const std::vector<sycl::event> &dependencies) {
+inline sycl::event dot(Func func, sycl::queue& queue, int64_t n, const T* x, const int64_t incx,
+                       const T* y, int64_t incy, T* result,
+                       const std::vector<sycl::event>& dependencies) {
     using rocDataType = typename RocEquivalentType<T>::Type;
     overflow_check(n, incx, incy);
 
-    auto done = queue.submit([&](sycl::handler &cgh) {
+    auto done = queue.submit([&](sycl::handler& cgh) {
         cgh.depends_on(dependencies);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler &sc) {
+        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
 
-            auto x_ = reinterpret_cast<const rocDataType *>(x);
-            auto y_ = reinterpret_cast<const rocDataType *>(y);
-            auto res_ = reinterpret_cast<rocDataType *>(result);
+            auto x_ = reinterpret_cast<const rocDataType*>(x);
+            auto y_ = reinterpret_cast<const rocDataType*>(y);
+            auto res_ = reinterpret_cast<rocDataType*>(result);
             rocblas_status err;
             ROCBLAS_ERROR_FUNC_SYNC(func, err, handle, n, x_, incx, y_, incy, res_);
         });
@@ -923,9 +921,9 @@ inline sycl::event dot(Func func, sycl::queue &queue, int64_t n, const T *x, con
 }
 
 #define DOT_LAUNCHER_USM(EXT, TYPE, ROCBLAS_ROUTINE)                                       \
-    sycl::event dot##EXT(sycl::queue &queue, int64_t n, const TYPE *x, const int64_t incx, \
-                         const TYPE *y, const int64_t incy, TYPE *result,                  \
-                         const std::vector<sycl::event> &dependencies) {                   \
+    sycl::event dot##EXT(sycl::queue& queue, int64_t n, const TYPE* x, const int64_t incx, \
+                         const TYPE* y, const int64_t incy, TYPE* result,                  \
+                         const std::vector<sycl::event>& dependencies) {                   \
         return dot(ROCBLAS_ROUTINE, queue, n, x, incx, y, incy, result, dependencies);     \
     }
 
@@ -938,29 +936,29 @@ DOT_LAUNCHER_USM(c, std::complex<double>, rocblas_zdotc)
 
 #undef DOT_LAUNCHER_USM
 
-sycl::event dot(sycl::queue &queue, int64_t n, const float *x, int64_t incx, const float *y,
-                int64_t incy, double *result, const std::vector<sycl::event> &dependencies) {
+sycl::event dot(sycl::queue& queue, int64_t n, const float* x, int64_t incx, const float* y,
+                int64_t incy, double* result, const std::vector<sycl::event>& dependencies) {
     throw unimplemented("blas", "dot", "for column_major layout");
 }
 
 template <typename Func, typename T1, typename T2, typename T3>
-inline sycl::event rot(Func func, sycl::queue &queue, int64_t n, T1 *x, const int64_t incx, T1 *y,
-                       int64_t incy, T2 c, T3 s, const std::vector<sycl::event> &dependencies) {
+inline sycl::event rot(Func func, sycl::queue& queue, int64_t n, T1* x, const int64_t incx, T1* y,
+                       int64_t incy, T2 c, T3 s, const std::vector<sycl::event>& dependencies) {
     using rocDataType1 = typename RocEquivalentType<T1>::Type;
     using rocDataType2 = typename RocEquivalentType<T2>::Type;
     using rocDataType3 = typename RocEquivalentType<T3>::Type;
     overflow_check(n, incx, incy);
 
-    auto done = queue.submit([&](sycl::handler &cgh) {
+    auto done = queue.submit([&](sycl::handler& cgh) {
         cgh.depends_on(dependencies);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler &sc) {
+        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
 
-            auto x_ = reinterpret_cast<rocDataType1 *>(x);
-            auto y_ = reinterpret_cast<rocDataType1 *>(y);
+            auto x_ = reinterpret_cast<rocDataType1*>(x);
+            auto y_ = reinterpret_cast<rocDataType1*>(y);
             rocblas_status err;
-            ROCBLAS_ERROR_FUNC_SYNC(func, err, handle, n, x_, incx, y_, incy, (rocDataType2 *)&c,
-                                    (rocDataType3 *)&s);
+            ROCBLAS_ERROR_FUNC_SYNC(func, err, handle, n, x_, incx, y_, incy, (rocDataType2*)&c,
+                                    (rocDataType3*)&s);
         });
     });
 
@@ -968,9 +966,9 @@ inline sycl::event rot(Func func, sycl::queue &queue, int64_t n, T1 *x, const in
 }
 
 #define ROT_LAUNCHER_USM(TYPE1, TYPE2, TYPE3, ROCBLAS_ROUTINE)                             \
-    sycl::event rot(sycl::queue &queue, int64_t n, TYPE1 *x, const int64_t incx, TYPE1 *y, \
+    sycl::event rot(sycl::queue& queue, int64_t n, TYPE1* x, const int64_t incx, TYPE1* y, \
                     int64_t incy, TYPE2 c, TYPE3 s,                                        \
-                    const std::vector<sycl::event> &dependencies) {                        \
+                    const std::vector<sycl::event>& dependencies) {                        \
         return rot(ROCBLAS_ROUTINE, queue, n, x, incx, y, incy, c, s, dependencies);       \
     }
 
@@ -981,20 +979,20 @@ ROT_LAUNCHER_USM(std::complex<double>, double, double, rocblas_zdrot)
 
 #undef ROT_LAUNCHER_USM
 
-sycl::event sdsdot(sycl::queue &queue, int64_t n, float sb, const float *x, int64_t incx,
-                   const float *y, int64_t incy, float *result,
-                   const std::vector<sycl::event> &dependencies) {
+sycl::event sdsdot(sycl::queue& queue, int64_t n, float sb, const float* x, int64_t incx,
+                   const float* y, int64_t incy, float* result,
+                   const std::vector<sycl::event>& dependencies) {
     overflow_check(n, incx, incy);
 
     // rocBLAS does not support sdot so we need to mimic sdot.
-    auto done = queue.submit([&](sycl::handler &cgh) {
+    auto done = queue.submit([&](sycl::handler& cgh) {
         cgh.depends_on(dependencies);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler &sc) {
+        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
 
-            auto x_ = reinterpret_cast<const float *>(x);
-            auto y_ = reinterpret_cast<const float *>(y);
-            auto res_ = reinterpret_cast<float *>(result);
+            auto x_ = reinterpret_cast<const float*>(x);
+            auto y_ = reinterpret_cast<const float*>(y);
+            auto res_ = reinterpret_cast<float*>(result);
             rocblas_status err;
             ROCBLAS_ERROR_FUNC_SYNC(rocblas_sdot, err, handle, n, x_, incx, y_, incy, res_);
         });
@@ -1006,20 +1004,20 @@ sycl::event sdsdot(sycl::queue &queue, int64_t n, float sb, const float *x, int6
 }
 
 template <typename Func, typename T>
-inline sycl::event rotmg(Func func, sycl::queue &queue, T *d1, T *d2, T *x1, T y1, T *param,
-                         const std::vector<sycl::event> &dependencies) {
+inline sycl::event rotmg(Func func, sycl::queue& queue, T* d1, T* d2, T* x1, T y1, T* param,
+                         const std::vector<sycl::event>& dependencies) {
     using rocDataType = typename RocEquivalentType<T>::Type;
 
-    auto done = queue.submit([&](sycl::handler &cgh) {
+    auto done = queue.submit([&](sycl::handler& cgh) {
         cgh.depends_on(dependencies);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler &sc) {
+        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
 
-            auto d1_ = reinterpret_cast<rocDataType *>(d1);
-            auto d2_ = reinterpret_cast<rocDataType *>(d2);
-            auto x1_ = reinterpret_cast<rocDataType *>(x1);
-            auto y1_ = reinterpret_cast<const rocDataType *>(&y1);
-            auto param_ = reinterpret_cast<rocDataType *>(param);
+            auto d1_ = reinterpret_cast<rocDataType*>(d1);
+            auto d2_ = reinterpret_cast<rocDataType*>(d2);
+            auto x1_ = reinterpret_cast<rocDataType*>(x1);
+            auto y1_ = reinterpret_cast<const rocDataType*>(&y1);
+            auto param_ = reinterpret_cast<rocDataType*>(param);
             rocblas_status err;
             ROCBLAS_ERROR_FUNC_SYNC(func, err, handle, d1_, d2_, x1_, y1_, param_);
         });
@@ -1029,8 +1027,8 @@ inline sycl::event rotmg(Func func, sycl::queue &queue, T *d1, T *d2, T *x1, T y
 }
 
 #define ROTMG_LAUNCHER_USM(TYPE, ROCBLAS_ROUTINE)                                             \
-    sycl::event rotmg(sycl::queue &queue, TYPE *d1, TYPE *d2, TYPE *x1, TYPE y1, TYPE *param, \
-                      const std::vector<sycl::event> &dependencies) {                         \
+    sycl::event rotmg(sycl::queue& queue, TYPE* d1, TYPE* d2, TYPE* x1, TYPE y1, TYPE* param, \
+                      const std::vector<sycl::event>& dependencies) {                         \
         return rotmg(ROCBLAS_ROUTINE, queue, d1, d2, x1, y1, param, dependencies);            \
     }
 
@@ -1040,8 +1038,8 @@ ROTMG_LAUNCHER_USM(double, rocblas_drotmg)
 #undef ROTMG_LAUNCHER_USM
 
 template <typename Func, typename T>
-inline sycl::event iamax(Func func, sycl::queue &queue, int64_t n, const T *x, const int64_t incx,
-                         int64_t *result, const std::vector<sycl::event> &dependencies) {
+inline sycl::event iamax(Func func, sycl::queue& queue, int64_t n, const T* x, const int64_t incx,
+                         int64_t* result, const std::vector<sycl::event>& dependencies) {
     using rocDataType = typename RocEquivalentType<T>::Type;
     overflow_check(n, incx);
     // rocBLAS does not support int64_t as return type for the data by default. So we need to
@@ -1049,17 +1047,17 @@ inline sycl::event iamax(Func func, sycl::queue &queue, int64_t n, const T *x, c
     // it back to the actual data on the host.
     // This change may cause failure as the result of integer overflow
     // based on the size.
-    auto int_res_p = (int *)sycl::aligned_alloc_shared(64, sizeof(rocblas_int), queue.get_device(),
-                                                       queue.get_context());
+    auto int_res_p = (int*)sycl::aligned_alloc_shared(64, sizeof(rocblas_int), queue.get_device(),
+                                                      queue.get_context());
     *int_res_p = 0;
 
-    auto done = queue.submit([&](sycl::handler &cgh) {
+    auto done = queue.submit([&](sycl::handler& cgh) {
         cgh.depends_on(dependencies);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler &sc) {
+        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             rocblas_set_pointer_mode(handle, rocblas_pointer_mode_device);
-            auto x_ = reinterpret_cast<const rocDataType *>(x);
-            auto int_res_p_ = reinterpret_cast<int *>(int_res_p);
+            auto x_ = reinterpret_cast<const rocDataType*>(x);
+            auto int_res_p_ = reinterpret_cast<int*>(int_res_p);
             rocblas_status err;
             // For negative incx, iamax returns 0. This behaviour is similar to that of
             // reference iamax.
@@ -1074,8 +1072,8 @@ inline sycl::event iamax(Func func, sycl::queue &queue, int64_t n, const T *x, c
 }
 
 #define IAMAX_LAUNCHER_USM(TYPE, ROCBLAS_ROUTINE)                                       \
-    sycl::event iamax(sycl::queue &queue, int64_t n, const TYPE *x, const int64_t incx, \
-                      int64_t *result, const std::vector<sycl::event> &dependencies) {  \
+    sycl::event iamax(sycl::queue& queue, int64_t n, const TYPE* x, const int64_t incx, \
+                      int64_t* result, const std::vector<sycl::event>& dependencies) {  \
         return iamax(ROCBLAS_ROUTINE, queue, n, x, incx, result, dependencies);         \
     }
 
@@ -1087,18 +1085,18 @@ IAMAX_LAUNCHER_USM(std::complex<double>, rocblas_izamax)
 #undef IAMAX_LAUNCHER_USM
 
 template <typename Func, typename T>
-inline sycl::event swap(Func func, sycl::queue &queue, int64_t n, T *x, int64_t incx, T *y,
-                        int64_t incy, const std::vector<sycl::event> &dependencies) {
+inline sycl::event swap(Func func, sycl::queue& queue, int64_t n, T* x, int64_t incx, T* y,
+                        int64_t incy, const std::vector<sycl::event>& dependencies) {
     using rocDataType = typename RocEquivalentType<T>::Type;
     overflow_check(n, incx, incy);
 
-    auto done = queue.submit([&](sycl::handler &cgh) {
+    auto done = queue.submit([&](sycl::handler& cgh) {
         cgh.depends_on(dependencies);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler &sc) {
+        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
 
-            auto x_ = reinterpret_cast<rocDataType *>(x);
-            auto y_ = reinterpret_cast<rocDataType *>(y);
+            auto x_ = reinterpret_cast<rocDataType*>(x);
+            auto y_ = reinterpret_cast<rocDataType*>(y);
             rocblas_status err;
             ROCBLAS_ERROR_FUNC_SYNC(func, err, handle, n, x_, incx, y_, incy);
         });
@@ -1108,8 +1106,8 @@ inline sycl::event swap(Func func, sycl::queue &queue, int64_t n, T *x, int64_t 
 }
 
 #define SWAP_LAUNCHER_USM(TYPE, ROCBLAS_ROUTINE)                                                  \
-    sycl::event swap(sycl::queue &queue, int64_t n, TYPE *x, int64_t incx, TYPE *y, int64_t incy, \
-                     const std::vector<sycl::event> &dependencies) {                              \
+    sycl::event swap(sycl::queue& queue, int64_t n, TYPE* x, int64_t incx, TYPE* y, int64_t incy, \
+                     const std::vector<sycl::event>& dependencies) {                              \
         return swap(ROCBLAS_ROUTINE, queue, n, x, incx, y, incy, dependencies);                   \
     }
 
@@ -1121,8 +1119,8 @@ SWAP_LAUNCHER_USM(std::complex<double>, rocblas_zswap)
 #undef SWAP_LAUNCHER_USM
 
 template <typename Func, typename T>
-inline sycl::event iamin(Func func, sycl::queue &queue, int64_t n, const T *x, const int64_t incx,
-                         int64_t *result, const std::vector<sycl::event> &dependencies) {
+inline sycl::event iamin(Func func, sycl::queue& queue, int64_t n, const T* x, const int64_t incx,
+                         int64_t* result, const std::vector<sycl::event>& dependencies) {
     using rocDataType = typename RocEquivalentType<T>::Type;
     overflow_check(n, incx);
     // rocBLAS does not support int64_t as return type for the data by default. So we need to
@@ -1130,18 +1128,18 @@ inline sycl::event iamin(Func func, sycl::queue &queue, int64_t n, const T *x, c
     // it back to the actual data on the host.
     // This change may cause failure as the result of integer overflow
     // based on the size.
-    auto int_res_p = (int *)sycl::aligned_alloc_shared(64, sizeof(rocblas_int), queue.get_device(),
-                                                       queue.get_context());
+    auto int_res_p = (int*)sycl::aligned_alloc_shared(64, sizeof(rocblas_int), queue.get_device(),
+                                                      queue.get_context());
     *int_res_p = 0;
 
-    auto done = queue.submit([&](sycl::handler &cgh) {
+    auto done = queue.submit([&](sycl::handler& cgh) {
         cgh.depends_on(dependencies);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler &sc) {
+        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             rocblas_set_pointer_mode(handle, rocblas_pointer_mode_device);
 
-            auto x_ = reinterpret_cast<const rocDataType *>(x);
-            auto int_res_p_ = reinterpret_cast<int *>(int_res_p);
+            auto x_ = reinterpret_cast<const rocDataType*>(x);
+            auto int_res_p_ = reinterpret_cast<int*>(int_res_p);
             rocblas_status err;
             // For negative incx, iamin returns 0. This behaviour is similar to that of
             // implemented iamin.
@@ -1156,8 +1154,8 @@ inline sycl::event iamin(Func func, sycl::queue &queue, int64_t n, const T *x, c
 }
 
 #define IAMIN_LAUNCHER_USM(TYPE, ROCBLAS_ROUTINE)                                       \
-    sycl::event iamin(sycl::queue &queue, int64_t n, const TYPE *x, const int64_t incx, \
-                      int64_t *result, const std::vector<sycl::event> &dependencies) {  \
+    sycl::event iamin(sycl::queue& queue, int64_t n, const TYPE* x, const int64_t incx, \
+                      int64_t* result, const std::vector<sycl::event>& dependencies) {  \
         return iamin(ROCBLAS_ROUTINE, queue, n, x, incx, result, dependencies);         \
     }
 
@@ -1169,20 +1167,20 @@ IAMIN_LAUNCHER_USM(std::complex<double>, rocblas_izamin)
 #undef IAMIN_LAUNCHER_USM
 
 template <typename Func, typename T1, typename T2>
-inline sycl::event nrm2(Func func, sycl::queue &queue, int64_t n, const T1 *x, const int64_t incx,
-                        T2 *result, const std::vector<sycl::event> &dependencies) {
+inline sycl::event nrm2(Func func, sycl::queue& queue, int64_t n, const T1* x, const int64_t incx,
+                        T2* result, const std::vector<sycl::event>& dependencies) {
     using rocDataType1 = typename RocEquivalentType<T1>::Type;
     using rocDataType2 = typename RocEquivalentType<T2>::Type;
     overflow_check(n, incx);
 
-    auto done = queue.submit([&](sycl::handler &cgh) {
+    auto done = queue.submit([&](sycl::handler& cgh) {
         cgh.depends_on(dependencies);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler &sc) {
+        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             rocblas_set_pointer_mode(handle, rocblas_pointer_mode_device);
 
-            auto x_ = reinterpret_cast<const rocDataType1 *>(x);
-            auto res_ = reinterpret_cast<rocDataType2 *>(result);
+            auto x_ = reinterpret_cast<const rocDataType1*>(x);
+            auto res_ = reinterpret_cast<rocDataType2*>(result);
             rocblas_status err;
             // NRM2 does not support negative index
             ROCBLAS_ERROR_FUNC_SYNC(func, err, handle, n, x_, std::abs(incx), res_);
@@ -1194,8 +1192,8 @@ inline sycl::event nrm2(Func func, sycl::queue &queue, int64_t n, const T1 *x, c
 }
 
 #define NRM2_LAUNCHER_USM(TYPE1, TYPE2, ROCBLAS_ROUTINE)                                \
-    sycl::event nrm2(sycl::queue &queue, int64_t n, const TYPE1 *x, const int64_t incx, \
-                     TYPE2 *result, const std::vector<sycl::event> &dependencies) {     \
+    sycl::event nrm2(sycl::queue& queue, int64_t n, const TYPE1* x, const int64_t incx, \
+                     TYPE2* result, const std::vector<sycl::event>& dependencies) {     \
         return nrm2(ROCBLAS_ROUTINE, queue, n, x, incx, result, dependencies);          \
     }
 
@@ -1212,14 +1210,14 @@ namespace row_major {
 // Buffer APIs
 
 template <typename Func, typename T1, typename T2>
-inline void asum(Func func, sycl::queue &queue, int64_t n, sycl::buffer<T1, 1> &x,
-                 const int64_t incx, sycl::buffer<T2, 1> &result) {
+inline void asum(Func func, sycl::queue& queue, int64_t n, sycl::buffer<T1, 1>& x,
+                 const int64_t incx, sycl::buffer<T2, 1>& result) {
     column_major::asum(func, queue, n, x, incx, result);
 }
 
 #define ASUM_LAUNCHER(TYPE1, TYPE2, ROCBLAS_ROUTINE)                                        \
-    void asum(sycl::queue &queue, int64_t n, sycl::buffer<TYPE1, 1> &x, const int64_t incx, \
-              sycl::buffer<TYPE2, 1> &result) {                                             \
+    void asum(sycl::queue& queue, int64_t n, sycl::buffer<TYPE1, 1>& x, const int64_t incx, \
+              sycl::buffer<TYPE2, 1>& result) {                                             \
         asum(ROCBLAS_ROUTINE, queue, n, x, incx, result);                                   \
     }
 
@@ -1231,13 +1229,13 @@ ASUM_LAUNCHER(std::complex<double>, double, rocblas_dzasum)
 #undef ASUM_LAUNCHER
 
 template <typename Func, typename T1, typename T2>
-inline void scal(Func func, sycl::queue &queue, int64_t n, T1 a, sycl::buffer<T2, 1> &x,
+inline void scal(Func func, sycl::queue& queue, int64_t n, T1 a, sycl::buffer<T2, 1>& x,
                  int64_t incx) {
     column_major::scal(func, queue, n, a, x, incx);
 }
 
 #define SCAL_LAUNCHER(TYPE1, TYPE2, ROCBLAS_ROUTINE)                                             \
-    void scal(sycl::queue &queue, int64_t n, TYPE1 a, sycl::buffer<TYPE2, 1> &x, int64_t incx) { \
+    void scal(sycl::queue& queue, int64_t n, TYPE1 a, sycl::buffer<TYPE2, 1>& x, int64_t incx) { \
         scal(ROCBLAS_ROUTINE, queue, n, a, x, incx);                                             \
     }
 
@@ -1251,14 +1249,14 @@ SCAL_LAUNCHER(double, std::complex<double>, rocblas_zdscal)
 #undef SCAL_LAUNCHER
 
 template <typename Func, typename T>
-inline void axpy(Func func, sycl::queue &queue, int64_t n, T alpha, sycl::buffer<T, 1> &x,
-                 int64_t incx, sycl::buffer<T, 1> &y, int64_t incy) {
+inline void axpy(Func func, sycl::queue& queue, int64_t n, T alpha, sycl::buffer<T, 1>& x,
+                 int64_t incx, sycl::buffer<T, 1>& y, int64_t incy) {
     column_major::axpy(func, queue, n, alpha, x, incx, y, incy);
 }
 
 #define AXPY_LAUNCHER(TYPE, ROCBLAS_ROUTINE)                                                     \
-    void axpy(sycl::queue &queue, int64_t n, TYPE alpha, sycl::buffer<TYPE, 1> &x, int64_t incx, \
-              sycl::buffer<TYPE, 1> &y, int64_t incy) {                                          \
+    void axpy(sycl::queue& queue, int64_t n, TYPE alpha, sycl::buffer<TYPE, 1>& x, int64_t incx, \
+              sycl::buffer<TYPE, 1>& y, int64_t incy) {                                          \
         axpy(ROCBLAS_ROUTINE, queue, n, alpha, x, incx, y, incy);                                \
     }
 
@@ -1269,37 +1267,37 @@ AXPY_LAUNCHER(std::complex<double>, rocblas_zaxpy)
 
 #undef AXPY_LAUNCHER
 
-void axpby(sycl::queue &queue, int64_t n, float alpha, sycl::buffer<float, 1> &x, int64_t incx,
-           float beta, sycl::buffer<float, 1> &y, int64_t incy) {
+void axpby(sycl::queue& queue, int64_t n, float alpha, sycl::buffer<float, 1>& x, int64_t incx,
+           float beta, sycl::buffer<float, 1>& y, int64_t incy) {
     throw unimplemented("blas", "axpby", "for row_major layout");
 }
 
-void axpby(sycl::queue &queue, int64_t n, double alpha, sycl::buffer<double, 1> &x, int64_t incx,
-           double beta, sycl::buffer<double, 1> &y, int64_t incy) {
+void axpby(sycl::queue& queue, int64_t n, double alpha, sycl::buffer<double, 1>& x, int64_t incx,
+           double beta, sycl::buffer<double, 1>& y, int64_t incy) {
     throw unimplemented("blas", "axpby", "for row_major layout");
 }
 
-void axpby(sycl::queue &queue, int64_t n, std::complex<float> alpha,
-           sycl::buffer<std::complex<float>, 1> &x, int64_t incx, std::complex<float> beta,
-           sycl::buffer<std::complex<float>, 1> &y, int64_t incy) {
+void axpby(sycl::queue& queue, int64_t n, std::complex<float> alpha,
+           sycl::buffer<std::complex<float>, 1>& x, int64_t incx, std::complex<float> beta,
+           sycl::buffer<std::complex<float>, 1>& y, int64_t incy) {
     throw unimplemented("blas", "axpby", "for row_major layout");
 }
 
-void axpby(sycl::queue &queue, int64_t n, std::complex<double> alpha,
-           sycl::buffer<std::complex<double>, 1> &x, int64_t incx, std::complex<double> beta,
-           sycl::buffer<std::complex<double>, 1> &y, int64_t incy) {
+void axpby(sycl::queue& queue, int64_t n, std::complex<double> alpha,
+           sycl::buffer<std::complex<double>, 1>& x, int64_t incx, std::complex<double> beta,
+           sycl::buffer<std::complex<double>, 1>& y, int64_t incy) {
     throw unimplemented("blas", "axpby", "for row_major layout");
 }
 
 template <typename Func, typename T1, typename T2>
-inline void rotg(Func func, sycl::queue &queue, sycl::buffer<T1, 1> &a, sycl::buffer<T1, 1> &b,
-                 sycl::buffer<T2, 1> &c, sycl::buffer<T1, 1> &s) {
+inline void rotg(Func func, sycl::queue& queue, sycl::buffer<T1, 1>& a, sycl::buffer<T1, 1>& b,
+                 sycl::buffer<T2, 1>& c, sycl::buffer<T1, 1>& s) {
     column_major::rotg(func, queue, a, b, c, s);
 }
 
 #define ROTG_LAUNCHER(TYPE1, TYPE2, ROCBLAS_ROUTINE)                                    \
-    void rotg(sycl::queue &queue, sycl::buffer<TYPE1, 1> &a, sycl::buffer<TYPE1, 1> &b, \
-              sycl::buffer<TYPE2, 1> &c, sycl::buffer<TYPE1, 1> &s) {                   \
+    void rotg(sycl::queue& queue, sycl::buffer<TYPE1, 1>& a, sycl::buffer<TYPE1, 1>& b, \
+              sycl::buffer<TYPE2, 1>& c, sycl::buffer<TYPE1, 1>& s) {                   \
         rotg(ROCBLAS_ROUTINE, queue, a, b, c, s);                                       \
     }
 
@@ -1311,14 +1309,14 @@ ROTG_LAUNCHER(std::complex<double>, double, rocblas_zrotg)
 #undef ROTG_LAUNCHER
 
 template <typename Func, typename T>
-inline void rotm(Func func, sycl::queue &queue, int64_t n, sycl::buffer<T, 1> &x, int64_t incx,
-                 sycl::buffer<T, 1> &y, int64_t incy, sycl::buffer<T, 1> &param) {
+inline void rotm(Func func, sycl::queue& queue, int64_t n, sycl::buffer<T, 1>& x, int64_t incx,
+                 sycl::buffer<T, 1>& y, int64_t incy, sycl::buffer<T, 1>& param) {
     column_major::rotm(func, queue, n, x, incx, y, incy, param);
 }
 
 #define ROTM_LAUNCHER(TYPE, ROCBLAS_ROUTINE)                                          \
-    void rotm(sycl::queue &queue, int64_t n, sycl::buffer<TYPE, 1> &x, int64_t incx,  \
-              sycl::buffer<TYPE, 1> &y, int64_t incy, sycl::buffer<TYPE, 1> &param) { \
+    void rotm(sycl::queue& queue, int64_t n, sycl::buffer<TYPE, 1>& x, int64_t incx,  \
+              sycl::buffer<TYPE, 1>& y, int64_t incy, sycl::buffer<TYPE, 1>& param) { \
         rotm(ROCBLAS_ROUTINE, queue, n, x, incx, y, incy, param);                     \
     }
 
@@ -1328,14 +1326,14 @@ ROTM_LAUNCHER(double, rocblas_drotm)
 #undef ROTM_LAUNCHER
 
 template <typename Func, typename T>
-inline void copy(Func func, sycl::queue &queue, int64_t n, sycl::buffer<T, 1> &x, int64_t incx,
-                 sycl::buffer<T, 1> &y, int64_t incy) {
+inline void copy(Func func, sycl::queue& queue, int64_t n, sycl::buffer<T, 1>& x, int64_t incx,
+                 sycl::buffer<T, 1>& y, int64_t incy) {
     column_major::copy(func, queue, n, x, incx, y, incy);
 }
 
 #define COPY_LAUNCHER(TYPE, ROCBLAS_ROUTINE)                                         \
-    void copy(sycl::queue &queue, int64_t n, sycl::buffer<TYPE, 1> &x, int64_t incx, \
-              sycl::buffer<TYPE, 1> &y, int64_t incy) {                              \
+    void copy(sycl::queue& queue, int64_t n, sycl::buffer<TYPE, 1>& x, int64_t incx, \
+              sycl::buffer<TYPE, 1>& y, int64_t incy) {                              \
         copy(ROCBLAS_ROUTINE, queue, n, x, incx, y, incy);                           \
     }
 
@@ -1347,14 +1345,14 @@ COPY_LAUNCHER(std::complex<double>, rocblas_zcopy)
 #undef COPY_LAUNCHER
 
 template <typename Func, typename T>
-inline void dot(Func func, sycl::queue &queue, int64_t n, sycl::buffer<T, 1> &x, const int64_t incx,
-                sycl::buffer<T, 1> &y, int64_t incy, sycl::buffer<T, 1> &result) {
+inline void dot(Func func, sycl::queue& queue, int64_t n, sycl::buffer<T, 1>& x, const int64_t incx,
+                sycl::buffer<T, 1>& y, int64_t incy, sycl::buffer<T, 1>& result) {
     column_major::dot(func, queue, n, x, incx, y, incy, result);
 }
 
 #define DOT_LAUNCHER(EXT, TYPE, ROCBLAS_ROUTINE)                                                 \
-    void dot##EXT(sycl::queue &queue, int64_t n, sycl::buffer<TYPE, 1> &x, const int64_t incx,   \
-                  sycl::buffer<TYPE, 1> &y, const int64_t incy, sycl::buffer<TYPE, 1> &result) { \
+    void dot##EXT(sycl::queue& queue, int64_t n, sycl::buffer<TYPE, 1>& x, const int64_t incx,   \
+                  sycl::buffer<TYPE, 1>& y, const int64_t incy, sycl::buffer<TYPE, 1>& result) { \
         dot(ROCBLAS_ROUTINE, queue, n, x, incx, y, incy, result);                                \
     }
 
@@ -1367,20 +1365,20 @@ DOT_LAUNCHER(c, std::complex<double>, rocblas_zdotc)
 
 #undef DOT_LAUNCHER
 
-void dot(sycl::queue &queue, int64_t n, sycl::buffer<float, 1> &x, int64_t incx,
-         sycl::buffer<float, 1> &y, int64_t incy, sycl::buffer<double, 1> &result) {
+void dot(sycl::queue& queue, int64_t n, sycl::buffer<float, 1>& x, int64_t incx,
+         sycl::buffer<float, 1>& y, int64_t incy, sycl::buffer<double, 1>& result) {
     throw unimplemented("blas", "dot", "for row_major layout");
 }
 
 template <typename Func, typename T1, typename T2, typename T3>
-inline void rot(Func func, sycl::queue &queue, int64_t n, sycl::buffer<T1, 1> &x,
-                const int64_t incx, sycl::buffer<T1, 1> &y, int64_t incy, T2 c, T3 s) {
+inline void rot(Func func, sycl::queue& queue, int64_t n, sycl::buffer<T1, 1>& x,
+                const int64_t incx, sycl::buffer<T1, 1>& y, int64_t incy, T2 c, T3 s) {
     column_major::rot(func, queue, n, x, incx, y, incy, c, s);
 }
 
 #define ROT_LAUNCHER(TYPE1, TYPE2, TYPE3, ROCBLAS_ROUTINE)                                 \
-    void rot(sycl::queue &queue, int64_t n, sycl::buffer<TYPE1, 1> &x, const int64_t incx, \
-             sycl::buffer<TYPE1, 1> &y, int64_t incy, TYPE2 c, TYPE3 s) {                  \
+    void rot(sycl::queue& queue, int64_t n, sycl::buffer<TYPE1, 1>& x, const int64_t incx, \
+             sycl::buffer<TYPE1, 1>& y, int64_t incy, TYPE2 c, TYPE3 s) {                  \
         rot(ROCBLAS_ROUTINE, queue, n, x, incx, y, incy, c, s);                            \
     }
 
@@ -1391,20 +1389,20 @@ ROT_LAUNCHER(std::complex<double>, double, double, rocblas_zdrot)
 
 #undef ROT_LAUNCHER
 
-void sdsdot(sycl::queue &queue, int64_t n, float sb, sycl::buffer<float, 1> &x, int64_t incx,
-            sycl::buffer<float, 1> &y, int64_t incy, sycl::buffer<float, 1> &result) {
+void sdsdot(sycl::queue& queue, int64_t n, float sb, sycl::buffer<float, 1>& x, int64_t incx,
+            sycl::buffer<float, 1>& y, int64_t incy, sycl::buffer<float, 1>& result) {
     column_major::sdsdot(queue, n, sb, x, incx, y, incy, result);
 }
 
 template <typename Func, typename T>
-inline void rotmg(Func func, sycl::queue &queue, sycl::buffer<T, 1> &d1, sycl::buffer<T, 1> &d2,
-                  sycl::buffer<T, 1> &x1, T y1, sycl::buffer<T, 1> &param) {
+inline void rotmg(Func func, sycl::queue& queue, sycl::buffer<T, 1>& d1, sycl::buffer<T, 1>& d2,
+                  sycl::buffer<T, 1>& x1, T y1, sycl::buffer<T, 1>& param) {
     column_major::rotmg(func, queue, d1, d2, x1, y1, param);
 }
 
 #define ROTMG_LAUNCHER(TYPE, ROCBLAS_ROUTINE)                                            \
-    void rotmg(sycl::queue &queue, sycl::buffer<TYPE, 1> &d1, sycl::buffer<TYPE, 1> &d2, \
-               sycl::buffer<TYPE, 1> &x1, TYPE y1, sycl::buffer<TYPE, 1> &param) {       \
+    void rotmg(sycl::queue& queue, sycl::buffer<TYPE, 1>& d1, sycl::buffer<TYPE, 1>& d2, \
+               sycl::buffer<TYPE, 1>& x1, TYPE y1, sycl::buffer<TYPE, 1>& param) {       \
         rotmg(ROCBLAS_ROUTINE, queue, d1, d2, x1, y1, param);                            \
     }
 
@@ -1414,14 +1412,14 @@ ROTMG_LAUNCHER(double, rocblas_drotmg)
 #undef ROTMG_LAUNCHER
 
 template <typename Func, typename T>
-inline void iamax(Func func, sycl::queue &queue, int64_t n, sycl::buffer<T, 1> &x,
-                  const int64_t incx, sycl::buffer<int64_t, 1> &result) {
+inline void iamax(Func func, sycl::queue& queue, int64_t n, sycl::buffer<T, 1>& x,
+                  const int64_t incx, sycl::buffer<int64_t, 1>& result) {
     column_major::iamax(func, queue, n, x, incx, result);
 }
 
 #define IAMAX_LAUNCHER(TYPE, ROCBLAS_ROUTINE)                                               \
-    void iamax(sycl::queue &queue, int64_t n, sycl::buffer<TYPE, 1> &x, const int64_t incx, \
-               sycl::buffer<int64_t, 1> &result) {                                          \
+    void iamax(sycl::queue& queue, int64_t n, sycl::buffer<TYPE, 1>& x, const int64_t incx, \
+               sycl::buffer<int64_t, 1>& result) {                                          \
         iamax(ROCBLAS_ROUTINE, queue, n, x, incx, result);                                  \
     }
 
@@ -1433,14 +1431,14 @@ IAMAX_LAUNCHER(std::complex<double>, rocblas_izamax)
 #undef IAMAX_LAUNCHER
 
 template <typename Func, typename T>
-inline void swap(Func func, sycl::queue &queue, int64_t n, sycl::buffer<T, 1> &x, int64_t incx,
-                 sycl::buffer<T, 1> &y, int64_t incy) {
+inline void swap(Func func, sycl::queue& queue, int64_t n, sycl::buffer<T, 1>& x, int64_t incx,
+                 sycl::buffer<T, 1>& y, int64_t incy) {
     column_major::swap(func, queue, n, x, incx, y, incy);
 }
 
 #define SWAP_LAUNCHER(TYPE, ROCBLAS_ROUTINE)                                         \
-    void swap(sycl::queue &queue, int64_t n, sycl::buffer<TYPE, 1> &x, int64_t incx, \
-              sycl::buffer<TYPE, 1> &y, int64_t incy) {                              \
+    void swap(sycl::queue& queue, int64_t n, sycl::buffer<TYPE, 1>& x, int64_t incx, \
+              sycl::buffer<TYPE, 1>& y, int64_t incy) {                              \
         swap(ROCBLAS_ROUTINE, queue, n, x, incx, y, incy);                           \
     }
 
@@ -1452,14 +1450,14 @@ SWAP_LAUNCHER(std::complex<double>, rocblas_zswap)
 #undef SWAP_LAUNCHER
 
 template <typename Func, typename T>
-inline void iamin(Func func, sycl::queue &queue, int64_t n, sycl::buffer<T, 1> &x,
-                  const int64_t incx, sycl::buffer<int64_t, 1> &result) {
+inline void iamin(Func func, sycl::queue& queue, int64_t n, sycl::buffer<T, 1>& x,
+                  const int64_t incx, sycl::buffer<int64_t, 1>& result) {
     column_major::iamin(func, queue, n, x, incx, result);
 }
 
 #define IAMIN_LAUNCHER(TYPE, ROCBLAS_ROUTINE)                                               \
-    void iamin(sycl::queue &queue, int64_t n, sycl::buffer<TYPE, 1> &x, const int64_t incx, \
-               sycl::buffer<int64_t, 1> &result) {                                          \
+    void iamin(sycl::queue& queue, int64_t n, sycl::buffer<TYPE, 1>& x, const int64_t incx, \
+               sycl::buffer<int64_t, 1>& result) {                                          \
         iamin(ROCBLAS_ROUTINE, queue, n, x, incx, result);                                  \
     }
 
@@ -1471,14 +1469,14 @@ IAMIN_LAUNCHER(std::complex<double>, rocblas_izamin)
 #undef IAMIN_LAUNCHER
 
 template <typename Func, typename T1, typename T2>
-inline void nrm2(Func func, sycl::queue &queue, int64_t n, sycl::buffer<T1, 1> &x,
-                 const int64_t incx, sycl::buffer<T2, 1> &result) {
+inline void nrm2(Func func, sycl::queue& queue, int64_t n, sycl::buffer<T1, 1>& x,
+                 const int64_t incx, sycl::buffer<T2, 1>& result) {
     column_major::nrm2(func, queue, n, x, incx, result);
 }
 
 #define NRM2_LAUNCHER(TYPE1, TYPE2, ROCBLAS_ROUTINE)                                        \
-    void nrm2(sycl::queue &queue, int64_t n, sycl::buffer<TYPE1, 1> &x, const int64_t incx, \
-              sycl::buffer<TYPE2, 1> &result) {                                             \
+    void nrm2(sycl::queue& queue, int64_t n, sycl::buffer<TYPE1, 1>& x, const int64_t incx, \
+              sycl::buffer<TYPE2, 1>& result) {                                             \
         nrm2(ROCBLAS_ROUTINE, queue, n, x, incx, result);                                   \
     }
 
@@ -1492,14 +1490,14 @@ NRM2_LAUNCHER(std::complex<double>, double, rocblas_dznrm2)
 // USM APIs
 
 template <typename Func, typename T1, typename T2>
-inline sycl::event asum(Func func, sycl::queue &queue, int64_t n, const T1 *x, const int64_t incx,
-                        T2 *result, const std::vector<sycl::event> &dependencies) {
+inline sycl::event asum(Func func, sycl::queue& queue, int64_t n, const T1* x, const int64_t incx,
+                        T2* result, const std::vector<sycl::event>& dependencies) {
     return column_major::asum(func, queue, n, x, incx, result, dependencies);
 }
 
 #define ASUM_LAUNCHER_USM(TYPE1, TYPE2, ROCBLAS_ROUTINE)                                \
-    sycl::event asum(sycl::queue &queue, int64_t n, const TYPE1 *x, const int64_t incx, \
-                     TYPE2 *result, const std::vector<sycl::event> &dependencies) {     \
+    sycl::event asum(sycl::queue& queue, int64_t n, const TYPE1* x, const int64_t incx, \
+                     TYPE2* result, const std::vector<sycl::event>& dependencies) {     \
         return asum(ROCBLAS_ROUTINE, queue, n, x, incx, result, dependencies);          \
     }
 
@@ -1511,14 +1509,14 @@ ASUM_LAUNCHER_USM(std::complex<double>, double, rocblas_dzasum)
 #undef ASUM_LAUNCHER_USM
 
 template <typename Func, typename T1, typename T2>
-inline sycl::event scal(Func func, sycl::queue &queue, int64_t n, T1 a, T2 *x, int64_t incx,
-                        const std::vector<sycl::event> &dependencies) {
+inline sycl::event scal(Func func, sycl::queue& queue, int64_t n, T1 a, T2* x, int64_t incx,
+                        const std::vector<sycl::event>& dependencies) {
     return column_major::scal(func, queue, n, a, x, incx, dependencies);
 }
 
 #define SCAL_LAUNCHER_USM(TYPE1, TYPE2, ROCBLAS_ROUTINE)                             \
-    sycl::event scal(sycl::queue &queue, int64_t n, TYPE1 a, TYPE2 *x, int64_t incx, \
-                     const std::vector<sycl::event> &dependencies) {                 \
+    sycl::event scal(sycl::queue& queue, int64_t n, TYPE1 a, TYPE2* x, int64_t incx, \
+                     const std::vector<sycl::event>& dependencies) {                 \
         return scal(ROCBLAS_ROUTINE, queue, n, a, x, incx, dependencies);            \
     }
 
@@ -1532,14 +1530,14 @@ SCAL_LAUNCHER_USM(double, std::complex<double>, rocblas_zdscal)
 #undef SCAL_LAUNCHER_USM
 
 template <typename Func, typename T>
-inline sycl::event axpy(Func func, sycl::queue &queue, int64_t n, T alpha, const T *x, int64_t incx,
-                        T *y, int64_t incy, const std::vector<sycl::event> &dependencies) {
+inline sycl::event axpy(Func func, sycl::queue& queue, int64_t n, T alpha, const T* x, int64_t incx,
+                        T* y, int64_t incy, const std::vector<sycl::event>& dependencies) {
     return column_major::axpy(func, queue, n, alpha, x, incx, y, incy, dependencies);
 }
 
 #define AXPY_LAUNCHER_USM(TYPE, ROCBLAS_ROUTINE)                                             \
-    sycl::event axpy(sycl::queue &queue, int64_t n, TYPE alpha, const TYPE *x, int64_t incx, \
-                     TYPE *y, int64_t incy, const std::vector<sycl::event> &dependencies) {  \
+    sycl::event axpy(sycl::queue& queue, int64_t n, TYPE alpha, const TYPE* x, int64_t incx, \
+                     TYPE* y, int64_t incy, const std::vector<sycl::event>& dependencies) {  \
         return axpy(ROCBLAS_ROUTINE, queue, n, alpha, x, incx, y, incy, dependencies);       \
     }
 
@@ -1550,38 +1548,38 @@ AXPY_LAUNCHER_USM(std::complex<double>, rocblas_zaxpy)
 
 #undef AXPY_LAUNCHER_USM
 
-sycl::event axpby(sycl::queue &queue, int64_t n, float alpha, const float *x, int64_t incx,
-                  float beta, float *y, int64_t incy,
-                  const std::vector<sycl::event> &dependencies) {
+sycl::event axpby(sycl::queue& queue, int64_t n, float alpha, const float* x, int64_t incx,
+                  float beta, float* y, int64_t incy,
+                  const std::vector<sycl::event>& dependencies) {
     throw unimplemented("blas", "axpby", "for row_major layout");
 }
-sycl::event axpby(sycl::queue &queue, int64_t n, double alpha, const double *x, int64_t incx,
-                  double beta, double *y, int64_t incy,
-                  const std::vector<sycl::event> &dependencies) {
+sycl::event axpby(sycl::queue& queue, int64_t n, double alpha, const double* x, int64_t incx,
+                  double beta, double* y, int64_t incy,
+                  const std::vector<sycl::event>& dependencies) {
     throw unimplemented("blas", "axpby", "for row_major layout");
 }
-sycl::event axpby(sycl::queue &queue, int64_t n, std::complex<float> alpha,
-                  const std::complex<float> *x, int64_t incx, std::complex<float> beta,
-                  std::complex<float> *y, int64_t incy,
-                  const std::vector<sycl::event> &dependencies) {
+sycl::event axpby(sycl::queue& queue, int64_t n, std::complex<float> alpha,
+                  const std::complex<float>* x, int64_t incx, std::complex<float> beta,
+                  std::complex<float>* y, int64_t incy,
+                  const std::vector<sycl::event>& dependencies) {
     throw unimplemented("blas", "axpby", "for row_major layout");
 }
-sycl::event axpby(sycl::queue &queue, int64_t n, std::complex<double> alpha,
-                  const std::complex<double> *x, int64_t incx, std::complex<double> beta,
-                  std::complex<double> *y, int64_t incy,
-                  const std::vector<sycl::event> &dependencies) {
+sycl::event axpby(sycl::queue& queue, int64_t n, std::complex<double> alpha,
+                  const std::complex<double>* x, int64_t incx, std::complex<double> beta,
+                  std::complex<double>* y, int64_t incy,
+                  const std::vector<sycl::event>& dependencies) {
     throw unimplemented("blas", "axpby", "for row_major layout");
 }
 
 template <typename Func, typename T1, typename T2>
-inline sycl::event rotg(Func func, sycl::queue &queue, T1 *a, T1 *b, T2 *c, T1 *s,
-                        const std::vector<sycl::event> &dependencies) {
+inline sycl::event rotg(Func func, sycl::queue& queue, T1* a, T1* b, T2* c, T1* s,
+                        const std::vector<sycl::event>& dependencies) {
     return column_major::rotg(func, queue, a, b, c, s, dependencies);
 }
 
 #define ROTG_LAUNCHER_USM(TYPE1, TYPE2, ROCBLAS_ROUTINE)                         \
-    sycl::event rotg(sycl::queue &queue, TYPE1 *a, TYPE1 *b, TYPE2 *c, TYPE1 *s, \
-                     const std::vector<sycl::event> &dependencies) {             \
+    sycl::event rotg(sycl::queue& queue, TYPE1* a, TYPE1* b, TYPE2* c, TYPE1* s, \
+                     const std::vector<sycl::event>& dependencies) {             \
         return rotg(ROCBLAS_ROUTINE, queue, a, b, c, s, dependencies);           \
     }
 
@@ -1593,14 +1591,14 @@ ROTG_LAUNCHER_USM(std::complex<double>, double, rocblas_zrotg)
 #undef ROTG_LAUNCHER_USM
 
 template <typename Func, typename T>
-inline sycl::event rotm(Func func, sycl::queue &queue, int64_t n, T *x, int64_t incx, T *y,
-                        int64_t incy, T *param, const std::vector<sycl::event> &dependencies) {
+inline sycl::event rotm(Func func, sycl::queue& queue, int64_t n, T* x, int64_t incx, T* y,
+                        int64_t incy, T* param, const std::vector<sycl::event>& dependencies) {
     return column_major::rotm(func, queue, n, x, incx, y, incy, param, dependencies);
 }
 
 #define ROTM_LAUNCHER_USM(TYPE, ROCBLAS_ROUTINE)                                                  \
-    sycl::event rotm(sycl::queue &queue, int64_t n, TYPE *x, int64_t incx, TYPE *y, int64_t incy, \
-                     TYPE *param, const std::vector<sycl::event> &dependencies) {                 \
+    sycl::event rotm(sycl::queue& queue, int64_t n, TYPE* x, int64_t incx, TYPE* y, int64_t incy, \
+                     TYPE* param, const std::vector<sycl::event>& dependencies) {                 \
         return rotm(ROCBLAS_ROUTINE, queue, n, x, incx, y, incy, param, dependencies);            \
     }
 
@@ -1610,14 +1608,14 @@ ROTM_LAUNCHER_USM(double, rocblas_drotm)
 #undef ROTM_LAUNCHER_USM
 
 template <typename Func, typename T>
-inline sycl::event copy(Func func, sycl::queue &queue, int64_t n, const T *x, int64_t incx, T *y,
-                        int64_t incy, const std::vector<sycl::event> &dependencies) {
+inline sycl::event copy(Func func, sycl::queue& queue, int64_t n, const T* x, int64_t incx, T* y,
+                        int64_t incy, const std::vector<sycl::event>& dependencies) {
     return column_major::copy(func, queue, n, x, incx, y, incy, dependencies);
 }
 
 #define COPY_LAUNCHER_USM(TYPE, ROCBLAS_ROUTINE)                                          \
-    sycl::event copy(sycl::queue &queue, int64_t n, const TYPE *x, int64_t incx, TYPE *y, \
-                     int64_t incy, const std::vector<sycl::event> &dependencies) {        \
+    sycl::event copy(sycl::queue& queue, int64_t n, const TYPE* x, int64_t incx, TYPE* y, \
+                     int64_t incy, const std::vector<sycl::event>& dependencies) {        \
         return copy(ROCBLAS_ROUTINE, queue, n, x, incx, y, incy, dependencies);           \
     }
 
@@ -1629,16 +1627,16 @@ COPY_LAUNCHER_USM(std::complex<double>, rocblas_zcopy)
 #undef COPY_LAUNCHER_USM
 
 template <typename Func, typename T>
-inline sycl::event dot(Func func, sycl::queue &queue, int64_t n, const T *x, const int64_t incx,
-                       const T *y, int64_t incy, T *result,
-                       const std::vector<sycl::event> &dependencies) {
+inline sycl::event dot(Func func, sycl::queue& queue, int64_t n, const T* x, const int64_t incx,
+                       const T* y, int64_t incy, T* result,
+                       const std::vector<sycl::event>& dependencies) {
     return column_major::dot(func, queue, n, x, incx, y, incy, result, dependencies);
 }
 
 #define DOT_LAUNCHER_USM(EXT, TYPE, ROCBLAS_ROUTINE)                                       \
-    sycl::event dot##EXT(sycl::queue &queue, int64_t n, const TYPE *x, const int64_t incx, \
-                         const TYPE *y, const int64_t incy, TYPE *result,                  \
-                         const std::vector<sycl::event> &dependencies) {                   \
+    sycl::event dot##EXT(sycl::queue& queue, int64_t n, const TYPE* x, const int64_t incx, \
+                         const TYPE* y, const int64_t incy, TYPE* result,                  \
+                         const std::vector<sycl::event>& dependencies) {                   \
         return dot(ROCBLAS_ROUTINE, queue, n, x, incx, y, incy, result, dependencies);     \
     }
 
@@ -1651,21 +1649,21 @@ DOT_LAUNCHER_USM(c, std::complex<double>, rocblas_zdotc)
 
 #undef DOT_LAUNCHER_USM
 
-sycl::event dot(sycl::queue &queue, int64_t n, const float *x, int64_t incx, const float *y,
-                int64_t incy, double *result, const std::vector<sycl::event> &dependencies) {
+sycl::event dot(sycl::queue& queue, int64_t n, const float* x, int64_t incx, const float* y,
+                int64_t incy, double* result, const std::vector<sycl::event>& dependencies) {
     throw unimplemented("blas", "dot", "for row_major layout");
 }
 
 template <typename Func, typename T1, typename T2, typename T3>
-inline sycl::event rot(Func func, sycl::queue &queue, int64_t n, T1 *x, const int64_t incx, T1 *y,
-                       int64_t incy, T2 c, T3 s, const std::vector<sycl::event> &dependencies) {
+inline sycl::event rot(Func func, sycl::queue& queue, int64_t n, T1* x, const int64_t incx, T1* y,
+                       int64_t incy, T2 c, T3 s, const std::vector<sycl::event>& dependencies) {
     return column_major::rot(func, queue, n, x, incx, y, incy, c, s, dependencies);
 }
 
 #define ROT_LAUNCHER_USM(TYPE1, TYPE2, TYPE3, ROCBLAS_ROUTINE)                             \
-    sycl::event rot(sycl::queue &queue, int64_t n, TYPE1 *x, const int64_t incx, TYPE1 *y, \
+    sycl::event rot(sycl::queue& queue, int64_t n, TYPE1* x, const int64_t incx, TYPE1* y, \
                     int64_t incy, TYPE2 c, TYPE3 s,                                        \
-                    const std::vector<sycl::event> &dependencies) {                        \
+                    const std::vector<sycl::event>& dependencies) {                        \
         return rot(ROCBLAS_ROUTINE, queue, n, x, incx, y, incy, c, s, dependencies);       \
     }
 
@@ -1676,21 +1674,21 @@ ROT_LAUNCHER_USM(std::complex<double>, double, double, rocblas_zdrot)
 
 #undef ROT_LAUNCHER_USM
 
-sycl::event sdsdot(sycl::queue &queue, int64_t n, float sb, const float *x, int64_t incx,
-                   const float *y, int64_t incy, float *result,
-                   const std::vector<sycl::event> &dependencies) {
+sycl::event sdsdot(sycl::queue& queue, int64_t n, float sb, const float* x, int64_t incx,
+                   const float* y, int64_t incy, float* result,
+                   const std::vector<sycl::event>& dependencies) {
     return column_major::sdsdot(queue, n, sb, x, incx, y, incy, result);
 }
 
 template <typename Func, typename T>
-inline sycl::event rotmg(Func func, sycl::queue &queue, T *d1, T *d2, T *x1, T y1, T *param,
-                         const std::vector<sycl::event> &dependencies) {
+inline sycl::event rotmg(Func func, sycl::queue& queue, T* d1, T* d2, T* x1, T y1, T* param,
+                         const std::vector<sycl::event>& dependencies) {
     return column_major::rotmg(func, queue, d1, d2, x1, y1, param, dependencies);
 }
 
 #define ROTMG_LAUNCHER_USM(TYPE, ROCBLAS_ROUTINE)                                             \
-    sycl::event rotmg(sycl::queue &queue, TYPE *d1, TYPE *d2, TYPE *x1, TYPE y1, TYPE *param, \
-                      const std::vector<sycl::event> &dependencies) {                         \
+    sycl::event rotmg(sycl::queue& queue, TYPE* d1, TYPE* d2, TYPE* x1, TYPE y1, TYPE* param, \
+                      const std::vector<sycl::event>& dependencies) {                         \
         return rotmg(ROCBLAS_ROUTINE, queue, d1, d2, x1, y1, param, dependencies);            \
     }
 
@@ -1700,14 +1698,14 @@ ROTMG_LAUNCHER_USM(double, rocblas_drotmg)
 #undef ROTMG_LAUNCHER_USM
 
 template <typename Func, typename T>
-inline sycl::event iamax(Func func, sycl::queue &queue, int64_t n, const T *x, const int64_t incx,
-                         int64_t *result, const std::vector<sycl::event> &dependencies) {
+inline sycl::event iamax(Func func, sycl::queue& queue, int64_t n, const T* x, const int64_t incx,
+                         int64_t* result, const std::vector<sycl::event>& dependencies) {
     return column_major::iamax(func, queue, n, x, incx, result, dependencies);
 }
 
 #define IAMAX_LAUNCHER_USM(TYPE, ROCBLAS_ROUTINE)                                       \
-    sycl::event iamax(sycl::queue &queue, int64_t n, const TYPE *x, const int64_t incx, \
-                      int64_t *result, const std::vector<sycl::event> &dependencies) {  \
+    sycl::event iamax(sycl::queue& queue, int64_t n, const TYPE* x, const int64_t incx, \
+                      int64_t* result, const std::vector<sycl::event>& dependencies) {  \
         return iamax(ROCBLAS_ROUTINE, queue, n, x, incx, result, dependencies);         \
     }
 
@@ -1719,14 +1717,14 @@ IAMAX_LAUNCHER_USM(std::complex<double>, rocblas_izamax)
 #undef IAMAX_LAUNCHER_USM
 
 template <typename Func, typename T>
-inline sycl::event swap(Func func, sycl::queue &queue, int64_t n, T *x, int64_t incx, T *y,
-                        int64_t incy, const std::vector<sycl::event> &dependencies) {
+inline sycl::event swap(Func func, sycl::queue& queue, int64_t n, T* x, int64_t incx, T* y,
+                        int64_t incy, const std::vector<sycl::event>& dependencies) {
     return column_major::swap(func, queue, n, x, incx, y, incy, dependencies);
 }
 
 #define SWAP_LAUNCHER_USM(TYPE, ROCBLAS_ROUTINE)                                                  \
-    sycl::event swap(sycl::queue &queue, int64_t n, TYPE *x, int64_t incx, TYPE *y, int64_t incy, \
-                     const std::vector<sycl::event> &dependencies) {                              \
+    sycl::event swap(sycl::queue& queue, int64_t n, TYPE* x, int64_t incx, TYPE* y, int64_t incy, \
+                     const std::vector<sycl::event>& dependencies) {                              \
         return swap(ROCBLAS_ROUTINE, queue, n, x, incx, y, incy, dependencies);                   \
     }
 
@@ -1738,14 +1736,14 @@ SWAP_LAUNCHER_USM(std::complex<double>, rocblas_zswap)
 #undef SWAP_LAUNCHER_USM
 
 template <typename Func, typename T>
-inline sycl::event iamin(Func func, sycl::queue &queue, int64_t n, const T *x, const int64_t incx,
-                         int64_t *result, const std::vector<sycl::event> &dependencies) {
+inline sycl::event iamin(Func func, sycl::queue& queue, int64_t n, const T* x, const int64_t incx,
+                         int64_t* result, const std::vector<sycl::event>& dependencies) {
     return column_major::iamin(func, queue, n, x, incx, result, dependencies);
 }
 
 #define IAMIN_LAUNCHER_USM(TYPE, ROCBLAS_ROUTINE)                                       \
-    sycl::event iamin(sycl::queue &queue, int64_t n, const TYPE *x, const int64_t incx, \
-                      int64_t *result, const std::vector<sycl::event> &dependencies) {  \
+    sycl::event iamin(sycl::queue& queue, int64_t n, const TYPE* x, const int64_t incx, \
+                      int64_t* result, const std::vector<sycl::event>& dependencies) {  \
         return iamin(ROCBLAS_ROUTINE, queue, n, x, incx, result, dependencies);         \
     }
 
@@ -1757,14 +1755,14 @@ IAMIN_LAUNCHER_USM(std::complex<double>, rocblas_izamin)
 #undef IAMIN_LAUNCHER_USM
 
 template <typename Func, typename T1, typename T2>
-inline sycl::event nrm2(Func func, sycl::queue &queue, int64_t n, const T1 *x, const int64_t incx,
-                        T2 *result, const std::vector<sycl::event> &dependencies) {
+inline sycl::event nrm2(Func func, sycl::queue& queue, int64_t n, const T1* x, const int64_t incx,
+                        T2* result, const std::vector<sycl::event>& dependencies) {
     return column_major::nrm2(func, queue, n, x, incx, result, dependencies);
 }
 
 #define NRM2_LAUNCHER_USM(TYPE1, TYPE2, ROCBLAS_ROUTINE)                                \
-    sycl::event nrm2(sycl::queue &queue, int64_t n, const TYPE1 *x, const int64_t incx, \
-                     TYPE2 *result, const std::vector<sycl::event> &dependencies) {     \
+    sycl::event nrm2(sycl::queue& queue, int64_t n, const TYPE1* x, const int64_t incx, \
+                     TYPE2* result, const std::vector<sycl::event>& dependencies) {     \
         return nrm2(ROCBLAS_ROUTINE, queue, n, x, incx, result, dependencies);          \
     }
 

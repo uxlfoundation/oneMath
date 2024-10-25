@@ -133,7 +133,7 @@ int main(int argc, char** argv) {
                         if (dev.is_gpu() && vendor_id == AMD_ID)
                             continue;
 #endif
-// clang-format off
+                        // clang-format off
 #ifdef __HIPSYCL__
                         if (dev.is_accelerator())
 #else

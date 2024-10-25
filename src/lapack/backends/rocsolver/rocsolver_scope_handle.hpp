@@ -52,23 +52,23 @@ namespace rocsolver {
 
 class RocsolverScopedContextHandler {
     hipCtx_t original_;
-    sycl::context *placedContext_;
+    sycl::context* placedContext_;
     bool needToRecover_;
-    sycl::interop_handle &ih;
+    sycl::interop_handle& ih;
 #ifdef ONEAPI_ONEMKL_PI_INTERFACE_REMOVED
     static thread_local rocsolver_handle<ur_context_handle_t> handle_helper;
 #else
     static thread_local rocsolver_handle<pi_context> handle_helper;
 #endif
-    hipStream_t get_stream(const sycl::queue &queue);
-    sycl::context get_context(const sycl::queue &queue);
+    hipStream_t get_stream(const sycl::queue& queue);
+    sycl::context get_context(const sycl::queue& queue);
 
 public:
-    RocsolverScopedContextHandler(sycl::queue queue, sycl::interop_handle &ih);
+    RocsolverScopedContextHandler(sycl::queue queue, sycl::interop_handle& ih);
 
     ~RocsolverScopedContextHandler() noexcept(false);
 
-    rocblas_handle get_handle(const sycl::queue &queue);
+    rocblas_handle get_handle(const sycl::queue& queue);
     // This is a work-around function for reinterpret_casting the memory. This
     // will be fixed when SYCL-2020 has been implemented for Pi backend.
     template <typename T, typename U>

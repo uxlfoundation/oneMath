@@ -43,19 +43,19 @@
 using namespace sycl;
 using std::vector;
 
-extern std::vector<sycl::device *> devices;
+extern std::vector<sycl::device*> devices;
 
 namespace {
 
 template <typename fp>
-int test(device *dev, oneapi::mkl::layout layout, int64_t incx, int64_t incy, int64_t batch_size) {
+int test(device* dev, oneapi::mkl::layout layout, int64_t incx, int64_t incy, int64_t batch_size) {
     // Catch asynchronous exceptions.
     auto exception_handler = [](exception_list exceptions) {
-        for (std::exception_ptr const &e : exceptions) {
+        for (std::exception_ptr const& e : exceptions) {
             try {
                 std::rethrow_exception(e);
             }
-            catch (exception const &e) {
+            catch (exception const& e) {
                 std::cout << "Caught asynchronous SYCL exception during GEMM_BATCH_STRIDE:\n"
                           << e.what() << std::endl;
                 print_error_code(e);
@@ -128,10 +128,10 @@ int test(device *dev, oneapi::mkl::layout layout, int64_t incx, int64_t incy, in
     int batch_size_ref = (int)batch_size;
 
     for (i = 0; i < batch_size_ref; i++) {
-        ::gemv(convert_to_cblas_layout(layout), convert_to_cblas_trans(transa), (const int *)&m_ref,
-               (const int *)&n_ref, (const fp_ref *)&alpha, (const fp_ref *)&A[stride_a * i],
-               (const int *)&lda_ref, (const fp_ref *)&x[stride_x * i], (const int *)&incx_ref,
-               (const fp_ref *)&beta, (fp_ref *)&y_ref[stride_y * i], (const int *)&incy_ref);
+        ::gemv(convert_to_cblas_layout(layout), convert_to_cblas_trans(transa), (const int*)&m_ref,
+               (const int*)&n_ref, (const fp_ref*)&alpha, (const fp_ref*)&A[stride_a * i],
+               (const int*)&lda_ref, (const fp_ref*)&x[stride_x * i], (const int*)&incx_ref,
+               (const fp_ref*)&beta, (fp_ref*)&y_ref[stride_y * i], (const int*)&incy_ref);
     }
 
     // Call DPC++ GEMV_BATCH_STRIDE.
@@ -171,17 +171,17 @@ int test(device *dev, oneapi::mkl::layout layout, int64_t incx, int64_t incy, in
         main_queue.wait();
 #endif
     }
-    catch (exception const &e) {
+    catch (exception const& e) {
         std::cout << "Caught synchronous SYCL exception during GEMV_BATCH_STRIDE:\n"
                   << e.what() << std::endl;
         print_error_code(e);
     }
 
-    catch (const oneapi::mkl::unimplemented &e) {
+    catch (const oneapi::mkl::unimplemented& e) {
         return test_skipped;
     }
 
-    catch (const std::runtime_error &error) {
+    catch (const std::runtime_error& error) {
         std::cout << "Error raised during execution of GEMV_BATCH_STRIDE:\n"
                   << error.what() << std::endl;
     }
@@ -197,7 +197,7 @@ int test(device *dev, oneapi::mkl::layout layout, int64_t incx, int64_t incy, in
 }
 
 class GemvBatchStrideUsmTests
-        : public ::testing::TestWithParam<std::tuple<sycl::device *, oneapi::mkl::layout>> {};
+        : public ::testing::TestWithParam<std::tuple<sycl::device*, oneapi::mkl::layout>> {};
 
 TEST_P(GemvBatchStrideUsmTests, RealSinglePrecision) {
     EXPECT_TRUEORSKIP(test<float>(std::get<0>(GetParam()), std::get<1>(GetParam()), 2, 3, 5));

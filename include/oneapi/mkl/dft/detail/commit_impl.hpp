@@ -54,18 +54,18 @@ protected:
 
 public:
     commit_impl(sycl::queue queue, mkl::backend backend,
-                const dft::detail::dft_values<prec, dom> &config_values)
+                const dft::detail::dft_values<prec, dom>& config_values)
             : queue_(queue),
               backend_(backend),
               external_workspace_helper_(config_values.workspace_placement ==
                                          dft::detail::config_value::WORKSPACE_EXTERNAL) {}
 
     // rule of three
-    commit_impl(const commit_impl &other) = delete;
-    commit_impl &operator=(const commit_impl &other) = delete;
+    commit_impl(const commit_impl& other) = delete;
+    commit_impl& operator=(const commit_impl& other) = delete;
     virtual ~commit_impl() = default;
 
-    sycl::queue &get_queue() noexcept {
+    sycl::queue& get_queue() noexcept {
         return queue_;
     }
 
@@ -73,9 +73,9 @@ public:
         return backend_;
     }
 
-    virtual void *get_handle() noexcept = 0;
+    virtual void* get_handle() noexcept = 0;
 
-    virtual void commit(const dft_values<prec, dom> &) = 0;
+    virtual void commit(const dft_values<prec, dom>&) = 0;
 
     inline std::int64_t get_workspace_external_bytes() {
         return external_workspace_helper_.get_rqd_workspace_bytes(*this);
@@ -87,54 +87,54 @@ public:
     // When not overridden, external workspace support is faked: an external workspace can be set,
     // and errors will be generated according to the specificiation,
     // but the required workspace size will always be zero, and any given workspace will not actually be used.
-    virtual void set_workspace(scalar_type *usm_workspace) {
+    virtual void set_workspace(scalar_type* usm_workspace) {
         external_workspace_helper_.set_workspace_throw(*this, usm_workspace);
     }
-    virtual void set_workspace(sycl::buffer<scalar_type> &buffer_workspace) {
+    virtual void set_workspace(sycl::buffer<scalar_type>& buffer_workspace) {
         external_workspace_helper_.set_workspace_throw(*this, buffer_workspace);
     }
 
-    virtual void forward_ip_cc(descriptor_type &desc, sycl::buffer<fwd_type, 1> &inout) = 0;
-    virtual void forward_ip_rr(descriptor_type &desc, sycl::buffer<scalar_type, 1> &inout_re,
-                               sycl::buffer<scalar_type, 1> &inout_im) = 0;
-    virtual void forward_op_cc(descriptor_type &desc, sycl::buffer<fwd_type, 1> &in,
-                               sycl::buffer<bwd_type, 1> &out) = 0;
-    virtual void forward_op_rr(descriptor_type &desc, sycl::buffer<scalar_type, 1> &in_re,
-                               sycl::buffer<scalar_type, 1> &in_im,
-                               sycl::buffer<scalar_type, 1> &out_re,
-                               sycl::buffer<scalar_type, 1> &out_im) = 0;
+    virtual void forward_ip_cc(descriptor_type& desc, sycl::buffer<fwd_type, 1>& inout) = 0;
+    virtual void forward_ip_rr(descriptor_type& desc, sycl::buffer<scalar_type, 1>& inout_re,
+                               sycl::buffer<scalar_type, 1>& inout_im) = 0;
+    virtual void forward_op_cc(descriptor_type& desc, sycl::buffer<fwd_type, 1>& in,
+                               sycl::buffer<bwd_type, 1>& out) = 0;
+    virtual void forward_op_rr(descriptor_type& desc, sycl::buffer<scalar_type, 1>& in_re,
+                               sycl::buffer<scalar_type, 1>& in_im,
+                               sycl::buffer<scalar_type, 1>& out_re,
+                               sycl::buffer<scalar_type, 1>& out_im) = 0;
 
-    virtual sycl::event forward_ip_cc(descriptor_type &desc, fwd_type *inout,
-                                      const std::vector<sycl::event> &dependencies) = 0;
-    virtual sycl::event forward_ip_rr(descriptor_type &desc, scalar_type *inout_re,
-                                      scalar_type *inout_im,
-                                      const std::vector<sycl::event> &dependencies) = 0;
-    virtual sycl::event forward_op_cc(descriptor_type &desc, fwd_type *in, bwd_type *out,
-                                      const std::vector<sycl::event> &dependencies) = 0;
-    virtual sycl::event forward_op_rr(descriptor_type &desc, scalar_type *in_re, scalar_type *in_im,
-                                      scalar_type *out_re, scalar_type *out_im,
-                                      const std::vector<sycl::event> &dependencies) = 0;
+    virtual sycl::event forward_ip_cc(descriptor_type& desc, fwd_type* inout,
+                                      const std::vector<sycl::event>& dependencies) = 0;
+    virtual sycl::event forward_ip_rr(descriptor_type& desc, scalar_type* inout_re,
+                                      scalar_type* inout_im,
+                                      const std::vector<sycl::event>& dependencies) = 0;
+    virtual sycl::event forward_op_cc(descriptor_type& desc, fwd_type* in, bwd_type* out,
+                                      const std::vector<sycl::event>& dependencies) = 0;
+    virtual sycl::event forward_op_rr(descriptor_type& desc, scalar_type* in_re, scalar_type* in_im,
+                                      scalar_type* out_re, scalar_type* out_im,
+                                      const std::vector<sycl::event>& dependencies) = 0;
 
-    virtual void backward_ip_cc(descriptor_type &desc, sycl::buffer<fwd_type, 1> &inout) = 0;
-    virtual void backward_ip_rr(descriptor_type &desc, sycl::buffer<scalar_type, 1> &inout_re,
-                                sycl::buffer<scalar_type, 1> &inout_im) = 0;
-    virtual void backward_op_cc(descriptor_type &desc, sycl::buffer<bwd_type, 1> &in,
-                                sycl::buffer<fwd_type, 1> &out) = 0;
-    virtual void backward_op_rr(descriptor_type &desc, sycl::buffer<scalar_type, 1> &in_re,
-                                sycl::buffer<scalar_type, 1> &in_im,
-                                sycl::buffer<scalar_type, 1> &out_re,
-                                sycl::buffer<scalar_type, 1> &out_im) = 0;
+    virtual void backward_ip_cc(descriptor_type& desc, sycl::buffer<fwd_type, 1>& inout) = 0;
+    virtual void backward_ip_rr(descriptor_type& desc, sycl::buffer<scalar_type, 1>& inout_re,
+                                sycl::buffer<scalar_type, 1>& inout_im) = 0;
+    virtual void backward_op_cc(descriptor_type& desc, sycl::buffer<bwd_type, 1>& in,
+                                sycl::buffer<fwd_type, 1>& out) = 0;
+    virtual void backward_op_rr(descriptor_type& desc, sycl::buffer<scalar_type, 1>& in_re,
+                                sycl::buffer<scalar_type, 1>& in_im,
+                                sycl::buffer<scalar_type, 1>& out_re,
+                                sycl::buffer<scalar_type, 1>& out_im) = 0;
 
-    virtual sycl::event backward_ip_cc(descriptor_type &desc, fwd_type *inout,
-                                       const std::vector<sycl::event> &dependencies) = 0;
-    virtual sycl::event backward_ip_rr(descriptor_type &desc, scalar_type *inout_re,
-                                       scalar_type *inout_im,
-                                       const std::vector<sycl::event> &dependencies) = 0;
-    virtual sycl::event backward_op_cc(descriptor_type &desc, bwd_type *in, fwd_type *out,
-                                       const std::vector<sycl::event> &dependencies) = 0;
-    virtual sycl::event backward_op_rr(descriptor_type &desc, scalar_type *in_re,
-                                       scalar_type *in_im, scalar_type *out_re, scalar_type *out_im,
-                                       const std::vector<sycl::event> &dependencies) = 0;
+    virtual sycl::event backward_ip_cc(descriptor_type& desc, fwd_type* inout,
+                                       const std::vector<sycl::event>& dependencies) = 0;
+    virtual sycl::event backward_ip_rr(descriptor_type& desc, scalar_type* inout_re,
+                                       scalar_type* inout_im,
+                                       const std::vector<sycl::event>& dependencies) = 0;
+    virtual sycl::event backward_op_cc(descriptor_type& desc, bwd_type* in, fwd_type* out,
+                                       const std::vector<sycl::event>& dependencies) = 0;
+    virtual sycl::event backward_op_rr(descriptor_type& desc, scalar_type* in_re,
+                                       scalar_type* in_im, scalar_type* out_re, scalar_type* out_im,
+                                       const std::vector<sycl::event>& dependencies) = 0;
 
     /** For compute calls, throw errors for the external workspace as required.
      * @tparam ArgTs The non-descriptor arg(s) for the compute call. First one is used to check
@@ -142,7 +142,7 @@ public:
      * @param function_name The function name to user in generated exceptions.
     */
     template <typename... ArgTs>
-    void compute_call_throw(const char *function_name) {
+    void compute_call_throw(const char* function_name) {
         external_workspace_helper_.template compute_call_throw<ArgTs...>(function_name);
     }
 
@@ -151,14 +151,14 @@ public:
      * @param function_name The function name to user in generated exceptions.
      * @param cgh The command group handler to associate the accessor with.
     */
-    void add_buffer_workspace_dependency_if_rqd(const char *function_name, sycl::handler &cgh) {
+    void add_buffer_workspace_dependency_if_rqd(const char* function_name, sycl::handler& cgh) {
         external_workspace_helper_.add_buffer_dependency_if_rqd(function_name, cgh);
     }
 
     /** If WORKSPACE_EXTERNAL is set, depend on the last USM workspace event added via set_last_usm_workspace_event.
      * @param cgh The command group handler to associate the accessor with.
     */
-    void depend_on_last_usm_workspace_event_if_rqd(sycl::handler &cgh) {
+    void depend_on_last_usm_workspace_event_if_rqd(sycl::handler& cgh) {
         external_workspace_helper_.depend_on_last_usm_workspace_event_if_rqd(cgh);
     }
 
@@ -166,7 +166,7 @@ public:
      * subsequent calls to depend_on_last_usm_workspace_event.
      * @param sycl_event The last usage of the USM workspace.
     */
-    void set_last_usm_workspace_event_if_rqd(sycl::event &sycl_event) {
+    void set_last_usm_workspace_event_if_rqd(sycl::event& sycl_event) {
         external_workspace_helper_.set_last_usm_workspace_event_if_rqd(sycl_event);
     }
 

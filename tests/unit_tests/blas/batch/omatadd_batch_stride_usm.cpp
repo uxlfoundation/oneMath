@@ -43,19 +43,19 @@
 using namespace sycl;
 using std::vector;
 
-extern std::vector<sycl::device *> devices;
+extern std::vector<sycl::device*> devices;
 
 namespace {
 
 template <typename fp>
-int test(device *dev, oneapi::mkl::layout layout, int64_t batch_size) {
+int test(device* dev, oneapi::mkl::layout layout, int64_t batch_size) {
     // Catch asynchronous exceptions.
     auto exception_handler = [](exception_list exceptions) {
-        for (std::exception_ptr const &e : exceptions) {
+        for (std::exception_ptr const& e : exceptions) {
             try {
                 std::rethrow_exception(e);
             }
-            catch (exception const &e) {
+            catch (exception const& e) {
                 std::cout << "Caught asynchronous SYCL exception during OMATADD_BATCH_STRIDE:\n"
                           << e.what() << std::endl;
                 print_error_code(e);
@@ -110,10 +110,10 @@ int test(device *dev, oneapi::mkl::layout layout, int64_t batch_size) {
     C.resize(stride_c * batch_size);
     C_ref.resize(stride_c * batch_size);
 
-    fp **a_array = (fp **)oneapi::mkl::malloc_shared(64, sizeof(fp *) * batch_size, *dev, cxt);
-    fp **b_array = (fp **)oneapi::mkl::malloc_shared(64, sizeof(fp *) * batch_size, *dev, cxt);
-    fp **c_array = (fp **)oneapi::mkl::malloc_shared(64, sizeof(fp *) * batch_size, *dev, cxt);
-    fp **c_ref_array = (fp **)oneapi::mkl::malloc_shared(64, sizeof(fp *) * batch_size, *dev, cxt);
+    fp** a_array = (fp**)oneapi::mkl::malloc_shared(64, sizeof(fp*) * batch_size, *dev, cxt);
+    fp** b_array = (fp**)oneapi::mkl::malloc_shared(64, sizeof(fp*) * batch_size, *dev, cxt);
+    fp** c_array = (fp**)oneapi::mkl::malloc_shared(64, sizeof(fp*) * batch_size, *dev, cxt);
+    fp** c_ref_array = (fp**)oneapi::mkl::malloc_shared(64, sizeof(fp*) * batch_size, *dev, cxt);
 
     if ((a_array == NULL) || (b_array == NULL) || (c_array == NULL) || (c_ref_array == NULL)) {
         std::cout << "Error cannot allocate arrays of pointers\n";
@@ -188,13 +188,13 @@ int test(device *dev, oneapi::mkl::layout layout, int64_t batch_size) {
         main_queue.wait();
 #endif
     }
-    catch (exception const &e) {
+    catch (exception const& e) {
         std::cout << "Caught synchronous SYCL exception during OMATADD_BATCH_STRIDE:\n"
                   << e.what() << std::endl;
         print_error_code(e);
     }
 
-    catch (const oneapi::mkl::unimplemented &e) {
+    catch (const oneapi::mkl::unimplemented& e) {
         oneapi::mkl::free_shared(a_array, cxt);
         oneapi::mkl::free_shared(b_array, cxt);
         oneapi::mkl::free_shared(c_array, cxt);
@@ -202,7 +202,7 @@ int test(device *dev, oneapi::mkl::layout layout, int64_t batch_size) {
         return test_skipped;
     }
 
-    catch (const std::runtime_error &error) {
+    catch (const std::runtime_error& error) {
         std::cout << "Error raised during execution of OMATADD_BATCH_STRIDE:\n"
                   << error.what() << std::endl;
     }
@@ -220,7 +220,7 @@ int test(device *dev, oneapi::mkl::layout layout, int64_t batch_size) {
 }
 
 class OmataddBatchStrideUsmTests
-        : public ::testing::TestWithParam<std::tuple<sycl::device *, oneapi::mkl::layout>> {};
+        : public ::testing::TestWithParam<std::tuple<sycl::device*, oneapi::mkl::layout>> {};
 
 TEST_P(OmataddBatchStrideUsmTests, RealSinglePrecision) {
     EXPECT_TRUEORSKIP(test<float>(std::get<0>(GetParam()), std::get<1>(GetParam()), 5));

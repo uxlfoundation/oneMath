@@ -31,8 +31,8 @@ namespace pfft = portfft;
 
 namespace oneapi::mkl::dft::portfft::detail {
 template <dft::precision prec, dft::domain dom>
-inline dft::detail::commit_impl<prec, dom> *checked_get_commit(
-    dft::detail::descriptor<prec, dom> &desc) {
+inline dft::detail::commit_impl<prec, dom>* checked_get_commit(
+    dft::detail::descriptor<prec, dom>& desc) {
     auto commit_handle = dft::detail::get_commit(desc);
     if (commit_handle == nullptr || commit_handle->get_backend() != backend::portfft) {
         throw mkl::invalid_argument("dft/backends/portfft", "get_commit",
@@ -53,9 +53,9 @@ using storage_type =
                                              detail::to_pfft_domain<descriptor_type>::type::value>>;
 
 template <typename descriptor_type>
-auto get_descriptors(descriptor_type &desc) {
+auto get_descriptors(descriptor_type& desc) {
     auto commit = detail::checked_get_commit(desc);
-    return reinterpret_cast<storage_type<descriptor_type> *>(commit->get_handle());
+    return reinterpret_cast<storage_type<descriptor_type>*>(commit->get_handle());
 }
 } // namespace oneapi::mkl::dft::portfft::detail
 

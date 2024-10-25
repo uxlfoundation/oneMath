@@ -25,7 +25,7 @@ namespace lapack {
 
 class exception {
 public:
-    exception(oneapi::mkl::exception *_ex, std::int64_t info, std::int64_t detail = 0)
+    exception(oneapi::mkl::exception* _ex, std::int64_t info, std::int64_t detail = 0)
             : _info(info),
               _detail(detail),
               _ex(_ex) {}
@@ -35,20 +35,20 @@ public:
     std::int64_t detail() const {
         return _detail;
     }
-    const char *what() const {
+    const char* what() const {
         return _ex->what();
     }
 
 private:
     std::int64_t _info;
     std::int64_t _detail;
-    mkl::exception *_ex;
+    mkl::exception* _ex;
 };
 
 class computation_error : public oneapi::mkl::computation_error,
                           public oneapi::mkl::lapack::exception {
 public:
-    computation_error(const std::string &function, const std::string &info, std::int64_t code)
+    computation_error(const std::string& function, const std::string& info, std::int64_t code)
             : oneapi::mkl::computation_error("LAPACK", function, info),
               oneapi::mkl::lapack::exception(this, code) {}
     using oneapi::mkl::computation_error::what;
@@ -56,17 +56,17 @@ public:
 
 class batch_error : public oneapi::mkl::batch_error, public oneapi::mkl::lapack::exception {
 public:
-    batch_error(const std::string &function, const std::string &info, std::int64_t num_errors,
+    batch_error(const std::string& function, const std::string& info, std::int64_t num_errors,
                 std::vector<std::int64_t> ids = {}, std::vector<std::exception_ptr> exceptions = {})
             : oneapi::mkl::batch_error("LAPACK", function, info),
               oneapi::mkl::lapack::exception(this, num_errors),
               _ids(ids),
               _exceptions(exceptions) {}
     using oneapi::mkl::batch_error::what;
-    const std::vector<std::int64_t> &ids() const {
+    const std::vector<std::int64_t>& ids() const {
         return _ids;
     }
-    const std::vector<std::exception_ptr> &exceptions() const {
+    const std::vector<std::exception_ptr>& exceptions() const {
         return _exceptions;
     }
 
@@ -78,7 +78,7 @@ private:
 class invalid_argument : public oneapi::mkl::invalid_argument,
                          public oneapi::mkl::lapack::exception {
 public:
-    invalid_argument(const std::string &function, const std::string &info,
+    invalid_argument(const std::string& function, const std::string& info,
                      std::int64_t arg_position = 0, std::int64_t detail = 0)
             : oneapi::mkl::invalid_argument("LAPACK", function, info),
               oneapi::mkl::lapack::exception(this, arg_position, detail) {}

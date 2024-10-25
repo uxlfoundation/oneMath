@@ -60,7 +60,7 @@
 // is performed and finally the results are post processed.
 //
 template <typename fpType, typename intType, typename selectorType>
-int run_sparse_matrix_vector_multiply_example(selectorType &selector) {
+int run_sparse_matrix_vector_multiply_example(selectorType& selector) {
     auto queue = selector.get_queue();
 
     // Matrix data size
@@ -75,11 +75,11 @@ int run_sparse_matrix_vector_multiply_example(selectorType &selector) {
     intType host_ia[] = { 0, 0, 1, 3, 4, 4, 4, 7, 7 };
     intType host_ja[] = { 0, 7, 2, 2, 5, 4, 0, 0, 7 };
 
-    intType *ia = (intType *)sycl::malloc_shared(nnz * sizeof(intType), queue);
-    intType *ja = (intType *)sycl::malloc_shared(nnz * sizeof(intType), queue);
-    fpType *a = (fpType *)sycl::malloc_shared(nnz * sizeof(fpType), queue);
-    fpType *x = (fpType *)sycl::malloc_shared(size * sizeof(fpType), queue);
-    fpType *y = (fpType *)sycl::malloc_shared(size * sizeof(fpType), queue);
+    intType* ia = (intType*)sycl::malloc_shared(nnz * sizeof(intType), queue);
+    intType* ja = (intType*)sycl::malloc_shared(nnz * sizeof(intType), queue);
+    fpType* a = (fpType*)sycl::malloc_shared(nnz * sizeof(fpType), queue);
+    fpType* x = (fpType*)sycl::malloc_shared(size * sizeof(fpType), queue);
+    fpType* y = (fpType*)sycl::malloc_shared(size * sizeof(fpType), queue);
 
     if (!ia || !ja || !a || !x || !y) {
         throw std::runtime_error("Failed to allocate USM memory");
@@ -100,10 +100,10 @@ int run_sparse_matrix_vector_multiply_example(selectorType &selector) {
         y[i] = set_fp_value(fpType(0.0));
     }
 
-    std::vector<intType *> int_ptr_vec;
+    std::vector<intType*> int_ptr_vec;
     int_ptr_vec.push_back(ia);
     int_ptr_vec.push_back(ja);
-    std::vector<fpType *> fp_ptr_vec;
+    std::vector<fpType*> fp_ptr_vec;
     fp_ptr_vec.push_back(a);
     fp_ptr_vec.push_back(x);
     fp_ptr_vec.push_back(y);
@@ -148,7 +148,7 @@ int run_sparse_matrix_vector_multiply_example(selectorType &selector) {
     std::size_t workspace_size = 0;
     oneapi::mkl::sparse::spmv_buffer_size(selector, transA, &alpha, A_view, A_handle, x_handle,
                                           &beta, y_handle, alg, descr, workspace_size);
-    void *workspace = sycl::malloc_device(workspace_size, queue);
+    void* workspace = sycl::malloc_device(workspace_size, queue);
 
     // Optimize spmv
     auto ev_opt =
@@ -176,7 +176,7 @@ int run_sparse_matrix_vector_multiply_example(selectorType &selector) {
     // Post Processing
     //
 
-    fpType *res = y;
+    fpType* res = y;
     fpType expected_res[size];
     const bool isConj = (transA == oneapi::mkl::transpose::conjtrans);
     for (intType row = 0; row < size; row++) {
@@ -243,15 +243,15 @@ void print_example_banner() {
 //
 // Main entry point for example
 //
-int main(int /*argc*/, char ** /*argv*/) {
+int main(int /*argc*/, char** /*argv*/) {
     print_example_banner();
 
     auto exception_handler = [](sycl::exception_list exceptions) {
-        for (std::exception_ptr const &e : exceptions) {
+        for (std::exception_ptr const& e : exceptions) {
             try {
                 std::rethrow_exception(e);
             }
-            catch (sycl::exception const &e) {
+            catch (sycl::exception const& e) {
                 std::cout << "Caught asynchronous SYCL "
                              "exception during sparse::spmv:\n"
                           << e.what() << std::endl;
@@ -281,13 +281,13 @@ int main(int /*argc*/, char ** /*argv*/) {
         run_sparse_matrix_vector_multiply_example<float, std::int32_t>(gpu_selector);
         std::cout << "Sparse BLAS SPMV USM example ran OK on MKLCPU and CUSPARSE." << std::endl;
     }
-    catch (sycl::exception const &e) {
+    catch (sycl::exception const& e) {
         std::cerr << "Caught synchronous SYCL exception during Sparse SPMV:" << std::endl;
         std::cerr << "\t" << e.what() << std::endl;
         std::cerr << "\tSYCL error code: " << e.code().value() << std::endl;
         return 1;
     }
-    catch (std::exception const &e) {
+    catch (std::exception const& e) {
         std::cerr << "Caught std::exception during Sparse SPMV:" << std::endl;
         std::cerr << "\t" << e.what() << std::endl;
         return 1;

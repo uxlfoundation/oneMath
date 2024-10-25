@@ -42,13 +42,13 @@
         std::int64_t size, sycl::buffer<FP_TYPE, 1> val);                             \
     template void init_dense_vector<FP_TYPE>(                                         \
         sycl::queue & queue, oneapi::mkl::sparse::dense_vector_handle_t * p_dvhandle, \
-        std::int64_t size, FP_TYPE * val);                                            \
+        std::int64_t size, FP_TYPE* val);                                             \
     template void set_dense_vector_data<FP_TYPE>(                                     \
         sycl::queue & queue, oneapi::mkl::sparse::dense_vector_handle_t dvhandle,     \
         std::int64_t size, sycl::buffer<FP_TYPE, 1> val);                             \
     template void set_dense_vector_data<FP_TYPE>(                                     \
         sycl::queue & queue, oneapi::mkl::sparse::dense_vector_handle_t dvhandle,     \
-        std::int64_t size, FP_TYPE * val)
+        std::int64_t size, FP_TYPE* val)
 
 #define INSTANTIATE_DENSE_MATRIX_FUNCS(FP_TYPE, FP_SUFFIX)                            \
     template void init_dense_matrix<FP_TYPE>(                                         \
@@ -58,7 +58,7 @@
     template void init_dense_matrix<FP_TYPE>(                                         \
         sycl::queue & queue, oneapi::mkl::sparse::dense_matrix_handle_t * p_dmhandle, \
         std::int64_t num_rows, std::int64_t num_cols, std::int64_t ld,                \
-        oneapi::mkl::layout dense_layout, FP_TYPE * val);                             \
+        oneapi::mkl::layout dense_layout, FP_TYPE* val);                              \
     template void set_dense_matrix_data<FP_TYPE>(                                     \
         sycl::queue & queue, oneapi::mkl::sparse::dense_matrix_handle_t dmhandle,     \
         std::int64_t num_rows, std::int64_t num_cols, std::int64_t ld,                \
@@ -66,7 +66,7 @@
     template void set_dense_matrix_data<FP_TYPE>(                                     \
         sycl::queue & queue, oneapi::mkl::sparse::dense_matrix_handle_t dmhandle,     \
         std::int64_t num_rows, std::int64_t num_cols, std::int64_t ld,                \
-        oneapi::mkl::layout dense_layout, FP_TYPE * val)
+        oneapi::mkl::layout dense_layout, FP_TYPE* val)
 
 #define INSTANTIATE_COO_MATRIX_FUNCS(FP_TYPE, FP_SUFFIX, INT_TYPE, INT_SUFFIX)                     \
     template void init_coo_matrix<FP_TYPE, INT_TYPE>(                                              \
@@ -77,7 +77,7 @@
     template void init_coo_matrix<FP_TYPE, INT_TYPE>(                                              \
         sycl::queue & queue, oneapi::mkl::sparse::matrix_handle_t * p_smhandle,                    \
         std::int64_t num_rows, std::int64_t num_cols, std::int64_t nnz,                            \
-        oneapi::mkl::index_base index, INT_TYPE * row_ind, INT_TYPE * col_ind, FP_TYPE * val);     \
+        oneapi::mkl::index_base index, INT_TYPE* row_ind, INT_TYPE* col_ind, FP_TYPE* val);        \
     template void set_coo_matrix_data<FP_TYPE, INT_TYPE>(                                          \
         sycl::queue & queue, oneapi::mkl::sparse::matrix_handle_t smhandle, std::int64_t num_rows, \
         std::int64_t num_cols, std::int64_t nnz, oneapi::mkl::index_base index,                    \
@@ -85,8 +85,8 @@
         sycl::buffer<FP_TYPE, 1> val);                                                             \
     template void set_coo_matrix_data<FP_TYPE, INT_TYPE>(                                          \
         sycl::queue & queue, oneapi::mkl::sparse::matrix_handle_t smhandle, std::int64_t num_rows, \
-        std::int64_t num_cols, std::int64_t nnz, oneapi::mkl::index_base index,                    \
-        INT_TYPE * row_ind, INT_TYPE * col_ind, FP_TYPE * val)
+        std::int64_t num_cols, std::int64_t nnz, oneapi::mkl::index_base index, INT_TYPE* row_ind, \
+        INT_TYPE* col_ind, FP_TYPE* val)
 
 #define INSTANTIATE_CSR_MATRIX_FUNCS(FP_TYPE, FP_SUFFIX, INT_TYPE, INT_SUFFIX)                     \
     template void init_csr_matrix<FP_TYPE, INT_TYPE>(                                              \
@@ -97,7 +97,7 @@
     template void init_csr_matrix<FP_TYPE, INT_TYPE>(                                              \
         sycl::queue & queue, oneapi::mkl::sparse::matrix_handle_t * p_smhandle,                    \
         std::int64_t num_rows, std::int64_t num_cols, std::int64_t nnz,                            \
-        oneapi::mkl::index_base index, INT_TYPE * row_ptr, INT_TYPE * col_ind, FP_TYPE * val);     \
+        oneapi::mkl::index_base index, INT_TYPE* row_ptr, INT_TYPE* col_ind, FP_TYPE* val);        \
     template void set_csr_matrix_data<FP_TYPE, INT_TYPE>(                                          \
         sycl::queue & queue, oneapi::mkl::sparse::matrix_handle_t smhandle, std::int64_t num_rows, \
         std::int64_t num_cols, std::int64_t nnz, oneapi::mkl::index_base index,                    \
@@ -105,8 +105,8 @@
         sycl::buffer<FP_TYPE, 1> val);                                                             \
     template void set_csr_matrix_data<FP_TYPE, INT_TYPE>(                                          \
         sycl::queue & queue, oneapi::mkl::sparse::matrix_handle_t smhandle, std::int64_t num_rows, \
-        std::int64_t num_cols, std::int64_t nnz, oneapi::mkl::index_base index,                    \
-        INT_TYPE * row_ptr, INT_TYPE * col_ind, FP_TYPE * val)
+        std::int64_t num_cols, std::int64_t nnz, oneapi::mkl::index_base index, INT_TYPE* row_ptr, \
+        INT_TYPE* col_ind, FP_TYPE* val)
 
 #define THROW_IF_NULLPTR(FUNC_NAME, PTR)                                       \
     if (!(PTR)) {                                                              \

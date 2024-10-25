@@ -43,19 +43,19 @@
 using namespace sycl;
 using std::vector;
 
-extern std::vector<sycl::device *> devices;
+extern std::vector<sycl::device*> devices;
 
 namespace {
 
 template <typename Ta, typename Tb, typename Tc, typename Ts>
-int test(device *dev, oneapi::mkl::layout layout, int64_t batch_size) {
+int test(device* dev, oneapi::mkl::layout layout, int64_t batch_size) {
     // Catch asynchronous exceptions.
     auto exception_handler = [](exception_list exceptions) {
-        for (std::exception_ptr const &e : exceptions) {
+        for (std::exception_ptr const& e : exceptions) {
             try {
                 std::rethrow_exception(e);
             }
-            catch (exception const &e) {
+            catch (exception const& e) {
                 std::cout << "Caught asynchronous SYCL exception during GEMM_BATCH_STRIDE:\n"
                           << e.what() << std::endl;
                 print_error_code(e);
@@ -136,10 +136,10 @@ int test(device *dev, oneapi::mkl::layout layout, int64_t batch_size) {
     C_ref.resize(stride_c * batch_size);
     C_cast_ref.resize(stride_c * batch_size);
 
-    Ta **a_array = (Ta **)oneapi::mkl::malloc_shared(64, sizeof(Ta *) * batch_size, *dev, cxt);
-    Tb **b_array = (Tb **)oneapi::mkl::malloc_shared(64, sizeof(Tb *) * batch_size, *dev, cxt);
-    Tc **c_array = (Tc **)oneapi::mkl::malloc_shared(64, sizeof(Tc *) * batch_size, *dev, cxt);
-    Ts **c_ref_array = (Ts **)oneapi::mkl::malloc_shared(64, sizeof(Ts *) * batch_size, *dev, cxt);
+    Ta** a_array = (Ta**)oneapi::mkl::malloc_shared(64, sizeof(Ta*) * batch_size, *dev, cxt);
+    Tb** b_array = (Tb**)oneapi::mkl::malloc_shared(64, sizeof(Tb*) * batch_size, *dev, cxt);
+    Tc** c_array = (Tc**)oneapi::mkl::malloc_shared(64, sizeof(Tc*) * batch_size, *dev, cxt);
+    Ts** c_ref_array = (Ts**)oneapi::mkl::malloc_shared(64, sizeof(Ts*) * batch_size, *dev, cxt);
 
     if ((a_array == NULL) || (b_array == NULL) || (c_array == NULL) || (c_ref_array == NULL)) {
         std::cout << "Error cannot allocate arrays of pointers\n";
@@ -181,12 +181,11 @@ int test(device *dev, oneapi::mkl::layout layout, int64_t batch_size) {
     int batch_size_ref = (int)batch_size;
     for (i = 0; i < batch_size_ref; i++) {
         ::gemm(convert_to_cblas_layout(layout), convert_to_cblas_trans(transa),
-               convert_to_cblas_trans(transb), (const int *)&m_ref, (const int *)&n_ref,
-               (const int *)&k_ref, (const fp_ref *)&alpha,
-               (const fp_ref *)(A_ref.data() + stride_a * i), (const int *)&lda_ref,
-               (const fp_ref *)(B_ref.data() + stride_b * i), (const int *)&ldb_ref,
-               (const fp_ref *)&beta, (fp_ref *)(C_ref.data() + stride_c * i),
-               (const int *)&ldc_ref);
+               convert_to_cblas_trans(transb), (const int*)&m_ref, (const int*)&n_ref,
+               (const int*)&k_ref, (const fp_ref*)&alpha,
+               (const fp_ref*)(A_ref.data() + stride_a * i), (const int*)&lda_ref,
+               (const fp_ref*)(B_ref.data() + stride_b * i), (const int*)&ldb_ref,
+               (const fp_ref*)&beta, (fp_ref*)(C_ref.data() + stride_c * i), (const int*)&ldc_ref);
     }
 
     // Call DPC++ GEMM_BATCH_STRIDE.
@@ -226,13 +225,13 @@ int test(device *dev, oneapi::mkl::layout layout, int64_t batch_size) {
         main_queue.wait_and_throw();
 #endif
     }
-    catch (exception const &e) {
+    catch (exception const& e) {
         std::cout << "Caught synchronous SYCL exception during GEMM_BATCH_STRIDE:\n"
                   << e.what() << std::endl;
         print_error_code(e);
     }
 
-    catch (const oneapi::mkl::unimplemented &e) {
+    catch (const oneapi::mkl::unimplemented& e) {
         oneapi::mkl::free_shared(a_array, cxt);
         oneapi::mkl::free_shared(b_array, cxt);
         oneapi::mkl::free_shared(c_array, cxt);
@@ -240,7 +239,7 @@ int test(device *dev, oneapi::mkl::layout layout, int64_t batch_size) {
         return test_skipped;
     }
 
-    catch (const std::runtime_error &error) {
+    catch (const std::runtime_error& error) {
         std::cout << "Error raised during execution of GEMM_BATCH_STRIDE:\n"
                   << error.what() << std::endl;
     }
@@ -267,7 +266,7 @@ int test(device *dev, oneapi::mkl::layout layout, int64_t batch_size) {
 }
 
 class GemmBatchStrideUsmTests
-        : public ::testing::TestWithParam<std::tuple<sycl::device *, oneapi::mkl::layout>> {};
+        : public ::testing::TestWithParam<std::tuple<sycl::device*, oneapi::mkl::layout>> {};
 
 TEST_P(GemmBatchStrideUsmTests, RealHalfPrecision) {
     EXPECT_TRUEORSKIP((test<sycl::half, sycl::half, sycl::half, sycl::half>(

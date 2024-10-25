@@ -48,9 +48,9 @@
  */
 template <typename fpType, typename testFunctorI32, typename testFunctorI64>
 void test_helper_with_format(testFunctorI32 test_functor_i32, testFunctorI64 test_functor_i64,
-                             sycl::device *dev, sparse_matrix_format_t format,
-                             oneapi::mkl::transpose transpose_val, int &num_passed,
-                             int &num_skipped) {
+                             sycl::device* dev, sparse_matrix_format_t format,
+                             oneapi::mkl::transpose transpose_val, int& num_passed,
+                             int& num_skipped) {
     sycl::property_list queue_properties;
     double density_A_matrix = 0.144;
     fpType alpha = set_fp_value<fpType>()(1.f, 0.f);
@@ -174,8 +174,8 @@ void test_helper_with_format(testFunctorI32 test_functor_i32, testFunctorI64 tes
  */
 template <typename fpType, typename testFunctorI32, typename testFunctorI64>
 void test_helper(testFunctorI32 test_functor_i32, testFunctorI64 test_functor_i64,
-                 sycl::device *dev, oneapi::mkl::transpose transpose_val, int &num_passed,
-                 int &num_skipped) {
+                 sycl::device* dev, oneapi::mkl::transpose transpose_val, int& num_passed,
+                 int& num_skipped) {
     test_helper_with_format<fpType>(test_functor_i32, test_functor_i64, dev,
                                     sparse_matrix_format_t::CSR, transpose_val, num_passed,
                                     num_skipped);
@@ -186,11 +186,11 @@ void test_helper(testFunctorI32 test_functor_i32, testFunctorI64 test_functor_i6
 
 /// Compute spsv reference as a dense operation
 template <typename fpType, typename intType>
-void prepare_reference_spsv_data(sparse_matrix_format_t format, const intType *ia,
-                                 const intType *ja, const fpType *a, intType m, intType nnz,
-                                 intType indexing, oneapi::mkl::transpose opA, const fpType *x,
+void prepare_reference_spsv_data(sparse_matrix_format_t format, const intType* ia,
+                                 const intType* ja, const fpType* a, intType m, intType nnz,
+                                 intType indexing, oneapi::mkl::transpose opA, const fpType* x,
                                  fpType alpha, oneapi::mkl::sparse::matrix_view A_view,
-                                 fpType *y_ref) {
+                                 fpType* y_ref) {
     std::size_t mu = static_cast<std::size_t>(m);
     auto dense_opa = sparse_to_dense(format, ia, ja, a, mu, mu, static_cast<std::size_t>(nnz),
                                      indexing, opA, A_view);

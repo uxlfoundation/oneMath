@@ -43,19 +43,19 @@
 using namespace sycl;
 using std::vector;
 
-extern std::vector<sycl::device *> devices;
+extern std::vector<sycl::device*> devices;
 
 namespace {
 
 template <typename fp>
-int test(device *dev, oneapi::mkl::layout layout, int64_t incx, int64_t incy, int64_t batch_size) {
+int test(device* dev, oneapi::mkl::layout layout, int64_t incx, int64_t incy, int64_t batch_size) {
     // Catch asynchronous exceptions.
     auto exception_handler = [](exception_list exceptions) {
-        for (std::exception_ptr const &e : exceptions) {
+        for (std::exception_ptr const& e : exceptions) {
             try {
                 std::rethrow_exception(e);
             }
-            catch (exception const &e) {
+            catch (exception const& e) {
                 std::cout << "Caught asynchronous SYCL exception during COPY_BATCH_STRIDE:\n"
                           << e.what() << std::endl;
                 print_error_code(e);
@@ -100,8 +100,8 @@ int test(device *dev, oneapi::mkl::layout layout, int64_t incx, int64_t incy, in
     int batch_size_ref = (int)batch_size;
 
     for (i = 0; i < batch_size_ref; i++) {
-        ::copy(&n_ref, (fp_ref *)x.data() + i * stride_x, &incx_ref,
-               (fp_ref *)y_ref.data() + i * stride_y, &incy_ref);
+        ::copy(&n_ref, (fp_ref*)x.data() + i * stride_x, &incx_ref,
+               (fp_ref*)y_ref.data() + i * stride_y, &incy_ref);
     }
 
     // Call DPC++ COPY_BATCH_STRIDE.
@@ -139,17 +139,17 @@ int test(device *dev, oneapi::mkl::layout layout, int64_t incx, int64_t incy, in
         main_queue.wait();
 #endif
     }
-    catch (exception const &e) {
+    catch (exception const& e) {
         std::cout << "Caught synchronous SYCL exception during COPY_BATCH_STRIDE:\n"
                   << e.what() << std::endl;
         print_error_code(e);
     }
 
-    catch (const oneapi::mkl::unimplemented &e) {
+    catch (const oneapi::mkl::unimplemented& e) {
         return test_skipped;
     }
 
-    catch (const std::runtime_error &error) {
+    catch (const std::runtime_error& error) {
         std::cout << "Error raised during execution of COPY_BATCH_STRIDE:\n"
                   << error.what() << std::endl;
     }
@@ -165,7 +165,7 @@ int test(device *dev, oneapi::mkl::layout layout, int64_t incx, int64_t incy, in
 }
 
 class CopyBatchStrideUsmTests
-        : public ::testing::TestWithParam<std::tuple<sycl::device *, oneapi::mkl::layout>> {};
+        : public ::testing::TestWithParam<std::tuple<sycl::device*, oneapi::mkl::layout>> {};
 
 TEST_P(CopyBatchStrideUsmTests, RealSinglePrecision) {
     float alpha = 2.0;

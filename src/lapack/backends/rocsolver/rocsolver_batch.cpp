@@ -31,476 +31,476 @@ namespace rocsolver {
 
 // BATCH BUFFER API
 
-void geqrf_batch(sycl::queue &queue, std::int64_t m, std::int64_t n, sycl::buffer<float> &a,
-                 std::int64_t lda, std::int64_t stride_a, sycl::buffer<float> &tau,
-                 std::int64_t stride_tau, std::int64_t batch_size, sycl::buffer<float> &scratchpad,
+void geqrf_batch(sycl::queue& queue, std::int64_t m, std::int64_t n, sycl::buffer<float>& a,
+                 std::int64_t lda, std::int64_t stride_a, sycl::buffer<float>& tau,
+                 std::int64_t stride_tau, std::int64_t batch_size, sycl::buffer<float>& scratchpad,
                  std::int64_t scratchpad_size) {
     throw unimplemented("lapack", "geqrf_batch");
 }
-void geqrf_batch(sycl::queue &queue, std::int64_t m, std::int64_t n, sycl::buffer<double> &a,
-                 std::int64_t lda, std::int64_t stride_a, sycl::buffer<double> &tau,
-                 std::int64_t stride_tau, std::int64_t batch_size, sycl::buffer<double> &scratchpad,
+void geqrf_batch(sycl::queue& queue, std::int64_t m, std::int64_t n, sycl::buffer<double>& a,
+                 std::int64_t lda, std::int64_t stride_a, sycl::buffer<double>& tau,
+                 std::int64_t stride_tau, std::int64_t batch_size, sycl::buffer<double>& scratchpad,
                  std::int64_t scratchpad_size) {
     throw unimplemented("lapack", "geqrf_batch");
 }
-void geqrf_batch(sycl::queue &queue, std::int64_t m, std::int64_t n,
-                 sycl::buffer<std::complex<float>> &a, std::int64_t lda, std::int64_t stride_a,
-                 sycl::buffer<std::complex<float>> &tau, std::int64_t stride_tau,
-                 std::int64_t batch_size, sycl::buffer<std::complex<float>> &scratchpad,
+void geqrf_batch(sycl::queue& queue, std::int64_t m, std::int64_t n,
+                 sycl::buffer<std::complex<float>>& a, std::int64_t lda, std::int64_t stride_a,
+                 sycl::buffer<std::complex<float>>& tau, std::int64_t stride_tau,
+                 std::int64_t batch_size, sycl::buffer<std::complex<float>>& scratchpad,
                  std::int64_t scratchpad_size) {
     throw unimplemented("lapack", "geqrf_batch");
 }
-void geqrf_batch(sycl::queue &queue, std::int64_t m, std::int64_t n,
-                 sycl::buffer<std::complex<double>> &a, std::int64_t lda, std::int64_t stride_a,
-                 sycl::buffer<std::complex<double>> &tau, std::int64_t stride_tau,
-                 std::int64_t batch_size, sycl::buffer<std::complex<double>> &scratchpad,
+void geqrf_batch(sycl::queue& queue, std::int64_t m, std::int64_t n,
+                 sycl::buffer<std::complex<double>>& a, std::int64_t lda, std::int64_t stride_a,
+                 sycl::buffer<std::complex<double>>& tau, std::int64_t stride_tau,
+                 std::int64_t batch_size, sycl::buffer<std::complex<double>>& scratchpad,
                  std::int64_t scratchpad_size) {
     throw unimplemented("lapack", "geqrf_batch");
 }
-void getri_batch(sycl::queue &queue, std::int64_t n, sycl::buffer<float> &a, std::int64_t lda,
-                 std::int64_t stride_a, sycl::buffer<std::int64_t> &ipiv, std::int64_t stride_ipiv,
-                 std::int64_t batch_size, sycl::buffer<float> &scratchpad,
+void getri_batch(sycl::queue& queue, std::int64_t n, sycl::buffer<float>& a, std::int64_t lda,
+                 std::int64_t stride_a, sycl::buffer<std::int64_t>& ipiv, std::int64_t stride_ipiv,
+                 std::int64_t batch_size, sycl::buffer<float>& scratchpad,
                  std::int64_t scratchpad_size) {
     throw unimplemented("lapack", "getri_batch");
 }
-void getri_batch(sycl::queue &queue, std::int64_t n, sycl::buffer<double> &a, std::int64_t lda,
-                 std::int64_t stride_a, sycl::buffer<std::int64_t> &ipiv, std::int64_t stride_ipiv,
-                 std::int64_t batch_size, sycl::buffer<double> &scratchpad,
+void getri_batch(sycl::queue& queue, std::int64_t n, sycl::buffer<double>& a, std::int64_t lda,
+                 std::int64_t stride_a, sycl::buffer<std::int64_t>& ipiv, std::int64_t stride_ipiv,
+                 std::int64_t batch_size, sycl::buffer<double>& scratchpad,
                  std::int64_t scratchpad_size) {
     throw unimplemented("lapack", "getri_batch");
 }
-void getri_batch(sycl::queue &queue, std::int64_t n, sycl::buffer<std::complex<float>> &a,
-                 std::int64_t lda, std::int64_t stride_a, sycl::buffer<std::int64_t> &ipiv,
+void getri_batch(sycl::queue& queue, std::int64_t n, sycl::buffer<std::complex<float>>& a,
+                 std::int64_t lda, std::int64_t stride_a, sycl::buffer<std::int64_t>& ipiv,
                  std::int64_t stride_ipiv, std::int64_t batch_size,
-                 sycl::buffer<std::complex<float>> &scratchpad, std::int64_t scratchpad_size) {
+                 sycl::buffer<std::complex<float>>& scratchpad, std::int64_t scratchpad_size) {
     throw unimplemented("lapack", "getri_batch");
 }
-void getri_batch(sycl::queue &queue, std::int64_t n, sycl::buffer<std::complex<double>> &a,
-                 std::int64_t lda, std::int64_t stride_a, sycl::buffer<std::int64_t> &ipiv,
+void getri_batch(sycl::queue& queue, std::int64_t n, sycl::buffer<std::complex<double>>& a,
+                 std::int64_t lda, std::int64_t stride_a, sycl::buffer<std::int64_t>& ipiv,
                  std::int64_t stride_ipiv, std::int64_t batch_size,
-                 sycl::buffer<std::complex<double>> &scratchpad, std::int64_t scratchpad_size) {
+                 sycl::buffer<std::complex<double>>& scratchpad, std::int64_t scratchpad_size) {
     throw unimplemented("lapack", "getri_batch");
 }
-void getrs_batch(sycl::queue &queue, oneapi::mkl::transpose trans, std::int64_t n,
-                 std::int64_t nrhs, sycl::buffer<float> &a, std::int64_t lda, std::int64_t stride_a,
-                 sycl::buffer<std::int64_t> &ipiv, std::int64_t stride_ipiv, sycl::buffer<float> &b,
+void getrs_batch(sycl::queue& queue, oneapi::mkl::transpose trans, std::int64_t n,
+                 std::int64_t nrhs, sycl::buffer<float>& a, std::int64_t lda, std::int64_t stride_a,
+                 sycl::buffer<std::int64_t>& ipiv, std::int64_t stride_ipiv, sycl::buffer<float>& b,
                  std::int64_t ldb, std::int64_t stride_b, std::int64_t batch_size,
-                 sycl::buffer<float> &scratchpad, std::int64_t scratchpad_size) {
+                 sycl::buffer<float>& scratchpad, std::int64_t scratchpad_size) {
     throw unimplemented("lapack", "getrs_batch");
 }
-void getrs_batch(sycl::queue &queue, oneapi::mkl::transpose trans, std::int64_t n,
-                 std::int64_t nrhs, sycl::buffer<double> &a, std::int64_t lda,
-                 std::int64_t stride_a, sycl::buffer<std::int64_t> &ipiv, std::int64_t stride_ipiv,
-                 sycl::buffer<double> &b, std::int64_t ldb, std::int64_t stride_b,
-                 std::int64_t batch_size, sycl::buffer<double> &scratchpad,
+void getrs_batch(sycl::queue& queue, oneapi::mkl::transpose trans, std::int64_t n,
+                 std::int64_t nrhs, sycl::buffer<double>& a, std::int64_t lda,
+                 std::int64_t stride_a, sycl::buffer<std::int64_t>& ipiv, std::int64_t stride_ipiv,
+                 sycl::buffer<double>& b, std::int64_t ldb, std::int64_t stride_b,
+                 std::int64_t batch_size, sycl::buffer<double>& scratchpad,
                  std::int64_t scratchpad_size) {
     throw unimplemented("lapack", "getrs_batch");
 }
-void getrs_batch(sycl::queue &queue, oneapi::mkl::transpose trans, std::int64_t n,
-                 std::int64_t nrhs, sycl::buffer<std::complex<float>> &a, std::int64_t lda,
-                 std::int64_t stride_a, sycl::buffer<std::int64_t> &ipiv, std::int64_t stride_ipiv,
-                 sycl::buffer<std::complex<float>> &b, std::int64_t ldb, std::int64_t stride_b,
-                 std::int64_t batch_size, sycl::buffer<std::complex<float>> &scratchpad,
+void getrs_batch(sycl::queue& queue, oneapi::mkl::transpose trans, std::int64_t n,
+                 std::int64_t nrhs, sycl::buffer<std::complex<float>>& a, std::int64_t lda,
+                 std::int64_t stride_a, sycl::buffer<std::int64_t>& ipiv, std::int64_t stride_ipiv,
+                 sycl::buffer<std::complex<float>>& b, std::int64_t ldb, std::int64_t stride_b,
+                 std::int64_t batch_size, sycl::buffer<std::complex<float>>& scratchpad,
                  std::int64_t scratchpad_size) {
     throw unimplemented("lapack", "getrs_batch");
 }
-void getrs_batch(sycl::queue &queue, oneapi::mkl::transpose trans, std::int64_t n,
-                 std::int64_t nrhs, sycl::buffer<std::complex<double>> &a, std::int64_t lda,
-                 std::int64_t stride_a, sycl::buffer<std::int64_t> &ipiv, std::int64_t stride_ipiv,
-                 sycl::buffer<std::complex<double>> &b, std::int64_t ldb, std::int64_t stride_b,
-                 std::int64_t batch_size, sycl::buffer<std::complex<double>> &scratchpad,
+void getrs_batch(sycl::queue& queue, oneapi::mkl::transpose trans, std::int64_t n,
+                 std::int64_t nrhs, sycl::buffer<std::complex<double>>& a, std::int64_t lda,
+                 std::int64_t stride_a, sycl::buffer<std::int64_t>& ipiv, std::int64_t stride_ipiv,
+                 sycl::buffer<std::complex<double>>& b, std::int64_t ldb, std::int64_t stride_b,
+                 std::int64_t batch_size, sycl::buffer<std::complex<double>>& scratchpad,
                  std::int64_t scratchpad_size) {
     throw unimplemented("lapack", "getrs_batch");
 }
-void getrf_batch(sycl::queue &queue, std::int64_t m, std::int64_t n, sycl::buffer<float> &a,
-                 std::int64_t lda, std::int64_t stride_a, sycl::buffer<std::int64_t> &ipiv,
-                 std::int64_t stride_ipiv, std::int64_t batch_size, sycl::buffer<float> &scratchpad,
+void getrf_batch(sycl::queue& queue, std::int64_t m, std::int64_t n, sycl::buffer<float>& a,
+                 std::int64_t lda, std::int64_t stride_a, sycl::buffer<std::int64_t>& ipiv,
+                 std::int64_t stride_ipiv, std::int64_t batch_size, sycl::buffer<float>& scratchpad,
                  std::int64_t scratchpad_size) {
     throw unimplemented("lapack", "getrf_batch");
 }
-void getrf_batch(sycl::queue &queue, std::int64_t m, std::int64_t n, sycl::buffer<double> &a,
-                 std::int64_t lda, std::int64_t stride_a, sycl::buffer<std::int64_t> &ipiv,
+void getrf_batch(sycl::queue& queue, std::int64_t m, std::int64_t n, sycl::buffer<double>& a,
+                 std::int64_t lda, std::int64_t stride_a, sycl::buffer<std::int64_t>& ipiv,
                  std::int64_t stride_ipiv, std::int64_t batch_size,
-                 sycl::buffer<double> &scratchpad, std::int64_t scratchpad_size) {
+                 sycl::buffer<double>& scratchpad, std::int64_t scratchpad_size) {
     throw unimplemented("lapack", "getrf_batch");
 }
-void getrf_batch(sycl::queue &queue, std::int64_t m, std::int64_t n,
-                 sycl::buffer<std::complex<float>> &a, std::int64_t lda, std::int64_t stride_a,
-                 sycl::buffer<std::int64_t> &ipiv, std::int64_t stride_ipiv,
-                 std::int64_t batch_size, sycl::buffer<std::complex<float>> &scratchpad,
+void getrf_batch(sycl::queue& queue, std::int64_t m, std::int64_t n,
+                 sycl::buffer<std::complex<float>>& a, std::int64_t lda, std::int64_t stride_a,
+                 sycl::buffer<std::int64_t>& ipiv, std::int64_t stride_ipiv,
+                 std::int64_t batch_size, sycl::buffer<std::complex<float>>& scratchpad,
                  std::int64_t scratchpad_size) {
     throw unimplemented("lapack", "getrf_batch");
 }
-void getrf_batch(sycl::queue &queue, std::int64_t m, std::int64_t n,
-                 sycl::buffer<std::complex<double>> &a, std::int64_t lda, std::int64_t stride_a,
-                 sycl::buffer<std::int64_t> &ipiv, std::int64_t stride_ipiv,
-                 std::int64_t batch_size, sycl::buffer<std::complex<double>> &scratchpad,
+void getrf_batch(sycl::queue& queue, std::int64_t m, std::int64_t n,
+                 sycl::buffer<std::complex<double>>& a, std::int64_t lda, std::int64_t stride_a,
+                 sycl::buffer<std::int64_t>& ipiv, std::int64_t stride_ipiv,
+                 std::int64_t batch_size, sycl::buffer<std::complex<double>>& scratchpad,
                  std::int64_t scratchpad_size) {
     throw unimplemented("lapack", "getrf_batch");
 }
-void orgqr_batch(sycl::queue &queue, std::int64_t m, std::int64_t n, std::int64_t k,
-                 sycl::buffer<float> &a, std::int64_t lda, std::int64_t stride_a,
-                 sycl::buffer<float> &tau, std::int64_t stride_tau, std::int64_t batch_size,
-                 sycl::buffer<float> &scratchpad, std::int64_t scratchpad_size) {
+void orgqr_batch(sycl::queue& queue, std::int64_t m, std::int64_t n, std::int64_t k,
+                 sycl::buffer<float>& a, std::int64_t lda, std::int64_t stride_a,
+                 sycl::buffer<float>& tau, std::int64_t stride_tau, std::int64_t batch_size,
+                 sycl::buffer<float>& scratchpad, std::int64_t scratchpad_size) {
     throw unimplemented("lapack", "orgqr_batch");
 }
-void orgqr_batch(sycl::queue &queue, std::int64_t m, std::int64_t n, std::int64_t k,
-                 sycl::buffer<double> &a, std::int64_t lda, std::int64_t stride_a,
-                 sycl::buffer<double> &tau, std::int64_t stride_tau, std::int64_t batch_size,
-                 sycl::buffer<double> &scratchpad, std::int64_t scratchpad_size) {
+void orgqr_batch(sycl::queue& queue, std::int64_t m, std::int64_t n, std::int64_t k,
+                 sycl::buffer<double>& a, std::int64_t lda, std::int64_t stride_a,
+                 sycl::buffer<double>& tau, std::int64_t stride_tau, std::int64_t batch_size,
+                 sycl::buffer<double>& scratchpad, std::int64_t scratchpad_size) {
     throw unimplemented("lapack", "orgqr_batch");
 }
-void potrf_batch(sycl::queue &queue, oneapi::mkl::uplo uplo, std::int64_t n, sycl::buffer<float> &a,
+void potrf_batch(sycl::queue& queue, oneapi::mkl::uplo uplo, std::int64_t n, sycl::buffer<float>& a,
                  std::int64_t lda, std::int64_t stride_a, std::int64_t batch_size,
-                 sycl::buffer<float> &scratchpad, std::int64_t scratchpad_size) {
+                 sycl::buffer<float>& scratchpad, std::int64_t scratchpad_size) {
     throw unimplemented("lapack", "potrf_batch");
 }
-void potrf_batch(sycl::queue &queue, oneapi::mkl::uplo uplo, std::int64_t n,
-                 sycl::buffer<double> &a, std::int64_t lda, std::int64_t stride_a,
-                 std::int64_t batch_size, sycl::buffer<double> &scratchpad,
-                 std::int64_t scratchpad_size) {
-    throw unimplemented("lapack", "potrf_batch");
-}
-void potrf_batch(sycl::queue &queue, oneapi::mkl::uplo uplo, std::int64_t n,
-                 sycl::buffer<std::complex<float>> &a, std::int64_t lda, std::int64_t stride_a,
-                 std::int64_t batch_size, sycl::buffer<std::complex<float>> &scratchpad,
+void potrf_batch(sycl::queue& queue, oneapi::mkl::uplo uplo, std::int64_t n,
+                 sycl::buffer<double>& a, std::int64_t lda, std::int64_t stride_a,
+                 std::int64_t batch_size, sycl::buffer<double>& scratchpad,
                  std::int64_t scratchpad_size) {
     throw unimplemented("lapack", "potrf_batch");
 }
-void potrf_batch(sycl::queue &queue, oneapi::mkl::uplo uplo, std::int64_t n,
-                 sycl::buffer<std::complex<double>> &a, std::int64_t lda, std::int64_t stride_a,
-                 std::int64_t batch_size, sycl::buffer<std::complex<double>> &scratchpad,
+void potrf_batch(sycl::queue& queue, oneapi::mkl::uplo uplo, std::int64_t n,
+                 sycl::buffer<std::complex<float>>& a, std::int64_t lda, std::int64_t stride_a,
+                 std::int64_t batch_size, sycl::buffer<std::complex<float>>& scratchpad,
                  std::int64_t scratchpad_size) {
     throw unimplemented("lapack", "potrf_batch");
 }
-void potrs_batch(sycl::queue &queue, oneapi::mkl::uplo uplo, std::int64_t n, std::int64_t nrhs,
-                 sycl::buffer<float> &a, std::int64_t lda, std::int64_t stride_a,
-                 sycl::buffer<float> &b, std::int64_t ldb, std::int64_t stride_b,
-                 std::int64_t batch_size, sycl::buffer<float> &scratchpad,
+void potrf_batch(sycl::queue& queue, oneapi::mkl::uplo uplo, std::int64_t n,
+                 sycl::buffer<std::complex<double>>& a, std::int64_t lda, std::int64_t stride_a,
+                 std::int64_t batch_size, sycl::buffer<std::complex<double>>& scratchpad,
+                 std::int64_t scratchpad_size) {
+    throw unimplemented("lapack", "potrf_batch");
+}
+void potrs_batch(sycl::queue& queue, oneapi::mkl::uplo uplo, std::int64_t n, std::int64_t nrhs,
+                 sycl::buffer<float>& a, std::int64_t lda, std::int64_t stride_a,
+                 sycl::buffer<float>& b, std::int64_t ldb, std::int64_t stride_b,
+                 std::int64_t batch_size, sycl::buffer<float>& scratchpad,
                  std::int64_t scratchpad_size) {
     throw unimplemented("lapack", "potrs_batch");
 }
-void potrs_batch(sycl::queue &queue, oneapi::mkl::uplo uplo, std::int64_t n, std::int64_t nrhs,
-                 sycl::buffer<double> &a, std::int64_t lda, std::int64_t stride_a,
-                 sycl::buffer<double> &b, std::int64_t ldb, std::int64_t stride_b,
-                 std::int64_t batch_size, sycl::buffer<double> &scratchpad,
+void potrs_batch(sycl::queue& queue, oneapi::mkl::uplo uplo, std::int64_t n, std::int64_t nrhs,
+                 sycl::buffer<double>& a, std::int64_t lda, std::int64_t stride_a,
+                 sycl::buffer<double>& b, std::int64_t ldb, std::int64_t stride_b,
+                 std::int64_t batch_size, sycl::buffer<double>& scratchpad,
                  std::int64_t scratchpad_size) {
     throw unimplemented("lapack", "potrs_batch");
 }
-void potrs_batch(sycl::queue &queue, oneapi::mkl::uplo uplo, std::int64_t n, std::int64_t nrhs,
-                 sycl::buffer<std::complex<float>> &a, std::int64_t lda, std::int64_t stride_a,
-                 sycl::buffer<std::complex<float>> &b, std::int64_t ldb, std::int64_t stride_b,
-                 std::int64_t batch_size, sycl::buffer<std::complex<float>> &scratchpad,
+void potrs_batch(sycl::queue& queue, oneapi::mkl::uplo uplo, std::int64_t n, std::int64_t nrhs,
+                 sycl::buffer<std::complex<float>>& a, std::int64_t lda, std::int64_t stride_a,
+                 sycl::buffer<std::complex<float>>& b, std::int64_t ldb, std::int64_t stride_b,
+                 std::int64_t batch_size, sycl::buffer<std::complex<float>>& scratchpad,
                  std::int64_t scratchpad_size) {
     throw unimplemented("lapack", "potrs_batch");
 }
-void potrs_batch(sycl::queue &queue, oneapi::mkl::uplo uplo, std::int64_t n, std::int64_t nrhs,
-                 sycl::buffer<std::complex<double>> &a, std::int64_t lda, std::int64_t stride_a,
-                 sycl::buffer<std::complex<double>> &b, std::int64_t ldb, std::int64_t stride_b,
-                 std::int64_t batch_size, sycl::buffer<std::complex<double>> &scratchpad,
+void potrs_batch(sycl::queue& queue, oneapi::mkl::uplo uplo, std::int64_t n, std::int64_t nrhs,
+                 sycl::buffer<std::complex<double>>& a, std::int64_t lda, std::int64_t stride_a,
+                 sycl::buffer<std::complex<double>>& b, std::int64_t ldb, std::int64_t stride_b,
+                 std::int64_t batch_size, sycl::buffer<std::complex<double>>& scratchpad,
                  std::int64_t scratchpad_size) {
     throw unimplemented("lapack", "potrs_batch");
 }
-void ungqr_batch(sycl::queue &queue, std::int64_t m, std::int64_t n, std::int64_t k,
-                 sycl::buffer<std::complex<float>> &a, std::int64_t lda, std::int64_t stride_a,
-                 sycl::buffer<std::complex<float>> &tau, std::int64_t stride_tau,
-                 std::int64_t batch_size, sycl::buffer<std::complex<float>> &scratchpad,
+void ungqr_batch(sycl::queue& queue, std::int64_t m, std::int64_t n, std::int64_t k,
+                 sycl::buffer<std::complex<float>>& a, std::int64_t lda, std::int64_t stride_a,
+                 sycl::buffer<std::complex<float>>& tau, std::int64_t stride_tau,
+                 std::int64_t batch_size, sycl::buffer<std::complex<float>>& scratchpad,
                  std::int64_t scratchpad_size) {
     throw unimplemented("lapack", "ungqr_batch");
 }
-void ungqr_batch(sycl::queue &queue, std::int64_t m, std::int64_t n, std::int64_t k,
-                 sycl::buffer<std::complex<double>> &a, std::int64_t lda, std::int64_t stride_a,
-                 sycl::buffer<std::complex<double>> &tau, std::int64_t stride_tau,
-                 std::int64_t batch_size, sycl::buffer<std::complex<double>> &scratchpad,
+void ungqr_batch(sycl::queue& queue, std::int64_t m, std::int64_t n, std::int64_t k,
+                 sycl::buffer<std::complex<double>>& a, std::int64_t lda, std::int64_t stride_a,
+                 sycl::buffer<std::complex<double>>& tau, std::int64_t stride_tau,
+                 std::int64_t batch_size, sycl::buffer<std::complex<double>>& scratchpad,
                  std::int64_t scratchpad_size) {
     throw unimplemented("lapack", "ungqr_batch");
 }
 
 // BATCH USM API
 
-sycl::event geqrf_batch(sycl::queue &queue, std::int64_t m, std::int64_t n, float *a,
-                        std::int64_t lda, std::int64_t stride_a, float *tau,
-                        std::int64_t stride_tau, std::int64_t batch_size, float *scratchpad,
+sycl::event geqrf_batch(sycl::queue& queue, std::int64_t m, std::int64_t n, float* a,
+                        std::int64_t lda, std::int64_t stride_a, float* tau,
+                        std::int64_t stride_tau, std::int64_t batch_size, float* scratchpad,
                         std::int64_t scratchpad_size,
-                        const std::vector<sycl::event> &dependencies) {
+                        const std::vector<sycl::event>& dependencies) {
     throw unimplemented("lapack", "geqrf_batch");
 }
-sycl::event geqrf_batch(sycl::queue &queue, std::int64_t m, std::int64_t n, double *a,
-                        std::int64_t lda, std::int64_t stride_a, double *tau,
-                        std::int64_t stride_tau, std::int64_t batch_size, double *scratchpad,
+sycl::event geqrf_batch(sycl::queue& queue, std::int64_t m, std::int64_t n, double* a,
+                        std::int64_t lda, std::int64_t stride_a, double* tau,
+                        std::int64_t stride_tau, std::int64_t batch_size, double* scratchpad,
                         std::int64_t scratchpad_size,
-                        const std::vector<sycl::event> &dependencies) {
+                        const std::vector<sycl::event>& dependencies) {
     throw unimplemented("lapack", "geqrf_batch");
 }
-sycl::event geqrf_batch(sycl::queue &queue, std::int64_t m, std::int64_t n, std::complex<float> *a,
-                        std::int64_t lda, std::int64_t stride_a, std::complex<float> *tau,
+sycl::event geqrf_batch(sycl::queue& queue, std::int64_t m, std::int64_t n, std::complex<float>* a,
+                        std::int64_t lda, std::int64_t stride_a, std::complex<float>* tau,
                         std::int64_t stride_tau, std::int64_t batch_size,
-                        std::complex<float> *scratchpad, std::int64_t scratchpad_size,
-                        const std::vector<sycl::event> &dependencies) {
+                        std::complex<float>* scratchpad, std::int64_t scratchpad_size,
+                        const std::vector<sycl::event>& dependencies) {
     throw unimplemented("lapack", "geqrf_batch");
 }
-sycl::event geqrf_batch(sycl::queue &queue, std::int64_t m, std::int64_t n, std::complex<double> *a,
-                        std::int64_t lda, std::int64_t stride_a, std::complex<double> *tau,
+sycl::event geqrf_batch(sycl::queue& queue, std::int64_t m, std::int64_t n, std::complex<double>* a,
+                        std::int64_t lda, std::int64_t stride_a, std::complex<double>* tau,
                         std::int64_t stride_tau, std::int64_t batch_size,
-                        std::complex<double> *scratchpad, std::int64_t scratchpad_size,
-                        const std::vector<sycl::event> &dependencies) {
+                        std::complex<double>* scratchpad, std::int64_t scratchpad_size,
+                        const std::vector<sycl::event>& dependencies) {
     throw unimplemented("lapack", "geqrf_batch");
 }
-sycl::event geqrf_batch(sycl::queue &queue, std::int64_t *m, std::int64_t *n, float **a,
-                        std::int64_t *lda, float **tau, std::int64_t group_count,
-                        std::int64_t *group_sizes, float *scratchpad, std::int64_t scratchpad_size,
-                        const std::vector<sycl::event> &dependencies) {
+sycl::event geqrf_batch(sycl::queue& queue, std::int64_t* m, std::int64_t* n, float** a,
+                        std::int64_t* lda, float** tau, std::int64_t group_count,
+                        std::int64_t* group_sizes, float* scratchpad, std::int64_t scratchpad_size,
+                        const std::vector<sycl::event>& dependencies) {
     throw unimplemented("lapack", "geqrf_batch");
 }
-sycl::event geqrf_batch(sycl::queue &queue, std::int64_t *m, std::int64_t *n, double **a,
-                        std::int64_t *lda, double **tau, std::int64_t group_count,
-                        std::int64_t *group_sizes, double *scratchpad, std::int64_t scratchpad_size,
-                        const std::vector<sycl::event> &dependencies) {
+sycl::event geqrf_batch(sycl::queue& queue, std::int64_t* m, std::int64_t* n, double** a,
+                        std::int64_t* lda, double** tau, std::int64_t group_count,
+                        std::int64_t* group_sizes, double* scratchpad, std::int64_t scratchpad_size,
+                        const std::vector<sycl::event>& dependencies) {
     throw unimplemented("lapack", "geqrf_batch");
 }
-sycl::event geqrf_batch(sycl::queue &queue, std::int64_t *m, std::int64_t *n,
-                        std::complex<float> **a, std::int64_t *lda, std::complex<float> **tau,
-                        std::int64_t group_count, std::int64_t *group_sizes,
-                        std::complex<float> *scratchpad, std::int64_t scratchpad_size,
-                        const std::vector<sycl::event> &dependencies) {
+sycl::event geqrf_batch(sycl::queue& queue, std::int64_t* m, std::int64_t* n,
+                        std::complex<float>** a, std::int64_t* lda, std::complex<float>** tau,
+                        std::int64_t group_count, std::int64_t* group_sizes,
+                        std::complex<float>* scratchpad, std::int64_t scratchpad_size,
+                        const std::vector<sycl::event>& dependencies) {
     throw unimplemented("lapack", "geqrf_batch");
 }
-sycl::event geqrf_batch(sycl::queue &queue, std::int64_t *m, std::int64_t *n,
-                        std::complex<double> **a, std::int64_t *lda, std::complex<double> **tau,
-                        std::int64_t group_count, std::int64_t *group_sizes,
-                        std::complex<double> *scratchpad, std::int64_t scratchpad_size,
-                        const std::vector<sycl::event> &dependencies) {
+sycl::event geqrf_batch(sycl::queue& queue, std::int64_t* m, std::int64_t* n,
+                        std::complex<double>** a, std::int64_t* lda, std::complex<double>** tau,
+                        std::int64_t group_count, std::int64_t* group_sizes,
+                        std::complex<double>* scratchpad, std::int64_t scratchpad_size,
+                        const std::vector<sycl::event>& dependencies) {
     throw unimplemented("lapack", "geqrf_batch");
 }
-sycl::event getrf_batch(sycl::queue &queue, std::int64_t m, std::int64_t n, float *a,
-                        std::int64_t lda, std::int64_t stride_a, std::int64_t *ipiv,
-                        std::int64_t stride_ipiv, std::int64_t batch_size, float *scratchpad,
+sycl::event getrf_batch(sycl::queue& queue, std::int64_t m, std::int64_t n, float* a,
+                        std::int64_t lda, std::int64_t stride_a, std::int64_t* ipiv,
+                        std::int64_t stride_ipiv, std::int64_t batch_size, float* scratchpad,
                         std::int64_t scratchpad_size,
-                        const std::vector<sycl::event> &dependencies) {
+                        const std::vector<sycl::event>& dependencies) {
     throw unimplemented("lapack", "getrf_batch");
 }
-sycl::event getrf_batch(sycl::queue &queue, std::int64_t m, std::int64_t n, double *a,
-                        std::int64_t lda, std::int64_t stride_a, std::int64_t *ipiv,
-                        std::int64_t stride_ipiv, std::int64_t batch_size, double *scratchpad,
+sycl::event getrf_batch(sycl::queue& queue, std::int64_t m, std::int64_t n, double* a,
+                        std::int64_t lda, std::int64_t stride_a, std::int64_t* ipiv,
+                        std::int64_t stride_ipiv, std::int64_t batch_size, double* scratchpad,
                         std::int64_t scratchpad_size,
-                        const std::vector<sycl::event> &dependencies) {
+                        const std::vector<sycl::event>& dependencies) {
     throw unimplemented("lapack", "getrf_batch");
 }
-sycl::event getrf_batch(sycl::queue &queue, std::int64_t m, std::int64_t n, std::complex<float> *a,
-                        std::int64_t lda, std::int64_t stride_a, std::int64_t *ipiv,
+sycl::event getrf_batch(sycl::queue& queue, std::int64_t m, std::int64_t n, std::complex<float>* a,
+                        std::int64_t lda, std::int64_t stride_a, std::int64_t* ipiv,
                         std::int64_t stride_ipiv, std::int64_t batch_size,
-                        std::complex<float> *scratchpad, std::int64_t scratchpad_size,
-                        const std::vector<sycl::event> &dependencies) {
+                        std::complex<float>* scratchpad, std::int64_t scratchpad_size,
+                        const std::vector<sycl::event>& dependencies) {
     throw unimplemented("lapack", "getrf_batch");
 }
-sycl::event getrf_batch(sycl::queue &queue, std::int64_t m, std::int64_t n, std::complex<double> *a,
-                        std::int64_t lda, std::int64_t stride_a, std::int64_t *ipiv,
+sycl::event getrf_batch(sycl::queue& queue, std::int64_t m, std::int64_t n, std::complex<double>* a,
+                        std::int64_t lda, std::int64_t stride_a, std::int64_t* ipiv,
                         std::int64_t stride_ipiv, std::int64_t batch_size,
-                        std::complex<double> *scratchpad, std::int64_t scratchpad_size,
-                        const std::vector<sycl::event> &dependencies) {
+                        std::complex<double>* scratchpad, std::int64_t scratchpad_size,
+                        const std::vector<sycl::event>& dependencies) {
     throw unimplemented("lapack", "getrf_batch");
 }
-sycl::event getrf_batch(sycl::queue &queue, std::int64_t *m, std::int64_t *n, float **a,
-                        std::int64_t *lda, std::int64_t **ipiv, std::int64_t group_count,
-                        std::int64_t *group_sizes, float *scratchpad, std::int64_t scratchpad_size,
-                        const std::vector<sycl::event> &dependencies) {
+sycl::event getrf_batch(sycl::queue& queue, std::int64_t* m, std::int64_t* n, float** a,
+                        std::int64_t* lda, std::int64_t** ipiv, std::int64_t group_count,
+                        std::int64_t* group_sizes, float* scratchpad, std::int64_t scratchpad_size,
+                        const std::vector<sycl::event>& dependencies) {
     throw unimplemented("lapack", "getrf_batch");
 }
-sycl::event getrf_batch(sycl::queue &queue, std::int64_t *m, std::int64_t *n, double **a,
-                        std::int64_t *lda, std::int64_t **ipiv, std::int64_t group_count,
-                        std::int64_t *group_sizes, double *scratchpad, std::int64_t scratchpad_size,
-                        const std::vector<sycl::event> &dependencies) {
+sycl::event getrf_batch(sycl::queue& queue, std::int64_t* m, std::int64_t* n, double** a,
+                        std::int64_t* lda, std::int64_t** ipiv, std::int64_t group_count,
+                        std::int64_t* group_sizes, double* scratchpad, std::int64_t scratchpad_size,
+                        const std::vector<sycl::event>& dependencies) {
     throw unimplemented("lapack", "getrf_batch");
 }
-sycl::event getrf_batch(sycl::queue &queue, std::int64_t *m, std::int64_t *n,
-                        std::complex<float> **a, std::int64_t *lda, std::int64_t **ipiv,
-                        std::int64_t group_count, std::int64_t *group_sizes,
-                        std::complex<float> *scratchpad, std::int64_t scratchpad_size,
-                        const std::vector<sycl::event> &dependencies) {
+sycl::event getrf_batch(sycl::queue& queue, std::int64_t* m, std::int64_t* n,
+                        std::complex<float>** a, std::int64_t* lda, std::int64_t** ipiv,
+                        std::int64_t group_count, std::int64_t* group_sizes,
+                        std::complex<float>* scratchpad, std::int64_t scratchpad_size,
+                        const std::vector<sycl::event>& dependencies) {
     throw unimplemented("lapack", "getrf_batch");
 }
-sycl::event getrf_batch(sycl::queue &queue, std::int64_t *m, std::int64_t *n,
-                        std::complex<double> **a, std::int64_t *lda, std::int64_t **ipiv,
-                        std::int64_t group_count, std::int64_t *group_sizes,
-                        std::complex<double> *scratchpad, std::int64_t scratchpad_size,
-                        const std::vector<sycl::event> &dependencies) {
+sycl::event getrf_batch(sycl::queue& queue, std::int64_t* m, std::int64_t* n,
+                        std::complex<double>** a, std::int64_t* lda, std::int64_t** ipiv,
+                        std::int64_t group_count, std::int64_t* group_sizes,
+                        std::complex<double>* scratchpad, std::int64_t scratchpad_size,
+                        const std::vector<sycl::event>& dependencies) {
     throw unimplemented("lapack", "getrf_batch");
 }
-sycl::event getri_batch(sycl::queue &queue, std::int64_t n, float *a, std::int64_t lda,
-                        std::int64_t stride_a, std::int64_t *ipiv, std::int64_t stride_ipiv,
-                        std::int64_t batch_size, float *scratchpad, std::int64_t scratchpad_size,
-                        const std::vector<sycl::event> &dependencies) {
+sycl::event getri_batch(sycl::queue& queue, std::int64_t n, float* a, std::int64_t lda,
+                        std::int64_t stride_a, std::int64_t* ipiv, std::int64_t stride_ipiv,
+                        std::int64_t batch_size, float* scratchpad, std::int64_t scratchpad_size,
+                        const std::vector<sycl::event>& dependencies) {
     throw unimplemented("lapack", "getri_batch");
 }
-sycl::event getri_batch(sycl::queue &queue, std::int64_t n, double *a, std::int64_t lda,
-                        std::int64_t stride_a, std::int64_t *ipiv, std::int64_t stride_ipiv,
-                        std::int64_t batch_size, double *scratchpad, std::int64_t scratchpad_size,
-                        const std::vector<sycl::event> &dependencies) {
+sycl::event getri_batch(sycl::queue& queue, std::int64_t n, double* a, std::int64_t lda,
+                        std::int64_t stride_a, std::int64_t* ipiv, std::int64_t stride_ipiv,
+                        std::int64_t batch_size, double* scratchpad, std::int64_t scratchpad_size,
+                        const std::vector<sycl::event>& dependencies) {
     throw unimplemented("lapack", "getri_batch");
 }
-sycl::event getri_batch(sycl::queue &queue, std::int64_t n, std::complex<float> *a,
-                        std::int64_t lda, std::int64_t stride_a, std::int64_t *ipiv,
+sycl::event getri_batch(sycl::queue& queue, std::int64_t n, std::complex<float>* a,
+                        std::int64_t lda, std::int64_t stride_a, std::int64_t* ipiv,
                         std::int64_t stride_ipiv, std::int64_t batch_size,
-                        std::complex<float> *scratchpad, std::int64_t scratchpad_size,
-                        const std::vector<sycl::event> &dependencies) {
+                        std::complex<float>* scratchpad, std::int64_t scratchpad_size,
+                        const std::vector<sycl::event>& dependencies) {
     throw unimplemented("lapack", "getri_batch");
 }
-sycl::event getri_batch(sycl::queue &queue, std::int64_t n, std::complex<double> *a,
-                        std::int64_t lda, std::int64_t stride_a, std::int64_t *ipiv,
+sycl::event getri_batch(sycl::queue& queue, std::int64_t n, std::complex<double>* a,
+                        std::int64_t lda, std::int64_t stride_a, std::int64_t* ipiv,
                         std::int64_t stride_ipiv, std::int64_t batch_size,
-                        std::complex<double> *scratchpad, std::int64_t scratchpad_size,
-                        const std::vector<sycl::event> &dependencies) {
+                        std::complex<double>* scratchpad, std::int64_t scratchpad_size,
+                        const std::vector<sycl::event>& dependencies) {
     throw unimplemented("lapack", "getri_batch");
 }
-sycl::event getri_batch(sycl::queue &queue, std::int64_t *n, float **a, std::int64_t *lda,
-                        std::int64_t **ipiv, std::int64_t group_count, std::int64_t *group_sizes,
-                        float *scratchpad, std::int64_t scratchpad_size,
-                        const std::vector<sycl::event> &dependencies) {
+sycl::event getri_batch(sycl::queue& queue, std::int64_t* n, float** a, std::int64_t* lda,
+                        std::int64_t** ipiv, std::int64_t group_count, std::int64_t* group_sizes,
+                        float* scratchpad, std::int64_t scratchpad_size,
+                        const std::vector<sycl::event>& dependencies) {
     throw unimplemented("lapack", "getri_batch");
 }
-sycl::event getri_batch(sycl::queue &queue, std::int64_t *n, double **a, std::int64_t *lda,
-                        std::int64_t **ipiv, std::int64_t group_count, std::int64_t *group_sizes,
-                        double *scratchpad, std::int64_t scratchpad_size,
-                        const std::vector<sycl::event> &dependencies) {
+sycl::event getri_batch(sycl::queue& queue, std::int64_t* n, double** a, std::int64_t* lda,
+                        std::int64_t** ipiv, std::int64_t group_count, std::int64_t* group_sizes,
+                        double* scratchpad, std::int64_t scratchpad_size,
+                        const std::vector<sycl::event>& dependencies) {
     throw unimplemented("lapack", "getri_batch");
 }
-sycl::event getri_batch(sycl::queue &queue, std::int64_t *n, std::complex<float> **a,
-                        std::int64_t *lda, std::int64_t **ipiv, std::int64_t group_count,
-                        std::int64_t *group_sizes, std::complex<float> *scratchpad,
+sycl::event getri_batch(sycl::queue& queue, std::int64_t* n, std::complex<float>** a,
+                        std::int64_t* lda, std::int64_t** ipiv, std::int64_t group_count,
+                        std::int64_t* group_sizes, std::complex<float>* scratchpad,
                         std::int64_t scratchpad_size,
-                        const std::vector<sycl::event> &dependencies) {
+                        const std::vector<sycl::event>& dependencies) {
     throw unimplemented("lapack", "getri_batch");
 }
-sycl::event getri_batch(sycl::queue &queue, std::int64_t *n, std::complex<double> **a,
-                        std::int64_t *lda, std::int64_t **ipiv, std::int64_t group_count,
-                        std::int64_t *group_sizes, std::complex<double> *scratchpad,
+sycl::event getri_batch(sycl::queue& queue, std::int64_t* n, std::complex<double>** a,
+                        std::int64_t* lda, std::int64_t** ipiv, std::int64_t group_count,
+                        std::int64_t* group_sizes, std::complex<double>* scratchpad,
                         std::int64_t scratchpad_size,
-                        const std::vector<sycl::event> &dependencies) {
+                        const std::vector<sycl::event>& dependencies) {
     throw unimplemented("lapack", "getri_batch");
 }
-sycl::event getrs_batch(sycl::queue &queue, oneapi::mkl::transpose trans, std::int64_t n,
-                        std::int64_t nrhs, float *a, std::int64_t lda, std::int64_t stride_a,
-                        std::int64_t *ipiv, std::int64_t stride_ipiv, float *b, std::int64_t ldb,
-                        std::int64_t stride_b, std::int64_t batch_size, float *scratchpad,
+sycl::event getrs_batch(sycl::queue& queue, oneapi::mkl::transpose trans, std::int64_t n,
+                        std::int64_t nrhs, float* a, std::int64_t lda, std::int64_t stride_a,
+                        std::int64_t* ipiv, std::int64_t stride_ipiv, float* b, std::int64_t ldb,
+                        std::int64_t stride_b, std::int64_t batch_size, float* scratchpad,
                         std::int64_t scratchpad_size,
-                        const std::vector<sycl::event> &dependencies) {
+                        const std::vector<sycl::event>& dependencies) {
     throw unimplemented("lapack", "getrs_batch");
 }
-sycl::event getrs_batch(sycl::queue &queue, oneapi::mkl::transpose trans, std::int64_t n,
-                        std::int64_t nrhs, double *a, std::int64_t lda, std::int64_t stride_a,
-                        std::int64_t *ipiv, std::int64_t stride_ipiv, double *b, std::int64_t ldb,
-                        std::int64_t stride_b, std::int64_t batch_size, double *scratchpad,
+sycl::event getrs_batch(sycl::queue& queue, oneapi::mkl::transpose trans, std::int64_t n,
+                        std::int64_t nrhs, double* a, std::int64_t lda, std::int64_t stride_a,
+                        std::int64_t* ipiv, std::int64_t stride_ipiv, double* b, std::int64_t ldb,
+                        std::int64_t stride_b, std::int64_t batch_size, double* scratchpad,
                         std::int64_t scratchpad_size,
-                        const std::vector<sycl::event> &dependencies) {
+                        const std::vector<sycl::event>& dependencies) {
     throw unimplemented("lapack", "getrs_batch");
 }
-sycl::event getrs_batch(sycl::queue &queue, oneapi::mkl::transpose trans, std::int64_t n,
-                        std::int64_t nrhs, std::complex<float> *a, std::int64_t lda,
-                        std::int64_t stride_a, std::int64_t *ipiv, std::int64_t stride_ipiv,
-                        std::complex<float> *b, std::int64_t ldb, std::int64_t stride_b,
-                        std::int64_t batch_size, std::complex<float> *scratchpad,
+sycl::event getrs_batch(sycl::queue& queue, oneapi::mkl::transpose trans, std::int64_t n,
+                        std::int64_t nrhs, std::complex<float>* a, std::int64_t lda,
+                        std::int64_t stride_a, std::int64_t* ipiv, std::int64_t stride_ipiv,
+                        std::complex<float>* b, std::int64_t ldb, std::int64_t stride_b,
+                        std::int64_t batch_size, std::complex<float>* scratchpad,
                         std::int64_t scratchpad_size,
-                        const std::vector<sycl::event> &dependencies) {
+                        const std::vector<sycl::event>& dependencies) {
     throw unimplemented("lapack", "getrs_batch");
 }
-sycl::event getrs_batch(sycl::queue &queue, oneapi::mkl::transpose trans, std::int64_t n,
-                        std::int64_t nrhs, std::complex<double> *a, std::int64_t lda,
-                        std::int64_t stride_a, std::int64_t *ipiv, std::int64_t stride_ipiv,
-                        std::complex<double> *b, std::int64_t ldb, std::int64_t stride_b,
-                        std::int64_t batch_size, std::complex<double> *scratchpad,
+sycl::event getrs_batch(sycl::queue& queue, oneapi::mkl::transpose trans, std::int64_t n,
+                        std::int64_t nrhs, std::complex<double>* a, std::int64_t lda,
+                        std::int64_t stride_a, std::int64_t* ipiv, std::int64_t stride_ipiv,
+                        std::complex<double>* b, std::int64_t ldb, std::int64_t stride_b,
+                        std::int64_t batch_size, std::complex<double>* scratchpad,
                         std::int64_t scratchpad_size,
-                        const std::vector<sycl::event> &dependencies) {
+                        const std::vector<sycl::event>& dependencies) {
     throw unimplemented("lapack", "getrs_batch");
 }
-sycl::event getrs_batch(sycl::queue &queue, oneapi::mkl::transpose *trans, std::int64_t *n,
-                        std::int64_t *nrhs, float **a, std::int64_t *lda, std::int64_t **ipiv,
-                        float **b, std::int64_t *ldb, std::int64_t group_count,
-                        std::int64_t *group_sizes, float *scratchpad, std::int64_t scratchpad_size,
-                        const std::vector<sycl::event> &dependencies) {
+sycl::event getrs_batch(sycl::queue& queue, oneapi::mkl::transpose* trans, std::int64_t* n,
+                        std::int64_t* nrhs, float** a, std::int64_t* lda, std::int64_t** ipiv,
+                        float** b, std::int64_t* ldb, std::int64_t group_count,
+                        std::int64_t* group_sizes, float* scratchpad, std::int64_t scratchpad_size,
+                        const std::vector<sycl::event>& dependencies) {
     throw unimplemented("lapack", "getrs_batch");
 }
-sycl::event getrs_batch(sycl::queue &queue, oneapi::mkl::transpose *trans, std::int64_t *n,
-                        std::int64_t *nrhs, double **a, std::int64_t *lda, std::int64_t **ipiv,
-                        double **b, std::int64_t *ldb, std::int64_t group_count,
-                        std::int64_t *group_sizes, double *scratchpad, std::int64_t scratchpad_size,
-                        const std::vector<sycl::event> &dependencies) {
+sycl::event getrs_batch(sycl::queue& queue, oneapi::mkl::transpose* trans, std::int64_t* n,
+                        std::int64_t* nrhs, double** a, std::int64_t* lda, std::int64_t** ipiv,
+                        double** b, std::int64_t* ldb, std::int64_t group_count,
+                        std::int64_t* group_sizes, double* scratchpad, std::int64_t scratchpad_size,
+                        const std::vector<sycl::event>& dependencies) {
     throw unimplemented("lapack", "getrs_batch");
 }
-sycl::event getrs_batch(sycl::queue &queue, oneapi::mkl::transpose *trans, std::int64_t *n,
-                        std::int64_t *nrhs, std::complex<float> **a, std::int64_t *lda,
-                        std::int64_t **ipiv, std::complex<float> **b, std::int64_t *ldb,
-                        std::int64_t group_count, std::int64_t *group_sizes,
-                        std::complex<float> *scratchpad, std::int64_t scratchpad_size,
-                        const std::vector<sycl::event> &dependencies) {
+sycl::event getrs_batch(sycl::queue& queue, oneapi::mkl::transpose* trans, std::int64_t* n,
+                        std::int64_t* nrhs, std::complex<float>** a, std::int64_t* lda,
+                        std::int64_t** ipiv, std::complex<float>** b, std::int64_t* ldb,
+                        std::int64_t group_count, std::int64_t* group_sizes,
+                        std::complex<float>* scratchpad, std::int64_t scratchpad_size,
+                        const std::vector<sycl::event>& dependencies) {
     throw unimplemented("lapack", "getrs_batch");
 }
-sycl::event getrs_batch(sycl::queue &queue, oneapi::mkl::transpose *trans, std::int64_t *n,
-                        std::int64_t *nrhs, std::complex<double> **a, std::int64_t *lda,
-                        std::int64_t **ipiv, std::complex<double> **b, std::int64_t *ldb,
-                        std::int64_t group_count, std::int64_t *group_sizes,
-                        std::complex<double> *scratchpad, std::int64_t scratchpad_size,
-                        const std::vector<sycl::event> &dependencies) {
+sycl::event getrs_batch(sycl::queue& queue, oneapi::mkl::transpose* trans, std::int64_t* n,
+                        std::int64_t* nrhs, std::complex<double>** a, std::int64_t* lda,
+                        std::int64_t** ipiv, std::complex<double>** b, std::int64_t* ldb,
+                        std::int64_t group_count, std::int64_t* group_sizes,
+                        std::complex<double>* scratchpad, std::int64_t scratchpad_size,
+                        const std::vector<sycl::event>& dependencies) {
     throw unimplemented("lapack", "getrs_batch");
 }
-sycl::event orgqr_batch(sycl::queue &queue, std::int64_t m, std::int64_t n, std::int64_t k,
-                        float *a, std::int64_t lda, std::int64_t stride_a, float *tau,
-                        std::int64_t stride_tau, std::int64_t batch_size, float *scratchpad,
+sycl::event orgqr_batch(sycl::queue& queue, std::int64_t m, std::int64_t n, std::int64_t k,
+                        float* a, std::int64_t lda, std::int64_t stride_a, float* tau,
+                        std::int64_t stride_tau, std::int64_t batch_size, float* scratchpad,
                         std::int64_t scratchpad_size,
-                        const std::vector<sycl::event> &dependencies) {
+                        const std::vector<sycl::event>& dependencies) {
     throw unimplemented("lapack", "orgqr_batch");
 }
-sycl::event orgqr_batch(sycl::queue &queue, std::int64_t m, std::int64_t n, std::int64_t k,
-                        double *a, std::int64_t lda, std::int64_t stride_a, double *tau,
-                        std::int64_t stride_tau, std::int64_t batch_size, double *scratchpad,
+sycl::event orgqr_batch(sycl::queue& queue, std::int64_t m, std::int64_t n, std::int64_t k,
+                        double* a, std::int64_t lda, std::int64_t stride_a, double* tau,
+                        std::int64_t stride_tau, std::int64_t batch_size, double* scratchpad,
                         std::int64_t scratchpad_size,
-                        const std::vector<sycl::event> &dependencies) {
+                        const std::vector<sycl::event>& dependencies) {
     throw unimplemented("lapack", "orgqr_batch");
 }
-sycl::event orgqr_batch(sycl::queue &queue, std::int64_t *m, std::int64_t *n, std::int64_t *k,
-                        float **a, std::int64_t *lda, float **tau, std::int64_t group_count,
-                        std::int64_t *group_sizes, float *scratchpad, std::int64_t scratchpad_size,
-                        const std::vector<sycl::event> &dependencies) {
+sycl::event orgqr_batch(sycl::queue& queue, std::int64_t* m, std::int64_t* n, std::int64_t* k,
+                        float** a, std::int64_t* lda, float** tau, std::int64_t group_count,
+                        std::int64_t* group_sizes, float* scratchpad, std::int64_t scratchpad_size,
+                        const std::vector<sycl::event>& dependencies) {
     throw unimplemented("lapack", "orgqr_batch");
 }
-sycl::event orgqr_batch(sycl::queue &queue, std::int64_t *m, std::int64_t *n, std::int64_t *k,
-                        double **a, std::int64_t *lda, double **tau, std::int64_t group_count,
-                        std::int64_t *group_sizes, double *scratchpad, std::int64_t scratchpad_size,
-                        const std::vector<sycl::event> &dependencies) {
+sycl::event orgqr_batch(sycl::queue& queue, std::int64_t* m, std::int64_t* n, std::int64_t* k,
+                        double** a, std::int64_t* lda, double** tau, std::int64_t group_count,
+                        std::int64_t* group_sizes, double* scratchpad, std::int64_t scratchpad_size,
+                        const std::vector<sycl::event>& dependencies) {
     throw unimplemented("lapack", "orgqr_batch");
 }
-sycl::event potrf_batch(sycl::queue &queue, oneapi::mkl::uplo uplo, std::int64_t n, float *a,
+sycl::event potrf_batch(sycl::queue& queue, oneapi::mkl::uplo uplo, std::int64_t n, float* a,
                         std::int64_t lda, std::int64_t stride_a, std::int64_t batch_size,
-                        float *scratchpad, std::int64_t scratchpad_size,
-                        const std::vector<sycl::event> &dependencies) {
+                        float* scratchpad, std::int64_t scratchpad_size,
+                        const std::vector<sycl::event>& dependencies) {
     throw unimplemented("lapack", "potrf_batch");
 }
-sycl::event potrf_batch(sycl::queue &queue, oneapi::mkl::uplo uplo, std::int64_t n, double *a,
+sycl::event potrf_batch(sycl::queue& queue, oneapi::mkl::uplo uplo, std::int64_t n, double* a,
                         std::int64_t lda, std::int64_t stride_a, std::int64_t batch_size,
-                        double *scratchpad, std::int64_t scratchpad_size,
-                        const std::vector<sycl::event> &dependencies) {
+                        double* scratchpad, std::int64_t scratchpad_size,
+                        const std::vector<sycl::event>& dependencies) {
     throw unimplemented("lapack", "potrf_batch");
 }
-sycl::event potrf_batch(sycl::queue &queue, oneapi::mkl::uplo uplo, std::int64_t n,
-                        std::complex<float> *a, std::int64_t lda, std::int64_t stride_a,
-                        std::int64_t batch_size, std::complex<float> *scratchpad,
+sycl::event potrf_batch(sycl::queue& queue, oneapi::mkl::uplo uplo, std::int64_t n,
+                        std::complex<float>* a, std::int64_t lda, std::int64_t stride_a,
+                        std::int64_t batch_size, std::complex<float>* scratchpad,
                         std::int64_t scratchpad_size,
-                        const std::vector<sycl::event> &dependencies) {
+                        const std::vector<sycl::event>& dependencies) {
     throw unimplemented("lapack", "potrf_batch");
 }
-sycl::event potrf_batch(sycl::queue &queue, oneapi::mkl::uplo uplo, std::int64_t n,
-                        std::complex<double> *a, std::int64_t lda, std::int64_t stride_a,
-                        std::int64_t batch_size, std::complex<double> *scratchpad,
+sycl::event potrf_batch(sycl::queue& queue, oneapi::mkl::uplo uplo, std::int64_t n,
+                        std::complex<double>* a, std::int64_t lda, std::int64_t stride_a,
+                        std::int64_t batch_size, std::complex<double>* scratchpad,
                         std::int64_t scratchpad_size,
-                        const std::vector<sycl::event> &dependencies) {
+                        const std::vector<sycl::event>& dependencies) {
     throw unimplemented("lapack", "potrf_batch");
 }
 
 template <typename Func, typename T>
-inline sycl::event potrf_batch(const char *func_name, Func func, sycl::queue &queue,
-                               oneapi::mkl::uplo *uplo, std::int64_t *n, T **a, std::int64_t *lda,
-                               std::int64_t group_count, std::int64_t *group_sizes, T *scratchpad,
+inline sycl::event potrf_batch(const char* func_name, Func func, sycl::queue& queue,
+                               oneapi::mkl::uplo* uplo, std::int64_t* n, T** a, std::int64_t* lda,
+                               std::int64_t group_count, std::int64_t* group_sizes, T* scratchpad,
                                std::int64_t scratchpad_size,
-                               const std::vector<sycl::event> &dependencies) {
+                               const std::vector<sycl::event>& dependencies) {
     using rocmDataType = typename RocmEquivalentType<T>::Type;
 
     int64_t batch_size = 0;
@@ -509,24 +509,24 @@ inline sycl::event potrf_batch(const char *func_name, Func func, sycl::queue &qu
         batch_size += group_sizes[i];
     }
 
-    int *info = (int *)malloc_device(sizeof(int) * batch_size, queue);
-    T **a_dev = (T **)malloc_device(sizeof(T *) * batch_size, queue);
+    int* info = (int*)malloc_device(sizeof(int) * batch_size, queue);
+    T** a_dev = (T**)malloc_device(sizeof(T*) * batch_size, queue);
     auto done_cpy =
-        queue.submit([&](sycl::handler &h) { h.memcpy(a_dev, a, batch_size * sizeof(T *)); });
+        queue.submit([&](sycl::handler& h) { h.memcpy(a_dev, a, batch_size * sizeof(T*)); });
 
-    auto done = queue.submit([&](sycl::handler &cgh) {
+    auto done = queue.submit([&](sycl::handler& cgh) {
         int64_t num_events = dependencies.size();
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
         cgh.depends_on(done_cpy);
-        onemkl_rocsolver_host_task(cgh, queue, [=](RocsolverScopedContextHandler &sc) {
+        onemkl_rocsolver_host_task(cgh, queue, [=](RocsolverScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             int64_t offset = 0;
             rocblas_status err;
             for (int64_t i = 0; i < group_count; i++) {
-                auto **a_ = reinterpret_cast<rocmDataType **>(a_dev);
-                auto *info_ = reinterpret_cast<rocblas_int *>(info);
+                auto** a_ = reinterpret_cast<rocmDataType**>(a_dev);
+                auto* info_ = reinterpret_cast<rocblas_int*>(info);
                 ROCSOLVER_ERROR_FUNC_T(func_name, func, err, handle, get_rocblas_fill_mode(uplo[i]),
                                        (int)n[i], a_ + offset, (int)lda[i], info_ + offset,
                                        (int)group_sizes[i]);
@@ -540,9 +540,9 @@ inline sycl::event potrf_batch(const char *func_name, Func func, sycl::queue &qu
 // Scratchpad memory not needed as parts of buffer a is used as workspace memory
 #define POTRF_BATCH_LAUNCHER_USM(TYPE, ROCSOLVER_ROUTINE)                                          \
     sycl::event potrf_batch(                                                                       \
-        sycl::queue &queue, oneapi::mkl::uplo *uplo, std::int64_t *n, TYPE **a, std::int64_t *lda, \
-        std::int64_t group_count, std::int64_t *group_sizes, TYPE *scratchpad,                     \
-        std::int64_t scratchpad_size, const std::vector<sycl::event> &dependencies) {              \
+        sycl::queue& queue, oneapi::mkl::uplo* uplo, std::int64_t* n, TYPE** a, std::int64_t* lda, \
+        std::int64_t group_count, std::int64_t* group_sizes, TYPE* scratchpad,                     \
+        std::int64_t scratchpad_size, const std::vector<sycl::event>& dependencies) {              \
         return potrf_batch(#ROCSOLVER_ROUTINE, ROCSOLVER_ROUTINE, queue, uplo, n, a, lda,          \
                            group_count, group_sizes, scratchpad, scratchpad_size, dependencies);   \
     }
@@ -554,44 +554,44 @@ POTRF_BATCH_LAUNCHER_USM(std::complex<double>, rocsolver_zpotrf_batched)
 
 #undef POTRF_BATCH_LAUNCHER_USM
 
-sycl::event potrs_batch(sycl::queue &queue, oneapi::mkl::uplo uplo, std::int64_t n,
-                        std::int64_t nrhs, float *a, std::int64_t lda, std::int64_t stride_a,
-                        float *b, std::int64_t ldb, std::int64_t stride_b, std::int64_t batch_size,
-                        float *scratchpad, std::int64_t scratchpad_size,
-                        const std::vector<sycl::event> &dependencies) {
+sycl::event potrs_batch(sycl::queue& queue, oneapi::mkl::uplo uplo, std::int64_t n,
+                        std::int64_t nrhs, float* a, std::int64_t lda, std::int64_t stride_a,
+                        float* b, std::int64_t ldb, std::int64_t stride_b, std::int64_t batch_size,
+                        float* scratchpad, std::int64_t scratchpad_size,
+                        const std::vector<sycl::event>& dependencies) {
     throw unimplemented("lapack", "potrs_batch");
 }
-sycl::event potrs_batch(sycl::queue &queue, oneapi::mkl::uplo uplo, std::int64_t n,
-                        std::int64_t nrhs, double *a, std::int64_t lda, std::int64_t stride_a,
-                        double *b, std::int64_t ldb, std::int64_t stride_b, std::int64_t batch_size,
-                        double *scratchpad, std::int64_t scratchpad_size,
-                        const std::vector<sycl::event> &dependencies) {
+sycl::event potrs_batch(sycl::queue& queue, oneapi::mkl::uplo uplo, std::int64_t n,
+                        std::int64_t nrhs, double* a, std::int64_t lda, std::int64_t stride_a,
+                        double* b, std::int64_t ldb, std::int64_t stride_b, std::int64_t batch_size,
+                        double* scratchpad, std::int64_t scratchpad_size,
+                        const std::vector<sycl::event>& dependencies) {
     throw unimplemented("lapack", "potrs_batch");
 }
-sycl::event potrs_batch(sycl::queue &queue, oneapi::mkl::uplo uplo, std::int64_t n,
-                        std::int64_t nrhs, std::complex<float> *a, std::int64_t lda,
-                        std::int64_t stride_a, std::complex<float> *b, std::int64_t ldb,
+sycl::event potrs_batch(sycl::queue& queue, oneapi::mkl::uplo uplo, std::int64_t n,
+                        std::int64_t nrhs, std::complex<float>* a, std::int64_t lda,
+                        std::int64_t stride_a, std::complex<float>* b, std::int64_t ldb,
                         std::int64_t stride_b, std::int64_t batch_size,
-                        std::complex<float> *scratchpad, std::int64_t scratchpad_size,
-                        const std::vector<sycl::event> &dependencies) {
+                        std::complex<float>* scratchpad, std::int64_t scratchpad_size,
+                        const std::vector<sycl::event>& dependencies) {
     throw unimplemented("lapack", "potrs_batch");
 }
-sycl::event potrs_batch(sycl::queue &queue, oneapi::mkl::uplo uplo, std::int64_t n,
-                        std::int64_t nrhs, std::complex<double> *a, std::int64_t lda,
-                        std::int64_t stride_a, std::complex<double> *b, std::int64_t ldb,
+sycl::event potrs_batch(sycl::queue& queue, oneapi::mkl::uplo uplo, std::int64_t n,
+                        std::int64_t nrhs, std::complex<double>* a, std::int64_t lda,
+                        std::int64_t stride_a, std::complex<double>* b, std::int64_t ldb,
                         std::int64_t stride_b, std::int64_t batch_size,
-                        std::complex<double> *scratchpad, std::int64_t scratchpad_size,
-                        const std::vector<sycl::event> &dependencies) {
+                        std::complex<double>* scratchpad, std::int64_t scratchpad_size,
+                        const std::vector<sycl::event>& dependencies) {
     throw unimplemented("lapack", "potrs_batch");
 }
 
 template <typename Func, typename T>
-inline sycl::event potrs_batch(const char *func_name, Func func, sycl::queue &queue,
-                               oneapi::mkl::uplo *uplo, std::int64_t *n, std::int64_t *nrhs, T **a,
-                               std::int64_t *lda, T **b, std::int64_t *ldb,
-                               std::int64_t group_count, std::int64_t *group_sizes, T *scratchpad,
+inline sycl::event potrs_batch(const char* func_name, Func func, sycl::queue& queue,
+                               oneapi::mkl::uplo* uplo, std::int64_t* n, std::int64_t* nrhs, T** a,
+                               std::int64_t* lda, T** b, std::int64_t* ldb,
+                               std::int64_t group_count, std::int64_t* group_sizes, T* scratchpad,
                                std::int64_t scratchpad_size,
-                               const std::vector<sycl::event> &dependencies) {
+                               const std::vector<sycl::event>& dependencies) {
     using rocmDataType = typename RocmEquivalentType<T>::Type;
 
     int64_t batch_size = 0;
@@ -605,28 +605,28 @@ inline sycl::event potrs_batch(const char *func_name, Func func, sycl::queue &qu
                                 "rocsolver potrs_batch only supports nrhs = 1");
     }
 
-    T **a_dev = (T **)malloc_device(sizeof(T *) * batch_size, queue);
-    T **b_dev = (T **)malloc_device(sizeof(T *) * batch_size, queue);
+    T** a_dev = (T**)malloc_device(sizeof(T*) * batch_size, queue);
+    T** b_dev = (T**)malloc_device(sizeof(T*) * batch_size, queue);
     auto done_cpy_a =
-        queue.submit([&](sycl::handler &h) { h.memcpy(a_dev, a, batch_size * sizeof(T *)); });
+        queue.submit([&](sycl::handler& h) { h.memcpy(a_dev, a, batch_size * sizeof(T*)); });
 
     auto done_cpy_b =
-        queue.submit([&](sycl::handler &h) { h.memcpy(b_dev, b, batch_size * sizeof(T *)); });
+        queue.submit([&](sycl::handler& h) { h.memcpy(b_dev, b, batch_size * sizeof(T*)); });
 
-    auto done = queue.submit([&](sycl::handler &cgh) {
+    auto done = queue.submit([&](sycl::handler& cgh) {
         int64_t num_events = dependencies.size();
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
         cgh.depends_on(done_cpy_a);
         cgh.depends_on(done_cpy_b);
-        onemkl_rocsolver_host_task(cgh, queue, [=](RocsolverScopedContextHandler &sc) {
+        onemkl_rocsolver_host_task(cgh, queue, [=](RocsolverScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             int64_t offset = 0;
             rocblas_status err;
             for (int64_t i = 0; i < group_count; i++) {
-                auto **a_ = reinterpret_cast<rocmDataType **>(a_dev);
-                auto **b_ = reinterpret_cast<rocmDataType **>(b_dev);
+                auto** a_ = reinterpret_cast<rocmDataType**>(a_dev);
+                auto** b_ = reinterpret_cast<rocmDataType**>(b_dev);
                 ROCSOLVER_ERROR_FUNC_T(func_name, func, err, handle, get_rocblas_fill_mode(uplo[i]),
                                        (int)n[i], (int)nrhs[i], a_ + offset, (int)lda[i],
                                        b_ + offset, (int)ldb[i], (int)group_sizes[i]);
@@ -640,10 +640,10 @@ inline sycl::event potrs_batch(const char *func_name, Func func, sycl::queue &qu
 // Scratchpad memory not needed as parts of buffer a is used as workspace memory
 #define POTRS_BATCH_LAUNCHER_USM(TYPE, ROCSOLVER_ROUTINE)                                          \
     sycl::event potrs_batch(                                                                       \
-        sycl::queue &queue, oneapi::mkl::uplo *uplo, std::int64_t *n, std::int64_t *nrhs,          \
-        TYPE **a, std::int64_t *lda, TYPE **b, std::int64_t *ldb, std::int64_t group_count,        \
-        std::int64_t *group_sizes, TYPE *scratchpad, std::int64_t scratchpad_size,                 \
-        const std::vector<sycl::event> &dependencies) {                                            \
+        sycl::queue& queue, oneapi::mkl::uplo* uplo, std::int64_t* n, std::int64_t* nrhs,          \
+        TYPE** a, std::int64_t* lda, TYPE** b, std::int64_t* ldb, std::int64_t group_count,        \
+        std::int64_t* group_sizes, TYPE* scratchpad, std::int64_t scratchpad_size,                 \
+        const std::vector<sycl::event>& dependencies) {                                            \
         return potrs_batch(#ROCSOLVER_ROUTINE, ROCSOLVER_ROUTINE, queue, uplo, n, nrhs, a, lda, b, \
                            ldb, group_count, group_sizes, scratchpad, scratchpad_size,             \
                            dependencies);                                                          \
@@ -656,52 +656,52 @@ POTRS_BATCH_LAUNCHER_USM(std::complex<double>, rocsolver_zpotrs_batched)
 
 #undef POTRS_BATCH_LAUNCHER_USM
 
-sycl::event ungqr_batch(sycl::queue &queue, std::int64_t m, std::int64_t n, std::int64_t k,
-                        std::complex<float> *a, std::int64_t lda, std::int64_t stride_a,
-                        std::complex<float> *tau, std::int64_t stride_tau, std::int64_t batch_size,
-                        std::complex<float> *scratchpad, std::int64_t scratchpad_size,
-                        const std::vector<sycl::event> &dependencies) {
+sycl::event ungqr_batch(sycl::queue& queue, std::int64_t m, std::int64_t n, std::int64_t k,
+                        std::complex<float>* a, std::int64_t lda, std::int64_t stride_a,
+                        std::complex<float>* tau, std::int64_t stride_tau, std::int64_t batch_size,
+                        std::complex<float>* scratchpad, std::int64_t scratchpad_size,
+                        const std::vector<sycl::event>& dependencies) {
     throw unimplemented("lapack", "ungqr_batch");
 }
-sycl::event ungqr_batch(sycl::queue &queue, std::int64_t m, std::int64_t n, std::int64_t k,
-                        std::complex<double> *a, std::int64_t lda, std::int64_t stride_a,
-                        std::complex<double> *tau, std::int64_t stride_tau, std::int64_t batch_size,
-                        std::complex<double> *scratchpad, std::int64_t scratchpad_size,
-                        const std::vector<sycl::event> &dependencies) {
+sycl::event ungqr_batch(sycl::queue& queue, std::int64_t m, std::int64_t n, std::int64_t k,
+                        std::complex<double>* a, std::int64_t lda, std::int64_t stride_a,
+                        std::complex<double>* tau, std::int64_t stride_tau, std::int64_t batch_size,
+                        std::complex<double>* scratchpad, std::int64_t scratchpad_size,
+                        const std::vector<sycl::event>& dependencies) {
     throw unimplemented("lapack", "ungqr_batch");
 }
-sycl::event ungqr_batch(sycl::queue &queue, std::int64_t *m, std::int64_t *n, std::int64_t *k,
-                        std::complex<float> **a, std::int64_t *lda, std::complex<float> **tau,
-                        std::int64_t group_count, std::int64_t *group_sizes,
-                        std::complex<float> *scratchpad, std::int64_t scratchpad_size,
-                        const std::vector<sycl::event> &dependencies) {
+sycl::event ungqr_batch(sycl::queue& queue, std::int64_t* m, std::int64_t* n, std::int64_t* k,
+                        std::complex<float>** a, std::int64_t* lda, std::complex<float>** tau,
+                        std::int64_t group_count, std::int64_t* group_sizes,
+                        std::complex<float>* scratchpad, std::int64_t scratchpad_size,
+                        const std::vector<sycl::event>& dependencies) {
     throw unimplemented("lapack", "ungqr_batch");
 }
-sycl::event ungqr_batch(sycl::queue &queue, std::int64_t *m, std::int64_t *n, std::int64_t *k,
-                        std::complex<double> **a, std::int64_t *lda, std::complex<double> **tau,
-                        std::int64_t group_count, std::int64_t *group_sizes,
-                        std::complex<double> *scratchpad, std::int64_t scratchpad_size,
-                        const std::vector<sycl::event> &dependencies) {
+sycl::event ungqr_batch(sycl::queue& queue, std::int64_t* m, std::int64_t* n, std::int64_t* k,
+                        std::complex<double>** a, std::int64_t* lda, std::complex<double>** tau,
+                        std::int64_t group_count, std::int64_t* group_sizes,
+                        std::complex<double>* scratchpad, std::int64_t scratchpad_size,
+                        const std::vector<sycl::event>& dependencies) {
     throw unimplemented("lapack", "ungqr_batch");
 }
 
 // BATCH SCRATCHPAD API
 
 template <>
-std::int64_t getrf_batch_scratchpad_size<float>(sycl::queue &queue, std::int64_t m, std::int64_t n,
+std::int64_t getrf_batch_scratchpad_size<float>(sycl::queue& queue, std::int64_t m, std::int64_t n,
                                                 std::int64_t lda, std::int64_t stride_a,
                                                 std::int64_t stride_ipiv, std::int64_t batch_size) {
     throw unimplemented("lapack", "getrf_batch_scratchpad_size");
 }
 template <>
-std::int64_t getrf_batch_scratchpad_size<double>(sycl::queue &queue, std::int64_t m, std::int64_t n,
+std::int64_t getrf_batch_scratchpad_size<double>(sycl::queue& queue, std::int64_t m, std::int64_t n,
                                                  std::int64_t lda, std::int64_t stride_a,
                                                  std::int64_t stride_ipiv,
                                                  std::int64_t batch_size) {
     throw unimplemented("lapack", "getrf_batch_scratchpad_size");
 }
 template <>
-std::int64_t getrf_batch_scratchpad_size<std::complex<float>>(sycl::queue &queue, std::int64_t m,
+std::int64_t getrf_batch_scratchpad_size<std::complex<float>>(sycl::queue& queue, std::int64_t m,
                                                               std::int64_t n, std::int64_t lda,
                                                               std::int64_t stride_a,
                                                               std::int64_t stride_ipiv,
@@ -709,7 +709,7 @@ std::int64_t getrf_batch_scratchpad_size<std::complex<float>>(sycl::queue &queue
     throw unimplemented("lapack", "getrf_batch_scratchpad_size");
 }
 template <>
-std::int64_t getrf_batch_scratchpad_size<std::complex<double>>(sycl::queue &queue, std::int64_t m,
+std::int64_t getrf_batch_scratchpad_size<std::complex<double>>(sycl::queue& queue, std::int64_t m,
                                                                std::int64_t n, std::int64_t lda,
                                                                std::int64_t stride_a,
                                                                std::int64_t stride_ipiv,
@@ -717,20 +717,20 @@ std::int64_t getrf_batch_scratchpad_size<std::complex<double>>(sycl::queue &queu
     throw unimplemented("lapack", "getrf_batch_scratchpad_size");
 }
 template <>
-std::int64_t getri_batch_scratchpad_size<float>(sycl::queue &queue, std::int64_t n,
+std::int64_t getri_batch_scratchpad_size<float>(sycl::queue& queue, std::int64_t n,
                                                 std::int64_t lda, std::int64_t stride_a,
                                                 std::int64_t stride_ipiv, std::int64_t batch_size) {
     throw unimplemented("lapack", "getri_batch_scratchpad_size");
 }
 template <>
-std::int64_t getri_batch_scratchpad_size<double>(sycl::queue &queue, std::int64_t n,
+std::int64_t getri_batch_scratchpad_size<double>(sycl::queue& queue, std::int64_t n,
                                                  std::int64_t lda, std::int64_t stride_a,
                                                  std::int64_t stride_ipiv,
                                                  std::int64_t batch_size) {
     throw unimplemented("lapack", "getri_batch_scratchpad_size");
 }
 template <>
-std::int64_t getri_batch_scratchpad_size<std::complex<float>>(sycl::queue &queue, std::int64_t n,
+std::int64_t getri_batch_scratchpad_size<std::complex<float>>(sycl::queue& queue, std::int64_t n,
                                                               std::int64_t lda,
                                                               std::int64_t stride_a,
                                                               std::int64_t stride_ipiv,
@@ -738,7 +738,7 @@ std::int64_t getri_batch_scratchpad_size<std::complex<float>>(sycl::queue &queue
     throw unimplemented("lapack", "getri_batch_scratchpad_size");
 }
 template <>
-std::int64_t getri_batch_scratchpad_size<std::complex<double>>(sycl::queue &queue, std::int64_t n,
+std::int64_t getri_batch_scratchpad_size<std::complex<double>>(sycl::queue& queue, std::int64_t n,
                                                                std::int64_t lda,
                                                                std::int64_t stride_a,
                                                                std::int64_t stride_ipiv,
@@ -746,7 +746,7 @@ std::int64_t getri_batch_scratchpad_size<std::complex<double>>(sycl::queue &queu
     throw unimplemented("lapack", "getri_batch_scratchpad_size");
 }
 template <>
-std::int64_t getrs_batch_scratchpad_size<float>(sycl::queue &queue, oneapi::mkl::transpose trans,
+std::int64_t getrs_batch_scratchpad_size<float>(sycl::queue& queue, oneapi::mkl::transpose trans,
                                                 std::int64_t n, std::int64_t nrhs, std::int64_t lda,
                                                 std::int64_t stride_a, std::int64_t stride_ipiv,
                                                 std::int64_t ldb, std::int64_t stride_b,
@@ -754,7 +754,7 @@ std::int64_t getrs_batch_scratchpad_size<float>(sycl::queue &queue, oneapi::mkl:
     throw unimplemented("lapack", "getrs_batch_scratchpad_size");
 }
 template <>
-std::int64_t getrs_batch_scratchpad_size<double>(sycl::queue &queue, oneapi::mkl::transpose trans,
+std::int64_t getrs_batch_scratchpad_size<double>(sycl::queue& queue, oneapi::mkl::transpose trans,
                                                  std::int64_t n, std::int64_t nrhs,
                                                  std::int64_t lda, std::int64_t stride_a,
                                                  std::int64_t stride_ipiv, std::int64_t ldb,
@@ -763,32 +763,32 @@ std::int64_t getrs_batch_scratchpad_size<double>(sycl::queue &queue, oneapi::mkl
 }
 template <>
 std::int64_t getrs_batch_scratchpad_size<std::complex<float>>(
-    sycl::queue &queue, oneapi::mkl::transpose trans, std::int64_t n, std::int64_t nrhs,
+    sycl::queue& queue, oneapi::mkl::transpose trans, std::int64_t n, std::int64_t nrhs,
     std::int64_t lda, std::int64_t stride_a, std::int64_t stride_ipiv, std::int64_t ldb,
     std::int64_t stride_b, std::int64_t batch_size) {
     throw unimplemented("lapack", "getrs_batch_scratchpad_size");
 }
 template <>
 std::int64_t getrs_batch_scratchpad_size<std::complex<double>>(
-    sycl::queue &queue, oneapi::mkl::transpose trans, std::int64_t n, std::int64_t nrhs,
+    sycl::queue& queue, oneapi::mkl::transpose trans, std::int64_t n, std::int64_t nrhs,
     std::int64_t lda, std::int64_t stride_a, std::int64_t stride_ipiv, std::int64_t ldb,
     std::int64_t stride_b, std::int64_t batch_size) {
     throw unimplemented("lapack", "getrs_batch_scratchpad_size");
 }
 template <>
-std::int64_t geqrf_batch_scratchpad_size<float>(sycl::queue &queue, std::int64_t m, std::int64_t n,
+std::int64_t geqrf_batch_scratchpad_size<float>(sycl::queue& queue, std::int64_t m, std::int64_t n,
                                                 std::int64_t lda, std::int64_t stride_a,
                                                 std::int64_t stride_tau, std::int64_t batch_size) {
     throw unimplemented("lapack", "geqrf_batch_scratchpad_size");
 }
 template <>
-std::int64_t geqrf_batch_scratchpad_size<double>(sycl::queue &queue, std::int64_t m, std::int64_t n,
+std::int64_t geqrf_batch_scratchpad_size<double>(sycl::queue& queue, std::int64_t m, std::int64_t n,
                                                  std::int64_t lda, std::int64_t stride_a,
                                                  std::int64_t stride_tau, std::int64_t batch_size) {
     throw unimplemented("lapack", "geqrf_batch_scratchpad_size");
 }
 template <>
-std::int64_t geqrf_batch_scratchpad_size<std::complex<float>>(sycl::queue &queue, std::int64_t m,
+std::int64_t geqrf_batch_scratchpad_size<std::complex<float>>(sycl::queue& queue, std::int64_t m,
                                                               std::int64_t n, std::int64_t lda,
                                                               std::int64_t stride_a,
                                                               std::int64_t stride_tau,
@@ -796,7 +796,7 @@ std::int64_t geqrf_batch_scratchpad_size<std::complex<float>>(sycl::queue &queue
     throw unimplemented("lapack", "geqrf_batch_scratchpad_size");
 }
 template <>
-std::int64_t geqrf_batch_scratchpad_size<std::complex<double>>(sycl::queue &queue, std::int64_t m,
+std::int64_t geqrf_batch_scratchpad_size<std::complex<double>>(sycl::queue& queue, std::int64_t m,
                                                                std::int64_t n, std::int64_t lda,
                                                                std::int64_t stride_a,
                                                                std::int64_t stride_tau,
@@ -805,19 +805,19 @@ std::int64_t geqrf_batch_scratchpad_size<std::complex<double>>(sycl::queue &queu
 }
 
 template <>
-std::int64_t potrf_batch_scratchpad_size<float>(sycl::queue &queue, oneapi::mkl::uplo uplo,
+std::int64_t potrf_batch_scratchpad_size<float>(sycl::queue& queue, oneapi::mkl::uplo uplo,
                                                 std::int64_t n, std::int64_t lda,
                                                 std::int64_t stride_a, std::int64_t batch_size) {
     throw unimplemented("lapack", "potrf_batch_scratchpad_size");
 }
 template <>
-std::int64_t potrf_batch_scratchpad_size<double>(sycl::queue &queue, oneapi::mkl::uplo uplo,
+std::int64_t potrf_batch_scratchpad_size<double>(sycl::queue& queue, oneapi::mkl::uplo uplo,
                                                  std::int64_t n, std::int64_t lda,
                                                  std::int64_t stride_a, std::int64_t batch_size) {
     throw unimplemented("lapack", "potrf_batch_scratchpad_size");
 }
 template <>
-std::int64_t potrf_batch_scratchpad_size<std::complex<float>>(sycl::queue &queue,
+std::int64_t potrf_batch_scratchpad_size<std::complex<float>>(sycl::queue& queue,
                                                               oneapi::mkl::uplo uplo,
                                                               std::int64_t n, std::int64_t lda,
                                                               std::int64_t stride_a,
@@ -825,7 +825,7 @@ std::int64_t potrf_batch_scratchpad_size<std::complex<float>>(sycl::queue &queue
     throw unimplemented("lapack", "potrf_batch_scratchpad_size");
 }
 template <>
-std::int64_t potrf_batch_scratchpad_size<std::complex<double>>(sycl::queue &queue,
+std::int64_t potrf_batch_scratchpad_size<std::complex<double>>(sycl::queue& queue,
                                                                oneapi::mkl::uplo uplo,
                                                                std::int64_t n, std::int64_t lda,
                                                                std::int64_t stride_a,
@@ -833,14 +833,14 @@ std::int64_t potrf_batch_scratchpad_size<std::complex<double>>(sycl::queue &queu
     throw unimplemented("lapack", "potrf_batch_scratchpad_size");
 }
 template <>
-std::int64_t potrs_batch_scratchpad_size<float>(sycl::queue &queue, oneapi::mkl::uplo uplo,
+std::int64_t potrs_batch_scratchpad_size<float>(sycl::queue& queue, oneapi::mkl::uplo uplo,
                                                 std::int64_t n, std::int64_t nrhs, std::int64_t lda,
                                                 std::int64_t stride_a, std::int64_t ldb,
                                                 std::int64_t stride_b, std::int64_t batch_size) {
     throw unimplemented("lapack", "potrs_batch_scratchpad_size");
 }
 template <>
-std::int64_t potrs_batch_scratchpad_size<double>(sycl::queue &queue, oneapi::mkl::uplo uplo,
+std::int64_t potrs_batch_scratchpad_size<double>(sycl::queue& queue, oneapi::mkl::uplo uplo,
                                                  std::int64_t n, std::int64_t nrhs,
                                                  std::int64_t lda, std::int64_t stride_a,
                                                  std::int64_t ldb, std::int64_t stride_b,
@@ -849,25 +849,25 @@ std::int64_t potrs_batch_scratchpad_size<double>(sycl::queue &queue, oneapi::mkl
 }
 template <>
 std::int64_t potrs_batch_scratchpad_size<std::complex<float>>(
-    sycl::queue &queue, oneapi::mkl::uplo uplo, std::int64_t n, std::int64_t nrhs, std::int64_t lda,
+    sycl::queue& queue, oneapi::mkl::uplo uplo, std::int64_t n, std::int64_t nrhs, std::int64_t lda,
     std::int64_t stride_a, std::int64_t ldb, std::int64_t stride_b, std::int64_t batch_size) {
     throw unimplemented("lapack", "potrs_batch_scratchpad_size");
 }
 template <>
 std::int64_t potrs_batch_scratchpad_size<std::complex<double>>(
-    sycl::queue &queue, oneapi::mkl::uplo uplo, std::int64_t n, std::int64_t nrhs, std::int64_t lda,
+    sycl::queue& queue, oneapi::mkl::uplo uplo, std::int64_t n, std::int64_t nrhs, std::int64_t lda,
     std::int64_t stride_a, std::int64_t ldb, std::int64_t stride_b, std::int64_t batch_size) {
     throw unimplemented("lapack", "potrs_batch_scratchpad_size");
 }
 template <>
-std::int64_t orgqr_batch_scratchpad_size<float>(sycl::queue &queue, std::int64_t m, std::int64_t n,
+std::int64_t orgqr_batch_scratchpad_size<float>(sycl::queue& queue, std::int64_t m, std::int64_t n,
                                                 std::int64_t k, std::int64_t lda,
                                                 std::int64_t stride_a, std::int64_t stride_tau,
                                                 std::int64_t batch_size) {
     throw unimplemented("lapack", "orgqr_batch_scratchpad_size");
 }
 template <>
-std::int64_t orgqr_batch_scratchpad_size<double>(sycl::queue &queue, std::int64_t m, std::int64_t n,
+std::int64_t orgqr_batch_scratchpad_size<double>(sycl::queue& queue, std::int64_t m, std::int64_t n,
                                                  std::int64_t k, std::int64_t lda,
                                                  std::int64_t stride_a, std::int64_t stride_tau,
                                                  std::int64_t batch_size) {
@@ -875,148 +875,148 @@ std::int64_t orgqr_batch_scratchpad_size<double>(sycl::queue &queue, std::int64_
 }
 template <>
 std::int64_t ungqr_batch_scratchpad_size<std::complex<float>>(
-    sycl::queue &queue, std::int64_t m, std::int64_t n, std::int64_t k, std::int64_t lda,
+    sycl::queue& queue, std::int64_t m, std::int64_t n, std::int64_t k, std::int64_t lda,
     std::int64_t stride_a, std::int64_t stride_tau, std::int64_t batch_size) {
     throw unimplemented("lapack", "ungqr_batch_scratchpad_size");
 }
 template <>
 std::int64_t ungqr_batch_scratchpad_size<std::complex<double>>(
-    sycl::queue &queue, std::int64_t m, std::int64_t n, std::int64_t k, std::int64_t lda,
+    sycl::queue& queue, std::int64_t m, std::int64_t n, std::int64_t k, std::int64_t lda,
     std::int64_t stride_a, std::int64_t stride_tau, std::int64_t batch_size) {
     throw unimplemented("lapack", "ungqr_batch_scratchpad_size");
 }
 template <>
-std::int64_t getrf_batch_scratchpad_size<float>(sycl::queue &queue, std::int64_t *m,
-                                                std::int64_t *n, std::int64_t *lda,
+std::int64_t getrf_batch_scratchpad_size<float>(sycl::queue& queue, std::int64_t* m,
+                                                std::int64_t* n, std::int64_t* lda,
                                                 std::int64_t group_count,
-                                                std::int64_t *group_sizes) {
+                                                std::int64_t* group_sizes) {
     throw unimplemented("lapack", "getrf_batch_scratchpad_size");
 }
 template <>
-std::int64_t getrf_batch_scratchpad_size<double>(sycl::queue &queue, std::int64_t *m,
-                                                 std::int64_t *n, std::int64_t *lda,
+std::int64_t getrf_batch_scratchpad_size<double>(sycl::queue& queue, std::int64_t* m,
+                                                 std::int64_t* n, std::int64_t* lda,
                                                  std::int64_t group_count,
-                                                 std::int64_t *group_sizes) {
+                                                 std::int64_t* group_sizes) {
     throw unimplemented("lapack", "getrf_batch_scratchpad_size");
 }
 template <>
-std::int64_t getrf_batch_scratchpad_size<std::complex<float>>(sycl::queue &queue, std::int64_t *m,
-                                                              std::int64_t *n, std::int64_t *lda,
+std::int64_t getrf_batch_scratchpad_size<std::complex<float>>(sycl::queue& queue, std::int64_t* m,
+                                                              std::int64_t* n, std::int64_t* lda,
                                                               std::int64_t group_count,
-                                                              std::int64_t *group_sizes) {
+                                                              std::int64_t* group_sizes) {
     throw unimplemented("lapack", "getrf_batch_scratchpad_size");
 }
 template <>
-std::int64_t getrf_batch_scratchpad_size<std::complex<double>>(sycl::queue &queue, std::int64_t *m,
-                                                               std::int64_t *n, std::int64_t *lda,
+std::int64_t getrf_batch_scratchpad_size<std::complex<double>>(sycl::queue& queue, std::int64_t* m,
+                                                               std::int64_t* n, std::int64_t* lda,
                                                                std::int64_t group_count,
-                                                               std::int64_t *group_sizes) {
+                                                               std::int64_t* group_sizes) {
     throw unimplemented("lapack", "getrf_batch_scratchpad_size");
 }
 template <>
-std::int64_t getri_batch_scratchpad_size<float>(sycl::queue &queue, std::int64_t *n,
-                                                std::int64_t *lda, std::int64_t group_count,
-                                                std::int64_t *group_sizes) {
+std::int64_t getri_batch_scratchpad_size<float>(sycl::queue& queue, std::int64_t* n,
+                                                std::int64_t* lda, std::int64_t group_count,
+                                                std::int64_t* group_sizes) {
     throw unimplemented("lapack", "getri_batch_scratchpad_size");
 }
 template <>
-std::int64_t getri_batch_scratchpad_size<double>(sycl::queue &queue, std::int64_t *n,
-                                                 std::int64_t *lda, std::int64_t group_count,
-                                                 std::int64_t *group_sizes) {
+std::int64_t getri_batch_scratchpad_size<double>(sycl::queue& queue, std::int64_t* n,
+                                                 std::int64_t* lda, std::int64_t group_count,
+                                                 std::int64_t* group_sizes) {
     throw unimplemented("lapack", "getri_batch_scratchpad_size");
 }
 template <>
-std::int64_t getri_batch_scratchpad_size<std::complex<float>>(sycl::queue &queue, std::int64_t *n,
-                                                              std::int64_t *lda,
+std::int64_t getri_batch_scratchpad_size<std::complex<float>>(sycl::queue& queue, std::int64_t* n,
+                                                              std::int64_t* lda,
                                                               std::int64_t group_count,
-                                                              std::int64_t *group_sizes) {
+                                                              std::int64_t* group_sizes) {
     throw unimplemented("lapack", "getri_batch_scratchpad_size");
 }
 template <>
-std::int64_t getri_batch_scratchpad_size<std::complex<double>>(sycl::queue &queue, std::int64_t *n,
-                                                               std::int64_t *lda,
+std::int64_t getri_batch_scratchpad_size<std::complex<double>>(sycl::queue& queue, std::int64_t* n,
+                                                               std::int64_t* lda,
                                                                std::int64_t group_count,
-                                                               std::int64_t *group_sizes) {
+                                                               std::int64_t* group_sizes) {
     throw unimplemented("lapack", "getri_batch_scratchpad_size");
 }
 template <>
-std::int64_t getrs_batch_scratchpad_size<float>(sycl::queue &queue, oneapi::mkl::transpose *trans,
-                                                std::int64_t *n, std::int64_t *nrhs,
-                                                std::int64_t *lda, std::int64_t *ldb,
+std::int64_t getrs_batch_scratchpad_size<float>(sycl::queue& queue, oneapi::mkl::transpose* trans,
+                                                std::int64_t* n, std::int64_t* nrhs,
+                                                std::int64_t* lda, std::int64_t* ldb,
                                                 std::int64_t group_count,
-                                                std::int64_t *group_sizes) {
+                                                std::int64_t* group_sizes) {
     throw unimplemented("lapack", "getrs_batch_scratchpad_size");
 }
 template <>
-std::int64_t getrs_batch_scratchpad_size<double>(sycl::queue &queue, oneapi::mkl::transpose *trans,
-                                                 std::int64_t *n, std::int64_t *nrhs,
-                                                 std::int64_t *lda, std::int64_t *ldb,
+std::int64_t getrs_batch_scratchpad_size<double>(sycl::queue& queue, oneapi::mkl::transpose* trans,
+                                                 std::int64_t* n, std::int64_t* nrhs,
+                                                 std::int64_t* lda, std::int64_t* ldb,
                                                  std::int64_t group_count,
-                                                 std::int64_t *group_sizes) {
+                                                 std::int64_t* group_sizes) {
     throw unimplemented("lapack", "getrs_batch_scratchpad_size");
 }
 template <>
 std::int64_t getrs_batch_scratchpad_size<std::complex<float>>(
-    sycl::queue &queue, oneapi::mkl::transpose *trans, std::int64_t *n, std::int64_t *nrhs,
-    std::int64_t *lda, std::int64_t *ldb, std::int64_t group_count, std::int64_t *group_sizes) {
+    sycl::queue& queue, oneapi::mkl::transpose* trans, std::int64_t* n, std::int64_t* nrhs,
+    std::int64_t* lda, std::int64_t* ldb, std::int64_t group_count, std::int64_t* group_sizes) {
     throw unimplemented("lapack", "getrs_batch_scratchpad_size");
 }
 template <>
 std::int64_t getrs_batch_scratchpad_size<std::complex<double>>(
-    sycl::queue &queue, oneapi::mkl::transpose *trans, std::int64_t *n, std::int64_t *nrhs,
-    std::int64_t *lda, std::int64_t *ldb, std::int64_t group_count, std::int64_t *group_sizes) {
+    sycl::queue& queue, oneapi::mkl::transpose* trans, std::int64_t* n, std::int64_t* nrhs,
+    std::int64_t* lda, std::int64_t* ldb, std::int64_t group_count, std::int64_t* group_sizes) {
     throw unimplemented("lapack", "getrs_batch_scratchpad_size");
 }
 template <>
-std::int64_t geqrf_batch_scratchpad_size<float>(sycl::queue &queue, std::int64_t *m,
-                                                std::int64_t *n, std::int64_t *lda,
+std::int64_t geqrf_batch_scratchpad_size<float>(sycl::queue& queue, std::int64_t* m,
+                                                std::int64_t* n, std::int64_t* lda,
                                                 std::int64_t group_count,
-                                                std::int64_t *group_sizes) {
+                                                std::int64_t* group_sizes) {
     throw unimplemented("lapack", "geqrf_batch_scratchpad_size");
 }
 template <>
-std::int64_t geqrf_batch_scratchpad_size<double>(sycl::queue &queue, std::int64_t *m,
-                                                 std::int64_t *n, std::int64_t *lda,
+std::int64_t geqrf_batch_scratchpad_size<double>(sycl::queue& queue, std::int64_t* m,
+                                                 std::int64_t* n, std::int64_t* lda,
                                                  std::int64_t group_count,
-                                                 std::int64_t *group_sizes) {
+                                                 std::int64_t* group_sizes) {
     throw unimplemented("lapack", "geqrf_batch_scratchpad_size");
 }
 template <>
-std::int64_t geqrf_batch_scratchpad_size<std::complex<float>>(sycl::queue &queue, std::int64_t *m,
-                                                              std::int64_t *n, std::int64_t *lda,
+std::int64_t geqrf_batch_scratchpad_size<std::complex<float>>(sycl::queue& queue, std::int64_t* m,
+                                                              std::int64_t* n, std::int64_t* lda,
                                                               std::int64_t group_count,
-                                                              std::int64_t *group_sizes) {
+                                                              std::int64_t* group_sizes) {
     throw unimplemented("lapack", "geqrf_batch_scratchpad_size");
 }
 template <>
-std::int64_t geqrf_batch_scratchpad_size<std::complex<double>>(sycl::queue &queue, std::int64_t *m,
-                                                               std::int64_t *n, std::int64_t *lda,
+std::int64_t geqrf_batch_scratchpad_size<std::complex<double>>(sycl::queue& queue, std::int64_t* m,
+                                                               std::int64_t* n, std::int64_t* lda,
                                                                std::int64_t group_count,
-                                                               std::int64_t *group_sizes) {
+                                                               std::int64_t* group_sizes) {
     throw unimplemented("lapack", "geqrf_batch_scratchpad_size");
 }
 template <>
-std::int64_t orgqr_batch_scratchpad_size<float>(sycl::queue &queue, std::int64_t *m,
-                                                std::int64_t *n, std::int64_t *k, std::int64_t *lda,
+std::int64_t orgqr_batch_scratchpad_size<float>(sycl::queue& queue, std::int64_t* m,
+                                                std::int64_t* n, std::int64_t* k, std::int64_t* lda,
                                                 std::int64_t group_count,
-                                                std::int64_t *group_sizes) {
+                                                std::int64_t* group_sizes) {
     throw unimplemented("lapack", "orgqr_batch_scratchpad_size");
 }
 template <>
-std::int64_t orgqr_batch_scratchpad_size<double>(sycl::queue &queue, std::int64_t *m,
-                                                 std::int64_t *n, std::int64_t *k,
-                                                 std::int64_t *lda, std::int64_t group_count,
-                                                 std::int64_t *group_sizes) {
+std::int64_t orgqr_batch_scratchpad_size<double>(sycl::queue& queue, std::int64_t* m,
+                                                 std::int64_t* n, std::int64_t* k,
+                                                 std::int64_t* lda, std::int64_t group_count,
+                                                 std::int64_t* group_sizes) {
     throw unimplemented("lapack", "orgqr_batch_scratchpad_size");
 }
 
 // rocsolverDnXpotrfBatched does not use scratchpad memory
-#define POTRF_GROUP_LAUNCHER_SCRATCH(TYPE)                                                   \
-    template <>                                                                              \
-    std::int64_t potrf_batch_scratchpad_size<TYPE>(                                          \
-        sycl::queue & queue, oneapi::mkl::uplo * uplo, std::int64_t * n, std::int64_t * lda, \
-        std::int64_t group_count, std::int64_t * group_sizes) {                              \
-        return 0;                                                                            \
+#define POTRF_GROUP_LAUNCHER_SCRATCH(TYPE)                                                 \
+    template <>                                                                            \
+    std::int64_t potrf_batch_scratchpad_size<TYPE>(                                        \
+        sycl::queue & queue, oneapi::mkl::uplo * uplo, std::int64_t* n, std::int64_t* lda, \
+        std::int64_t group_count, std::int64_t* group_sizes) {                             \
+        return 0;                                                                          \
     }
 
 POTRF_GROUP_LAUNCHER_SCRATCH(float)
@@ -1027,13 +1027,13 @@ POTRF_GROUP_LAUNCHER_SCRATCH(std::complex<double>)
 #undef POTRF_GROUP_LAUNCHER_SCRATCH
 
 // rocsolverDnXpotrsBatched does not use scratchpad memory
-#define POTRS_GROUP_LAUNCHER_SCRATCH(TYPE)                                                    \
-    template <>                                                                               \
-    std::int64_t potrs_batch_scratchpad_size<TYPE>(                                           \
-        sycl::queue & queue, oneapi::mkl::uplo * uplo, std::int64_t * n, std::int64_t * nrhs, \
-        std::int64_t * lda, std::int64_t * ldb, std::int64_t group_count,                     \
-        std::int64_t * group_sizes) {                                                         \
-        return 0;                                                                             \
+#define POTRS_GROUP_LAUNCHER_SCRATCH(TYPE)                                                  \
+    template <>                                                                             \
+    std::int64_t potrs_batch_scratchpad_size<TYPE>(                                         \
+        sycl::queue & queue, oneapi::mkl::uplo * uplo, std::int64_t* n, std::int64_t* nrhs, \
+        std::int64_t* lda, std::int64_t* ldb, std::int64_t group_count,                     \
+        std::int64_t* group_sizes) {                                                        \
+        return 0;                                                                           \
     }
 
 POTRS_GROUP_LAUNCHER_SCRATCH(float)
@@ -1044,19 +1044,19 @@ POTRS_GROUP_LAUNCHER_SCRATCH(std::complex<double>)
 #undef POTRS_GROUP_LAUNCHER_SCRATCH
 
 template <>
-std::int64_t ungqr_batch_scratchpad_size<std::complex<float>>(sycl::queue &queue, std::int64_t *m,
-                                                              std::int64_t *n, std::int64_t *k,
-                                                              std::int64_t *lda,
+std::int64_t ungqr_batch_scratchpad_size<std::complex<float>>(sycl::queue& queue, std::int64_t* m,
+                                                              std::int64_t* n, std::int64_t* k,
+                                                              std::int64_t* lda,
                                                               std::int64_t group_count,
-                                                              std::int64_t *group_sizes) {
+                                                              std::int64_t* group_sizes) {
     throw unimplemented("lapack", "ungqr_batch_scratchpad_size");
 }
 template <>
-std::int64_t ungqr_batch_scratchpad_size<std::complex<double>>(sycl::queue &queue, std::int64_t *m,
-                                                               std::int64_t *n, std::int64_t *k,
-                                                               std::int64_t *lda,
+std::int64_t ungqr_batch_scratchpad_size<std::complex<double>>(sycl::queue& queue, std::int64_t* m,
+                                                               std::int64_t* n, std::int64_t* k,
+                                                               std::int64_t* lda,
                                                                std::int64_t group_count,
-                                                               std::int64_t *group_sizes) {
+                                                               std::int64_t* group_sizes) {
     throw unimplemented("lapack", "ungqr_batch_scratchpad_size");
 }
 

@@ -43,12 +43,12 @@
 using namespace sycl;
 using std::vector;
 
-extern std::vector<sycl::device *> devices;
+extern std::vector<sycl::device*> devices;
 
 namespace {
 
 template <typename fp>
-int test(device *dev, oneapi::mkl::layout layout) {
+int test(device* dev, oneapi::mkl::layout layout) {
     // Prepare data.
     int64_t m, n;
     int64_t lda, ldb;
@@ -95,11 +95,11 @@ int test(device *dev, oneapi::mkl::layout layout) {
 
     // Catch asynchronous exceptions.
     auto exception_handler = [](exception_list exceptions) {
-        for (std::exception_ptr const &e : exceptions) {
+        for (std::exception_ptr const& e : exceptions) {
             try {
                 std::rethrow_exception(e);
             }
-            catch (exception const &e) {
+            catch (exception const& e) {
                 std::cout << "Caught asynchronous SYCL exception during IMATCOPY:\n"
                           << e.what() << std::endl;
                 print_error_code(e);
@@ -138,17 +138,17 @@ int test(device *dev, oneapi::mkl::layout layout) {
         }
 #endif
     }
-    catch (exception const &e) {
+    catch (exception const& e) {
         std::cout << "Caught synchronous SYCL exception during IMATCOPY:\n"
                   << e.what() << std::endl;
         print_error_code(e);
     }
 
-    catch (const oneapi::mkl::unimplemented &e) {
+    catch (const oneapi::mkl::unimplemented& e) {
         return test_skipped;
     }
 
-    catch (const std::runtime_error &error) {
+    catch (const std::runtime_error& error) {
         std::cout << "Error raised during execution of IMATCOPY:\n" << error.what() << std::endl;
     }
 
@@ -162,7 +162,7 @@ int test(device *dev, oneapi::mkl::layout layout) {
 }
 
 class ImatcopyTests
-        : public ::testing::TestWithParam<std::tuple<sycl::device *, oneapi::mkl::layout>> {};
+        : public ::testing::TestWithParam<std::tuple<sycl::device*, oneapi::mkl::layout>> {};
 
 TEST_P(ImatcopyTests, RealSinglePrecision) {
     EXPECT_TRUEORSKIP(test<float>(std::get<0>(GetParam()), std::get<1>(GetParam())));

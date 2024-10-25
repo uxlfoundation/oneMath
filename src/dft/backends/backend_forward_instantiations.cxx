@@ -25,29 +25,29 @@ using desc_rd_t =
     dft::detail::descriptor<dft::detail::precision::DOUBLE, dft::detail::domain::REAL>;
 using desc_cd_t =
     dft::detail::descriptor<dft::detail::precision::DOUBLE, dft::detail::domain::COMPLEX>;
-using depends_vec_t = const std::vector<sycl::event> &;
+using depends_vec_t = const std::vector<sycl::event>&;
 
-#define ONEMKL_DFT_FORWARD_INSTANTIATIONS(DESCRIPTOR_T, SCALAR_T, FORWARD_T, BACKWARD_T)           \
-    /* Buffer API */                                                                               \
-    template ONEMKL_EXPORT void compute_forward<DESCRIPTOR_T>(DESCRIPTOR_T &,                      \
-                                                              sycl::buffer<FORWARD_T> &);          \
-    template ONEMKL_EXPORT void compute_forward<DESCRIPTOR_T>(                                     \
-        DESCRIPTOR_T &, sycl::buffer<SCALAR_T> &, sycl::buffer<SCALAR_T> &);                       \
-    template ONEMKL_EXPORT void compute_forward<DESCRIPTOR_T>(                                     \
-        DESCRIPTOR_T &, sycl::buffer<FORWARD_T> &, sycl::buffer<BACKWARD_T> &);                    \
-    template ONEMKL_EXPORT void compute_forward<DESCRIPTOR_T>(                                     \
-        DESCRIPTOR_T &, sycl::buffer<SCALAR_T> &, sycl::buffer<SCALAR_T> &,                        \
-        sycl::buffer<SCALAR_T> &, sycl::buffer<SCALAR_T> &);                                       \
-                                                                                                   \
-    /* USM API */                                                                                  \
-    template ONEMKL_EXPORT sycl::event compute_forward<DESCRIPTOR_T>(DESCRIPTOR_T &, FORWARD_T *,  \
-                                                                     depends_vec_t);               \
-    template ONEMKL_EXPORT sycl::event compute_forward<DESCRIPTOR_T>(DESCRIPTOR_T &, SCALAR_T *,   \
-                                                                     SCALAR_T *, depends_vec_t);   \
-    template ONEMKL_EXPORT sycl::event compute_forward<DESCRIPTOR_T>(DESCRIPTOR_T &, FORWARD_T *,  \
-                                                                     BACKWARD_T *, depends_vec_t); \
-    template ONEMKL_EXPORT sycl::event compute_forward<DESCRIPTOR_T>(                              \
-        DESCRIPTOR_T &, SCALAR_T *, SCALAR_T *, SCALAR_T *, SCALAR_T *, depends_vec_t);
+#define ONEMKL_DFT_FORWARD_INSTANTIATIONS(DESCRIPTOR_T, SCALAR_T, FORWARD_T, BACKWARD_T)          \
+    /* Buffer API */                                                                              \
+    template ONEMKL_EXPORT void compute_forward<DESCRIPTOR_T>(DESCRIPTOR_T&,                      \
+                                                              sycl::buffer<FORWARD_T>&);          \
+    template ONEMKL_EXPORT void compute_forward<DESCRIPTOR_T>(                                    \
+        DESCRIPTOR_T&, sycl::buffer<SCALAR_T>&, sycl::buffer<SCALAR_T>&);                         \
+    template ONEMKL_EXPORT void compute_forward<DESCRIPTOR_T>(                                    \
+        DESCRIPTOR_T&, sycl::buffer<FORWARD_T>&, sycl::buffer<BACKWARD_T>&);                      \
+    template ONEMKL_EXPORT void compute_forward<DESCRIPTOR_T>(                                    \
+        DESCRIPTOR_T&, sycl::buffer<SCALAR_T>&, sycl::buffer<SCALAR_T>&, sycl::buffer<SCALAR_T>&, \
+        sycl::buffer<SCALAR_T>&);                                                                 \
+                                                                                                  \
+    /* USM API */                                                                                 \
+    template ONEMKL_EXPORT sycl::event compute_forward<DESCRIPTOR_T>(DESCRIPTOR_T&, FORWARD_T*,   \
+                                                                     depends_vec_t);              \
+    template ONEMKL_EXPORT sycl::event compute_forward<DESCRIPTOR_T>(DESCRIPTOR_T&, SCALAR_T*,    \
+                                                                     SCALAR_T*, depends_vec_t);   \
+    template ONEMKL_EXPORT sycl::event compute_forward<DESCRIPTOR_T>(DESCRIPTOR_T&, FORWARD_T*,   \
+                                                                     BACKWARD_T*, depends_vec_t); \
+    template ONEMKL_EXPORT sycl::event compute_forward<DESCRIPTOR_T>(                             \
+        DESCRIPTOR_T&, SCALAR_T*, SCALAR_T*, SCALAR_T*, SCALAR_T*, depends_vec_t);
 
 ONEMKL_DFT_FORWARD_INSTANTIATIONS(desc_rf_t, float, float, std::complex<float>)
 ONEMKL_DFT_FORWARD_INSTANTIATIONS(desc_cf_t, float, std::complex<float>, std::complex<float>)

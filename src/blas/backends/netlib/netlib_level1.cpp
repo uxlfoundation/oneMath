@@ -43,7 +43,7 @@ inline double abs_val(std::complex<double> val) {
     return std::abs(val.real()) + std::abs(val.imag());
 }
 
-int cblas_isamin(int n, const float *x, int incx) {
+int cblas_isamin(int n, const float* x, int incx) {
     if (n < 1 || incx < 1) {
         return 0;
     }
@@ -65,7 +65,7 @@ int cblas_isamin(int n, const float *x, int incx) {
     return min_idx;
 }
 
-int cblas_idamin(int n, const double *x, int incx) {
+int cblas_idamin(int n, const double* x, int incx) {
     if (n < 1 || incx < 1) {
         return 0;
     }
@@ -87,7 +87,7 @@ int cblas_idamin(int n, const double *x, int incx) {
     return min_idx;
 }
 
-int cblas_icamin(int n, const std::complex<float> *x, int incx) {
+int cblas_icamin(int n, const std::complex<float>* x, int incx) {
     if (n < 1 || incx < 1) {
         return 0;
     }
@@ -109,7 +109,7 @@ int cblas_icamin(int n, const std::complex<float> *x, int incx) {
     return min_idx;
 }
 
-int cblas_izamin(int n, const std::complex<double> *x, int incx) {
+int cblas_izamin(int n, const std::complex<double>* x, int incx) {
     if (n < 1 || incx < 1) {
         return 0;
     }
@@ -131,7 +131,7 @@ int cblas_izamin(int n, const std::complex<double> *x, int incx) {
     return min_idx;
 }
 
-void cblas_csrot(const int n, std::complex<float> *cx, const int incx, std::complex<float> *cy,
+void cblas_csrot(const int n, std::complex<float>* cx, const int incx, std::complex<float>* cy,
                  const int incy, const float c, const float s) {
     if (n < 1)
         return;
@@ -158,7 +158,7 @@ void cblas_csrot(const int n, std::complex<float> *cx, const int incx, std::comp
     }
 }
 
-void cblas_zdrot(const int n, std::complex<double> *zx, const int incx, std::complex<double> *zy,
+void cblas_zdrot(const int n, std::complex<double>* zx, const int incx, std::complex<double>* zy,
                  const int incy, const double c, const double s) {
     if (n < 1)
         return;
@@ -185,8 +185,8 @@ void cblas_zdrot(const int n, std::complex<double> *zx, const int incx, std::com
     }
 }
 
-void cblas_crotg(std::complex<float> *ca, const std::complex<float> *cb, float *c,
-                 std::complex<float> *s) {
+void cblas_crotg(std::complex<float>* ca, const std::complex<float>* cb, float* c,
+                 std::complex<float>* s) {
     if (std::abs(ca[0]) == 0) {
         c[0] = 0.0;
         s[0] = std::complex<float>(1.0, 0.0);
@@ -203,8 +203,8 @@ void cblas_crotg(std::complex<float> *ca, const std::complex<float> *cb, float *
     }
 }
 
-void cblas_zrotg(std::complex<double> *ca, const std::complex<double> *cb, double *c,
-                 std::complex<double> *s) {
+void cblas_zrotg(std::complex<double>* ca, const std::complex<double>* cb, double* c,
+                 std::complex<double>* s) {
     if (std::abs(ca[0]) == 0) {
         c[0] = 0.0;
         s[0] = std::complex<double>(1.0, 0.0);

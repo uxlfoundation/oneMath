@@ -41,12 +41,12 @@
 using namespace sycl;
 using std::vector;
 
-extern std::vector<sycl::device *> devices;
+extern std::vector<sycl::device*> devices;
 
 namespace {
 
 template <typename fp>
-int test(device *dev, oneapi::mkl::layout layout, int N, int incx, int incy, fp alpha, fp beta) {
+int test(device* dev, oneapi::mkl::layout layout, int N, int incx, int incy, fp alpha, fp beta) {
     // Prepare data.
     vector<fp> x, y, y_ref;
 
@@ -58,18 +58,18 @@ int test(device *dev, oneapi::mkl::layout layout, int N, int incx, int incy, fp 
     using fp_ref = typename ref_type_info<fp>::type;
     const int N_ref = N, incx_ref = incx, incy_ref = incy;
 
-    ::axpby(&N_ref, (fp_ref *)&alpha, (fp_ref *)x.data(), &incx_ref, (fp_ref *)&beta,
-            (fp_ref *)y_ref.data(), &incy_ref);
+    ::axpby(&N_ref, (fp_ref*)&alpha, (fp_ref*)x.data(), &incx_ref, (fp_ref*)&beta,
+            (fp_ref*)y_ref.data(), &incy_ref);
 
     // Call DPC++ AXPBY.
 
     // Catch asynchronous exceptions.
     auto exception_handler = [](exception_list exceptions) {
-        for (std::exception_ptr const &e : exceptions) {
+        for (std::exception_ptr const& e : exceptions) {
             try {
                 std::rethrow_exception(e);
             }
-            catch (exception const &e) {
+            catch (exception const& e) {
                 std::cout << "Caught asynchronous SYCL exception during AXPBY:\n"
                           << e.what() << std::endl;
                 print_error_code(e);
@@ -109,16 +109,16 @@ int test(device *dev, oneapi::mkl::layout layout, int N, int incx, int incy, fp 
         }
 #endif
     }
-    catch (exception const &e) {
+    catch (exception const& e) {
         std::cout << "Caught synchronous SYCL exception during AXPBY:\n" << e.what() << std::endl;
         print_error_code(e);
     }
 
-    catch (const oneapi::mkl::unimplemented &e) {
+    catch (const oneapi::mkl::unimplemented& e) {
         return test_skipped;
     }
 
-    catch (const std::runtime_error &error) {
+    catch (const std::runtime_error& error) {
         std::cout << "Error raised during execution of AXPBY:\n" << error.what() << std::endl;
     }
 
@@ -130,8 +130,8 @@ int test(device *dev, oneapi::mkl::layout layout, int N, int incx, int incy, fp 
     return (int)good;
 }
 
-class AxpbyTests
-        : public ::testing::TestWithParam<std::tuple<sycl::device *, oneapi::mkl::layout>> {};
+class AxpbyTests : public ::testing::TestWithParam<std::tuple<sycl::device*, oneapi::mkl::layout>> {
+};
 
 TEST_P(AxpbyTests, RealSinglePrecision) {
     float alpha(2.0);

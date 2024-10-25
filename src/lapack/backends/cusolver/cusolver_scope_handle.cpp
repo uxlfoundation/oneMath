@@ -44,7 +44,7 @@ thread_local cusolver_handle<pi_context> CusolverScopedContextHandler::handle_he
 #endif
 
 CusolverScopedContextHandler::CusolverScopedContextHandler(sycl::queue queue,
-                                                           sycl::interop_handle &ih)
+                                                           sycl::interop_handle& ih)
         : ih(ih),
           needToRecover_(false) {
     placedContext_ = new sycl::context(queue.get_context());
@@ -74,8 +74,8 @@ CusolverScopedContextHandler::~CusolverScopedContextHandler() noexcept(false) {
     delete placedContext_;
 }
 
-void ContextCallback(void *userData) {
-    auto *ptr = static_cast<std::atomic<cusolverDnHandle_t> *>(userData);
+void ContextCallback(void* userData) {
+    auto* ptr = static_cast<std::atomic<cusolverDnHandle_t>*>(userData);
     if (!ptr) {
         return;
     }
@@ -93,7 +93,7 @@ void ContextCallback(void *userData) {
     }
 }
 
-cusolverDnHandle_t CusolverScopedContextHandler::get_handle(const sycl::queue &queue) {
+cusolverDnHandle_t CusolverScopedContextHandler::get_handle(const sycl::queue& queue) {
     auto cudaDevice = ih.get_native_device<sycl::backend::ext_oneapi_cuda>();
     CUresult cuErr;
     CUcontext desired;
@@ -140,10 +140,10 @@ cusolverDnHandle_t CusolverScopedContextHandler::get_handle(const sycl::queue &q
     return handle;
 }
 
-CUstream CusolverScopedContextHandler::get_stream(const sycl::queue &queue) {
+CUstream CusolverScopedContextHandler::get_stream(const sycl::queue& queue) {
     return sycl::get_native<sycl::backend::ext_oneapi_cuda>(queue);
 }
-sycl::context CusolverScopedContextHandler::get_context(const sycl::queue &queue) {
+sycl::context CusolverScopedContextHandler::get_context(const sycl::queue& queue) {
     return queue.get_context();
 }
 

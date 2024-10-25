@@ -34,10 +34,9 @@
 #define N_GEN_SERVICE (N_ENGINES * N_PORTION)
 
 // defines for skip_ahead_ex tests
-#define N_SKIP     ((std::uint64_t)pow(2, 62))
-#define SKIP_TIMES ((std::int32_t)pow(2, 14))
-#define NUM_TO_SKIP \
-    { 0, (std::uint64_t)pow(2, 12) }
+#define N_SKIP      ((std::uint64_t)pow(2, 62))
+#define SKIP_TIMES  ((std::int32_t)pow(2, 14))
+#define NUM_TO_SKIP { 0, (std::uint64_t)pow(2, 12) }
 
 // Correctness checking.
 static inline bool check_equal(float x, float x_ref) {

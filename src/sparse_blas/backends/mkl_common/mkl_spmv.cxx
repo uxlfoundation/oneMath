@@ -36,16 +36,16 @@ struct spmv_descr {
 
 namespace oneapi::mkl::sparse::BACKEND {
 
-void init_spmv_descr(sycl::queue & /*queue*/, spmv_descr_t *p_spmv_descr) {
+void init_spmv_descr(sycl::queue& /*queue*/, spmv_descr_t* p_spmv_descr) {
     *p_spmv_descr = new spmv_descr();
 }
 
-sycl::event release_spmv_descr(sycl::queue &queue, spmv_descr_t spmv_descr,
-                               const std::vector<sycl::event> &dependencies) {
+sycl::event release_spmv_descr(sycl::queue& queue, spmv_descr_t spmv_descr,
+                               const std::vector<sycl::event>& dependencies) {
     return detail::submit_release(queue, spmv_descr, dependencies);
 }
 
-void check_valid_spmv(const std::string &function_name, oneapi::mkl::transpose opA,
+void check_valid_spmv(const std::string& function_name, oneapi::mkl::transpose opA,
                       matrix_view A_view, matrix_handle_t A_handle, dense_vector_handle_t x_handle,
                       dense_vector_handle_t y_handle, bool is_alpha_host_accessible,
                       bool is_beta_host_accessible) {
@@ -62,10 +62,10 @@ void check_valid_spmv(const std::string &function_name, oneapi::mkl::transpose o
     }
 }
 
-void spmv_buffer_size(sycl::queue &queue, oneapi::mkl::transpose opA, const void *alpha,
+void spmv_buffer_size(sycl::queue& queue, oneapi::mkl::transpose opA, const void* alpha,
                       matrix_view A_view, matrix_handle_t A_handle, dense_vector_handle_t x_handle,
-                      const void *beta, dense_vector_handle_t y_handle, spmv_alg /*alg*/,
-                      spmv_descr_t spmv_descr, std::size_t &temp_buffer_size) {
+                      const void* beta, dense_vector_handle_t y_handle, spmv_alg /*alg*/,
+                      spmv_descr_t spmv_descr, std::size_t& temp_buffer_size) {
     // TODO: Add support for external workspace once the close-source oneMKL backend supports it.
     bool is_alpha_host_accessible = detail::is_ptr_accessible_on_host(queue, alpha);
     bool is_beta_host_accessible = detail::is_ptr_accessible_on_host(queue, beta);
@@ -75,9 +75,9 @@ void spmv_buffer_size(sycl::queue &queue, oneapi::mkl::transpose opA, const void
     spmv_descr->buffer_size_called = true;
 }
 
-inline void common_spmv_optimize(sycl::queue &queue, oneapi::mkl::transpose opA, const void *alpha,
+inline void common_spmv_optimize(sycl::queue& queue, oneapi::mkl::transpose opA, const void* alpha,
                                  matrix_view A_view, matrix_handle_t A_handle,
-                                 dense_vector_handle_t x_handle, const void *beta,
+                                 dense_vector_handle_t x_handle, const void* beta,
                                  dense_vector_handle_t y_handle, spmv_alg alg,
                                  spmv_descr_t spmv_descr) {
     bool is_alpha_host_accessible = detail::is_ptr_accessible_on_host(queue, alpha);
@@ -97,9 +97,9 @@ inline void common_spmv_optimize(sycl::queue &queue, oneapi::mkl::transpose opA,
     spmv_descr->last_optimized_alg = alg;
 }
 
-void spmv_optimize(sycl::queue &queue, oneapi::mkl::transpose opA, const void *alpha,
+void spmv_optimize(sycl::queue& queue, oneapi::mkl::transpose opA, const void* alpha,
                    matrix_view A_view, matrix_handle_t A_handle, dense_vector_handle_t x_handle,
-                   const void *beta, dense_vector_handle_t y_handle, spmv_alg alg,
+                   const void* beta, dense_vector_handle_t y_handle, spmv_alg alg,
                    spmv_descr_t spmv_descr, sycl::buffer<std::uint8_t, 1> /*workspace*/) {
     auto internal_A_handle = detail::get_internal_handle(A_handle);
     if (!internal_A_handle->all_use_buffer()) {
@@ -125,11 +125,11 @@ void spmv_optimize(sycl::queue &queue, oneapi::mkl::transpose opA, const void *a
     }
 }
 
-sycl::event spmv_optimize(sycl::queue &queue, oneapi::mkl::transpose opA, const void *alpha,
+sycl::event spmv_optimize(sycl::queue& queue, oneapi::mkl::transpose opA, const void* alpha,
                           matrix_view A_view, matrix_handle_t A_handle,
-                          dense_vector_handle_t x_handle, const void *beta,
+                          dense_vector_handle_t x_handle, const void* beta,
                           dense_vector_handle_t y_handle, spmv_alg alg, spmv_descr_t spmv_descr,
-                          void * /*workspace*/, const std::vector<sycl::event> &dependencies) {
+                          void* /*workspace*/, const std::vector<sycl::event>& dependencies) {
     auto internal_A_handle = detail::get_internal_handle(A_handle);
     if (internal_A_handle->all_use_buffer()) {
         detail::throw_incompatible_container(__func__);
@@ -155,16 +155,16 @@ sycl::event spmv_optimize(sycl::queue &queue, oneapi::mkl::transpose opA, const 
 }
 
 template <typename T>
-sycl::event internal_spmv(sycl::queue &queue, oneapi::mkl::transpose opA, const void *alpha,
+sycl::event internal_spmv(sycl::queue& queue, oneapi::mkl::transpose opA, const void* alpha,
                           matrix_view A_view, matrix_handle_t A_handle,
-                          dense_vector_handle_t x_handle, const void *beta,
+                          dense_vector_handle_t x_handle, const void* beta,
                           dense_vector_handle_t y_handle, spmv_alg /*alg*/,
-                          spmv_descr_t /*spmv_descr*/, const std::vector<sycl::event> &dependencies,
+                          spmv_descr_t /*spmv_descr*/, const std::vector<sycl::event>& dependencies,
                           bool is_alpha_host_accessible, bool is_beta_host_accessible) {
     T host_alpha =
-        detail::get_scalar_on_host(queue, static_cast<const T *>(alpha), is_alpha_host_accessible);
+        detail::get_scalar_on_host(queue, static_cast<const T*>(alpha), is_alpha_host_accessible);
     T host_beta =
-        detail::get_scalar_on_host(queue, static_cast<const T *>(beta), is_beta_host_accessible);
+        detail::get_scalar_on_host(queue, static_cast<const T*>(beta), is_beta_host_accessible);
     auto internal_A_handle = detail::get_internal_handle(A_handle);
     internal_A_handle->can_be_reset = false;
     auto backend_handle = internal_A_handle->backend_handle;
@@ -207,10 +207,10 @@ sycl::event internal_spmv(sycl::queue &queue, oneapi::mkl::transpose opA, const 
     }
 }
 
-sycl::event spmv(sycl::queue &queue, oneapi::mkl::transpose opA, const void *alpha,
+sycl::event spmv(sycl::queue& queue, oneapi::mkl::transpose opA, const void* alpha,
                  matrix_view A_view, matrix_handle_t A_handle, dense_vector_handle_t x_handle,
-                 const void *beta, dense_vector_handle_t y_handle, spmv_alg alg,
-                 spmv_descr_t spmv_descr, const std::vector<sycl::event> &dependencies) {
+                 const void* beta, dense_vector_handle_t y_handle, spmv_alg alg,
+                 spmv_descr_t spmv_descr, const std::vector<sycl::event>& dependencies) {
     bool is_alpha_host_accessible = detail::is_ptr_accessible_on_host(queue, alpha);
     bool is_beta_host_accessible = detail::is_ptr_accessible_on_host(queue, beta);
     check_valid_spmv(__func__, opA, A_view, A_handle, x_handle, y_handle, is_alpha_host_accessible,

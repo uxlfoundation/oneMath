@@ -33,7 +33,7 @@ namespace oneapi::mkl::dft {
 
 //In-place transform
 template <typename descriptor_type, typename data_type>
-void compute_backward(descriptor_type &desc, sycl::buffer<data_type, 1> &inout) {
+void compute_backward(descriptor_type& desc, sycl::buffer<data_type, 1>& inout) {
     static_assert(detail::valid_compute_arg<descriptor_type, data_type>::value,
                   "unexpected type for data_type");
 
@@ -46,8 +46,8 @@ void compute_backward(descriptor_type &desc, sycl::buffer<data_type, 1> &inout) 
 //In-place transform, using config_param::COMPLEX_STORAGE=config_value::REAL_REAL data format
 template <typename descriptor_type, typename data_type,
           std::enable_if_t<detail::valid_ip_realreal_impl<descriptor_type, data_type>, bool> = true>
-void compute_backward(descriptor_type &desc, sycl::buffer<data_type, 1> &inout_re,
-                      sycl::buffer<data_type, 1> &inout_im) {
+void compute_backward(descriptor_type& desc, sycl::buffer<data_type, 1>& inout_re,
+                      sycl::buffer<data_type, 1>& inout_im) {
     static_assert(detail::valid_compute_arg<descriptor_type, data_type>::value,
                   "unexpected type for data_type");
 
@@ -61,8 +61,8 @@ void compute_backward(descriptor_type &desc, sycl::buffer<data_type, 1> &inout_r
 
 //Out-of-place transform
 template <typename descriptor_type, typename input_type, typename output_type>
-void compute_backward(descriptor_type &desc, sycl::buffer<input_type, 1> &in,
-                      sycl::buffer<output_type, 1> &out) {
+void compute_backward(descriptor_type& desc, sycl::buffer<input_type, 1>& in,
+                      sycl::buffer<output_type, 1>& out) {
     static_assert(detail::valid_compute_arg<descriptor_type, input_type>::value,
                   "unexpected type for input_type");
     static_assert(detail::valid_compute_arg<descriptor_type, output_type>::value,
@@ -79,9 +79,9 @@ void compute_backward(descriptor_type &desc, sycl::buffer<input_type, 1> &in,
 
 //Out-of-place transform, using config_param::COMPLEX_STORAGE=config_value::REAL_REAL data format
 template <typename descriptor_type, typename input_type, typename output_type>
-void compute_backward(descriptor_type &desc, sycl::buffer<input_type, 1> &in_re,
-                      sycl::buffer<input_type, 1> &in_im, sycl::buffer<output_type, 1> &out_re,
-                      sycl::buffer<output_type, 1> &out_im) {
+void compute_backward(descriptor_type& desc, sycl::buffer<input_type, 1>& in_re,
+                      sycl::buffer<input_type, 1>& in_im, sycl::buffer<output_type, 1>& out_re,
+                      sycl::buffer<output_type, 1>& out_im) {
     static_assert(detail::valid_compute_arg<descriptor_type, input_type>::value,
                   "unexpected type for input_type");
     static_assert(detail::valid_compute_arg<descriptor_type, output_type>::value,
@@ -104,34 +104,32 @@ void compute_backward(descriptor_type &desc, sycl::buffer<input_type, 1> &in_re,
 
 //In-place transform
 template <typename descriptor_type, typename data_type>
-sycl::event compute_backward(descriptor_type &desc, data_type *inout,
-                             const std::vector<sycl::event> &dependencies = {}) {
+sycl::event compute_backward(descriptor_type& desc, data_type* inout,
+                             const std::vector<sycl::event>& dependencies = {}) {
     static_assert(detail::valid_compute_arg<descriptor_type, data_type>::value,
                   "unexpected type for data_type");
 
     using fwd_type = typename detail::descriptor_info<descriptor_type>::forward_type;
-    return get_commit(desc)->backward_ip_cc(desc, reinterpret_cast<fwd_type *>(inout),
-                                            dependencies);
+    return get_commit(desc)->backward_ip_cc(desc, reinterpret_cast<fwd_type*>(inout), dependencies);
 }
 
 //In-place transform, using config_param::COMPLEX_STORAGE=config_value::REAL_REAL data format
 template <typename descriptor_type, typename data_type,
           std::enable_if_t<detail::valid_ip_realreal_impl<descriptor_type, data_type>, bool> = true>
-sycl::event compute_backward(descriptor_type &desc, data_type *inout_re, data_type *inout_im,
-                             const std::vector<sycl::event> &dependencies = {}) {
+sycl::event compute_backward(descriptor_type& desc, data_type* inout_re, data_type* inout_im,
+                             const std::vector<sycl::event>& dependencies = {}) {
     static_assert(detail::valid_compute_arg<descriptor_type, data_type>::value,
                   "unexpected type for data_type");
 
     using scalar_type = typename detail::descriptor_info<descriptor_type>::scalar_type;
-    return get_commit(desc)->backward_ip_rr(desc, reinterpret_cast<scalar_type *>(inout_re),
-                                            reinterpret_cast<scalar_type *>(inout_im),
-                                            dependencies);
+    return get_commit(desc)->backward_ip_rr(desc, reinterpret_cast<scalar_type*>(inout_re),
+                                            reinterpret_cast<scalar_type*>(inout_im), dependencies);
 }
 
 //Out-of-place transform
 template <typename descriptor_type, typename input_type, typename output_type>
-sycl::event compute_backward(descriptor_type &desc, input_type *in, output_type *out,
-                             const std::vector<sycl::event> &dependencies = {}) {
+sycl::event compute_backward(descriptor_type& desc, input_type* in, output_type* out,
+                             const std::vector<sycl::event>& dependencies = {}) {
     static_assert(detail::valid_compute_arg<descriptor_type, input_type>::value,
                   "unexpected type for input_type");
     static_assert(detail::valid_compute_arg<descriptor_type, output_type>::value,
@@ -139,25 +137,25 @@ sycl::event compute_backward(descriptor_type &desc, input_type *in, output_type 
 
     using fwd_type = typename detail::descriptor_info<descriptor_type>::forward_type;
     using bwd_type = typename detail::descriptor_info<descriptor_type>::backward_type;
-    return get_commit(desc)->backward_op_cc(desc, reinterpret_cast<bwd_type *>(in),
-                                            reinterpret_cast<fwd_type *>(out), dependencies);
+    return get_commit(desc)->backward_op_cc(desc, reinterpret_cast<bwd_type*>(in),
+                                            reinterpret_cast<fwd_type*>(out), dependencies);
 }
 
 //Out-of-place transform, using config_param::COMPLEX_STORAGE=config_value::REAL_REAL data format
 template <typename descriptor_type, typename input_type, typename output_type>
-sycl::event compute_backward(descriptor_type &desc, input_type *in_re, input_type *in_im,
-                             output_type *out_re, output_type *out_im,
-                             const std::vector<sycl::event> &dependencies = {}) {
+sycl::event compute_backward(descriptor_type& desc, input_type* in_re, input_type* in_im,
+                             output_type* out_re, output_type* out_im,
+                             const std::vector<sycl::event>& dependencies = {}) {
     static_assert(detail::valid_compute_arg<descriptor_type, input_type>::value,
                   "unexpected type for input_type");
     static_assert(detail::valid_compute_arg<descriptor_type, output_type>::value,
                   "unexpected type for output_type");
 
     using scalar_type = typename detail::descriptor_info<descriptor_type>::scalar_type;
-    return get_commit(desc)->backward_op_rr(desc, reinterpret_cast<scalar_type *>(in_re),
-                                            reinterpret_cast<scalar_type *>(in_im),
-                                            reinterpret_cast<scalar_type *>(out_re),
-                                            reinterpret_cast<scalar_type *>(out_im), dependencies);
+    return get_commit(desc)->backward_op_rr(desc, reinterpret_cast<scalar_type*>(in_re),
+                                            reinterpret_cast<scalar_type*>(in_im),
+                                            reinterpret_cast<scalar_type*>(out_re),
+                                            reinterpret_cast<scalar_type*>(out_im), dependencies);
 }
 } // namespace oneapi::mkl::dft
 

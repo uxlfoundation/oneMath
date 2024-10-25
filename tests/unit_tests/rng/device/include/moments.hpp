@@ -59,9 +59,8 @@ public:
              std::is_same_v<
                  Distribution,
                  oneapi::mkl::rng::device::poisson<
-                     std::int32_t, oneapi::mkl::rng::device::poisson_method::devroye>>)&&!queue
-                .get_device()
-                .has(sycl::aspect::fp64)) {
+                     std::int32_t, oneapi::mkl::rng::device::poisson_method::devroye>>) &&
+            !queue.get_device().has(sycl::aspect::fp64)) {
             status = test_skipped;
             return;
         }

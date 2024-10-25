@@ -113,7 +113,7 @@ using valid_compute_arg = typename std::bool_constant<
 
 template <class descriptor_t, typename data_t>
 constexpr bool valid_ip_realreal_impl =
-    is_complex_dft<descriptor_t>&& std::is_same_v<descriptor_scalar_t<descriptor_t>, data_t>;
+    is_complex_dft<descriptor_t> && std::is_same_v<descriptor_scalar_t<descriptor_t>, data_t>;
 
 // compute the range of a reinterpreted buffer
 template <typename In, typename Out>

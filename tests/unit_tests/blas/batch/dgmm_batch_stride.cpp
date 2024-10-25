@@ -43,12 +43,12 @@
 using namespace sycl;
 using std::vector;
 
-extern std::vector<sycl::device *> devices;
+extern std::vector<sycl::device*> devices;
 
 namespace {
 
 template <typename fp>
-int test(device *dev, oneapi::mkl::layout layout, oneapi::mkl::side left_right, int64_t incx,
+int test(device* dev, oneapi::mkl::layout layout, oneapi::mkl::side left_right, int64_t incx,
          int64_t batch_size) {
     // Prepare data.
     int64_t m, n;
@@ -90,21 +90,20 @@ int test(device *dev, oneapi::mkl::layout layout, oneapi::mkl::side left_right, 
 
     for (i = 0; i < batch_size_ref; i++) {
         ::dgmm(convert_to_cblas_layout(layout), convert_to_cblas_side(left_right),
-               (const int *)&m_ref, (const int *)&n_ref, (const fp_ref *)(A.data() + stride_a * i),
-               (const int *)&lda_ref, (const fp_ref *)(x.data() + stride_x * i),
-               (const int *)&incx_ref, (fp_ref *)(C_ref.data() + stride_c * i),
-               (const int *)&ldc_ref);
+               (const int*)&m_ref, (const int*)&n_ref, (const fp_ref*)(A.data() + stride_a * i),
+               (const int*)&lda_ref, (const fp_ref*)(x.data() + stride_x * i),
+               (const int*)&incx_ref, (fp_ref*)(C_ref.data() + stride_c * i), (const int*)&ldc_ref);
     }
 
     // Call DPC++ DGMM_BATCH_STRIDE.
 
     // Catch asynchronous exceptions.
     auto exception_handler = [](exception_list exceptions) {
-        for (std::exception_ptr const &e : exceptions) {
+        for (std::exception_ptr const& e : exceptions) {
             try {
                 std::rethrow_exception(e);
             }
-            catch (exception const &e) {
+            catch (exception const& e) {
                 std::cout << "Caught asynchronous SYCL exception during DGMM_BATCH_STRIDE:\n"
                           << e.what() << std::endl;
                 print_error_code(e);
@@ -149,17 +148,17 @@ int test(device *dev, oneapi::mkl::layout layout, oneapi::mkl::side left_right, 
         }
 #endif
     }
-    catch (exception const &e) {
+    catch (exception const& e) {
         std::cout << "Caught synchronous SYCL exception during DGMM_BATCH_STRIDE:\n"
                   << e.what() << std::endl;
         print_error_code(e);
     }
 
-    catch (const oneapi::mkl::unimplemented &e) {
+    catch (const oneapi::mkl::unimplemented& e) {
         return test_skipped;
     }
 
-    catch (const std::runtime_error &error) {
+    catch (const std::runtime_error& error) {
         std::cout << "Error raised during execution of DGMM_BATCH_STRIDE:\n"
                   << error.what() << std::endl;
     }
@@ -177,7 +176,7 @@ int test(device *dev, oneapi::mkl::layout layout, oneapi::mkl::side left_right, 
 }
 
 class DgmmBatchStrideTests
-        : public ::testing::TestWithParam<std::tuple<sycl::device *, oneapi::mkl::layout>> {};
+        : public ::testing::TestWithParam<std::tuple<sycl::device*, oneapi::mkl::layout>> {};
 
 TEST_P(DgmmBatchStrideTests, RealSinglePrecision) {
     EXPECT_TRUEORSKIP(test<float>(std::get<0>(GetParam()), std::get<1>(GetParam()),

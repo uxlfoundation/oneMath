@@ -81,7 +81,7 @@ void overflow_check(Index index, Next... indices) {
 
 class cublas_error : virtual public std::runtime_error {
 protected:
-    inline const char *cublas_error_map(cublasStatus_t error) {
+    inline const char* cublas_error_map(cublasStatus_t error) {
         switch (error) {
             case CUBLAS_STATUS_SUCCESS: return "CUBLAS_STATUS_SUCCESS";
 
@@ -133,7 +133,7 @@ public:
 
 class cuda_error : virtual public std::runtime_error {
 protected:
-    inline const char *cuda_error_map(CUresult result) {
+    inline const char* cuda_error_map(CUresult result) {
         switch (result) {
             case CUDA_SUCCESS: return "CUDA_SUCCESS";
             case CUDA_ERROR_NOT_PERMITTED: return "CUDA_ERROR_NOT_PERMITTED";

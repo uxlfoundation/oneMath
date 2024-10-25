@@ -27,7 +27,7 @@ namespace blas {
 namespace rocblas {
 
 rocblas_handle_container::~rocblas_handle_container() noexcept(false) {
-    for (auto &handle_pair : rocblas_handle_mapper_) {
+    for (auto& handle_pair : rocblas_handle_mapper_) {
         rocblas_status err;
         if (handle_pair.second != nullptr) {
             auto handle = handle_pair.second->exchange(nullptr);
@@ -46,10 +46,10 @@ thread_local rocblas_handle_container RocblasScopedContextHandler::handle_helper
     rocblas_handle_container{};
 
 RocblasScopedContextHandler::RocblasScopedContextHandler(sycl::queue queue,
-                                                         sycl::interop_handle &ih)
+                                                         sycl::interop_handle& ih)
         : interop_h(ih) {}
 
-rocblas_handle RocblasScopedContextHandler::get_handle(const sycl::queue &queue) {
+rocblas_handle RocblasScopedContextHandler::get_handle(const sycl::queue& queue) {
     sycl::device device = queue.get_device();
     int current_device = interop_h.get_native_device<sycl::backend::hip>();
     hipStream_t streamId = get_stream(queue);
@@ -84,7 +84,7 @@ rocblas_handle RocblasScopedContextHandler::get_handle(const sycl::queue &queue)
     return handle;
 }
 
-hipStream_t RocblasScopedContextHandler::get_stream(const sycl::queue &queue) {
+hipStream_t RocblasScopedContextHandler::get_stream(const sycl::queue& queue) {
     return interop_h.get_native_queue<sycl::backend::hip>();
 }
 

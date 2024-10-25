@@ -81,7 +81,7 @@ void overflow_check(Index index, Next... indices) {
 
 class rocsolver_error : virtual public std::runtime_error {
 protected:
-    inline const char *rocsolver_error_map(rocblas_status error) {
+    inline const char* rocsolver_error_map(rocblas_status error) {
         return rocblas_status_to_string(error);
     }
 
@@ -111,7 +111,7 @@ public:
 
 class hip_error : virtual public std::runtime_error {
 protected:
-    inline const char *hip_error_map(hipError_t result) {
+    inline const char* hip_error_map(hipError_t result) {
         return hipGetErrorName(result);
     }
     int error_number; ///< error number
@@ -247,12 +247,12 @@ struct RocmEquivalentType<std::complex<double>> {
 
 /* devinfo */
 
-inline int get_rocsolver_devinfo(sycl::queue &queue, sycl::buffer<int> &devInfo) {
+inline int get_rocsolver_devinfo(sycl::queue& queue, sycl::buffer<int>& devInfo) {
     sycl::host_accessor<int, 1, sycl::access::mode::read> dev_info_{ devInfo };
     return dev_info_[0];
 }
 
-inline int get_rocsolver_devinfo(sycl::queue &queue, const int *devInfo) {
+inline int get_rocsolver_devinfo(sycl::queue& queue, const int* devInfo) {
     int dev_info_;
     queue.memcpy(&dev_info_, devInfo, sizeof(int));
     queue.wait();
@@ -260,8 +260,8 @@ inline int get_rocsolver_devinfo(sycl::queue &queue, const int *devInfo) {
 }
 
 template <typename DEVINFO_T>
-inline void lapack_info_check(sycl::queue &queue, DEVINFO_T devinfo, const char *func_name,
-                              const char *cufunc_name) {
+inline void lapack_info_check(sycl::queue& queue, DEVINFO_T devinfo, const char* func_name,
+                              const char* cufunc_name) {
     queue.wait();
     const int devinfo_ = get_rocsolver_devinfo(queue, devinfo);
     if (devinfo_ > 0)

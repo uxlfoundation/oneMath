@@ -42,20 +42,20 @@
 using namespace sycl;
 using std::vector;
 
-extern std::vector<sycl::device *> devices;
+extern std::vector<sycl::device*> devices;
 
 namespace {
 
 template <typename fp>
-int test(device *dev, oneapi::mkl::layout layout, int m, int n, fp alpha, int incx, int incy,
+int test(device* dev, oneapi::mkl::layout layout, int m, int n, fp alpha, int incx, int incy,
          int lda) {
     // Catch asynchronous exceptions.
     auto exception_handler = [](exception_list exceptions) {
-        for (std::exception_ptr const &e : exceptions) {
+        for (std::exception_ptr const& e : exceptions) {
             try {
                 std::rethrow_exception(e);
             }
-            catch (exception const &e) {
+            catch (exception const& e) {
                 std::cout << "Caught asynchronous SYCL exception during GERU:\n"
                           << e.what() << std::endl;
                 print_error_code(e);
@@ -82,8 +82,8 @@ int test(device *dev, oneapi::mkl::layout layout, int m, int n, fp alpha, int in
     const int m_ref = m, n_ref = n, incx_ref = incx, incy_ref = incy, lda_ref = lda;
     using fp_ref = typename ref_type_info<fp>::type;
 
-    ::geru(convert_to_cblas_layout(layout), &m_ref, &n_ref, (fp_ref *)&alpha, (fp_ref *)x.data(),
-           &incx_ref, (fp_ref *)y.data(), &incy_ref, (fp_ref *)A_ref.data(), &lda_ref);
+    ::geru(convert_to_cblas_layout(layout), &m_ref, &n_ref, (fp_ref*)&alpha, (fp_ref*)x.data(),
+           &incx_ref, (fp_ref*)y.data(), &incy_ref, (fp_ref*)A_ref.data(), &lda_ref);
 
     // Call DPC++ GERU.
 
@@ -120,16 +120,16 @@ int test(device *dev, oneapi::mkl::layout layout, int m, int n, fp alpha, int in
         main_queue.wait();
 #endif
     }
-    catch (exception const &e) {
+    catch (exception const& e) {
         std::cout << "Caught synchronous SYCL exception during GERU:\n" << e.what() << std::endl;
         print_error_code(e);
     }
 
-    catch (const oneapi::mkl::unimplemented &e) {
+    catch (const oneapi::mkl::unimplemented& e) {
         return test_skipped;
     }
 
-    catch (const std::runtime_error &error) {
+    catch (const std::runtime_error& error) {
         std::cout << "Error raised during execution of GERU:\n" << error.what() << std::endl;
     }
 
@@ -141,7 +141,7 @@ int test(device *dev, oneapi::mkl::layout layout, int m, int n, fp alpha, int in
 }
 
 class GeruUsmTests
-        : public ::testing::TestWithParam<std::tuple<sycl::device *, oneapi::mkl::layout>> {};
+        : public ::testing::TestWithParam<std::tuple<sycl::device*, oneapi::mkl::layout>> {};
 
 TEST_P(GeruUsmTests, ComplexSinglePrecision) {
     std::complex<float> alpha(2.0, -0.5);

@@ -42,12 +42,12 @@
 using namespace sycl;
 using std::vector;
 
-extern std::vector<sycl::device *> devices;
+extern std::vector<sycl::device*> devices;
 
 namespace {
 
 template <typename fp>
-int test(device *dev, oneapi::mkl::layout layout, oneapi::mkl::uplo upper_lower, int n, int k,
+int test(device* dev, oneapi::mkl::layout layout, oneapi::mkl::uplo upper_lower, int n, int k,
          fp alpha, fp beta, int incx, int incy, int lda) {
     // Prepare data.
     vector<fp> x, y, y_ref, A;
@@ -63,18 +63,18 @@ int test(device *dev, oneapi::mkl::layout layout, oneapi::mkl::uplo upper_lower,
     using fp_ref = typename ref_type_info<fp>::type;
 
     ::hbmv(convert_to_cblas_layout(layout), convert_to_cblas_uplo(upper_lower), &n_ref, &k_ref,
-           (fp_ref *)&alpha, (fp_ref *)A.data(), &lda_ref, (fp_ref *)x.data(), &incx_ref,
-           (fp_ref *)&beta, (fp_ref *)y_ref.data(), &incy_ref);
+           (fp_ref*)&alpha, (fp_ref*)A.data(), &lda_ref, (fp_ref*)x.data(), &incx_ref,
+           (fp_ref*)&beta, (fp_ref*)y_ref.data(), &incy_ref);
 
     // Call DPC++ HBMV.
 
     // Catch asynchronous exceptions.
     auto exception_handler = [](exception_list exceptions) {
-        for (std::exception_ptr const &e : exceptions) {
+        for (std::exception_ptr const& e : exceptions) {
             try {
                 std::rethrow_exception(e);
             }
-            catch (exception const &e) {
+            catch (exception const& e) {
                 std::cout << "Caught asynchronous SYCL exception during HBMV:\n"
                           << e.what() << std::endl;
                 print_error_code(e);
@@ -118,16 +118,16 @@ int test(device *dev, oneapi::mkl::layout layout, oneapi::mkl::uplo upper_lower,
         }
 #endif
     }
-    catch (exception const &e) {
+    catch (exception const& e) {
         std::cout << "Caught synchronous SYCL exception during HBMV:\n" << e.what() << std::endl;
         print_error_code(e);
     }
 
-    catch (const oneapi::mkl::unimplemented &e) {
+    catch (const oneapi::mkl::unimplemented& e) {
         return test_skipped;
     }
 
-    catch (const std::runtime_error &error) {
+    catch (const std::runtime_error& error) {
         std::cout << "Error raised during execution of HBMV:\n" << error.what() << std::endl;
     }
 
@@ -138,7 +138,7 @@ int test(device *dev, oneapi::mkl::layout layout, oneapi::mkl::uplo upper_lower,
     return (int)good;
 }
 
-class HbmvTests : public ::testing::TestWithParam<std::tuple<sycl::device *, oneapi::mkl::layout>> {
+class HbmvTests : public ::testing::TestWithParam<std::tuple<sycl::device*, oneapi::mkl::layout>> {
 };
 
 TEST_P(HbmvTests, ComplexSinglePrecision) {

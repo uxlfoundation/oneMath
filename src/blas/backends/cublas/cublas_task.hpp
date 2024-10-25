@@ -58,7 +58,7 @@ namespace cublas {
 
 #ifdef __HIPSYCL__
 template <typename H, typename F>
-static inline void host_task_internal(H &cgh, sycl::queue queue, F f) {
+static inline void host_task_internal(H& cgh, sycl::queue queue, F f) {
     cgh.hipSYCL_enqueue_custom_operation([f, queue](sycl::interop_handle ih) {
         auto sc = CublasScopedContextHandler(queue, ih);
         f(sc);
@@ -66,7 +66,7 @@ static inline void host_task_internal(H &cgh, sycl::queue queue, F f) {
 }
 #else
 template <typename H, typename F>
-static inline void host_task_internal(H &cgh, sycl::queue queue, F f) {
+static inline void host_task_internal(H& cgh, sycl::queue queue, F f) {
     cgh.host_task([f, queue](sycl::interop_handle ih) {
         auto sc = CublasScopedContextHandler(queue, ih);
         f(sc);
@@ -74,7 +74,7 @@ static inline void host_task_internal(H &cgh, sycl::queue queue, F f) {
 }
 #endif
 template <typename H, typename F>
-static inline void onemkl_cublas_host_task(H &cgh, sycl::queue queue, F f) {
+static inline void onemkl_cublas_host_task(H& cgh, sycl::queue queue, F f) {
     (void)host_task_internal(cgh, queue, f);
 }
 

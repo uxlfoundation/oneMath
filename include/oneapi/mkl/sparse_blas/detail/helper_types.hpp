@@ -40,7 +40,7 @@ inline constexpr bool is_int_supported_v =
 
 template <typename dataType, typename indexType>
 inline constexpr bool are_fp_int_supported_v =
-    is_fp_supported_v<dataType>&& is_int_supported_v<indexType>;
+    is_fp_supported_v<dataType> && is_int_supported_v<indexType>;
 
 } // namespace detail
 } // namespace sparse

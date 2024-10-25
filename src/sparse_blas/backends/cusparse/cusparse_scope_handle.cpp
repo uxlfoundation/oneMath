@@ -41,7 +41,7 @@ thread_local cusparse_global_handle<pi_context> CusparseScopedContextHandler::ha
 #endif
 
 CusparseScopedContextHandler::CusparseScopedContextHandler(sycl::queue queue,
-                                                           sycl::interop_handle &ih)
+                                                           sycl::interop_handle& ih)
         : ih(ih),
           needToRecover_(false) {
     placedContext_ = new sycl::context(queue.get_context());
@@ -69,8 +69,8 @@ CusparseScopedContextHandler::~CusparseScopedContextHandler() noexcept(false) {
     delete placedContext_;
 }
 
-void ContextCallback(void *userData) {
-    auto *ptr = static_cast<std::atomic<cusparseHandle_t> *>(userData);
+void ContextCallback(void* userData) {
+    auto* ptr = static_cast<std::atomic<cusparseHandle_t>*>(userData);
     if (!ptr) {
         return;
     }
@@ -88,7 +88,7 @@ void ContextCallback(void *userData) {
 }
 
 std::pair<cusparseHandle_t, CUstream> CusparseScopedContextHandler::get_handle_and_stream(
-    const sycl::queue &queue) {
+    const sycl::queue& queue) {
     auto cudaDevice = ih.get_native_device<sycl::backend::ext_oneapi_cuda>();
     CUcontext desired;
     CUDA_ERROR_FUNC(cuDevicePrimaryCtxRetain, &desired, cudaDevice);
@@ -132,15 +132,15 @@ std::pair<cusparseHandle_t, CUstream> CusparseScopedContextHandler::get_handle_a
     return { handle, streamId };
 }
 
-cusparseHandle_t CusparseScopedContextHandler::get_handle(const sycl::queue &queue) {
+cusparseHandle_t CusparseScopedContextHandler::get_handle(const sycl::queue& queue) {
     return get_handle_and_stream(queue).first;
 }
 
-CUstream CusparseScopedContextHandler::get_stream(const sycl::queue &queue) {
+CUstream CusparseScopedContextHandler::get_stream(const sycl::queue& queue) {
     return sycl::get_native<sycl::backend::ext_oneapi_cuda>(queue);
 }
 
-sycl::context CusparseScopedContextHandler::get_context(const sycl::queue &queue) {
+sycl::context CusparseScopedContextHandler::get_context(const sycl::queue& queue) {
     return queue.get_context();
 }
 

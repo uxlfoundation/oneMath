@@ -35,27 +35,27 @@
 #include "compute_out_of_place.hpp"
 #include "compute_out_of_place_real_real.hpp"
 
-extern std::vector<sycl::device *> devices;
+extern std::vector<sycl::device*> devices;
 
 namespace {
 
 class ComputeTests_in_place_COMPLEX
-        : public ::testing::TestWithParam<std::tuple<sycl::device *, DFTParams>> {};
+        : public ::testing::TestWithParam<std::tuple<sycl::device*, DFTParams>> {};
 class ComputeTests_real_real_in_place_COMPLEX
-        : public ::testing::TestWithParam<std::tuple<sycl::device *, DFTParams>> {};
+        : public ::testing::TestWithParam<std::tuple<sycl::device*, DFTParams>> {};
 class ComputeTests_out_of_place_COMPLEX
-        : public ::testing::TestWithParam<std::tuple<sycl::device *, DFTParams>> {};
+        : public ::testing::TestWithParam<std::tuple<sycl::device*, DFTParams>> {};
 class ComputeTests_real_real_out_of_place_COMPLEX
-        : public ::testing::TestWithParam<std::tuple<sycl::device *, DFTParams>> {};
+        : public ::testing::TestWithParam<std::tuple<sycl::device*, DFTParams>> {};
 
 class ComputeTests_in_place_REAL
-        : public ::testing::TestWithParam<std::tuple<sycl::device *, DFTParams>> {};
+        : public ::testing::TestWithParam<std::tuple<sycl::device*, DFTParams>> {};
 class ComputeTests_real_real_in_place_REAL
-        : public ::testing::TestWithParam<std::tuple<sycl::device *, DFTParams>> {};
+        : public ::testing::TestWithParam<std::tuple<sycl::device*, DFTParams>> {};
 class ComputeTests_out_of_place_REAL
-        : public ::testing::TestWithParam<std::tuple<sycl::device *, DFTParams>> {};
+        : public ::testing::TestWithParam<std::tuple<sycl::device*, DFTParams>> {};
 class ComputeTests_real_real_out_of_place_REAL
-        : public ::testing::TestWithParam<std::tuple<sycl::device *, DFTParams>> {};
+        : public ::testing::TestWithParam<std::tuple<sycl::device*, DFTParams>> {};
 
 #define INSTANTIATE_TEST(PRECISION, DOMAIN, PLACE, LAYOUT, STORAGE)                       \
     TEST_P(ComputeTests##_##LAYOUT##PLACE##_##DOMAIN,                                     \

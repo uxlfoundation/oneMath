@@ -31,14 +31,14 @@ namespace mkl {
 
 class backend_not_found : public oneapi::mkl::exception {
 public:
-    backend_not_found(const std::string &info = "")
+    backend_not_found(const std::string& info = "")
             : oneapi::mkl::exception(
                   "", "", ((info.length() != 0) ? info : "Couldn't load selected backend")) {}
 };
 
 class function_not_found : public oneapi::mkl::exception {
 public:
-    function_not_found(const std::string &info = "")
+    function_not_found(const std::string& info = "")
             : oneapi::mkl::exception(
                   "", "",
                   ((info.length() != 0) ? info : "Couldn't load functions from selected backend")) {
@@ -47,7 +47,7 @@ public:
 
 class specification_mismatch : public oneapi::mkl::exception {
 public:
-    specification_mismatch(const std::string &info = "")
+    specification_mismatch(const std::string& info = "")
             : oneapi::mkl::exception(
                   "", "",
                   ((info.length() != 0) ? info : "Loaded oneMKL specification version mismatch")) {}

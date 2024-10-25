@@ -30,7 +30,7 @@
 
 #ifdef __linux__
 #include <dlfcn.h>
-#define LIB_TYPE                 void *
+#define LIB_TYPE                 void*
 #define GET_LIB_HANDLE(libname)  dlopen((libname), RTLD_LAZY | RTLD_GLOBAL)
 #define GET_FUNC(lib, fn)        dlsym(lib, (fn))
 #define FREE_LIB_HANDLE(libname) dlclose(libname)
@@ -59,7 +59,7 @@ class table_initializer {
     using dlhandle = std::unique_ptr<LIB_TYPE, handle_deleter>;
 
 public:
-    function_table_t &operator[](oneapi::mkl::device key) {
+    function_table_t& operator[](oneapi::mkl::device key) {
         auto lib = tables.find(key);
         if (lib != tables.end())
             return lib->second;
@@ -90,10 +90,10 @@ private:
     }
 #endif
 
-    function_table_t &add_table(oneapi::mkl::device key) {
+    function_table_t& add_table(oneapi::mkl::device key) {
         dlhandle handle;
         // check all available libraries for the key(device)
-        for (const char *libname : libraries[domain_id][key]) {
+        for (const char* libname : libraries[domain_id][key]) {
             handle = dlhandle{ ::GET_LIB_HANDLE(libname) };
             if (handle)
                 break;
@@ -103,7 +103,7 @@ private:
             throw mkl::backend_not_found();
         }
         auto t =
-            reinterpret_cast<function_table_t *>(::GET_FUNC(handle.get(), table_names[domain_id]));
+            reinterpret_cast<function_table_t*>(::GET_FUNC(handle.get(), table_names[domain_id]));
 
         if (!t) {
             std::cerr << ERROR_MSG << '\n';

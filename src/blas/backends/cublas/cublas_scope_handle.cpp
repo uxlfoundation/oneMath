@@ -43,7 +43,7 @@ thread_local cublas_handle<pi_context> CublasScopedContextHandler::handle_helper
     cublas_handle<pi_context>{};
 #endif
 
-CublasScopedContextHandler::CublasScopedContextHandler(sycl::queue queue, sycl::interop_handle &ih)
+CublasScopedContextHandler::CublasScopedContextHandler(sycl::queue queue, sycl::interop_handle& ih)
         : ih(ih),
           needToRecover_(false) {
     placedContext_ = new sycl::context(queue.get_context());
@@ -73,8 +73,8 @@ CublasScopedContextHandler::~CublasScopedContextHandler() noexcept(false) {
     delete placedContext_;
 }
 
-void ContextCallback(void *userData) {
-    auto *ptr = static_cast<std::atomic<cublasHandle_t> *>(userData);
+void ContextCallback(void* userData) {
+    auto* ptr = static_cast<std::atomic<cublasHandle_t>*>(userData);
     if (!ptr) {
         return;
     }
@@ -92,7 +92,7 @@ void ContextCallback(void *userData) {
     }
 }
 
-cublasHandle_t CublasScopedContextHandler::get_handle(const sycl::queue &queue) {
+cublasHandle_t CublasScopedContextHandler::get_handle(const sycl::queue& queue) {
     auto cudaDevice = ih.get_native_device<sycl::backend::ext_oneapi_cuda>();
     CUresult cuErr;
     CUcontext desired;
@@ -139,10 +139,10 @@ cublasHandle_t CublasScopedContextHandler::get_handle(const sycl::queue &queue) 
     return handle;
 }
 
-CUstream CublasScopedContextHandler::get_stream(const sycl::queue &queue) {
+CUstream CublasScopedContextHandler::get_stream(const sycl::queue& queue) {
     return sycl::get_native<sycl::backend::ext_oneapi_cuda>(queue);
 }
-sycl::context CublasScopedContextHandler::get_context(const sycl::queue &queue) {
+sycl::context CublasScopedContextHandler::get_context(const sycl::queue& queue) {
     return queue.get_context();
 }
 

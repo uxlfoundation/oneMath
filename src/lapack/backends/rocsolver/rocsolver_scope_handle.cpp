@@ -46,7 +46,7 @@ thread_local rocsolver_handle<pi_context> RocsolverScopedContextHandler::handle_
 #endif
 
 RocsolverScopedContextHandler::RocsolverScopedContextHandler(sycl::queue queue,
-                                                             sycl::interop_handle &ih)
+                                                             sycl::interop_handle& ih)
         : ih(ih),
           needToRecover_(false) {
     placedContext_ = new sycl::context(queue.get_context());
@@ -76,8 +76,8 @@ RocsolverScopedContextHandler::~RocsolverScopedContextHandler() noexcept(false) 
     delete placedContext_;
 }
 
-void ContextCallback(void *userData) {
-    auto *ptr = static_cast<std::atomic<rocblas_handle> *>(userData);
+void ContextCallback(void* userData) {
+    auto* ptr = static_cast<std::atomic<rocblas_handle>*>(userData);
     if (!ptr) {
         return;
     }
@@ -95,7 +95,7 @@ void ContextCallback(void *userData) {
     }
 }
 
-rocblas_handle RocsolverScopedContextHandler::get_handle(const sycl::queue &queue) {
+rocblas_handle RocsolverScopedContextHandler::get_handle(const sycl::queue& queue) {
     auto hipDevice = ih.get_native_device<sycl::backend::ext_oneapi_hip>();
     hipError_t hipErr;
     hipCtx_t desired;
@@ -142,10 +142,10 @@ rocblas_handle RocsolverScopedContextHandler::get_handle(const sycl::queue &queu
     return handle;
 }
 
-hipStream_t RocsolverScopedContextHandler::get_stream(const sycl::queue &queue) {
+hipStream_t RocsolverScopedContextHandler::get_stream(const sycl::queue& queue) {
     return sycl::get_native<sycl::backend::ext_oneapi_hip>(queue);
 }
-sycl::context RocsolverScopedContextHandler::get_context(const sycl::queue &queue) {
+sycl::context RocsolverScopedContextHandler::get_context(const sycl::queue& queue) {
     return queue.get_context();
 }
 

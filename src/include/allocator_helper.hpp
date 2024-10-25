@@ -29,7 +29,7 @@
 namespace oneapi {
 namespace mkl {
 
-static inline void *aligned_alloc(size_t align, size_t size) {
+static inline void* aligned_alloc(size_t align, size_t size) {
 #ifdef _WIN64
     return ::_aligned_malloc(size, align);
 #else
@@ -37,7 +37,7 @@ static inline void *aligned_alloc(size_t align, size_t size) {
 #endif
 }
 
-static inline void aligned_free(void *p) {
+static inline void aligned_free(void* p) {
 #ifdef _WIN64
     ::_aligned_free(p);
 #else

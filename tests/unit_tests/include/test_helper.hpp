@@ -281,11 +281,11 @@
         }                                                                  \
     } while (0);
 
-void print_error_code(sycl::exception const &e);
+void print_error_code(sycl::exception const& e);
 
 class DeviceNamePrint {
 public:
-    std::string operator()(testing::TestParamInfo<sycl::device *> dev) const {
+    std::string operator()(testing::TestParamInfo<sycl::device*> dev) const {
         std::string dev_name = dev.param->get_info<sycl::info::device::name>();
         for (std::string::size_type i = 0; i < dev_name.size(); ++i) {
             if (!isalnum(dev_name[i]))
@@ -300,7 +300,7 @@ public:
 class LayoutDeviceNamePrint {
 public:
     std::string operator()(
-        testing::TestParamInfo<std::tuple<sycl::device *, oneapi::mkl::layout>> dev) const {
+        testing::TestParamInfo<std::tuple<sycl::device*, oneapi::mkl::layout>> dev) const {
         std::string layout_name =
             std::get<1>(dev.param) == oneapi::mkl::layout::col_major ? "Column_Major" : "Row_Major";
         std::string dev_name = std::get<0>(dev.param)->get_info<sycl::info::device::name>();
@@ -318,7 +318,7 @@ public:
 namespace oneapi {
 namespace mkl {
 
-static inline void *aligned_alloc(size_t align, size_t size) {
+static inline void* aligned_alloc(size_t align, size_t size) {
 #ifdef _WIN64
     return ::_aligned_malloc(size, align);
 #else
@@ -326,7 +326,7 @@ static inline void *aligned_alloc(size_t align, size_t size) {
 #endif
 }
 
-static inline void aligned_free(void *p) {
+static inline void aligned_free(void* p) {
 #ifdef _WIN64
     ::_aligned_free(p);
 #else
@@ -335,7 +335,7 @@ static inline void aligned_free(void *p) {
 }
 
 /* Support for Unified Shared Memory allocations for different backends */
-static inline void *malloc_shared(size_t align, size_t size, sycl::device dev, sycl::context ctx) {
+static inline void* malloc_shared(size_t align, size_t size, sycl::device dev, sycl::context ctx) {
     (void)align;
 #ifdef _WIN64
     return sycl::malloc_shared(size, dev, ctx);
@@ -349,7 +349,7 @@ static inline void *malloc_shared(size_t align, size_t size, sycl::device dev, s
 #endif
 }
 
-static inline void *malloc_device(size_t align, size_t size, sycl::device dev, sycl::context ctx) {
+static inline void* malloc_device(size_t align, size_t size, sycl::device dev, sycl::context ctx) {
     (void)align;
 #ifdef _WIN64
     return sycl::malloc_device(size, dev, ctx);
@@ -363,11 +363,11 @@ static inline void *malloc_device(size_t align, size_t size, sycl::device dev, s
 #endif
 }
 
-static inline void free_shared(void *p, sycl::context ctx) {
+static inline void free_shared(void* p, sycl::context ctx) {
     sycl::free(p, ctx);
 }
 
-static inline void free_usm(void *p, sycl::context ctx) {
+static inline void free_usm(void* p, sycl::context ctx) {
     sycl::free(p, ctx);
 }
 

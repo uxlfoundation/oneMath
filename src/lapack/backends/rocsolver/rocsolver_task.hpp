@@ -51,7 +51,7 @@ namespace lapack {
 namespace rocsolver {
 
 template <typename H, typename F>
-static inline void host_task_internal(H &cgh, sycl::queue queue, F f) {
+static inline void host_task_internal(H& cgh, sycl::queue queue, F f) {
     cgh.host_task([f, queue](cl::sycl::interop_handle ih) {
         auto sc = RocsolverScopedContextHandler(queue, ih);
         f(sc);
@@ -59,7 +59,7 @@ static inline void host_task_internal(H &cgh, sycl::queue queue, F f) {
 }
 
 template <typename H, typename F>
-static inline void onemkl_rocsolver_host_task(H &cgh, sycl::queue queue, F f) {
+static inline void onemkl_rocsolver_host_task(H& cgh, sycl::queue queue, F f) {
     (void)host_task_internal(cgh, queue, f);
 }
 

@@ -23,19 +23,19 @@
 
 #include "test_spmm.hpp"
 
-extern std::vector<sycl::device *> devices;
+extern std::vector<sycl::device*> devices;
 
 namespace {
 
 template <typename fpType, typename intType>
-int test_spmm(sycl::device *dev, sycl::property_list queue_properties,
+int test_spmm(sycl::device* dev, sycl::property_list queue_properties,
               sparse_matrix_format_t format, intType nrows_A, intType ncols_A, intType ncols_C,
               double density_A_matrix, oneapi::mkl::index_base index,
               oneapi::mkl::layout dense_matrix_layout, oneapi::mkl::transpose transpose_A,
               oneapi::mkl::transpose transpose_B, fpType alpha, fpType beta, intType ldb,
               intType ldc, oneapi::mkl::sparse::spmm_alg alg,
               oneapi::mkl::sparse::matrix_view A_view,
-              const std::set<oneapi::mkl::sparse::matrix_property> &matrix_properties,
+              const std::set<oneapi::mkl::sparse::matrix_property>& matrix_properties,
               bool reset_data, bool test_scalar_on_device) {
     sycl::queue main_queue(*dev, exception_handler_t(), queue_properties);
 
@@ -80,11 +80,11 @@ int test_spmm(sycl::device *dev, sycl::property_list queue_properties,
     auto alpha_usm_uptr = malloc_device_uptr<fpType>(main_queue, 1);
     auto beta_usm_uptr = malloc_device_uptr<fpType>(main_queue, 1);
 
-    intType *ia_usm = ia_usm_uptr.get();
-    intType *ja_usm = ja_usm_uptr.get();
-    fpType *a_usm = a_usm_uptr.get();
-    fpType *b_usm = b_usm_uptr.get();
-    fpType *c_usm = c_usm_uptr.get();
+    intType* ia_usm = ia_usm_uptr.get();
+    intType* ja_usm = ja_usm_uptr.get();
+    fpType* a_usm = a_usm_uptr.get();
+    fpType* b_usm = b_usm_uptr.get();
+    fpType* c_usm = c_usm_uptr.get();
 
     std::vector<sycl::event> dependencies;
     // Copy host to device
@@ -96,8 +96,8 @@ int test_spmm(sycl::device *dev, sycl::property_list queue_properties,
     dependencies.push_back(main_queue.memcpy(b_usm, b_host.data(), b_host.size() * sizeof(fpType)));
     dependencies.push_back(main_queue.memcpy(c_usm, c_host.data(), c_host.size() * sizeof(fpType)));
 
-    fpType *alpha_host_or_usm_ptr = &alpha;
-    fpType *beta_host_or_usm_ptr = &beta;
+    fpType* alpha_host_or_usm_ptr = &alpha;
+    fpType* beta_host_or_usm_ptr = &beta;
     if (test_scalar_on_device) {
         dependencies.push_back(main_queue.memcpy(alpha_usm_uptr.get(), &alpha, sizeof(fpType)));
         dependencies.push_back(main_queue.memcpy(beta_usm_uptr.get(), &beta, sizeof(fpType)));
@@ -188,13 +188,13 @@ int test_spmm(sycl::device *dev, sycl::property_list queue_properties,
 
         ev_copy = main_queue.memcpy(c_host.data(), c_usm, c_host.size() * sizeof(fpType), ev_spmm);
     }
-    catch (const sycl::exception &e) {
+    catch (const sycl::exception& e) {
         std::cout << "Caught synchronous SYCL exception during sparse SPMM:\n"
                   << e.what() << std::endl;
         print_error_code(e);
         return 0;
     }
-    catch (const oneapi::mkl::unimplemented &e) {
+    catch (const oneapi::mkl::unimplemented& e) {
         wait_and_free_handles(main_queue, A_handle, B_handle, C_handle);
         if (descr) {
             sycl::event ev_release_descr;
@@ -204,7 +204,7 @@ int test_spmm(sycl::device *dev, sycl::property_list queue_properties,
         }
         return test_skipped;
     }
-    catch (const std::runtime_error &error) {
+    catch (const std::runtime_error& error) {
         std::cout << "Error raised during execution of sparse SPMM:\n" << error.what() << std::endl;
         return 0;
     }
@@ -227,7 +227,7 @@ int test_spmm(sycl::device *dev, sycl::property_list queue_properties,
     return static_cast<int>(valid);
 }
 
-class SparseSpmmUsmTests : public ::testing::TestWithParam<sycl::device *> {};
+class SparseSpmmUsmTests : public ::testing::TestWithParam<sycl::device*> {};
 
 TEST_P(SparseSpmmUsmTests, RealSinglePrecision) {
     using fpType = float;
