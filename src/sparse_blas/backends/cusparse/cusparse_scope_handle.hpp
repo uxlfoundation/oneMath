@@ -40,7 +40,7 @@
 #include "cusparse_global_handle.hpp"
 #include "cusparse_helper.hpp"
 
-namespace oneapi::mkl::sparse::cusparse {
+namespace oneapi::mkl::sparse::cusparse::detail {
 
 class CusparseScopedContextHandler {
     CUcontext original_;
@@ -83,6 +83,6 @@ inline void* get_mem(sycl::interop_handle ih, AccT acc) {
     return reinterpret_cast<void*>(cudaPtr);
 }
 
-} // namespace oneapi::mkl::sparse::cusparse
+} // namespace oneapi::mkl::sparse::cusparse::detail
 
 #endif //_ONEMKL_SPARSE_BLAS_BACKENDS_CUSPARSE_SCOPE_HANDLE_HPP_

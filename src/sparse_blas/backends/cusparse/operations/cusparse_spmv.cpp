@@ -54,46 +54,7 @@ struct spmv_descr {
 
 namespace oneapi::mkl::sparse::cusparse {
 
-void init_spmv_descr(sycl::queue& /*queue*/, spmv_descr_t* p_spmv_descr) {
-    *p_spmv_descr = new spmv_descr();
-}
-
-sycl::event release_spmv_descr(sycl::queue& queue, spmv_descr_t spmv_descr,
-                               const std::vector<sycl::event>& dependencies) {
-    if (!spmv_descr) {
-        return detail::collapse_dependencies(queue, dependencies);
-    }
-
-    auto release_functor = [=]() {
-        spmv_descr->cu_handle = nullptr;
-        spmv_descr->last_optimized_A_handle = nullptr;
-        spmv_descr->last_optimized_x_handle = nullptr;
-        spmv_descr->last_optimized_y_handle = nullptr;
-        delete spmv_descr;
-    };
-
-    // Use dispatch_submit to ensure the descriptor is kept alive as long as the buffers are used
-    // dispatch_submit can only be used if the descriptor's handles are valid
-    if (spmv_descr->last_optimized_A_handle &&
-        spmv_descr->last_optimized_A_handle->all_use_buffer() &&
-        spmv_descr->last_optimized_x_handle && spmv_descr->last_optimized_y_handle &&
-        spmv_descr->workspace.use_buffer()) {
-        auto dispatch_functor = [=](sycl::interop_handle, sycl::accessor<std::uint8_t>) {
-            release_functor();
-        };
-        return dispatch_submit(
-            __func__, queue, dispatch_functor, spmv_descr->last_optimized_A_handle,
-            spmv_descr->workspace.get_buffer<std::uint8_t>(), spmv_descr->last_optimized_x_handle,
-            spmv_descr->last_optimized_y_handle);
-    }
-
-    // Release used if USM is used or if the descriptor has been released before spmv_optimize has succeeded
-    sycl::event event = queue.submit([&](sycl::handler& cgh) {
-        cgh.depends_on(dependencies);
-        cgh.host_task(release_functor);
-    });
-    return event;
-}
+namespace detail {
 
 inline auto get_cuda_spmv_alg(spmv_alg alg) {
     switch (alg) {
@@ -109,46 +70,14 @@ void check_valid_spmv(const std::string& function_name, oneapi::mkl::transpose o
                       matrix_view A_view, matrix_handle_t A_handle, dense_vector_handle_t x_handle,
                       dense_vector_handle_t y_handle, bool is_alpha_host_accessible,
                       bool is_beta_host_accessible) {
-    detail::check_valid_spmv_common(function_name, opA, A_view, A_handle, x_handle, y_handle,
-                                    is_alpha_host_accessible, is_beta_host_accessible);
+    check_valid_spmv_common(function_name, opA, A_view, A_handle, x_handle, y_handle,
+                            is_alpha_host_accessible, is_beta_host_accessible);
     check_valid_matrix_properties(function_name, A_handle);
     if (A_view.type_view != matrix_descr::general) {
         throw mkl::unimplemented(
             "sparse_blas", function_name,
             "The backend does not support spmv with a `type_view` other than `matrix_descr::general`.");
     }
-}
-
-void spmv_buffer_size(sycl::queue& queue, oneapi::mkl::transpose opA, const void* alpha,
-                      matrix_view A_view, matrix_handle_t A_handle, dense_vector_handle_t x_handle,
-                      const void* beta, dense_vector_handle_t y_handle, spmv_alg alg,
-                      spmv_descr_t spmv_descr, std::size_t& temp_buffer_size) {
-    bool is_alpha_host_accessible = detail::is_ptr_accessible_on_host(queue, alpha);
-    bool is_beta_host_accessible = detail::is_ptr_accessible_on_host(queue, beta);
-    check_valid_spmv(__func__, opA, A_view, A_handle, x_handle, y_handle, is_alpha_host_accessible,
-                     is_beta_host_accessible);
-
-    auto functor = [=, &temp_buffer_size](sycl::interop_handle ih) {
-        CusparseScopedContextHandler sc(queue, ih);
-        auto [cu_handle, cu_stream] = sc.get_handle_and_stream(queue);
-        spmv_descr->cu_handle = cu_handle;
-        spmv_descr->cu_stream = cu_stream;
-        auto cu_a = A_handle->backend_handle;
-        auto cu_x = x_handle->backend_handle;
-        auto cu_y = y_handle->backend_handle;
-        auto type = A_handle->value_container.data_type;
-        auto cu_op = get_cuda_operation(type, opA);
-        auto cu_type = get_cuda_value_type(type);
-        auto cu_alg = get_cuda_spmv_alg(alg);
-        set_pointer_mode(cu_handle, is_alpha_host_accessible);
-        auto status = cusparseSpMV_bufferSize(cu_handle, cu_op, alpha, cu_a, cu_x, beta, cu_y,
-                                              cu_type, cu_alg, &temp_buffer_size);
-        check_status(status, __func__);
-    };
-    auto event = dispatch_submit(__func__, queue, functor, A_handle, x_handle, y_handle);
-    event.wait_and_throw();
-    spmv_descr->temp_buffer_size = temp_buffer_size;
-    spmv_descr->buffer_size_called = true;
 }
 
 inline void common_spmv_optimize(oneapi::mkl::transpose opA, bool is_alpha_host_accessible,
@@ -191,6 +120,81 @@ void spmv_optimize_impl(cusparseHandle_t cu_handle, oneapi::mkl::transpose opA, 
 }
 #endif
 
+} // namespace detail
+
+void init_spmv_descr(sycl::queue& /*queue*/, spmv_descr_t* p_spmv_descr) {
+    *p_spmv_descr = new spmv_descr();
+}
+
+sycl::event release_spmv_descr(sycl::queue& queue, spmv_descr_t spmv_descr,
+                               const std::vector<sycl::event>& dependencies) {
+    if (!spmv_descr) {
+        return detail::collapse_dependencies(queue, dependencies);
+    }
+
+    auto release_functor = [=]() {
+        spmv_descr->cu_handle = nullptr;
+        spmv_descr->last_optimized_A_handle = nullptr;
+        spmv_descr->last_optimized_x_handle = nullptr;
+        spmv_descr->last_optimized_y_handle = nullptr;
+        delete spmv_descr;
+    };
+
+    // Use dispatch_submit to ensure the descriptor is kept alive as long as the buffers are used
+    // dispatch_submit can only be used if the descriptor's handles are valid
+    if (spmv_descr->last_optimized_A_handle &&
+        spmv_descr->last_optimized_A_handle->all_use_buffer() &&
+        spmv_descr->last_optimized_x_handle && spmv_descr->last_optimized_y_handle &&
+        spmv_descr->workspace.use_buffer()) {
+        auto dispatch_functor = [=](sycl::interop_handle, sycl::accessor<std::uint8_t>) {
+            release_functor();
+        };
+        return detail::dispatch_submit(
+            __func__, queue, dispatch_functor, spmv_descr->last_optimized_A_handle,
+            spmv_descr->workspace.get_buffer<std::uint8_t>(), spmv_descr->last_optimized_x_handle,
+            spmv_descr->last_optimized_y_handle);
+    }
+
+    // Release used if USM is used or if the descriptor has been released before spmv_optimize has succeeded
+    sycl::event event = queue.submit([&](sycl::handler& cgh) {
+        cgh.depends_on(dependencies);
+        cgh.host_task(release_functor);
+    });
+    return event;
+}
+
+void spmv_buffer_size(sycl::queue& queue, oneapi::mkl::transpose opA, const void* alpha,
+                      matrix_view A_view, matrix_handle_t A_handle, dense_vector_handle_t x_handle,
+                      const void* beta, dense_vector_handle_t y_handle, spmv_alg alg,
+                      spmv_descr_t spmv_descr, std::size_t& temp_buffer_size) {
+    bool is_alpha_host_accessible = detail::is_ptr_accessible_on_host(queue, alpha);
+    bool is_beta_host_accessible = detail::is_ptr_accessible_on_host(queue, beta);
+    detail::check_valid_spmv(__func__, opA, A_view, A_handle, x_handle, y_handle,
+                             is_alpha_host_accessible, is_beta_host_accessible);
+
+    auto functor = [=, &temp_buffer_size](sycl::interop_handle ih) {
+        detail::CusparseScopedContextHandler sc(queue, ih);
+        auto [cu_handle, cu_stream] = sc.get_handle_and_stream(queue);
+        spmv_descr->cu_handle = cu_handle;
+        spmv_descr->cu_stream = cu_stream;
+        auto cu_a = A_handle->backend_handle;
+        auto cu_x = x_handle->backend_handle;
+        auto cu_y = y_handle->backend_handle;
+        auto type = A_handle->value_container.data_type;
+        auto cu_op = detail::get_cuda_operation(type, opA);
+        auto cu_type = detail::get_cuda_value_type(type);
+        auto cu_alg = detail::get_cuda_spmv_alg(alg);
+        detail::set_pointer_mode(cu_handle, is_alpha_host_accessible);
+        auto status = cusparseSpMV_bufferSize(cu_handle, cu_op, alpha, cu_a, cu_x, beta, cu_y,
+                                              cu_type, cu_alg, &temp_buffer_size);
+        detail::check_status(status, __func__);
+    };
+    auto event = detail::dispatch_submit(__func__, queue, functor, A_handle, x_handle, y_handle);
+    event.wait_and_throw();
+    spmv_descr->temp_buffer_size = temp_buffer_size;
+    spmv_descr->buffer_size_called = true;
+}
+
 void spmv_optimize(sycl::queue& queue, oneapi::mkl::transpose opA, const void* alpha,
                    matrix_view A_view, matrix_handle_t A_handle, dense_vector_handle_t x_handle,
                    const void* beta, dense_vector_handle_t y_handle, spmv_alg alg,
@@ -200,8 +204,8 @@ void spmv_optimize(sycl::queue& queue, oneapi::mkl::transpose opA, const void* a
     if (!A_handle->all_use_buffer()) {
         detail::throw_incompatible_container(__func__);
     }
-    common_spmv_optimize(opA, is_alpha_host_accessible, A_view, A_handle, x_handle,
-                         is_beta_host_accessible, y_handle, alg, spmv_descr);
+    detail::common_spmv_optimize(opA, is_alpha_host_accessible, A_view, A_handle, x_handle,
+                                 is_beta_host_accessible, y_handle, alg, spmv_descr);
     // Copy the buffer to extend its lifetime until the descriptor is free'd.
     spmv_descr->workspace.set_buffer_untyped(workspace);
     if (alg == spmv_alg::no_optimize_alg) {
@@ -215,21 +219,21 @@ void spmv_optimize(sycl::queue& queue, oneapi::mkl::transpose opA, const void* a
     if (spmv_descr->temp_buffer_size > 0) {
         auto functor = [=](sycl::interop_handle ih, sycl::accessor<std::uint8_t> workspace_acc) {
             auto cu_handle = spmv_descr->cu_handle;
-            auto workspace_ptr = get_mem(ih, workspace_acc);
-            spmv_optimize_impl(cu_handle, opA, alpha, A_handle, x_handle, beta, y_handle, alg,
-                               workspace_ptr, is_alpha_host_accessible);
+            auto workspace_ptr = detail::get_mem(ih, workspace_acc);
+            detail::spmv_optimize_impl(cu_handle, opA, alpha, A_handle, x_handle, beta, y_handle,
+                                       alg, workspace_ptr, is_alpha_host_accessible);
         };
 
         // The accessor can only be created if the buffer size is greater than 0
-        dispatch_submit(__func__, queue, functor, A_handle, workspace, x_handle, y_handle);
+        detail::dispatch_submit(__func__, queue, functor, A_handle, workspace, x_handle, y_handle);
     }
     else {
         auto functor = [=](sycl::interop_handle) {
             auto cu_handle = spmv_descr->cu_handle;
-            spmv_optimize_impl(cu_handle, opA, alpha, A_handle, x_handle, beta, y_handle, alg,
-                               nullptr, is_alpha_host_accessible);
+            detail::spmv_optimize_impl(cu_handle, opA, alpha, A_handle, x_handle, beta, y_handle,
+                                       alg, nullptr, is_alpha_host_accessible);
         };
-        dispatch_submit(__func__, queue, functor, A_handle, x_handle, y_handle);
+        detail::dispatch_submit(__func__, queue, functor, A_handle, x_handle, y_handle);
     }
 #endif
 }
@@ -244,8 +248,8 @@ sycl::event spmv_optimize(sycl::queue& queue, oneapi::mkl::transpose opA, const 
     if (A_handle->all_use_buffer()) {
         detail::throw_incompatible_container(__func__);
     }
-    common_spmv_optimize(opA, is_alpha_host_accessible, A_view, A_handle, x_handle,
-                         is_beta_host_accessible, y_handle, alg, spmv_descr);
+    detail::common_spmv_optimize(opA, is_alpha_host_accessible, A_view, A_handle, x_handle,
+                                 is_beta_host_accessible, y_handle, alg, spmv_descr);
     spmv_descr->workspace.usm_ptr = workspace;
     if (alg == spmv_alg::no_optimize_alg) {
         return detail::collapse_dependencies(queue, dependencies);
@@ -257,10 +261,11 @@ sycl::event spmv_optimize(sycl::queue& queue, oneapi::mkl::transpose opA, const 
 #else
     auto functor = [=](sycl::interop_handle) {
         auto cu_handle = spmv_descr->cu_handle;
-        spmv_optimize_impl(cu_handle, opA, alpha, A_handle, x_handle, beta, y_handle, alg,
-                           workspace, is_alpha_host_accessible);
+        detail::spmv_optimize_impl(cu_handle, opA, alpha, A_handle, x_handle, beta, y_handle, alg,
+                                   workspace, is_alpha_host_accessible);
     };
-    return dispatch_submit(__func__, queue, dependencies, functor, A_handle, x_handle, y_handle);
+    return detail::dispatch_submit(__func__, queue, dependencies, functor, A_handle, x_handle,
+                                   y_handle);
 #endif
 }
 
@@ -270,8 +275,8 @@ sycl::event spmv(sycl::queue& queue, oneapi::mkl::transpose opA, const void* alp
                  spmv_descr_t spmv_descr, const std::vector<sycl::event>& dependencies) {
     bool is_alpha_host_accessible = detail::is_ptr_accessible_on_host(queue, alpha);
     bool is_beta_host_accessible = detail::is_ptr_accessible_on_host(queue, beta);
-    check_valid_spmv(__func__, opA, A_view, A_handle, x_handle, y_handle, is_alpha_host_accessible,
-                     is_beta_host_accessible);
+    detail::check_valid_spmv(__func__, opA, A_view, A_handle, x_handle, y_handle,
+                             is_alpha_host_accessible, is_beta_host_accessible);
     if (A_handle->all_use_buffer() != spmv_descr->workspace.use_buffer()) {
         detail::throw_incompatible_container(__func__);
     }
@@ -294,25 +299,25 @@ sycl::event spmv(sycl::queue& queue, oneapi::mkl::transpose opA, const void* alp
         auto cu_x = x_handle->backend_handle;
         auto cu_y = y_handle->backend_handle;
         auto type = A_handle->value_container.data_type;
-        auto cu_op = get_cuda_operation(type, opA);
-        auto cu_type = get_cuda_value_type(type);
-        auto cu_alg = get_cuda_spmv_alg(alg);
-        set_pointer_mode(cu_handle, is_alpha_host_accessible);
+        auto cu_op = detail::get_cuda_operation(type, opA);
+        auto cu_type = detail::get_cuda_value_type(type);
+        auto cu_alg = detail::get_cuda_spmv_alg(alg);
+        detail::set_pointer_mode(cu_handle, is_alpha_host_accessible);
         auto status = cusparseSpMV(cu_handle, cu_op, alpha, cu_a, cu_x, beta, cu_y, cu_type, cu_alg,
                                    workspace_ptr);
-        check_status(status, __func__);
-        synchronize_if_needed(is_in_order_queue, spmv_descr->cu_stream);
+        detail::check_status(status, __func__);
+        detail::synchronize_if_needed(is_in_order_queue, spmv_descr->cu_stream);
     };
     if (A_handle->all_use_buffer() && spmv_descr->temp_buffer_size > 0) {
         // The accessor can only be created if the buffer size is greater than 0
         auto functor_buffer = [=](sycl::interop_handle ih,
                                   sycl::accessor<std::uint8_t> workspace_acc) {
-            auto workspace_ptr = get_mem(ih, workspace_acc);
+            auto workspace_ptr = detail::get_mem(ih, workspace_acc);
             compute_functor(workspace_ptr);
         };
-        return dispatch_submit_native_ext(__func__, queue, functor_buffer, A_handle,
-                                          spmv_descr->workspace.get_buffer<std::uint8_t>(),
-                                          x_handle, y_handle);
+        return detail::dispatch_submit_native_ext(__func__, queue, functor_buffer, A_handle,
+                                                  spmv_descr->workspace.get_buffer<std::uint8_t>(),
+                                                  x_handle, y_handle);
     }
     else {
         // The same dispatch_submit can be used for USM or buffers if no
@@ -322,8 +327,8 @@ sycl::event spmv(sycl::queue& queue, oneapi::mkl::transpose opA, const void* alp
         auto functor_usm = [=](sycl::interop_handle) {
             compute_functor(workspace_ptr);
         };
-        return dispatch_submit_native_ext(__func__, queue, dependencies, functor_usm, A_handle,
-                                          x_handle, y_handle);
+        return detail::dispatch_submit_native_ext(__func__, queue, dependencies, functor_usm,
+                                                  A_handle, x_handle, y_handle);
     }
 }
 

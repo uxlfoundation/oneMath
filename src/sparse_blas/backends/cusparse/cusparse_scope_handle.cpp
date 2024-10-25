@@ -23,7 +23,7 @@
 
 #include "cusparse_scope_handle.hpp"
 
-namespace oneapi::mkl::sparse::cusparse {
+namespace oneapi::mkl::sparse::cusparse::detail {
 
 /**
  * Inserts a new element in the map if its key is unique. This new element
@@ -144,4 +144,4 @@ sycl::context CusparseScopedContextHandler::get_context(const sycl::queue& queue
     return queue.get_context();
 }
 
-} // namespace oneapi::mkl::sparse::cusparse
+} // namespace oneapi::mkl::sparse::cusparse::detail

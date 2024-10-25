@@ -27,7 +27,7 @@
 
 #include "oneapi/mkl/exceptions.hpp"
 
-namespace oneapi::mkl::sparse::cusparse {
+namespace oneapi::mkl::sparse::cusparse::detail {
 
 inline std::string cuda_result_to_str(CUresult result) {
     switch (result) {
@@ -44,13 +44,13 @@ inline std::string cuda_result_to_str(CUresult result) {
     }
 }
 
-#define CUDA_ERROR_FUNC(func, ...)                                                  \
-    do {                                                                            \
-        auto res = func(__VA_ARGS__);                                               \
-        if (res != CUDA_SUCCESS) {                                                  \
-            throw oneapi::mkl::exception("sparse_blas", #func,                      \
-                                         "cuda error: " + cuda_result_to_str(res)); \
-        }                                                                           \
+#define CUDA_ERROR_FUNC(func, ...)                                                          \
+    do {                                                                                    \
+        auto res = func(__VA_ARGS__);                                                       \
+        if (res != CUDA_SUCCESS) {                                                          \
+            throw oneapi::mkl::exception("sparse_blas", #func,                              \
+                                         "cuda error: " + detail::cuda_result_to_str(res)); \
+        }                                                                                   \
     } while (0)
 
 inline std::string cusparse_status_to_str(cusparseStatus_t status) {
@@ -92,12 +92,12 @@ inline void check_status(cusparseStatus_t status, const std::string& function,
     }
 }
 
-#define CUSPARSE_ERR_FUNC(func, ...)     \
-    do {                                 \
-        auto status = func(__VA_ARGS__); \
-        check_status(status, #func);     \
+#define CUSPARSE_ERR_FUNC(func, ...)         \
+    do {                                     \
+        auto status = func(__VA_ARGS__);     \
+        detail::check_status(status, #func); \
     } while (0)
 
-} // namespace oneapi::mkl::sparse::cusparse
+} // namespace oneapi::mkl::sparse::cusparse::detail
 
 #endif // _ONEMKL_SPARSE_BLAS_BACKENDS_CUSPARSE_ERROR_HPP_

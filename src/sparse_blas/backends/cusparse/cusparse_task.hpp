@@ -25,7 +25,7 @@
 
 /// This file provide a helper function to submit host_task using buffers or USM seamlessly
 
-namespace oneapi::mkl::sparse::cusparse {
+namespace oneapi::mkl::sparse::cusparse::detail {
 
 template <typename T, typename Container>
 auto get_value_accessor(sycl::handler& cgh, Container container) {
@@ -198,8 +198,8 @@ sycl::event dispatch_submit_impl_fp_int(const std::string& function_name, sycl::
                                         Ts... other_containers) {
     bool is_in_order_queue = queue.is_in_order();
     if (sm_handle->all_use_buffer()) {
-        detail::data_type value_type = sm_handle->get_value_type();
-        detail::data_type int_type = sm_handle->get_int_type();
+        data_type value_type = sm_handle->get_value_type();
+        data_type int_type = sm_handle->get_int_type();
 
 #define ONEMKL_CUSPARSE_SUBMIT(FP_TYPE, INT_TYPE)                                                 \
     return queue.submit([&](sycl::handler& cgh) {                                                 \
@@ -239,23 +239,23 @@ sycl::event dispatch_submit_impl_fp_int(const std::string& function_name, sycl::
         }                                                                                         \
     })
 #define ONEMKL_CUSPARSE_SUBMIT_INT(FP_TYPE)            \
-    if (int_type == detail::data_type::int32) {        \
+    if (int_type == data_type::int32) {                \
         ONEMKL_CUSPARSE_SUBMIT(FP_TYPE, std::int32_t); \
     }                                                  \
-    else if (int_type == detail::data_type::int64) {   \
+    else if (int_type == data_type::int64) {           \
         ONEMKL_CUSPARSE_SUBMIT(FP_TYPE, std::int64_t); \
     }
 
-        if (value_type == detail::data_type::real_fp32) {
+        if (value_type == data_type::real_fp32) {
             ONEMKL_CUSPARSE_SUBMIT_INT(float)
         }
-        else if (value_type == detail::data_type::real_fp64) {
+        else if (value_type == data_type::real_fp64) {
             ONEMKL_CUSPARSE_SUBMIT_INT(double)
         }
-        else if (value_type == detail::data_type::complex_fp32) {
+        else if (value_type == data_type::complex_fp32) {
             ONEMKL_CUSPARSE_SUBMIT_INT(std::complex<float>)
         }
-        else if (value_type == detail::data_type::complex_fp64) {
+        else if (value_type == data_type::complex_fp64) {
             ONEMKL_CUSPARSE_SUBMIT_INT(std::complex<double>)
         }
 
@@ -296,7 +296,7 @@ sycl::event dispatch_submit_impl_fp(const std::string& function_name, sycl::queu
                                     const std::vector<sycl::event>& dependencies, Functor functor,
                                     ContainerT container_handle) {
     if (container_handle->all_use_buffer()) {
-        detail::data_type value_type = container_handle->get_value_type();
+        data_type value_type = container_handle->get_value_type();
 
 #define ONEMKL_CUSPARSE_SUBMIT(FP_TYPE)                                  \
     return queue.submit([&](sycl::handler& cgh) {                        \
@@ -305,16 +305,16 @@ sycl::event dispatch_submit_impl_fp(const std::string& function_name, sycl::queu
         submit_host_task(cgh, queue, functor, fp_accs);                  \
     })
 
-        if (value_type == detail::data_type::real_fp32) {
+        if (value_type == data_type::real_fp32) {
             ONEMKL_CUSPARSE_SUBMIT(float);
         }
-        else if (value_type == detail::data_type::real_fp64) {
+        else if (value_type == data_type::real_fp64) {
             ONEMKL_CUSPARSE_SUBMIT(double);
         }
-        else if (value_type == detail::data_type::complex_fp32) {
+        else if (value_type == data_type::complex_fp32) {
             ONEMKL_CUSPARSE_SUBMIT(std::complex<float>);
         }
-        else if (value_type == detail::data_type::complex_fp64) {
+        else if (value_type == data_type::complex_fp64) {
             ONEMKL_CUSPARSE_SUBMIT(std::complex<double>);
         }
 
@@ -428,6 +428,6 @@ inline void synchronize_if_needed(bool is_in_order_queue, CUstream cu_stream) {
 #endif
 }
 
-} // namespace oneapi::mkl::sparse::cusparse
+} // namespace oneapi::mkl::sparse::cusparse::detail
 
 #endif // _ONEMKL_SPARSE_BLAS_BACKENDS_CUSPARSE_TASKS_HPP_

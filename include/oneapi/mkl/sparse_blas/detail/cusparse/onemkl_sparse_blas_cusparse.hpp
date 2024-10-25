@@ -26,8 +26,6 @@
 
 namespace oneapi::mkl::sparse::cusparse {
 
-namespace detail = oneapi::mkl::sparse::detail;
-
 #include "oneapi/mkl/sparse_blas/detail/onemkl_sparse_blas_backends.hxx"
 
 } // namespace oneapi::mkl::sparse::cusparse

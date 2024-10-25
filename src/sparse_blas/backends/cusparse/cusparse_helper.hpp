@@ -31,7 +31,9 @@
 #include "sparse_blas/sycl_helper.hpp"
 #include "cusparse_error.hpp"
 
-namespace oneapi::mkl::sparse::cusparse {
+namespace oneapi::mkl::sparse::cusparse::detail {
+
+using namespace oneapi::mkl::sparse::detail;
 
 template <typename T>
 struct CudaEnumType;
@@ -68,12 +70,12 @@ inline std::string cast_enum_to_str(E e) {
     return std::to_string(static_cast<char>(e));
 }
 
-inline cudaDataType_t get_cuda_value_type(detail::data_type onemkl_data_type) {
+inline cudaDataType_t get_cuda_value_type(data_type onemkl_data_type) {
     switch (onemkl_data_type) {
-        case detail::data_type::real_fp32: return CUDA_R_32F;
-        case detail::data_type::real_fp64: return CUDA_R_64F;
-        case detail::data_type::complex_fp32: return CUDA_C_32F;
-        case detail::data_type::complex_fp64: return CUDA_C_64F;
+        case data_type::real_fp32: return CUDA_R_32F;
+        case data_type::real_fp64: return CUDA_R_64F;
+        case data_type::complex_fp32: return CUDA_C_32F;
+        case data_type::complex_fp64: return CUDA_C_64F;
         default:
             throw oneapi::mkl::invalid_argument(
                 "sparse_blas", "get_cuda_value_type",
@@ -103,13 +105,12 @@ inline cusparseIndexBase_t get_cuda_index_base(index_base index) {
 
 /// Return the CUDA transpose operation from a oneMKL type.
 /// Do not conjugate for real types to avoid an invalid argument.
-inline cusparseOperation_t get_cuda_operation(detail::data_type type, transpose op) {
+inline cusparseOperation_t get_cuda_operation(data_type type, transpose op) {
     switch (op) {
         case transpose::nontrans: return CUSPARSE_OPERATION_NON_TRANSPOSE;
         case transpose::trans: return CUSPARSE_OPERATION_TRANSPOSE;
         case transpose::conjtrans:
-            return (type == detail::data_type::complex_fp32 ||
-                    type == detail::data_type::complex_fp64)
+            return (type == data_type::complex_fp32 || type == data_type::complex_fp64)
                        ? CUSPARSE_OPERATION_CONJUGATE_TRANSPOSE
                        : CUSPARSE_OPERATION_TRANSPOSE;
         default:
@@ -160,6 +161,6 @@ inline void set_pointer_mode(cusparseHandle_t cu_handle, bool is_ptr_host_access
                                                              : CUSPARSE_POINTER_MODE_DEVICE);
 }
 
-} // namespace oneapi::mkl::sparse::cusparse
+} // namespace oneapi::mkl::sparse::cusparse::detail
 
 #endif //_ONEMKL_SPARSE_BLAS_BACKENDS_CUSPARSE_HELPER_HPP_

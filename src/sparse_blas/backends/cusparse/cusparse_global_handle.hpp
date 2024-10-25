@@ -29,7 +29,7 @@
 #include <atomic>
 #include <unordered_map>
 
-namespace oneapi::mkl::sparse::cusparse {
+namespace oneapi::mkl::sparse::cusparse::detail {
 
 template <typename T>
 struct cusparse_global_handle {
@@ -58,6 +58,6 @@ struct cusparse_global_handle {
     }
 };
 
-} // namespace oneapi::mkl::sparse::cusparse
+} // namespace oneapi::mkl::sparse::cusparse::detail
 
 #endif // _ONEMKL_SPARSE_BLAS_BACKENDS_CUSPARSE_GLOBAL_HANDLE_HPP_

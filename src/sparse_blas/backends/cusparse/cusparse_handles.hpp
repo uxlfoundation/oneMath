@@ -75,9 +75,11 @@ struct matrix_handle : public detail::generic_sparse_handle<cusparseSpMatDescr_t
                                                                   num_cols, nnz, index) {}
 };
 
+namespace detail {
+
 inline void check_valid_matrix_properties(const std::string& function_name,
                                           matrix_handle_t sm_handle) {
-    if (sm_handle->format == detail::sparse_format::COO &&
+    if (sm_handle->format == sparse_format::COO &&
         !(sm_handle->has_matrix_property(matrix_property::sorted_by_rows) ||
           sm_handle->has_matrix_property(matrix_property::sorted))) {
         throw mkl::unimplemented(
@@ -85,6 +87,8 @@ inline void check_valid_matrix_properties(const std::string& function_name,
             "The backend does not support unsorted COO format. Use `set_matrix_property` to set the property `matrix_property::sorted_by_rows` or `matrix_property::sorted`");
     }
 }
+
+} // namespace detail
 
 } // namespace oneapi::mkl::sparse
 
