@@ -155,9 +155,9 @@ void test_helper_with_format(testFunctorI32 test_functor_i32, testFunctorI64 tes
     }
     // In-order queue
     EXPECT_TRUE_OR_FUTURE_SKIP(
-        test_functor_i32(dev, { sycl::property::queue::in_order{} }, format, m,
-                         density_A_matrix, index_zero, transpose_val, alpha, default_alg,
-                         default_A_view, default_properties, no_reset_data, no_scalars_on_device),
+        test_functor_i32(dev, { sycl::property::queue::in_order{} }, format, m, density_A_matrix,
+                         index_zero, transpose_val, alpha, default_alg, default_A_view,
+                         default_properties, no_reset_data, no_scalars_on_device),
         num_passed, num_skipped);
 }
 
