@@ -17,15 +17,27 @@
 # SPDX-License-Identifier: Apache-2.0
 #===============================================================================
 
-if("blas" IN_LIST TARGET_DOMAINS)
-  find_package(CBLAS REQUIRED)
+set(TEST_TARGET_DOMAINS ${TARGET_DOMAINS})
+
+if("blas" IN_LIST TEST_TARGET_DOMAINS)
+  find_package(CBLAS)
+  if(NOT CBLAS_FOUND)
+    # TODO: add list of tests without Netlib dependency
+    message(WARNING "Netlib CBLAS headers or libraries are not found, BLAS unit tests will be skipped")
+    list(REMOVE_ITEM TEST_TARGET_DOMAINS "blas")
+  endif()
 endif()
 
-if("lapack" IN_LIST TARGET_DOMAINS)
-    find_package(LAPACKE REQUIRED)
+if("lapack" IN_LIST TEST_TARGET_DOMAINS)
+  find_package(LAPACKE)
+  if(NOT LAPACKE_FOUND)
+    # TODO: add list of tests without Netlib dependency
+    message(WARNING "Netlib LAPACKE headers or libraries are not found, LAPACK unit tests will be skipped")
+    list(REMOVE_ITEM TEST_TARGET_DOMAINS "lapack")
+  endif()
 endif()
 
-foreach(domain ${TARGET_DOMAINS})
+foreach(domain ${TEST_TARGET_DOMAINS})
   # Build tests first
   add_subdirectory(${domain})
 endforeach()
@@ -50,7 +62,9 @@ set(blas_TEST_LINK "")
 set(lapack_TEST_LIST
         lapack_source)
 
-set(lapack_TEST_LINK ${LAPACKE_LINK})
+if(LAPACKE_FOUND)
+  set(lapack_TEST_LINK ${LAPACKE_LINK})
+endif()
 
 # RNG config
 set(rng_TEST_LIST
@@ -75,7 +89,7 @@ set(sparse_blas_TEST_LIST
 
 set(sparse_blas_TEST_LINK "")
 
-foreach(domain ${TARGET_DOMAINS})
+foreach(domain ${TEST_TARGET_DOMAINS})
   # Generate RT and CT test lists
   set(${domain}_TEST_LIST_RT ${${domain}_TEST_LIST})
   set(${domain}_TEST_LIST_CT ${${domain}_TEST_LIST})
@@ -200,7 +214,7 @@ foreach(domain ${TARGET_DOMAINS})
 
   string(TOUPPER ${domain} DOMAIN_PREFIX)
 
-  if(domain STREQUAL "blas")
+  if(domain STREQUAL "blas" AND CBLAS_FOUND)
     set(TEST_LD_LIBRARY_PATH ${CMAKE_BINARY_DIR}/lib:${CBLAS_LIB_DIR}:$ENV{LD_LIBRARY_PATH})
   else()
     set(TEST_LD_LIBRARY_PATH ${CMAKE_BINARY_DIR}/lib:$ENV{LD_LIBRARY_PATH})

@@ -55,7 +55,7 @@ inline void asum(Func func, sycl::queue& queue, int64_t n, sycl::buffer<T1, 1>& 
             auto res_ = sc.get_mem<rocDataType2*>(res_acc);
             rocblas_status err;
             // ASUM does not support negative index
-            ROCBLAS_ERROR_FUNC_SYNC(func, err, handle, n, x_, std::abs(incx), res_);
+            rocblas_native_func(func, err, handle, n, x_, std::abs(incx), res_);
             // Higher level BLAS functions expect rocblas_pointer_mode_host
             // to be set, therfore we need to reset this to the default value
             // in order to avoid invalid memory accesses
@@ -91,7 +91,7 @@ inline void scal(Func func, sycl::queue& queue, int64_t n, T1 a, sycl::buffer<T2
             auto x_ = sc.get_mem<rocDataType2*>(x_acc);
             rocblas_status err;
             // SCAL does not support negative incx
-            ROCBLAS_ERROR_FUNC_SYNC(func, err, handle, n, (rocDataType1*)&a, x_, std::abs(incx));
+            rocblas_native_func(func, err, handle, n, (rocDataType1*)&a, x_, std::abs(incx));
         });
     });
 }
@@ -125,7 +125,7 @@ inline void axpy(Func func, sycl::queue& queue, int64_t n, T alpha, sycl::buffer
             auto x_ = sc.get_mem<rocDataType*>(x_acc);
             auto y_ = sc.get_mem<rocDataType*>(y_acc);
             rocblas_status err;
-            ROCBLAS_ERROR_FUNC_SYNC(func, err, handle, n, (rocDataType*)&alpha, x_, incx, y_, incy);
+            rocblas_native_func(func, err, handle, n, (rocDataType*)&alpha, x_, incx, y_, incy);
         });
     });
 }
@@ -189,7 +189,7 @@ inline void rotg(Func func, sycl::queue& queue, sycl::buffer<T1, 1>& a, sycl::bu
             auto c_ = sc.get_mem<rocDataType2*>(c_acc);
             auto s_ = sc.get_mem<rocDataType1*>(s_acc);
             rocblas_status err;
-            ROCBLAS_ERROR_FUNC_SYNC(func, err, handle, a_, b_, c_, s_);
+            rocblas_native_func(func, err, handle, a_, b_, c_, s_);
             // Higher level BLAS functions expect rocblas_pointer_mode_host
             // to be set, therfore we need to reset this to the default value
             // in order to avoid invalid memory accesses
@@ -234,7 +234,7 @@ inline void rotm(Func func, sycl::queue& queue, int64_t n, sycl::buffer<T, 1>& x
             auto y_ = sc.get_mem<rocDataType*>(y_acc);
             auto param_ = sc.get_mem<rocDataType*>(param_acc);
             rocblas_status err;
-            ROCBLAS_ERROR_FUNC_SYNC(func, err, handle, n, x_, incx, y_, incy, param_);
+            rocblas_native_func(func, err, handle, n, x_, incx, y_, incy, param_);
             // Higher level BLAS functions expect rocblas_pointer_mode_host
             // to be set, therfore we need to reset this to the default value
             // in order to avoid invalid memory accesses
@@ -269,7 +269,7 @@ inline void copy(Func func, sycl::queue& queue, int64_t n, sycl::buffer<T, 1>& x
             auto x_ = sc.get_mem<rocDataType*>(x_acc);
             auto y_ = sc.get_mem<rocDataType*>(y_acc);
             rocblas_status err;
-            ROCBLAS_ERROR_FUNC_SYNC(func, err, handle, n, x_, incx, y_, incy);
+            rocblas_native_func(func, err, handle, n, x_, incx, y_, incy);
         });
     });
 }
@@ -310,7 +310,7 @@ inline void dot(Func func, sycl::queue& queue, int64_t n, sycl::buffer<T, 1>& x,
             auto y_ = sc.get_mem<rocDataType*>(y_acc);
             auto res_ = sc.get_mem<rocDataType*>(res_acc);
             rocblas_status err;
-            ROCBLAS_ERROR_FUNC_SYNC(func, err, handle, n, x_, incx, y_, incy, res_);
+            rocblas_native_func(func, err, handle, n, x_, incx, y_, incy, res_);
             // Higher level BLAS functions expect rocblas_pointer_mode_host
             // to be set, therfore we need to reset this to the default value
             // in order to avoid invalid memory accesses
@@ -361,8 +361,8 @@ inline void rot(Func func, sycl::queue& queue, int64_t n, sycl::buffer<T1, 1>& x
             auto x_ = sc.get_mem<rocDataType1*>(x_acc);
             auto y_ = sc.get_mem<rocDataType1*>(y_acc);
             rocblas_status err;
-            ROCBLAS_ERROR_FUNC_SYNC(func, err, handle, n, x_, incx, y_, incy, (rocDataType2*)&c,
-                                    (rocDataType3*)&s);
+            rocblas_native_func(func, err, handle, n, x_, incx, y_, incy, (rocDataType2*)&c,
+                                (rocDataType3*)&s);
         });
     });
 }
@@ -402,7 +402,7 @@ void sdsdot(sycl::queue& queue, int64_t n, float sb, sycl::buffer<float, 1>& x, 
             auto y_ = sc.get_mem<float*>(y_acc);
             auto res_ = sc.get_mem<float*>(res_acc);
             rocblas_status err;
-            ROCBLAS_ERROR_FUNC_SYNC(rocblas_sdot, err, handle, n, x_, incx, y_, incy, res_);
+            rocblas_native_func(rocblas_sdot, err, handle, n, x_, incx, y_, incy, res_);
             // Higher level BLAS functions expect rocblas_pointer_mode_host
             // to be set, therfore we need to reset this to the default value
             // in order to avoid invalid memory accesses
@@ -442,7 +442,7 @@ inline void rotmg(Func func, sycl::queue& queue, sycl::buffer<T, 1>& d1, sycl::b
             auto y1_ = sc.get_mem<rocDataType*>(y1_acc);
             auto param_ = sc.get_mem<rocDataType*>(param_acc);
             rocblas_status err;
-            ROCBLAS_ERROR_FUNC_SYNC(func, err, handle, d1_, d2_, x1_, y1_, param_);
+            rocblas_native_func(func, err, handle, d1_, d2_, x1_, y1_, param_);
             // Higher level BLAS functions expect rocblas_pointer_mode_host
             // to be set, therfore we need to reset this to the default value
             // in order to avoid invalid memory accesses
@@ -493,7 +493,7 @@ inline void iamax(Func func, sycl::queue& queue, int64_t n, sycl::buffer<T, 1>& 
             rocblas_status err;
             // For negative incx, iamax returns 0. This behaviour is similar to that of
             // reference netlib BLAS.
-            ROCBLAS_ERROR_FUNC_SYNC(func, err, handle, n, x_, incx, int_res_);
+            rocblas_native_func(func, err, handle, n, x_, incx, int_res_);
             // Higher level BLAS functions expect rocblas_pointer_mode_host
             // to be set, therfore we need to reset this to the default value
             // in order to avoid invalid memory accesses
@@ -537,7 +537,7 @@ inline void swap(Func func, sycl::queue& queue, int64_t n, sycl::buffer<T, 1>& x
             auto x_ = sc.get_mem<rocDataType*>(x_acc);
             auto y_ = sc.get_mem<rocDataType*>(y_acc);
             rocblas_status err;
-            ROCBLAS_ERROR_FUNC_SYNC(func, err, handle, n, x_, incx, y_, incy);
+            rocblas_native_func(func, err, handle, n, x_, incx, y_, incy);
         });
     });
 }
@@ -586,7 +586,7 @@ inline void iamin(Func func, sycl::queue& queue, int64_t n, sycl::buffer<T, 1>& 
             rocblas_status err;
             // For negative incx, iamin returns 0. This behaviour is similar to that of
             // implemented as a reference IAMIN.
-            ROCBLAS_ERROR_FUNC_SYNC(func, err, handle, n, x_, incx, int_res_);
+            rocblas_native_func(func, err, handle, n, x_, incx, int_res_);
             // Higher level BLAS functions expect rocblas_pointer_mode_host
             // to be set, therfore we need to reset this to the default value
             // in order to avoid invalid memory accesses
@@ -638,7 +638,7 @@ inline void nrm2(Func func, sycl::queue& queue, int64_t n, sycl::buffer<T1, 1>& 
             auto res_ = sc.get_mem<rocDataType2*>(res_acc);
             rocblas_status err;
             // NRM2 does not support negative index
-            ROCBLAS_ERROR_FUNC_SYNC(func, err, handle, n, x_, std::abs(incx), res_);
+            rocblas_native_func(func, err, handle, n, x_, std::abs(incx), res_);
             // Higher level BLAS functions expect rocblas_pointer_mode_host
             // to be set, therfore we need to reset this to the default value
             // in order to avoid invalid memory accesses
@@ -679,7 +679,7 @@ inline sycl::event asum(Func func, sycl::queue& queue, int64_t n, const T1* x, c
             auto res_ = reinterpret_cast<rocDataType2*>(result);
             rocblas_status err;
             // ASUM does not support negative index
-            ROCBLAS_ERROR_FUNC_SYNC(func, err, handle, n, x_, std::abs(incx), res_);
+            rocblas_native_func(func, err, handle, n, x_, std::abs(incx), res_);
             rocblas_set_pointer_mode(handle, rocblas_pointer_mode_host);
         });
     });
@@ -715,7 +715,7 @@ inline sycl::event scal(Func func, sycl::queue& queue, int64_t n, T1 a, T2* x, i
             auto x_ = reinterpret_cast<rocDataType2*>(x);
             rocblas_status err;
             // SCAL does not support negative incx
-            ROCBLAS_ERROR_FUNC_SYNC(func, err, handle, n, (rocDataType1*)&a, x_, std::abs(incx));
+            rocblas_native_func(func, err, handle, n, (rocDataType1*)&a, x_, std::abs(incx));
         });
     });
 
@@ -751,7 +751,7 @@ inline sycl::event axpy(Func func, sycl::queue& queue, int64_t n, T alpha, const
             auto x_ = reinterpret_cast<const rocDataType*>(x);
             auto y_ = reinterpret_cast<rocDataType*>(y);
             rocblas_status err;
-            ROCBLAS_ERROR_FUNC_SYNC(func, err, handle, n, (rocDataType*)&alpha, x_, incx, y_, incy);
+            rocblas_native_func(func, err, handle, n, (rocDataType*)&alpha, x_, incx, y_, incy);
         });
     });
 
@@ -810,7 +810,7 @@ inline sycl::event rotg(Func func, sycl::queue& queue, T1* a, T1* b, T2* c, T1* 
             auto c_ = reinterpret_cast<rocDataType2*>(c);
             auto s_ = reinterpret_cast<rocDataType1*>(s);
             rocblas_status err;
-            ROCBLAS_ERROR_FUNC_SYNC(func, err, handle, a_, b_, c_, s_);
+            rocblas_native_func(func, err, handle, a_, b_, c_, s_);
         });
     });
 
@@ -845,7 +845,7 @@ inline sycl::event rotm(Func func, sycl::queue& queue, int64_t n, T* x, int64_t 
             auto y_ = reinterpret_cast<rocDataType*>(y);
             auto param_ = reinterpret_cast<rocDataType*>(param);
             rocblas_status err;
-            ROCBLAS_ERROR_FUNC_SYNC(func, err, handle, n, x_, incx, y_, incy, param_);
+            rocblas_native_func(func, err, handle, n, x_, incx, y_, incy, param_);
         });
     });
 
@@ -877,7 +877,7 @@ inline sycl::event copy(Func func, sycl::queue& queue, int64_t n, const T* x, in
             auto x_ = reinterpret_cast<const rocDataType*>(x);
             auto y_ = reinterpret_cast<rocDataType*>(y);
             rocblas_status err;
-            ROCBLAS_ERROR_FUNC_SYNC(func, err, handle, n, x_, incx, y_, incy);
+            rocblas_native_func(func, err, handle, n, x_, incx, y_, incy);
         });
     });
 
@@ -913,7 +913,7 @@ inline sycl::event dot(Func func, sycl::queue& queue, int64_t n, const T* x, con
             auto y_ = reinterpret_cast<const rocDataType*>(y);
             auto res_ = reinterpret_cast<rocDataType*>(result);
             rocblas_status err;
-            ROCBLAS_ERROR_FUNC_SYNC(func, err, handle, n, x_, incx, y_, incy, res_);
+            rocblas_native_func(func, err, handle, n, x_, incx, y_, incy, res_);
         });
     });
 
@@ -957,8 +957,8 @@ inline sycl::event rot(Func func, sycl::queue& queue, int64_t n, T1* x, const in
             auto x_ = reinterpret_cast<rocDataType1*>(x);
             auto y_ = reinterpret_cast<rocDataType1*>(y);
             rocblas_status err;
-            ROCBLAS_ERROR_FUNC_SYNC(func, err, handle, n, x_, incx, y_, incy, (rocDataType2*)&c,
-                                    (rocDataType3*)&s);
+            rocblas_native_func(func, err, handle, n, x_, incx, y_, incy, (rocDataType2*)&c,
+                                (rocDataType3*)&s);
         });
     });
 
@@ -994,7 +994,7 @@ sycl::event sdsdot(sycl::queue& queue, int64_t n, float sb, const float* x, int6
             auto y_ = reinterpret_cast<const float*>(y);
             auto res_ = reinterpret_cast<float*>(result);
             rocblas_status err;
-            ROCBLAS_ERROR_FUNC_SYNC(rocblas_sdot, err, handle, n, x_, incx, y_, incy, res_);
+            rocblas_native_func(rocblas_sdot, err, handle, n, x_, incx, y_, incy, res_);
         });
     });
 
@@ -1019,7 +1019,7 @@ inline sycl::event rotmg(Func func, sycl::queue& queue, T* d1, T* d2, T* x1, T y
             auto y1_ = reinterpret_cast<const rocDataType*>(&y1);
             auto param_ = reinterpret_cast<rocDataType*>(param);
             rocblas_status err;
-            ROCBLAS_ERROR_FUNC_SYNC(func, err, handle, d1_, d2_, x1_, y1_, param_);
+            rocblas_native_func(func, err, handle, d1_, d2_, x1_, y1_, param_);
         });
     });
 
@@ -1061,7 +1061,7 @@ inline sycl::event iamax(Func func, sycl::queue& queue, int64_t n, const T* x, c
             rocblas_status err;
             // For negative incx, iamax returns 0. This behaviour is similar to that of
             // reference iamax.
-            ROCBLAS_ERROR_FUNC_SYNC(func, err, handle, n, x_, incx, int_res_p_);
+            rocblas_native_func(func, err, handle, n, x_, incx, int_res_p_);
             rocblas_set_pointer_mode(handle, rocblas_pointer_mode_host);
         });
     });
@@ -1098,7 +1098,7 @@ inline sycl::event swap(Func func, sycl::queue& queue, int64_t n, T* x, int64_t 
             auto x_ = reinterpret_cast<rocDataType*>(x);
             auto y_ = reinterpret_cast<rocDataType*>(y);
             rocblas_status err;
-            ROCBLAS_ERROR_FUNC_SYNC(func, err, handle, n, x_, incx, y_, incy);
+            rocblas_native_func(func, err, handle, n, x_, incx, y_, incy);
         });
     });
 
@@ -1143,7 +1143,7 @@ inline sycl::event iamin(Func func, sycl::queue& queue, int64_t n, const T* x, c
             rocblas_status err;
             // For negative incx, iamin returns 0. This behaviour is similar to that of
             // implemented iamin.
-            ROCBLAS_ERROR_FUNC_SYNC(func, err, handle, n, x_, incx, int_res_p_);
+            rocblas_native_func(func, err, handle, n, x_, incx, int_res_p_);
             rocblas_set_pointer_mode(handle, rocblas_pointer_mode_host);
         });
     });
@@ -1183,7 +1183,7 @@ inline sycl::event nrm2(Func func, sycl::queue& queue, int64_t n, const T1* x, c
             auto res_ = reinterpret_cast<rocDataType2*>(result);
             rocblas_status err;
             // NRM2 does not support negative index
-            ROCBLAS_ERROR_FUNC_SYNC(func, err, handle, n, x_, std::abs(incx), res_);
+            rocblas_native_func(func, err, handle, n, x_, std::abs(incx), res_);
             rocblas_set_pointer_mode(handle, rocblas_pointer_mode_host);
         });
     });

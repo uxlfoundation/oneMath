@@ -73,8 +73,8 @@
     if (d->get_info<sycl::info::device::double_fp_config>().size() == 0) \
     GTEST_SKIP() << "Double precision is not supported on the device"
 
-#if defined(ENABLE_MKLCPU_BACKEND) || defined(ENABLE_NETLIB_BACKEND)
-#ifdef ENABLE_MKLCPU_BACKEND
+#if defined(ONEMKL_ENABLE_MKLCPU_BACKEND) || defined(ONEMKL_ENABLE_NETLIB_BACKEND)
+#ifdef ONEMKL_ENABLE_MKLCPU_BACKEND
 #define TEST_RUN_INTELCPU_SELECT_NO_ARGS(q, func) \
     func(oneapi::mkl::backend_selector<oneapi::mkl::backend::mklcpu>{ q })
 #define TEST_RUN_INTELCPU_SELECT(q, func, ...) \
@@ -88,7 +88,7 @@
 #define TEST_RUN_INTELCPU_SELECT(q, func, ...)
 #endif
 
-#ifdef ENABLE_MKLGPU_BACKEND
+#ifdef ONEMKL_ENABLE_MKLGPU_BACKEND
 #define TEST_RUN_INTELGPU_SELECT_NO_ARGS(q, func) \
     func(oneapi::mkl::backend_selector<oneapi::mkl::backend::mklgpu>{ q })
 #define TEST_RUN_INTELGPU_SELECT(q, func, ...) \
@@ -98,55 +98,55 @@
 #define TEST_RUN_INTELGPU_SELECT(q, func, ...)
 #endif
 
-#ifdef ENABLE_CUBLAS_BACKEND
+#ifdef ONEMKL_ENABLE_CUBLAS_BACKEND
 #define TEST_RUN_NVIDIAGPU_CUBLAS_SELECT(q, func, ...) \
     func(oneapi::mkl::backend_selector<oneapi::mkl::backend::cublas>{ q }, __VA_ARGS__)
 #else
 #define TEST_RUN_NVIDIAGPU_CUBLAS_SELECT(q, func, ...)
 #endif
-#ifdef ENABLE_CUSOLVER_BACKEND
+#ifdef ONEMKL_ENABLE_CUSOLVER_BACKEND
 #define TEST_RUN_NVIDIAGPU_CUSOLVER_SELECT(q, func, ...) \
     func(oneapi::mkl::backend_selector<oneapi::mkl::backend::cusolver>{ q }, __VA_ARGS__)
 #else
 #define TEST_RUN_NVIDIAGPU_CUSOLVER_SELECT(q, func, ...)
 #endif
 
-#ifdef ENABLE_ROCBLAS_BACKEND
+#ifdef ONEMKL_ENABLE_ROCBLAS_BACKEND
 #define TEST_RUN_AMDGPU_ROCBLAS_SELECT(q, func, ...) \
     func(oneapi::mkl::backend_selector<oneapi::mkl::backend::rocblas>{ q }, __VA_ARGS__)
 #else
 #define TEST_RUN_AMDGPU_ROCBLAS_SELECT(q, func, ...)
 #endif
 
-#ifdef ENABLE_CURAND_BACKEND
+#ifdef ONEMKL_ENABLE_CURAND_BACKEND
 #define TEST_RUN_NVIDIAGPU_CURAND_SELECT(q, func, ...) \
     func(oneapi::mkl::backend_selector<oneapi::mkl::backend::curand>{ q }, __VA_ARGS__)
 #else
 #define TEST_RUN_NVIDIAGPU_CURAND_SELECT(q, func, ...)
 #endif
 
-#ifdef ENABLE_ROCRAND_BACKEND
+#ifdef ONEMKL_ENABLE_ROCRAND_BACKEND
 #define TEST_RUN_AMDGPU_ROCRAND_SELECT(q, func, ...) \
     func(oneapi::mkl::backend_selector<oneapi::mkl::backend::rocrand>{ q }, __VA_ARGS__)
 #else
 #define TEST_RUN_AMDGPU_ROCRAND_SELECT(q, func, ...)
 #endif
 
-#ifdef ENABLE_ROCSOLVER_BACKEND
+#ifdef ONEMKL_ENABLE_ROCSOLVER_BACKEND
 #define TEST_RUN_AMDGPU_ROCSOLVER_SELECT(q, func, ...) \
     func(oneapi::mkl::backend_selector<oneapi::mkl::backend::rocsolver>{ q }, __VA_ARGS__)
 #else
 #define TEST_RUN_AMDGPU_ROCSOLVER_SELECT(q, func, ...)
 #endif
 
-#ifdef ENABLE_PORTBLAS_BACKEND
+#ifdef ONEMKL_ENABLE_PORTBLAS_BACKEND
 #define TEST_RUN_PORTBLAS_SELECT(q, func, ...) \
     func(oneapi::mkl::backend_selector<oneapi::mkl::backend::portblas>{ q }, __VA_ARGS__)
 #else
 #define TEST_RUN_PORTBLAS_SELECT(q, func, ...)
 #endif
 
-#ifdef ENABLE_CUFFT_BACKEND
+#ifdef ONEMKL_ENABLE_CUFFT_BACKEND
 #define TEST_RUN_NVIDIAGPU_CUFFT_SELECT_NO_ARGS(q, func) \
     func(oneapi::mkl::backend_selector<oneapi::mkl::backend::cufft>{ q })
 #define TEST_RUN_NVIDIAGPU_CUFFT_SELECT(q, func, ...) \
@@ -156,7 +156,7 @@
 #define TEST_RUN_NVIDIAGPU_CUFFT_SELECT(q, func, ...)
 #endif
 
-#ifdef ENABLE_ROCFFT_BACKEND
+#ifdef ONEMKL_ENABLE_ROCFFT_BACKEND
 #define TEST_RUN_AMDGPU_ROCFFT_SELECT_NO_ARGS(q, func) \
     func(oneapi::mkl::backend_selector<oneapi::mkl::backend::rocfft>{ q })
 #define TEST_RUN_AMDGPU_ROCFFT_SELECT(q, func, ...) \
@@ -166,7 +166,7 @@
 #define TEST_RUN_AMDGPU_ROCFFT_SELECT(q, func, ...)
 #endif
 
-#ifdef ENABLE_PORTFFT_BACKEND
+#ifdef ONEMKL_ENABLE_PORTFFT_BACKEND
 #define TEST_RUN_PORTFFT_SELECT_NO_ARGS(q, func) \
     func(oneapi::mkl::backend_selector<oneapi::mkl::backend::portfft>{ q })
 #define TEST_RUN_PORTFFT_SELECT(q, func, ...) \
@@ -176,7 +176,7 @@
 #define TEST_RUN_PORTFFT_SELECT(q, func, ...)
 #endif
 
-#ifdef ENABLE_CUSPARSE_BACKEND
+#ifdef ONEMKL_ENABLE_CUSPARSE_BACKEND
 #define TEST_RUN_NVIDIAGPU_CUSPARSE_SELECT(q, func, ...) \
     func(oneapi::mkl::backend_selector<oneapi::mkl::backend::cusparse>{ q }, __VA_ARGS__)
 #else
@@ -340,10 +340,10 @@ static inline void* malloc_shared(size_t align, size_t size, sycl::device dev, s
 #ifdef _WIN64
     return sycl::malloc_shared(size, dev, ctx);
 #else
-#if defined(ENABLE_CUBLAS_BACKEND) || defined(ENABLE_ROCBLAS_BACKEND)
+#if defined(ONEMKL_ENABLE_CUBLAS_BACKEND) || defined(ONEMKL_ENABLE_ROCBLAS_BACKEND)
     return sycl::aligned_alloc_shared(align, size, dev, ctx);
 #endif
-#if !defined(ENABLE_CUBLAS_BACKEND) && !defined(ENABLE_ROCBLAS_BACKEND)
+#if !defined(ONEMKL_ENABLE_CUBLAS_BACKEND) && !defined(ONEMKL_ENABLE_ROCBLAS_BACKEND)
     return sycl::malloc_shared(size, dev, ctx);
 #endif
 #endif
@@ -354,10 +354,10 @@ static inline void* malloc_device(size_t align, size_t size, sycl::device dev, s
 #ifdef _WIN64
     return sycl::malloc_device(size, dev, ctx);
 #else
-#if defined(ENABLE_CUBLAS_BACKEND) || defined(ENABLE_ROCBLAS_BACKEND)
+#if defined(ONEMKL_ENABLE_CUBLAS_BACKEND) || defined(ONEMKL_ENABLE_ROCBLAS_BACKEND)
     return sycl::aligned_alloc_device(align, size, dev, ctx);
 #endif
-#if !defined(ENABLE_CUBLAS_BACKEND) && !defined(ENABLE_ROCBLAS_BACKEND)
+#if !defined(ONEMKL_ENABLE_CUBLAS_BACKEND) && !defined(ONEMKL_ENABLE_ROCBLAS_BACKEND)
     return sycl::malloc_device(size, dev, ctx);
 #endif
 #endif

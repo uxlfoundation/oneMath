@@ -298,8 +298,8 @@ else()
 endif()
 
 if(DEFINED REF_BLAS_ROOT)
-  find_file(REF_BLAS_LIBNAME NAMES blas.dll libblas.so HINTS ${REF_BLAS_ROOT} PATH_SUFFIXES lib lib64)
-  find_file(REF_CBLAS_LIBNAME NAMES cblas.dll libcblas.so HINTS ${REF_BLAS_ROOT} PATH_SUFFIXES lib lib64)
+  find_file(ONEMKL_REF_BLAS_LIBNAME NAMES blas.dll libblas.so HINTS ${REF_BLAS_ROOT} PATH_SUFFIXES lib lib64)
+  find_file(ONEMKL_REF_CBLAS_LIBNAME NAMES cblas.dll libcblas.so HINTS ${REF_BLAS_ROOT} PATH_SUFFIXES lib lib64)
 endif()
 
 # Add source directory and output to bin/

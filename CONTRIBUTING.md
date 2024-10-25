@@ -15,6 +15,8 @@ Before sending your pull requests, ensure that you follow this checklist:
 
 * Ensure that [unit tests](CONTRIBUTING.md#unit-tests) pass. Include logs from tests as attachments to the pull request.
 
+* Ensure that corresponding [maintainer GitHub team](#onemkl-interfaces-maintainers) is assigned to the PR review.
+
 ## Library Functionality Guidelines
 
 oneMKL focuses on the following criteria:
@@ -45,6 +47,7 @@ Please also provide the following details as part of the RFC:
 
 * What existing libraries have implementations of this function and can be used under the oneMKL interface.
 
+* Ensure that corresponding [maintainer GitHub team](#onemkl-interfaces-maintainers) is assigned to the RFC review.
 
 ## Bug Reporting
 
@@ -55,6 +58,22 @@ If you find a bug or problem, please open a request under [Issues](https://githu
 
 Report security issues to onemkl.maintainers@intel.com.
 
+## oneMKL Interfaces Maintainers
+
+For GitHub questions, issues, RFCs, or PRs you can contact maintainers via one of the following GitHub teams based on the topic:
+
+| GitHub team name | Description |
+:-----------|:------------|
+| @oneapi-src/onemkl-maintain  | All oneMKL Interfaces maintainers |
+| @oneapi-src/onemkl-arch-write | oneMKL Interfaces Architecture maintainers |
+| @oneapi-src/onemkl-blas-write | oneMKL Interfaces BLAS maintainers |
+| @oneapi-src/onemkl-dft-write | oneMKL Interfaces DFT maintainers |
+| @oneapi-src/onemkl-lapack-write | oneMKL Interfaces LAPACK maintainers |
+| @oneapi-src/onemkl-rng-write | oneMKL Interfaces RNG maintainers |
+| @oneapi-src/onemkl-sparse-write | oneMKL Interfaces Sparse Algebra maintainers |
+| @oneapi-src/onemkl-vm-write | oneMKL Interfaces Vector Math maintainers |
+
+Please read [MAINTAINERS page](MAINTAINERS.md) for more information about maintainer roles, responsibilities, and how to become one of them.
 
 ## Coding Style
 
@@ -62,7 +81,16 @@ The general principle is to follow the style of existing/surrounding code. If yo
 ```sh
 clang-format -style=file -i foo.cpp
 ```
-This formats code using the `_clang_format` file found in the oneMKL top-level directory.
+This formats code using the `_clang_format` file found in the oneMKL top-level directory. The version of `clang-format` is specified in [`.pre-commit-config.yaml`](https://github.com/oneapi-src/oneMKL/blob/develop/.pre-commit-config.yaml). Alternatively, you can install and run `pre-commit`, which will install the specified `clang-format` version automatically:
+```sh
+python3 -m venv <venv-name>
+source <venv-name>/bin/activate
+pip install pre-commit
+cd <path-to-onemkl>
+pre-commit run --all-files
+deactivate
+```
+By default, `pre-commit` caches data in `~/.cache/pre-commit`. You can set `PRE_COMMIT_HOME` to use another location.
 
 
 ### GN: General Naming

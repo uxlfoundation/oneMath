@@ -41,11 +41,11 @@ extern "C" {
 static LIB_TYPE h_libblas = NULL;
 static LIB_TYPE blas_library() {
     if (h_libblas == NULL) {
-        h_libblas = GET_LIB_HANDLE(REF_BLAS_LIBNAME);
+        h_libblas = GET_LIB_HANDLE(ONEMKL_REF_BLAS_LIBNAME);
         if (h_libblas == NULL) {
             throw oneapi::mkl::library_not_found(
                 "BLAS", "blas_library()",
-                std::string("failed to load BLAS library ") + REF_BLAS_LIBNAME);
+                std::string("failed to load BLAS library ") + ONEMKL_REF_BLAS_LIBNAME);
         }
     }
     return h_libblas;
@@ -54,11 +54,11 @@ static LIB_TYPE blas_library() {
 static LIB_TYPE h_libcblas = NULL;
 static LIB_TYPE cblas_library() {
     if (h_libcblas == NULL) {
-        h_libcblas = GET_LIB_HANDLE(REF_CBLAS_LIBNAME);
+        h_libcblas = GET_LIB_HANDLE(ONEMKL_REF_CBLAS_LIBNAME);
         if (h_libcblas == NULL) {
             throw oneapi::mkl::library_not_found(
                 "BLAS", "cblas_library()",
-                std::string("failed to load CBLAS library ") + REF_CBLAS_LIBNAME);
+                std::string("failed to load CBLAS library ") + ONEMKL_REF_CBLAS_LIBNAME);
         }
     }
     return h_libcblas;

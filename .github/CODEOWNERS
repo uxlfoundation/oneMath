@@ -1,0 +1,71 @@
+# Arch files
+/.github/ @oneapi-src/onemkl-arch-write
+/.gitignore/ @oneapi-src/onemkl-arch-write
+/cmake/ @oneapi-src/onemkl-arch-write
+/deps/ @oneapi-src/onemkl-arch-write
+/docs/ @oneapi-src/onemkl-arch-write
+/examples/include/ @oneapi-src/onemkl-arch-write
+/examples/CMakeList.txt @oneapi-src/onemkl-arch-write
+/examples/README.md @oneapi-src/onemkl-arch-write
+/include/oneapi/mkl.hpp @oneapi-src/onemkl-arch-write
+/include/oneapi/mkl/detail/ @oneapi-src/onemkl-arch-write
+/include/oneapi/mkl/exceptions.hpp @oneapi-src/onemkl-arch-write
+/scripts/ @oneapi-src/onemkl-arch-write
+/src/include/ @oneapi-src/onemkl-arch-write
+/src/CMakeLists.txt @oneapi-src/onemkl-arch-write
+/src/config.hpp.in @oneapi-src/onemkl-arch-write
+/tests/CMakeLists.txt @oneapi-src/onemkl-arch-write
+/tests/README.md @oneapi-src/onemkl-arch-write
+/tests/unit_tests/include/ @oneapi-src/onemkl-arch-write
+/tests/unit_tests/CMakeLists.txt @oneapi-src/onemkl-arch-write
+/tests/unit_tests/main_test.cpp @oneapi-src/onemkl-arch-write
+/third-party-programs/ @oneapi-src/onemkl-arch-write
+/CMakeLists.txt @oneapi-src/onemkl-arch-write
+/CODE_OF_CONDUCT.md @oneapi-src/onemkl-arch-write
+/CONTRIBUTING.md @oneapi-src/onemkl-arch-write
+/LICENSE @oneapi-src/onemkl-arch-write
+/MAINTAINERS.md @oneapi-src/onemkl-arch-write
+/README.md @oneapi-src/onemkl-arch-write
+/SECURITY.md @oneapi-src/onemkl-arch-write
+/_clang-format @oneapi-src/onemkl-arch-write
+/legal_information.md @oneapi-src/onemkl-arch-write
+
+# BLAS files
+/examples/blas/ @oneapi-src/onemkl-blas-write
+/include/oneapi/mkl/blas/ @oneapi-src/onemkl-blas-write
+/include/oneapi/mkl/blas.hxx @oneapi-src/onemkl-blas-write
+/include/oneapi/mkl/blas.hpp @oneapi-src/onemkl-blas-write
+/include/oneapi/mkl/bfloat16.hpp @oneapi-src/onemkl-blas-write
+/src/blas/ @oneapi-src/onemkl-blas-write
+/tests/unit_tests/blas/ @oneapi-src/onemkl-blas-write
+
+# DFT files
+/examples/dft/ @oneapi-src/onemkl-dft-write
+/include/oneapi/mkl/dft/ @oneapi-src/onemkl-dft-write
+/include/oneapi/mkl/dft.hpp @oneapi-src/onemkl-dft-write
+/src/dft/ @oneapi-src/onemkl-dft-write
+/tests/unit_tests/dft/ @oneapi-src/onemkl-dft-write
+
+# LAPACK files
+/examples/lapack/ @oneapi-src/onemkl-lapack-write
+/include/oneapi/mkl/lapack/ @oneapi-src/onemkl-lapack-write
+/include/oneapi/mkl/lapack.hpp @oneapi-src/onemkl-lapack-write
+/src/lapack/ @oneapi-src/onemkl-lapack-write
+/tests/unit_tests/lapack/ @oneapi-src/onemkl-lapack-write
+
+# RNG files
+/examples/rng/ @oneapi-src/onemkl-rng-write
+/include/oneapi/mkl/rng/ @oneapi-src/onemkl-rng-write
+/include/oneapi/mkl/rng.hpp @oneapi-src/onemkl-rng-write
+/src/rng/ @oneapi-src/onemkl-rng-write
+/tests/unit_tests/rng/ @oneapi-src/onemkl-rng-write
+
+# Sparse BLAS files
+/examples/sparse_blas/ @oneapi-src/onemkl-sparse-write
+/include/oneapi/mkl/sparse_blas/ @oneapi-src/onemkl-sparse-write
+/include/oneapi/mkl/sparse_blas.hpp @oneapi-src/onemkl-sparse-write
+/src/sparse_blas/ @oneapi-src/onemkl-sparse-write
+/tests/unit_tests/sparse_blas/ @oneapi-src/onemkl-sparse-write
+
+# Shared files
+/include/oneapi/mkl/types.hpp @oneapi-src/onemkl-blas-write @oneapi-src/onemkl-lapack-write

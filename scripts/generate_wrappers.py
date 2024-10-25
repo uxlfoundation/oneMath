@@ -33,7 +33,7 @@ def usage(err = None):
         print('error: %s' % err)
     print('''\
 Script to generate blank wrappers and pointers table based on header.hpp
-Note: requires clang-format 9.0.0 tool
+Note: requires clang-format tool
 Usage:
 
     {script} <path/to/header.hpp> <path/to/table.hpp> <path/to/out_wrappers.cpp> <libname>

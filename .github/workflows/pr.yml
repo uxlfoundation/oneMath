@@ -14,6 +14,19 @@ env:
   PARALLEL: -j 2
 
 jobs:
+  format-checks:
+    runs-on: ubuntu-latest
+    name: clang-format check
+    steps:
+    - uses: actions/checkout@44c2b7a8a4ea60a981eaca3cf939b5f4305c123b # v4.1.5
+    - uses: actions/setup-python@f677139bbe7f9c59b41e40162b753c062f5d49a3 # v5.2.0
+      with:
+        python-version: '3.10'
+        cache: 'pip'
+    - name: Install pre-commit
+      run: pip install pre-commit
+    - name: Run clang-format check
+      run: pre-commit run --all-files --show-diff-on-failure --color always
   unit-tests:
     runs-on: ubuntu-latest
     # One runner for each domain

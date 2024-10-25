@@ -50,7 +50,7 @@ rocblas_handle_container<T>::~rocblas_handle_container() noexcept(false) {
  * takes place if no other element in the container has a key equivalent to
  * the one being emplaced (keys in a map container are unique).
  */
-#ifdef ONEAPI_ONEMKL_PI_INTERFACE_REMOVED
+#ifdef ONEMKL_PI_INTERFACE_REMOVED
 thread_local rocblas_handle_container<ur_context_handle_t>
     RocblasScopedContextHandler::handle_helper = rocblas_handle_container<ur_context_handle_t>{};
 #else
@@ -113,7 +113,7 @@ rocblas_handle RocblasScopedContextHandler::get_handle(const sycl::queue& queue)
     hipError_t hipErr;
     hipCtx_t desired;
     HIP_ERROR_FUNC(hipDevicePrimaryCtxRetain, hipErr, &desired, hipDevice);
-#ifdef ONEAPI_ONEMKL_PI_INTERFACE_REMOVED
+#ifdef ONEMKL_PI_INTERFACE_REMOVED
     auto piPlacedContext_ = reinterpret_cast<ur_context_handle_t>(desired);
 #else
     auto piPlacedContext_ = reinterpret_cast<pi_context>(desired);

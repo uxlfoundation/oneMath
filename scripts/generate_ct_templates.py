@@ -33,7 +33,7 @@ def usage(err = None):
         print('error: %s' % err)
     print('''\
 Script to generate header file for templated compile-time API based on base_header.h
-Note: requires clang-format 9.0.0 tool to be installed
+Note: requires clang-format tool to be installed
 Usage:
 
     {script} <path/to/base_header.hpp> <path/to/out_headername.hpp>

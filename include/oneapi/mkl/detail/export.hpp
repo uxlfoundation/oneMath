@@ -22,7 +22,7 @@
 
 #include "oneapi/mkl/detail/config.hpp"
 
-#if !defined(BUILD_SHARED_LIBS) || !defined(_WIN64)
+#if !defined(ONEMKL_BUILD_SHARED_LIBS) || !defined(_WIN64)
 #define ONEMKL_EXPORT
 #define ONEMKL_NO_EXPORT
 #else

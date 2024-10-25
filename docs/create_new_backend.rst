@@ -157,13 +157,13 @@ To integrate the new third-party library to a oneMKL header-based part, followin
             { domain::blas,
               { { device::x86cpu,
                   {
-        #ifdef ENABLE_MKLCPU_BACKEND
+        #ifdef ONEMKL_ENABLE_MKLCPU_BACKEND
                       LIB_NAME("blas_mklcpu")
         #endif
                    } },
      +          { device::newdevice,
      +            {
-     +  #ifdef ENABLE_NEWLIB_BACKEND
+     +  #ifdef ONEMKL_ENABLE_NEWLIB_BACKEND
      +                 LIB_NAME("blas_newlib")
      +  #endif
      +             } },
@@ -427,8 +427,8 @@ Update the following files to enable the new third-party library for unit tests:
 
   .. code-block:: diff
     
-        #cmakedefine ENABLE_MKLCPU_BACKEND
-     +  #cmakedefine ENABLE_NEWLIB_BACKEND
+        #cmakedefine ONEMKL_ENABLE_MKLCPU_BACKEND
+     +  #cmakedefine ONEMKL_ENABLE_NEWLIB_BACKEND
 
 * ``tests/unit_tests/CMakeLists.txt``: add instructions about how to link tests with the new backend library
 
@@ -464,14 +464,14 @@ Update the following files to enable the new third-party library for unit tests:
 
   .. code-block:: diff
     
-        #ifdef ENABLE_MKLGPU_BACKEND
+        #ifdef ONEMKL_ENABLE_MKLGPU_BACKEND
             #define TEST_RUN_INTELGPU(q, func, args) \
                 func<oneapi::mkl::backend::mklgpu> args
         #else
             #define TEST_RUN_INTELGPU(q, func, args)
         #endif
      +    
-     +  #ifdef ENABLE_NEWLIB_BACKEND
+     +  #ifdef ONEMKL_ENABLE_NEWLIB_BACKEND
      +     #define TEST_RUN_NEWDEVICE(q, func, args) \
      +         func<oneapi::mkl::backend::newbackend> args
      +  #else
@@ -495,7 +495,7 @@ Update the following files to enable the new third-party library for unit tests:
                 }
             }
      +           
-     +  #ifdef ENABLE_NEWLIB_BACKEND
+     +  #ifdef ONEMKL_ENABLE_NEWLIB_BACKEND
      +      devices.push_back(sycl::device(sycl::host_selector()));
      +  #endif
 

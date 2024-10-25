@@ -23,12 +23,6 @@ if(WIN32 AND BUILD_SHARED_LIBS)
   list(APPEND ONEMKL_BUILD_COPT "-Donemkl_EXPORTS")
 endif()
 
-# portBLAS backend variables must be accessible here to correctly
-# generate the config file.
-set(ENABLE_PORTBLAS_BACKEND_INTEL_CPU OFF CACHE INTERNAL "")
-set(ENABLE_PORTBLAS_BACKEND_INTEL_GPU OFF CACHE INTERNAL "")
-set(ENABLE_PORTBLAS_BACKEND_AMD_GPU OFF CACHE INTERNAL "")
-set(ENABLE_PORTBLAS_BACKEND_NVIDIA_GPU OFF CACHE INTERNAL "")
 # store path to CMAKE_CURRENT_BINARY_DIR to use it later (makes FetchContent_Declare workable)
 set(ONEMKL_GENERATED_INCLUDE_PATH ${CMAKE_CURRENT_BINARY_DIR})
 
@@ -46,15 +40,39 @@ foreach(domain ${TARGET_DOMAINS})
 endforeach()
 
 # Generate header with enabled backends for testing
-configure_file(config.hpp.in "${CMAKE_CURRENT_BINARY_DIR}/oneapi/mkl/config.hpp.configured")
-file(GENERATE
-  OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/oneapi/mkl/detail/config.hpp"
-  INPUT "${CMAKE_CURRENT_BINARY_DIR}/oneapi/mkl/config.hpp.configured"
-)
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/oneapi/mkl/detail/config.hpp"
-  DESTINATION include/oneapi/mkl/detail
-  COMPONENT Devel
-)
+
+function(generate_header_file)
+  # Following if-conditions allow to decouple cmake configuration variables with
+  # the corresponding generated macro. This is done to be conformant with ES.33
+  # C++ Core Guidelines
+  set(ONEMKL_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
+  set(ONEMKL_ENABLE_MKLCPU_BACKEND ${ENABLE_MKLCPU_BACKEND})
+  set(ONEMKL_ENABLE_MKLGPU_BACKEND ${ENABLE_MKLGPU_BACKEND})
+  set(ONEMKL_ENABLE_CUBLAS_BACKEND ${ENABLE_CUBLAS_BACKEND})
+  set(ONEMKL_ENABLE_ROCBLAS_BACKEND ${ENABLE_ROCBLAS_BACKEND})
+  set(ONEMKL_ENABLE_NETLIB_BACKEND ${ENABLE_NETLIB_BACKEND})
+  set(ONEMKL_ENABLE_PORTBLAS_BACKEND ${ENABLE_PORTBLAS_BACKEND})
+  set(ONEMKL_ENABLE_CURAND_BACKEND ${ENABLE_CURAND_BACKEND})
+  set(ONEMKL_ENABLE_ROCRAND_BACKEND ${ENABLE_ROCRAND_BACKEND})
+  set(ONEMKL_ENABLE_CUSOLVER_BACKEND ${ENABLE_CUSOLVER_BACKEND})
+  set(ONEMKL_ENABLE_ROCSOLVER_BACKEND ${ENABLE_ROCSOLVER_BACKEND})
+  set(ONEMKL_ENABLE_CUFFT_BACKEND ${ENABLE_CUFFT_BACKEND})
+  set(ONEMKL_ENABLE_ROCFFT_BACKEND ${ENABLE_ROCFFT_BACKEND})
+  set(ONEMKL_ENABLE_PORTFFT_BACKEND ${ENABLE_PORTFFT_BACKEND})
+  set(ONEMKL_ENABLE_CUSPARSE_BACKEND ${ENABLE_CUSPARSE_BACKEND})
+
+  configure_file(config.hpp.in "${CMAKE_CURRENT_BINARY_DIR}/oneapi/mkl/config.hpp.configured")
+  file(GENERATE
+    OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/oneapi/mkl/detail/config.hpp"
+    INPUT "${CMAKE_CURRENT_BINARY_DIR}/oneapi/mkl/config.hpp.configured"
+  )
+  install(FILES "${CMAKE_CURRENT_BINARY_DIR}/oneapi/mkl/detail/config.hpp"
+    DESTINATION include/oneapi/mkl/detail
+    COMPONENT Devel
+  )
+endfunction()
+
+generate_header_file()
 
 # Add recipe for onemkl loader library
 if(BUILD_SHARED_LIBS)
@@ -81,6 +99,10 @@ if(BUILD_SHARED_LIBS)
   set (ONEMKL_LIBS ${TARGET_DOMAINS})
   list(TRANSFORM ONEMKL_LIBS PREPEND onemkl_)
   target_link_libraries(onemkl PUBLIC ${ONEMKL_LIBS})
+  set_target_properties(onemkl PROPERTIES
+      INSTALL_RPATH "\$ORIGIN"
+      BUILD_WITH_INSTALL_RPATH TRUE
+  )
 
   # Add the library to install package
   foreach(domain_lib ${ONEMKL_LIBS})

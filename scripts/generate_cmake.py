@@ -84,7 +84,7 @@ add_library(${{LIB_OBJ}} OBJECT
 
 for f in file_list:
     if re.search('_dyn.c', f):
-        out_file.write("""  $<$<BOOL:${{BUILD_SHARED_LIBS}}>: {filename}>
+        out_file.write("""  $<$<BOOL:${{ONEMKL_BUILD_SHARED_LIBS}}>: {filename}>
 """.format(filename=f))
     else:
         out_file.write("""  {filename}

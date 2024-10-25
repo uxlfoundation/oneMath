@@ -194,7 +194,7 @@ void test_helper_with_format_with_transpose(
         }
         // In-order queue
         EXPECT_TRUE_OR_FUTURE_SKIP(
-            test_functor_i32(dev, { property::queue::in_order::in_order() }, format, nrows_A,
+            test_functor_i32(dev, { sycl::property::queue::in_order{} }, format, nrows_A,
                              ncols_A, ncols_C, density_A_matrix, index_zero, col_major, transpose_A,
                              transpose_B, fp_one, fp_zero, ldb, ldc, default_alg, default_A_view,
                              default_properties, no_reset_data, no_scalars_on_device),

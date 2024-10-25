@@ -34,28 +34,28 @@ template <>
 commit_impl<precision::SINGLE, domain::COMPLEX>* create_commit<precision::SINGLE, domain::COMPLEX>(
     const descriptor<precision::SINGLE, domain::COMPLEX>& desc, sycl::queue& sycl_queue) {
     auto libkey = get_device_id(sycl_queue);
-    return function_tables[libkey].create_commit_sycl_fz(desc, sycl_queue);
+    return function_tables[{ libkey, sycl_queue }].create_commit_sycl_fz(desc, sycl_queue);
 }
 
 template <>
 commit_impl<precision::DOUBLE, domain::COMPLEX>* create_commit<precision::DOUBLE, domain::COMPLEX>(
     const descriptor<precision::DOUBLE, domain::COMPLEX>& desc, sycl::queue& sycl_queue) {
     auto libkey = get_device_id(sycl_queue);
-    return function_tables[libkey].create_commit_sycl_dz(desc, sycl_queue);
+    return function_tables[{ libkey, sycl_queue }].create_commit_sycl_dz(desc, sycl_queue);
 }
 
 template <>
 commit_impl<precision::SINGLE, domain::REAL>* create_commit<precision::SINGLE, domain::REAL>(
     const descriptor<precision::SINGLE, domain::REAL>& desc, sycl::queue& sycl_queue) {
     auto libkey = get_device_id(sycl_queue);
-    return function_tables[libkey].create_commit_sycl_fr(desc, sycl_queue);
+    return function_tables[{ libkey, sycl_queue }].create_commit_sycl_fr(desc, sycl_queue);
 }
 
 template <>
 commit_impl<precision::DOUBLE, domain::REAL>* create_commit<precision::DOUBLE, domain::REAL>(
     const descriptor<precision::DOUBLE, domain::REAL>& desc, sycl::queue& sycl_queue) {
     auto libkey = get_device_id(sycl_queue);
-    return function_tables[libkey].create_commit_sycl_dr(desc, sycl_queue);
+    return function_tables[{ libkey, sycl_queue }].create_commit_sycl_dr(desc, sycl_queue);
 }
 
 template <precision prec, domain dom>

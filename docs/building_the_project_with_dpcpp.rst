@@ -228,6 +228,21 @@ A few often-used architectures are listed below:
 For a host with ROCm installed, the device architecture can be retrieved via the
 ``rocminfo`` tool. The architecture will be displayed in the ``Name:`` row.
 
+.. _build_for_other_SYCL_devices:
+
+Building for other SYCL devices
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+SYCL enables portable heterogeneous computing on a wide range of accelerators.
+Consequently, it is possible to use oneMKL Interfaces with accelerators not
+anticipated by the oneMKL Interfaces team.
+
+For generic SYCL devices, only portBLAS and portFFT backend are enabled.
+The user must set the appropriate ``-fsycl-targets`` for their device, and also
+any other option required for performance. See `Building for portBLAS`_ and
+`Building for portFFT`_. Extensive testing is strongly advised for these
+unsupported configurations.
+
 .. _build_for_portlibs_dpcpp:
 
 Pure SYCL backends: portBLAS and portFFT
@@ -375,11 +390,11 @@ disabled:
   cmake $ONEMKL_DIR \
       -DCMAKE_CXX_COMPILER=clang++ \ 
       -DCMAKE_C_COMPILER=clang \
-      -DENABLE_MKLCPU_BACKEND=False \ 
+      -DENABLE_MKLCPU_BACKEND=False \
       -DENABLE_MKLGPU_BACKEND=False \
-      -DENABLE_ROCFFT_BACKEND=True  \ 
+      -DENABLE_ROCFFT_BACKEND=True  \
       -DENABLE_ROCBLAS_BACKEND=True \
-      -DENABLE_ROCSOLVER_BACKEND=True \ 
+      -DENABLE_ROCSOLVER_BACKEND=True \
       -DHIP_TARGETS=gfx90a \
       -DBUILD_FUNCTIONAL_TESTS=False
 
@@ -411,6 +426,36 @@ default, with backends for Nvidia GPU and AMD GPU explicitly enabled.
 set, the backend libraries to enable the use of BLAS, LAPACK and RNG with MKLGPU
 and MKLCPU would also be enabled. The build of examples is disabled. Since
 functional testing was not disabled, tests would be built.
+
+Build oneMKL for the BLAS domain on a generic SYCL device:
+
+.. code-block:: bash
+
+  cmake $ONEMKL_DIR \ 
+      -DCMAKE_CXX_COMPILER=clang++ \
+      -DCMAKE_C_COMPILER=clang \ 
+      -DENABLE_MKLCPU_BACKEND=False \ 
+      -DENABLE_MKLGPU_BACKEND=False \
+      -DENABLE_PORTBLAS_BACKEND=True
+
+Note that this is not a tested configuration. This builds oneMKL Interfaces
+with the portBLAS backend only, for a generic SYCL device supported by the 
+Open DPC++ project.
+
+Build oneMKL for the DFT domain on a generic SYCL device:
+
+.. code-block:: bash
+
+  cmake $ONEMKL_DIR \
+      -DCMAKE_CXX_COMPILER=clang++ \
+      -DCMAKE_C_COMPILER=clang \
+      -DENABLE_MKLCPU_BACKEND=False \
+      -DENABLE_MKLGPU_BACKEND=False \
+      -DENABLE_PORTFFT_BACKEND=True
+
+Note that this is not a tested configuration. This builds oneMKL Interfaces
+with the portFFT backend only, for a generic SYCL device supported by the
+Open DPC++ project.
 
 .. _project_cleanup:
 

@@ -56,6 +56,20 @@ static inline DataType ln_wrapper(DataType a) {
     return sycl::log(a);
 }
 
+template <typename DataType>
+static inline DataType pow_wrapper(DataType a, DataType b) {
+    return sycl::pow(a, b);
+}
+
+template <typename DataType>
+static inline DataType powr_wrapper(DataType a, DataType b) {
+    return sycl::powr(a, b);
+}
+
+template <typename DataType>
+static inline DataType exp_wrapper(DataType a) {
+    return sycl::exp(a);
+}
 } // namespace oneapi::mkl::rng::device::detail
 
 #endif // _MKL_RNG_DEVICE_VM_WRAPPERS_HPP_

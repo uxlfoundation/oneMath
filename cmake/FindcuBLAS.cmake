@@ -26,6 +26,7 @@ HINTS
 ${OPENCL_INCLUDE_DIR}
 ${SYCL_BINARY_DIR}/../include/sycl/
 ${SYCL_BINARY_DIR}/../../include/sycl/
+${SYCL_BINARY_DIR}/../include/
 )
 # this is work around to avoid duplication half creation in both cuda and SYCL
 add_compile_definitions(CUDA_NO_HALF)

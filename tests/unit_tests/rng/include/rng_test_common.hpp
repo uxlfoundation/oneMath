@@ -91,7 +91,7 @@ public:
             }
         };
 
-#ifdef ENABLE_CURAND_BACKEND // w/a for cuda backend hangs when there are several queues with different contexts
+#ifdef ONEMKL_ENABLE_CURAND_BACKEND // w/a for cuda backend hangs when there are several queues with different contexts
         static sycl::device* previous_device = nullptr;
         static sycl::context* context = nullptr;
 

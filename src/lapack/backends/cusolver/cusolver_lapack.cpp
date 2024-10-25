@@ -57,7 +57,7 @@ inline void gebrd(const char* func_name, Func func, sycl::queue& queue, std::int
             auto taup_ = sc.get_mem<cuDataType_A*>(taup_acc);
             auto scratch_ = sc.get_mem<cuDataType_A*>(scratch_acc);
             cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, m, n, a_, lda, d_, e_, tauq_,
+            cusolver_native_named_func(func_name, func, err, handle, m, n, a_, lda, d_, e_, tauq_,
                                        taup_, scratch_, scratchpad_size, nullptr);
         });
     });
@@ -117,7 +117,7 @@ inline void geqrf(const char* func_name, Func func, sycl::queue& queue, std::int
             auto tau_ = sc.get_mem<cuDataType*>(tau_acc);
             auto scratch_ = sc.get_mem<cuDataType*>(scratch_acc);
             cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, m, n, a_, lda, tau_, scratch_,
+            cusolver_native_named_func(func_name, func, err, handle, m, n, a_, lda, tau_, scratch_,
                                        scratchpad_size, nullptr);
         });
     });
@@ -164,7 +164,7 @@ void getrf(const char* func_name, Func func, sycl::queue& queue, std::int64_t m,
             auto devInfo_ = sc.get_mem<int*>(devInfo_acc);
             auto scratch_ = sc.get_mem<cuDataType*>(scratch_acc);
             cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, m, n, a_, lda, scratch_,
+            cusolver_native_named_func(func_name, func, err, handle, m, n, a_, lda, scratch_,
                                        ipiv32_, devInfo_);
         });
     });
@@ -243,7 +243,7 @@ inline void getrs(const char* func_name, Func func, sycl::queue& queue,
             auto ipiv_ = sc.get_mem<std::int32_t*>(ipiv_acc);
             auto b_ = sc.get_mem<cuDataType*>(b_acc);
             cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cublas_operation(trans), n,
+            cusolver_native_named_func(func_name, func, err, handle, get_cublas_operation(trans), n,
                                        nrhs, a_, lda, ipiv_, b_, ldb, nullptr);
         });
     });
@@ -292,7 +292,7 @@ inline void gesvd(const char* func_name, Func func, sycl::queue& queue, oneapi::
             auto scratch_ = sc.get_mem<cuDataType_A*>(scratch_acc);
             cusolverStatus_t err;
             // rwork is set to nullptr. If set it is filled with information from the superdiagonal.
-            CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cusolver_jobsvd(jobu),
+            cusolver_native_named_func(func_name, func, err, handle, get_cusolver_jobsvd(jobu),
                                        get_cusolver_jobsvd(jobvt), m, n, a_, lda, s_, u_, ldu, vt_,
                                        ldvt, scratch_, scratchpad_size, nullptr, devInfo_);
         });
@@ -338,7 +338,7 @@ inline void heevd(const char* func_name, Func func, sycl::queue& queue, oneapi::
             auto devInfo_ = sc.get_mem<int*>(devInfo_acc);
             auto scratch_ = sc.get_mem<cuDataType_A*>(scratch_acc);
             cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cusolver_job(jobz),
+            cusolver_native_named_func(func_name, func, err, handle, get_cusolver_job(jobz),
                                        get_cublas_fill_mode(uplo), n, a_, lda, w_, scratch_,
                                        scratchpad_size, devInfo_);
         });
@@ -383,7 +383,7 @@ inline void hegvd(const char* func_name, Func func, sycl::queue& queue, std::int
             auto devInfo_ = sc.get_mem<int*>(devInfo_acc);
             auto scratch_ = sc.get_mem<cuDataType_A*>(scratch_acc);
             cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cusolver_itype(itype),
+            cusolver_native_named_func(func_name, func, err, handle, get_cusolver_itype(itype),
                                        get_cusolver_job(jobz), get_cublas_fill_mode(uplo), n, a_,
                                        lda, b_, ldb, w_, scratch_, scratchpad_size, devInfo_);
         });
@@ -430,7 +430,7 @@ inline void hetrd(const char* func_name, Func func, sycl::queue& queue, oneapi::
             auto devInfo_ = sc.get_mem<int*>(devInfo_acc);
             auto scratch_ = sc.get_mem<cuDataType_A*>(scratch_acc);
             cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cublas_fill_mode(uplo), n,
+            cusolver_native_named_func(func_name, func, err, handle, get_cublas_fill_mode(uplo), n,
                                        a_, lda, d_, e_, tau_, scratch_, scratchpad_size, devInfo_);
         });
     });
@@ -480,7 +480,7 @@ inline void orgbr(const char* func_name, Func func, sycl::queue& queue, oneapi::
             auto tau_ = sc.get_mem<cuDataType*>(tau_acc);
             auto scratch_ = sc.get_mem<cuDataType*>(scratch_acc);
             cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cublas_generate(vec), m, n,
+            cusolver_native_named_func(func_name, func, err, handle, get_cublas_generate(vec), m, n,
                                        k, a_, lda, tau_, scratch_, scratchpad_size, nullptr);
         });
     });
@@ -515,7 +515,7 @@ inline void orgqr(const char* func_name, Func func, sycl::queue& queue, std::int
             auto tau_ = sc.get_mem<cuDataType*>(tau_acc);
             auto scratch_ = sc.get_mem<cuDataType*>(scratch_acc);
             cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, m, n, k, a_, lda, tau_,
+            cusolver_native_named_func(func_name, func, err, handle, m, n, k, a_, lda, tau_,
                                        scratch_, scratchpad_size, nullptr);
         });
     });
@@ -550,7 +550,7 @@ inline void orgtr(const char* func_name, Func func, sycl::queue& queue, oneapi::
             auto tau_ = sc.get_mem<cuDataType*>(tau_acc);
             auto scratch_ = sc.get_mem<cuDataType*>(scratch_acc);
             cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cublas_fill_mode(uplo), n,
+            cusolver_native_named_func(func_name, func, err, handle, get_cublas_fill_mode(uplo), n,
                                        a_, lda, tau_, scratch_, scratchpad_size, nullptr);
         });
     });
@@ -589,7 +589,7 @@ inline void ormtr(const char* func_name, Func func, sycl::queue& queue, oneapi::
             auto c_ = sc.get_mem<cuDataType*>(c_acc);
             auto scratch_ = sc.get_mem<cuDataType*>(scratch_acc);
             cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cublas_side_mode(side),
+            cusolver_native_named_func(func_name, func, err, handle, get_cublas_side_mode(side),
                                        get_cublas_fill_mode(uplo), get_cublas_operation(trans), m,
                                        n, a_, lda, tau_, c_, ldc, scratch_, scratchpad_size,
                                        nullptr);
@@ -644,7 +644,7 @@ inline void ormqr(const char* func_name, Func func, sycl::queue& queue, oneapi::
             auto c_ = sc.get_mem<cuDataType*>(c_acc);
             auto scratch_ = sc.get_mem<cuDataType*>(scratch_acc);
             cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cublas_side_mode(side),
+            cusolver_native_named_func(func_name, func, err, handle, get_cublas_side_mode(side),
                                        get_cublas_operation(trans), m, n, k, a_, lda, tau_, c_, ldc,
                                        scratch_, scratchpad_size, nullptr);
         });
@@ -682,7 +682,7 @@ inline void potrf(const char* func_name, Func func, sycl::queue& queue, oneapi::
             auto devInfo_ = sc.get_mem<int*>(devInfo_acc);
             auto scratch_ = sc.get_mem<cuDataType*>(scratch_acc);
             cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cublas_fill_mode(uplo), n,
+            cusolver_native_named_func(func_name, func, err, handle, get_cublas_fill_mode(uplo), n,
                                        a_, lda, scratch_, scratchpad_size, devInfo_);
         });
     });
@@ -720,7 +720,7 @@ inline void potri(const char* func_name, Func func, sycl::queue& queue, oneapi::
             auto devInfo_ = sc.get_mem<int*>(devInfo_acc);
             auto scratch_ = sc.get_mem<cuDataType*>(scratch_acc);
             cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cublas_fill_mode(uplo), n,
+            cusolver_native_named_func(func_name, func, err, handle, get_cublas_fill_mode(uplo), n,
                                        a_, lda, scratch_, scratchpad_size, devInfo_);
         });
     });
@@ -757,7 +757,7 @@ inline void potrs(const char* func_name, Func func, sycl::queue& queue, oneapi::
             auto a_ = sc.get_mem<cuDataType*>(a_acc);
             auto b_ = sc.get_mem<cuDataType*>(b_acc);
             cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cublas_fill_mode(uplo), n,
+            cusolver_native_named_func(func_name, func, err, handle, get_cublas_fill_mode(uplo), n,
                                        nrhs, a_, lda, b_, ldb, nullptr);
         });
     });
@@ -797,7 +797,7 @@ inline void syevd(const char* func_name, Func func, sycl::queue& queue, oneapi::
             auto devInfo_ = sc.get_mem<int*>(devInfo_acc);
             auto scratch_ = sc.get_mem<cuDataType*>(scratch_acc);
             cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cusolver_job(jobz),
+            cusolver_native_named_func(func_name, func, err, handle, get_cusolver_job(jobz),
                                        get_cublas_fill_mode(uplo), n, a_, lda, w_, scratch_,
                                        scratchpad_size, devInfo_);
         });
@@ -840,7 +840,7 @@ inline void sygvd(const char* func_name, Func func, sycl::queue& queue, std::int
             auto devInfo_ = sc.get_mem<int*>(devInfo_acc);
             auto scratch_ = sc.get_mem<cuDataType*>(scratch_acc);
             cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cusolver_itype(itype),
+            cusolver_native_named_func(func_name, func, err, handle, get_cusolver_itype(itype),
                                        get_cusolver_job(jobz), get_cublas_fill_mode(uplo), n, a_,
                                        lda, b_, ldb, w_, scratch_, scratchpad_size, devInfo_);
         });
@@ -886,7 +886,7 @@ inline void sytrd(const char* func_name, Func func, sycl::queue& queue, oneapi::
             auto devInfo_ = sc.get_mem<int*>(devInfo_acc);
             auto scratch_ = sc.get_mem<cuDataType*>(scratch_acc);
             cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cublas_fill_mode(uplo), n,
+            cusolver_native_named_func(func_name, func, err, handle, get_cublas_fill_mode(uplo), n,
                                        a_, lda, d_, e_, tau_, scratch_, scratchpad_size, devInfo_);
         });
     });
@@ -934,7 +934,7 @@ inline void sytrf(const char* func_name, Func func, sycl::queue& queue, oneapi::
             auto devInfo_ = sc.get_mem<int*>(devInfo_acc);
             auto scratch_ = sc.get_mem<cuDataType*>(scratch_acc);
             cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cublas_fill_mode(uplo), n,
+            cusolver_native_named_func(func_name, func, err, handle, get_cublas_fill_mode(uplo), n,
                                        a_, lda, ipiv32_, scratch_, scratchpad_size, devInfo_);
         });
     });
@@ -1009,7 +1009,7 @@ inline void ungbr(const char* func_name, Func func, sycl::queue& queue, oneapi::
             auto tau_ = sc.get_mem<cuDataType*>(tau_acc);
             auto scratch_ = sc.get_mem<cuDataType*>(scratch_acc);
             cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cublas_generate(vec), m, n,
+            cusolver_native_named_func(func_name, func, err, handle, get_cublas_generate(vec), m, n,
                                        k, a_, lda, tau_, scratch_, scratchpad_size, nullptr);
         });
     });
@@ -1044,7 +1044,7 @@ inline void ungqr(const char* func_name, Func func, sycl::queue& queue, std::int
             auto tau_ = sc.get_mem<cuDataType*>(tau_acc);
             auto scratch_ = sc.get_mem<cuDataType*>(scratch_acc);
             cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, m, n, k, a_, lda, tau_,
+            cusolver_native_named_func(func_name, func, err, handle, m, n, k, a_, lda, tau_,
                                        scratch_, scratchpad_size, nullptr);
         });
     });
@@ -1079,7 +1079,7 @@ inline void ungtr(const char* func_name, Func func, sycl::queue& queue, oneapi::
             auto tau_ = sc.get_mem<cuDataType*>(tau_acc);
             auto scratch_ = sc.get_mem<cuDataType*>(scratch_acc);
             cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cublas_fill_mode(uplo), n,
+            cusolver_native_named_func(func_name, func, err, handle, get_cublas_fill_mode(uplo), n,
                                        a_, lda, tau_, scratch_, scratchpad_size, nullptr);
         });
     });
@@ -1132,7 +1132,7 @@ inline void unmqr(const char* func_name, Func func, sycl::queue& queue, oneapi::
             auto c_ = sc.get_mem<cuDataType*>(c_acc);
             auto scratch_ = sc.get_mem<cuDataType*>(scratch_acc);
             cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cublas_side_mode(side),
+            cusolver_native_named_func(func_name, func, err, handle, get_cublas_side_mode(side),
                                        get_cublas_operation(trans), m, n, k, a_, lda, tau_, c_, ldc,
                                        scratch_, scratchpad_size, nullptr);
         });
@@ -1173,7 +1173,7 @@ inline void unmtr(const char* func_name, Func func, sycl::queue& queue, oneapi::
             auto c_ = sc.get_mem<cuDataType*>(c_acc);
             auto scratch_ = sc.get_mem<cuDataType*>(scratch_acc);
             cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cublas_side_mode(side),
+            cusolver_native_named_func(func_name, func, err, handle, get_cublas_side_mode(side),
                                        get_cublas_fill_mode(uplo), get_cublas_operation(trans), m,
                                        n, a_, lda, tau_, c_, ldc, scratch_, scratchpad_size,
                                        nullptr);
@@ -1224,7 +1224,7 @@ inline sycl::event gebrd(const char* func_name, Func func, sycl::queue& queue, s
             auto taup_ = reinterpret_cast<cuDataType_A*>(taup);
             auto scratch_ = reinterpret_cast<cuDataType_A*>(scratchpad);
             cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, m, n, a_, lda, d_, e_, tauq_,
+            cusolver_native_named_func(func_name, func, err, handle, m, n, a_, lda, d_, e_, tauq_,
                                        taup_, scratch_, scratchpad_size, nullptr);
         });
     });
@@ -1286,7 +1286,7 @@ inline sycl::event geqrf(const char* func_name, Func func, sycl::queue& queue, s
             auto tau_ = reinterpret_cast<cuDataType*>(tau);
             auto scratch_ = reinterpret_cast<cuDataType*>(scratchpad);
             cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, m, n, a_, lda, tau_, scratch_,
+            cusolver_native_named_func(func_name, func, err, handle, m, n, a_, lda, tau_, scratch_,
                                        scratchpad_size, nullptr);
         });
     });
@@ -1335,7 +1335,7 @@ inline sycl::event getrf(const char* func_name, Func func, sycl::queue& queue, s
             auto scratch_ = reinterpret_cast<cuDataType*>(scratchpad);
             auto ipiv_ = reinterpret_cast<int*>(ipiv32);
             cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, m, n, a_, lda, scratch_, ipiv_,
+            cusolver_native_named_func(func_name, func, err, handle, m, n, a_, lda, scratch_, ipiv_,
                                        devInfo_);
         });
     });
@@ -1422,7 +1422,7 @@ inline sycl::event getrs(const char* func_name, Func func, sycl::queue& queue,
             auto ipiv_ = reinterpret_cast<int*>(ipiv32);
             auto b_ = reinterpret_cast<cuDataType*>(b);
             cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cublas_operation(trans), n,
+            cusolver_native_named_func(func_name, func, err, handle, get_cublas_operation(trans), n,
                                        nrhs, a_, lda, ipiv_, b_, ldb, nullptr);
         });
     });
@@ -1475,7 +1475,7 @@ inline sycl::event gesvd(const char* func_name, Func func, sycl::queue& queue,
             auto scratch_ = reinterpret_cast<cuDataType_A*>(scratchpad);
             cusolverStatus_t err;
             // rwork is set to nullptr. If set it is filled with information from the superdiagonal.
-            CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cusolver_jobsvd(jobu),
+            cusolver_native_named_func(func_name, func, err, handle, get_cusolver_jobsvd(jobu),
                                        get_cusolver_jobsvd(jobvt), m, n, a_, lda, s_, u_, ldu, vt_,
                                        ldvt, scratch_, scratchpad_size, nullptr, devInfo_);
         });
@@ -1523,7 +1523,7 @@ inline sycl::event heevd(const char* func_name, Func func, sycl::queue& queue,
             auto devInfo_ = reinterpret_cast<int*>(devInfo);
             auto scratch_ = reinterpret_cast<cuDataType_A*>(scratchpad);
             cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cusolver_job(jobz),
+            cusolver_native_named_func(func_name, func, err, handle, get_cusolver_job(jobz),
                                        get_cublas_fill_mode(uplo), n, a_, lda, w_, scratch_,
                                        scratchpad_size, devInfo_);
         });
@@ -1570,7 +1570,7 @@ inline sycl::event hegvd(const char* func_name, Func func, sycl::queue& queue, s
             auto devInfo_ = reinterpret_cast<int*>(devInfo);
             auto scratch_ = reinterpret_cast<cuDataType_A*>(scratchpad);
             cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cusolver_itype(itype),
+            cusolver_native_named_func(func_name, func, err, handle, get_cusolver_itype(itype),
                                        get_cusolver_job(jobz), get_cublas_fill_mode(uplo), n, a_,
                                        lda, b_, ldb, w_, scratch_, scratchpad_size, devInfo);
         });
@@ -1618,7 +1618,7 @@ inline sycl::event hetrd(const char* func_name, Func func, sycl::queue& queue,
             auto devInfo_ = reinterpret_cast<int*>(devInfo);
             auto scratch_ = reinterpret_cast<cuDataType_A*>(scratchpad);
             cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cublas_fill_mode(uplo), n,
+            cusolver_native_named_func(func_name, func, err, handle, get_cublas_fill_mode(uplo), n,
                                        a_, lda, d_, e_, tau_, scratch_, scratchpad_size, devInfo_);
         });
     });
@@ -1673,7 +1673,7 @@ inline sycl::event orgbr(const char* func_name, Func func, sycl::queue& queue,
             auto tau_ = reinterpret_cast<cuDataType*>(tau);
             auto scratch_ = reinterpret_cast<cuDataType*>(scratchpad);
             cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cublas_generate(vec), m, n,
+            cusolver_native_named_func(func_name, func, err, handle, get_cublas_generate(vec), m, n,
                                        k, a_, lda, tau_, scratch_, scratchpad_size, nullptr);
         });
     });
@@ -1712,7 +1712,7 @@ inline sycl::event orgqr(const char* func_name, Func func, sycl::queue& queue, s
             auto tau_ = reinterpret_cast<cuDataType*>(tau);
             auto scratch_ = reinterpret_cast<cuDataType*>(scratchpad);
             cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, m, n, k, a_, lda, tau_,
+            cusolver_native_named_func(func_name, func, err, handle, m, n, k, a_, lda, tau_,
                                        scratch_, scratchpad_size, nullptr);
         });
     });
@@ -1750,7 +1750,7 @@ inline sycl::event orgtr(const char* func_name, Func func, sycl::queue& queue,
             auto tau_ = reinterpret_cast<cuDataType*>(tau);
             auto scratch_ = reinterpret_cast<cuDataType*>(scratchpad);
             cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cublas_fill_mode(uplo), n,
+            cusolver_native_named_func(func_name, func, err, handle, get_cublas_fill_mode(uplo), n,
                                        a_, lda, tau_, scratch_, scratchpad_size, nullptr);
         });
     });
@@ -1791,7 +1791,7 @@ inline sycl::event ormtr(const char* func_name, Func func, sycl::queue& queue,
             auto c_ = reinterpret_cast<cuDataType*>(c);
             auto scratch_ = reinterpret_cast<cuDataType*>(scratchpad);
             cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cublas_side_mode(side),
+            cusolver_native_named_func(func_name, func, err, handle, get_cublas_side_mode(side),
                                        get_cublas_fill_mode(uplo), get_cublas_operation(trans), m,
                                        n, a_, lda, tau_, c_, ldc, scratch_, scratchpad_size,
                                        nullptr);
@@ -1848,7 +1848,7 @@ inline sycl::event ormqr(const char* func_name, Func func, sycl::queue& queue,
             auto c_ = reinterpret_cast<cuDataType*>(c);
             auto scratch_ = reinterpret_cast<cuDataType*>(scratchpad);
             cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cublas_side_mode(side),
+            cusolver_native_named_func(func_name, func, err, handle, get_cublas_side_mode(side),
                                        get_cublas_operation(trans), m, n, k, a_, lda, tau_, c_, ldc,
                                        scratch_, scratchpad_size, nullptr);
         });
@@ -1890,7 +1890,7 @@ inline sycl::event potrf(const char* func_name, Func func, sycl::queue& queue,
             auto devInfo_ = reinterpret_cast<int*>(devInfo);
             auto scratch_ = reinterpret_cast<cuDataType*>(scratchpad);
             cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cublas_fill_mode(uplo), n,
+            cusolver_native_named_func(func_name, func, err, handle, get_cublas_fill_mode(uplo), n,
                                        a_, lda, scratch_, scratchpad_size, devInfo_);
         });
     });
@@ -1933,7 +1933,7 @@ inline sycl::event potri(const char* func_name, Func func, sycl::queue& queue,
             auto scratch_ = reinterpret_cast<cuDataType*>(scratchpad);
             auto devInfo_ = reinterpret_cast<int*>(devInfo);
             cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cublas_fill_mode(uplo), n,
+            cusolver_native_named_func(func_name, func, err, handle, get_cublas_fill_mode(uplo), n,
                                        a_, lda, scratch_, scratchpad_size, devInfo_);
         });
     });
@@ -1976,7 +1976,7 @@ inline sycl::event potrs(const char* func_name, Func func, sycl::queue& queue,
             auto a_ = reinterpret_cast<cuDataType*>(a);
             auto b_ = reinterpret_cast<cuDataType*>(b);
             cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cublas_fill_mode(uplo), n,
+            cusolver_native_named_func(func_name, func, err, handle, get_cublas_fill_mode(uplo), n,
                                        nrhs, a_, lda, b_, ldb, nullptr);
         });
     });
@@ -2019,7 +2019,7 @@ inline sycl::event syevd(const char* func_name, Func func, sycl::queue& queue,
             auto scratch_ = reinterpret_cast<cuDataType*>(scratchpad);
             auto devInfo_ = reinterpret_cast<int*>(devInfo);
             cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cusolver_job(jobz),
+            cusolver_native_named_func(func_name, func, err, handle, get_cusolver_job(jobz),
                                        get_cublas_fill_mode(uplo), n, a_, lda, w_, scratch_,
                                        scratchpad_size, devInfo_);
         });
@@ -2065,7 +2065,7 @@ inline sycl::event sygvd(const char* func_name, Func func, sycl::queue& queue, s
             auto devInfo_ = reinterpret_cast<int*>(devInfo);
             auto scratch_ = reinterpret_cast<cuDataType*>(scratchpad);
             cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cusolver_itype(itype),
+            cusolver_native_named_func(func_name, func, err, handle, get_cusolver_itype(itype),
                                        get_cusolver_job(jobz), get_cublas_fill_mode(uplo), n, a_,
                                        lda, b_, ldb, w_, scratch_, scratchpad_size, devInfo);
         });
@@ -2111,7 +2111,7 @@ inline sycl::event sytrd(const char* func_name, Func func, sycl::queue& queue,
             auto devInfo_ = reinterpret_cast<int*>(devInfo);
             auto scratch_ = reinterpret_cast<cuDataType*>(scratchpad);
             cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cublas_fill_mode(uplo), n,
+            cusolver_native_named_func(func_name, func, err, handle, get_cublas_fill_mode(uplo), n,
                                        a_, lda, d_, e_, tau_, scratch_, scratchpad_size, devInfo_);
         });
     });
@@ -2161,7 +2161,7 @@ inline sycl::event sytrf(const char* func_name, Func func, sycl::queue& queue,
             auto ipiv_ = reinterpret_cast<int*>(ipiv32);
             auto devInfo_ = reinterpret_cast<int*>(devInfo);
             cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cublas_fill_mode(uplo), n,
+            cusolver_native_named_func(func_name, func, err, handle, get_cublas_fill_mode(uplo), n,
                                        a_, lda, ipiv_, scratch_, scratchpad_size, devInfo_);
         });
     });
@@ -2245,7 +2245,7 @@ inline sycl::event ungbr(const char* func_name, Func func, sycl::queue& queue,
             auto tau_ = reinterpret_cast<cuDataType*>(tau);
             auto scratch_ = reinterpret_cast<cuDataType*>(scratchpad);
             cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cublas_generate(vec), m, n,
+            cusolver_native_named_func(func_name, func, err, handle, get_cublas_generate(vec), m, n,
                                        k, a_, lda, tau_, scratch_, scratchpad_size, nullptr);
         });
     });
@@ -2284,7 +2284,7 @@ inline sycl::event ungqr(const char* func_name, Func func, sycl::queue& queue, s
             auto tau_ = reinterpret_cast<cuDataType*>(tau);
             auto scratch_ = reinterpret_cast<cuDataType*>(scratchpad);
             cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, m, n, k, a_, lda, tau_,
+            cusolver_native_named_func(func_name, func, err, handle, m, n, k, a_, lda, tau_,
                                        scratch_, scratchpad_size, nullptr);
         });
     });
@@ -2322,7 +2322,7 @@ inline sycl::event ungtr(const char* func_name, Func func, sycl::queue& queue,
             auto tau_ = reinterpret_cast<cuDataType*>(tau);
             auto scratch_ = reinterpret_cast<cuDataType*>(scratchpad);
             cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cublas_fill_mode(uplo), n,
+            cusolver_native_named_func(func_name, func, err, handle, get_cublas_fill_mode(uplo), n,
                                        a_, lda, tau_, scratch_, scratchpad_size, nullptr);
         });
     });
@@ -2377,7 +2377,7 @@ inline sycl::event unmqr(const char* func_name, Func func, sycl::queue& queue,
             auto c_ = reinterpret_cast<cuDataType*>(c);
             auto scratch_ = reinterpret_cast<cuDataType*>(scratchpad);
             cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cublas_side_mode(side),
+            cusolver_native_named_func(func_name, func, err, handle, get_cublas_side_mode(side),
                                        get_cublas_operation(trans), m, n, k, a_, lda, tau_, c_, ldc,
                                        scratch_, scratchpad_size, nullptr);
         });
@@ -2421,7 +2421,7 @@ inline sycl::event unmtr(const char* func_name, Func func, sycl::queue& queue,
             auto c_ = reinterpret_cast<cuDataType*>(c);
             auto scratch_ = reinterpret_cast<cuDataType*>(scratchpad);
             cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cublas_side_mode(side),
+            cusolver_native_named_func(func_name, func, err, handle, get_cublas_side_mode(side),
                                        get_cublas_fill_mode(uplo), get_cublas_operation(trans), m,
                                        n, a_, lda, tau_, c_, ldc, scratch_, scratchpad_size,
                                        nullptr);
@@ -2451,14 +2451,15 @@ template <typename Func>
 inline void gebrd_scratchpad_size(const char* func_name, Func func, sycl::queue& queue,
                                   std::int64_t m, std::int64_t n, std::int64_t lda,
                                   int* scratch_size) {
-    queue.submit([&](sycl::handler& cgh) {
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
-            cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T(func_name, func, err, handle, m, n, scratch_size);
-        });
-    });
-    queue.wait();
+    queue
+        .submit([&](sycl::handler& cgh) {
+            onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+                auto handle = sc.get_handle(queue);
+                cusolverStatus_t err;
+                CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, m, n, scratch_size);
+            });
+        })
+        .wait();
 }
 
 #define GEBRD_LAUNCHER_SCRATCH(TYPE, CUSOLVER_ROUTINE)                                            \
@@ -2503,14 +2504,16 @@ template <typename Func>
 inline void geqrf_scratchpad_size(const char* func_name, Func func, sycl::queue& queue,
                                   std::int64_t m, std::int64_t n, std::int64_t lda,
                                   int* scratch_size) {
-    queue.submit([&](sycl::handler& cgh) {
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
-            cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T(func_name, func, err, handle, m, n, nullptr, lda, scratch_size);
-        });
-    });
-    queue.wait();
+    queue
+        .submit([&](sycl::handler& cgh) {
+            onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+                auto handle = sc.get_handle(queue);
+                cusolverStatus_t err;
+                CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, m, n, nullptr, lda,
+                                           scratch_size);
+            });
+        })
+        .wait();
 }
 
 #define GEQRF_LAUNCHER_SCRATCH(TYPE, CUSOLVER_ROUTINE)                                            \
@@ -2535,14 +2538,15 @@ inline void gesvd_scratchpad_size(const char* func_name, Func func, sycl::queue&
                                   oneapi::mkl::jobsvd jobu, oneapi::mkl::jobsvd jobvt,
                                   std::int64_t m, std::int64_t n, std::int64_t lda,
                                   std::int64_t ldu, std::int64_t ldvt, int* scratch_size) {
-    queue.submit([&](sycl::handler& cgh) {
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
-            cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T(func_name, func, err, handle, m, n, scratch_size);
-        });
-    });
-    queue.wait();
+    queue
+        .submit([&](sycl::handler& cgh) {
+            onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+                auto handle = sc.get_handle(queue);
+                cusolverStatus_t err;
+                CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, m, n, scratch_size);
+            });
+        })
+        .wait();
 }
 
 #define GESVD_LAUNCHER_SCRATCH(TYPE, CUSOLVER_ROUTINE)                                            \
@@ -2567,14 +2571,16 @@ template <typename Func>
 inline void getrf_scratchpad_size(const char* func_name, Func func, sycl::queue& queue,
                                   std::int64_t m, std::int64_t n, std::int64_t lda,
                                   int* scratch_size) {
-    queue.submit([&](sycl::handler& cgh) {
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
-            cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T(func_name, func, err, handle, m, n, nullptr, lda, scratch_size);
-        });
-    });
-    queue.wait();
+    queue
+        .submit([&](sycl::handler& cgh) {
+            onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+                auto handle = sc.get_handle(queue);
+                cusolverStatus_t err;
+                CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, m, n, nullptr, lda,
+                                           scratch_size);
+            });
+        })
+        .wait();
 }
 
 #define GETRF_LAUNCHER_SCRATCH(TYPE, CUSOLVER_ROUTINE)                                            \
@@ -2628,16 +2634,17 @@ template <typename Func>
 inline void heevd_scratchpad_size(const char* func_name, Func func, sycl::queue& queue,
                                   oneapi::mkl::job jobz, oneapi::mkl::uplo uplo, std::int64_t n,
                                   std::int64_t lda, int* scratch_size) {
-    queue.submit([&](sycl::handler& cgh) {
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
-            cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T(func_name, func, err, handle, get_cusolver_job(jobz),
-                                  get_cublas_fill_mode(uplo), n, nullptr, lda, nullptr,
-                                  scratch_size);
-        });
-    });
-    queue.wait();
+    queue
+        .submit([&](sycl::handler& cgh) {
+            onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+                auto handle = sc.get_handle(queue);
+                cusolverStatus_t err;
+                CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cusolver_job(jobz),
+                                           get_cublas_fill_mode(uplo), n, nullptr, lda, nullptr,
+                                           scratch_size);
+            });
+        })
+        .wait();
 }
 
 #define HEEVD_LAUNCHER_SCRATCH(TYPE, CUSOLVER_ROUTINE)                                        \
@@ -2661,16 +2668,17 @@ inline void hegvd_scratchpad_size(const char* func_name, Func func, sycl::queue&
                                   std::int64_t itype, oneapi::mkl::job jobz, oneapi::mkl::uplo uplo,
                                   std::int64_t n, std::int64_t lda, std::int64_t ldb,
                                   int* scratch_size) {
-    queue.submit([&](sycl::handler& cgh) {
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
-            cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T(func_name, func, err, handle, get_cusolver_itype(itype),
-                                  get_cusolver_job(jobz), get_cublas_fill_mode(uplo), n, nullptr,
-                                  lda, nullptr, ldb, nullptr, scratch_size);
-        });
-    });
-    queue.wait();
+    queue
+        .submit([&](sycl::handler& cgh) {
+            onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+                auto handle = sc.get_handle(queue);
+                cusolverStatus_t err;
+                CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cusolver_itype(itype),
+                                           get_cusolver_job(jobz), get_cublas_fill_mode(uplo), n,
+                                           nullptr, lda, nullptr, ldb, nullptr, scratch_size);
+            });
+        })
+        .wait();
 }
 
 #define HEGVD_LAUNCHER_SCRATCH(TYPE, CUSOLVER_ROUTINE)                                             \
@@ -2693,15 +2701,17 @@ template <typename Func>
 inline void hetrd_scratchpad_size(const char* func_name, Func func, sycl::queue& queue,
                                   oneapi::mkl::uplo uplo, std::int64_t n, std::int64_t lda,
                                   int* scratch_size) {
-    queue.submit([&](sycl::handler& cgh) {
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
-            cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T(func_name, func, err, handle, get_cublas_fill_mode(uplo), n,
-                                  nullptr, lda, nullptr, nullptr, nullptr, scratch_size);
-        });
-    });
-    queue.wait();
+    queue
+        .submit([&](sycl::handler& cgh) {
+            onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+                auto handle = sc.get_handle(queue);
+                cusolverStatus_t err;
+                CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cublas_fill_mode(uplo),
+                                           n, nullptr, lda, nullptr, nullptr, nullptr,
+                                           scratch_size);
+            });
+        })
+        .wait();
 }
 
 #define HETRD_LAUNCHER_SCRATCH(TYPE, CUSOLVER_ROUTINE)                                    \
@@ -2734,15 +2744,16 @@ template <typename Func>
 inline void orgbr_scratchpad_size(const char* func_name, Func func, sycl::queue& queue,
                                   oneapi::mkl::generate vec, std::int64_t m, std::int64_t n,
                                   std::int64_t k, std::int64_t lda, int* scratch_size) {
-    queue.submit([&](sycl::handler& cgh) {
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
-            cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T(func_name, func, err, handle, get_cublas_generate(vec), m, n, k,
-                                  nullptr, lda, nullptr, scratch_size);
-        });
-    });
-    queue.wait();
+    queue
+        .submit([&](sycl::handler& cgh) {
+            onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+                auto handle = sc.get_handle(queue);
+                cusolverStatus_t err;
+                CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cublas_generate(vec),
+                                           m, n, k, nullptr, lda, nullptr, scratch_size);
+            });
+        })
+        .wait();
 }
 
 #define ORGBR_LAUNCHER_SCRATCH(TYPE, CUSOLVER_ROUTINE)                                       \
@@ -2765,15 +2776,16 @@ template <typename Func>
 inline void orgtr_scratchpad_size(const char* func_name, Func func, sycl::queue& queue,
                                   oneapi::mkl::uplo uplo, std::int64_t n, std::int64_t lda,
                                   int* scratch_size) {
-    queue.submit([&](sycl::handler& cgh) {
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
-            cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T(func_name, func, err, handle, get_cublas_fill_mode(uplo), n,
-                                  nullptr, lda, nullptr, scratch_size);
-        });
-    });
-    queue.wait();
+    queue
+        .submit([&](sycl::handler& cgh) {
+            onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+                auto handle = sc.get_handle(queue);
+                cusolverStatus_t err;
+                CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cublas_fill_mode(uplo),
+                                           n, nullptr, lda, nullptr, scratch_size);
+            });
+        })
+        .wait();
 }
 
 #define ORGTR_LAUNCHER_SCRATCH(TYPE, CUSOLVER_ROUTINE)                                    \
@@ -2795,15 +2807,16 @@ template <typename Func>
 inline void orgqr_scratchpad_size(const char* func_name, Func func, sycl::queue& queue,
                                   std::int64_t m, std::int64_t n, std::int64_t k, std::int64_t lda,
                                   int* scratch_size) {
-    queue.submit([&](sycl::handler& cgh) {
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
-            cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T(func_name, func, err, handle, m, n, k, nullptr, lda, nullptr,
-                                  scratch_size);
-        });
-    });
-    queue.wait();
+    queue
+        .submit([&](sycl::handler& cgh) {
+            onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+                auto handle = sc.get_handle(queue);
+                cusolverStatus_t err;
+                CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, m, n, k, nullptr, lda,
+                                           nullptr, scratch_size);
+            });
+        })
+        .wait();
 }
 
 #define ORGQR_LAUNCHER_SCRATCH(TYPE, CUSOLVER_ROUTINE)                                            \
@@ -2841,16 +2854,17 @@ inline void ormqr_scratchpad_size(const char* func_name, Func func, sycl::queue&
                                   oneapi::mkl::side side, oneapi::mkl::transpose trans,
                                   std::int64_t m, std::int64_t n, std::int64_t k, std::int64_t lda,
                                   std::int64_t ldc, int* scratch_size) {
-    queue.submit([&](sycl::handler& cgh) {
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
-            cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T(func_name, func, err, handle, get_cublas_side_mode(side),
-                                  get_cublas_operation(trans), m, n, k, nullptr, lda, nullptr,
-                                  nullptr, ldc, scratch_size);
-        });
-    });
-    queue.wait();
+    queue
+        .submit([&](sycl::handler& cgh) {
+            onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+                auto handle = sc.get_handle(queue);
+                cusolverStatus_t err;
+                CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cublas_side_mode(side),
+                                           get_cublas_operation(trans), m, n, k, nullptr, lda,
+                                           nullptr, nullptr, ldc, scratch_size);
+            });
+        })
+        .wait();
 }
 
 #define ORMQRF_LAUNCHER_SCRATCH(TYPE, CUSOLVER_ROUTINE)                                            \
@@ -2874,16 +2888,17 @@ inline void ormtr_scratchpad_size(const char* func_name, Func func, sycl::queue&
                                   oneapi::mkl::side side, oneapi::mkl::uplo uplo,
                                   oneapi::mkl::transpose trans, std::int64_t m, std::int64_t n,
                                   std::int64_t lda, std::int64_t ldc, int* scratch_size) {
-    queue.submit([&](sycl::handler& cgh) {
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
-            cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T(func_name, func, err, handle, get_cublas_side_mode(side),
-                                  get_cublas_fill_mode(uplo), get_cublas_operation(trans), m, n,
-                                  nullptr, lda, nullptr, nullptr, ldc, scratch_size);
-        });
-    });
-    queue.wait();
+    queue
+        .submit([&](sycl::handler& cgh) {
+            onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+                auto handle = sc.get_handle(queue);
+                cusolverStatus_t err;
+                CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cublas_side_mode(side),
+                                           get_cublas_fill_mode(uplo), get_cublas_operation(trans),
+                                           m, n, nullptr, lda, nullptr, nullptr, ldc, scratch_size);
+            });
+        })
+        .wait();
 }
 
 #define ORMTR_LAUNCHER_SCRATCH(TYPE, CUSOLVER_ROUTINE)                                             \
@@ -2907,15 +2922,16 @@ template <typename Func>
 inline void potrf_scratchpad_size(const char* func_name, Func func, sycl::queue& queue,
                                   oneapi::mkl::uplo uplo, std::int64_t n, std::int64_t lda,
                                   int* scratch_size) {
-    queue.submit([&](sycl::handler& cgh) {
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
-            cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T(func_name, func, err, handle, get_cublas_fill_mode(uplo), n,
-                                  nullptr, lda, scratch_size);
-        });
-    });
-    queue.wait();
+    queue
+        .submit([&](sycl::handler& cgh) {
+            onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+                auto handle = sc.get_handle(queue);
+                cusolverStatus_t err;
+                CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cublas_fill_mode(uplo),
+                                           n, nullptr, lda, scratch_size);
+            });
+        })
+        .wait();
 }
 
 #define POTRF_LAUNCHER_SCRATCH(TYPE, CUSOLVER_ROUTINE)                                    \
@@ -2955,15 +2971,16 @@ template <typename Func>
 inline void potri_scratchpad_size(const char* func_name, Func func, sycl::queue& queue,
                                   oneapi::mkl::uplo uplo, std::int64_t n, std::int64_t lda,
                                   int* scratch_size) {
-    queue.submit([&](sycl::handler& cgh) {
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
-            cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T(func_name, func, err, handle, get_cublas_fill_mode(uplo), n,
-                                  nullptr, lda, scratch_size);
-        });
-    });
-    queue.wait();
+    queue
+        .submit([&](sycl::handler& cgh) {
+            onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+                auto handle = sc.get_handle(queue);
+                cusolverStatus_t err;
+                CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cublas_fill_mode(uplo),
+                                           n, nullptr, lda, scratch_size);
+            });
+        })
+        .wait();
 }
 
 #define POTRI_LAUNCHER_SCRATCH(TYPE, CUSOLVER_ROUTINE)                                    \
@@ -2987,14 +3004,16 @@ template <typename Func>
 inline void sytrf_scratchpad_size(const char* func_name, Func func, sycl::queue& queue,
                                   oneapi::mkl::uplo uplo, std::int64_t n, std::int64_t lda,
                                   int* scratch_size) {
-    queue.submit([&](sycl::handler& cgh) {
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
-            cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T(func_name, func, err, handle, n, nullptr, lda, scratch_size);
-        });
-    });
-    queue.wait();
+    queue
+        .submit([&](sycl::handler& cgh) {
+            onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+                auto handle = sc.get_handle(queue);
+                cusolverStatus_t err;
+                CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, n, nullptr, lda,
+                                           scratch_size);
+            });
+        })
+        .wait();
 }
 
 #define SYTRF_LAUNCHER_SCRATCH(TYPE, CUSOLVER_ROUTINE)                                    \
@@ -3018,16 +3037,17 @@ template <typename Func>
 inline void syevd_scratchpad_size(const char* func_name, Func func, sycl::queue& queue,
                                   oneapi::mkl::job jobz, oneapi::mkl::uplo uplo, std::int64_t n,
                                   std::int64_t lda, int* scratch_size) {
-    queue.submit([&](sycl::handler& cgh) {
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
-            cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T(func_name, func, err, handle, get_cusolver_job(jobz),
-                                  get_cublas_fill_mode(uplo), n, nullptr, lda, nullptr,
-                                  scratch_size);
-        });
-    });
-    queue.wait();
+    queue
+        .submit([&](sycl::handler& cgh) {
+            onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+                auto handle = sc.get_handle(queue);
+                cusolverStatus_t err;
+                CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cusolver_job(jobz),
+                                           get_cublas_fill_mode(uplo), n, nullptr, lda, nullptr,
+                                           scratch_size);
+            });
+        })
+        .wait();
 }
 
 #define SYEVD_LAUNCHER_SCRATCH(TYPE, CUSOLVER_ROUTINE)                                        \
@@ -3051,16 +3071,17 @@ inline void sygvd_scratchpad_size(const char* func_name, Func func, sycl::queue&
                                   std::int64_t itype, oneapi::mkl::job jobz, oneapi::mkl::uplo uplo,
                                   std::int64_t n, std::int64_t lda, std::int64_t ldb,
                                   int* scratch_size) {
-    queue.submit([&](sycl::handler& cgh) {
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
-            cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T(func_name, func, err, handle, get_cusolver_itype(itype),
-                                  get_cusolver_job(jobz), get_cublas_fill_mode(uplo), n, nullptr,
-                                  lda, nullptr, ldb, nullptr, scratch_size);
-        });
-    });
-    queue.wait();
+    queue
+        .submit([&](sycl::handler& cgh) {
+            onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+                auto handle = sc.get_handle(queue);
+                cusolverStatus_t err;
+                CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cusolver_itype(itype),
+                                           get_cusolver_job(jobz), get_cublas_fill_mode(uplo), n,
+                                           nullptr, lda, nullptr, ldb, nullptr, scratch_size);
+            });
+        })
+        .wait();
 }
 
 #define SYGVD_LAUNCHER_SCRATCH(TYPE, CUSOLVER_ROUTINE)                                             \
@@ -3083,15 +3104,17 @@ template <typename Func>
 inline void sytrd_scratchpad_size(const char* func_name, Func func, sycl::queue& queue,
                                   oneapi::mkl::uplo uplo, std::int64_t n, std::int64_t lda,
                                   int* scratch_size) {
-    queue.submit([&](sycl::handler& cgh) {
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
-            cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T(func_name, func, err, handle, get_cublas_fill_mode(uplo), n,
-                                  nullptr, lda, nullptr, nullptr, nullptr, scratch_size);
-        });
-    });
-    queue.wait();
+    queue
+        .submit([&](sycl::handler& cgh) {
+            onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+                auto handle = sc.get_handle(queue);
+                cusolverStatus_t err;
+                CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cublas_fill_mode(uplo),
+                                           n, nullptr, lda, nullptr, nullptr, nullptr,
+                                           scratch_size);
+            });
+        })
+        .wait();
 }
 
 #define SYTRD_LAUNCHER_SCRATCH(TYPE, CUSOLVER_ROUTINE)                                    \
@@ -3144,15 +3167,16 @@ template <typename Func>
 inline void ungbr_scratchpad_size(const char* func_name, Func func, sycl::queue& queue,
                                   oneapi::mkl::generate vec, std::int64_t m, std::int64_t n,
                                   std::int64_t k, std::int64_t lda, int* scratch_size) {
-    queue.submit([&](sycl::handler& cgh) {
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
-            cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T(func_name, func, err, handle, get_cublas_generate(vec), m, n, k,
-                                  nullptr, lda, nullptr, scratch_size);
-        });
-    });
-    queue.wait();
+    queue
+        .submit([&](sycl::handler& cgh) {
+            onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+                auto handle = sc.get_handle(queue);
+                cusolverStatus_t err;
+                CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cublas_generate(vec),
+                                           m, n, k, nullptr, lda, nullptr, scratch_size);
+            });
+        })
+        .wait();
 }
 
 #define UNGBR_LAUNCHER_SCRATCH(TYPE, CUSOLVER_ROUTINE)                                       \
@@ -3175,15 +3199,16 @@ template <typename Func>
 inline void ungqr_scratchpad_size(const char* func_name, Func func, sycl::queue& queue,
                                   std::int64_t m, std::int64_t n, std::int64_t k, std::int64_t lda,
                                   int* scratch_size) {
-    queue.submit([&](sycl::handler& cgh) {
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
-            cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T(func_name, func, err, handle, m, n, k, nullptr, lda, nullptr,
-                                  scratch_size);
-        });
-    });
-    queue.wait();
+    queue
+        .submit([&](sycl::handler& cgh) {
+            onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+                auto handle = sc.get_handle(queue);
+                cusolverStatus_t err;
+                CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, m, n, k, nullptr, lda,
+                                           nullptr, scratch_size);
+            });
+        })
+        .wait();
 }
 
 #define UNGQR_LAUNCHER_SCRATCH(TYPE, CUSOLVER_ROUTINE)                                            \
@@ -3205,15 +3230,16 @@ template <typename Func>
 inline void ungtr_scratchpad_size(const char* func_name, Func func, sycl::queue& queue,
                                   oneapi::mkl::uplo uplo, std::int64_t n, std::int64_t lda,
                                   int* scratch_size) {
-    queue.submit([&](sycl::handler& cgh) {
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
-            cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T(func_name, func, err, handle, get_cublas_fill_mode(uplo), n,
-                                  nullptr, lda, nullptr, scratch_size);
-        });
-    });
-    queue.wait();
+    queue
+        .submit([&](sycl::handler& cgh) {
+            onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+                auto handle = sc.get_handle(queue);
+                cusolverStatus_t err;
+                CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cublas_fill_mode(uplo),
+                                           n, nullptr, lda, nullptr, scratch_size);
+            });
+        })
+        .wait();
 }
 
 #define UNGTR_LAUNCHER_SCRATCH(TYPE, CUSOLVER_ROUTINE)                                    \
@@ -3253,16 +3279,17 @@ inline void unmqr_scratchpad_size(const char* func_name, Func func, sycl::queue&
                                   oneapi::mkl::side side, oneapi::mkl::transpose trans,
                                   std::int64_t m, std::int64_t n, std::int64_t k, std::int64_t lda,
                                   std::int64_t ldc, int* scratch_size) {
-    queue.submit([&](sycl::handler& cgh) {
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
-            cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T(func_name, func, err, handle, get_cublas_side_mode(side),
-                                  get_cublas_operation(trans), m, n, k, nullptr, lda, nullptr,
-                                  nullptr, ldc, scratch_size);
-        });
-    });
-    queue.wait();
+    queue
+        .submit([&](sycl::handler& cgh) {
+            onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+                auto handle = sc.get_handle(queue);
+                cusolverStatus_t err;
+                CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cublas_side_mode(side),
+                                           get_cublas_operation(trans), m, n, k, nullptr, lda,
+                                           nullptr, nullptr, ldc, scratch_size);
+            });
+        })
+        .wait();
 }
 
 #define UNMQR_LAUNCHER_SCRATCH(TYPE, CUSOLVER_ROUTINE)                                             \
@@ -3286,16 +3313,17 @@ inline void unmtr_scratchpad_size(const char* func_name, Func func, sycl::queue&
                                   oneapi::mkl::side side, oneapi::mkl::uplo uplo,
                                   oneapi::mkl::transpose trans, std::int64_t m, std::int64_t n,
                                   std::int64_t lda, std::int64_t ldc, int* scratch_size) {
-    queue.submit([&](sycl::handler& cgh) {
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
-            cusolverStatus_t err;
-            CUSOLVER_ERROR_FUNC_T(func_name, func, err, handle, get_cublas_side_mode(side),
-                                  get_cublas_fill_mode(uplo), get_cublas_operation(trans), m, n,
-                                  nullptr, lda, nullptr, nullptr, ldc, scratch_size);
-        });
-    });
-    queue.wait();
+    queue
+        .submit([&](sycl::handler& cgh) {
+            onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+                auto handle = sc.get_handle(queue);
+                cusolverStatus_t err;
+                CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cublas_side_mode(side),
+                                           get_cublas_fill_mode(uplo), get_cublas_operation(trans),
+                                           m, n, nullptr, lda, nullptr, nullptr, ldc, scratch_size);
+            });
+        })
+        .wait();
 }
 
 #define UNMTR_LAUNCHER_SCRATCH(TYPE, CUSOLVER_ROUTINE)                                             \

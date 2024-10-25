@@ -17,8 +17,8 @@
 * SPDX-License-Identifier: Apache-2.0
 *******************************************************************************/
 
-#ifndef _ONEMKL_DFT_SRC_ROCFFT_EXECUTE_HELPER_HPP_
-#define _ONEMKL_DFT_SRC_ROCFFT_EXECUTE_HELPER_HPP_
+#ifndef _ONEMKL_DFT_SRC_EXECUTE_HELPER_ROCFFT_HPP_
+#define _ONEMKL_DFT_SRC_EXECUTE_HELPER_ROCFFT_HPP_
 
 #if __has_include(<sycl/sycl.hpp>)
 #include <sycl/sycl.hpp>
@@ -83,15 +83,21 @@ inline void sync_checked(const std::string& func, hipStream_t stream) {
     }
 }
 
-inline void execute_checked(const std::string& func, const rocfft_plan plan, void* in_buffer[],
-                            void* out_buffer[], rocfft_execution_info info) {
+inline void execute_checked(const std::string& func, hipStream_t stream, const rocfft_plan plan,
+                            void* in_buffer[], void* out_buffer[], rocfft_execution_info info) {
     auto result = rocfft_execute(plan, in_buffer, out_buffer, info);
     if (result != rocfft_status_success) {
         throw oneapi::mkl::exception("dft/backends/rocfft", func,
                                      "rocfft_execute returned " + std::to_string(result));
     }
+#ifndef SYCL_EXT_ONEAPI_ENQUEUE_NATIVE_COMMAND
+    // If not using equeue native extension, the host task must wait on the
+    // asynchronous operation to complete. Otherwise it report the operation
+    // as complete early.
+    sync_checked(func, stream);
+#endif
 }
 
 } // namespace oneapi::mkl::dft::rocfft::detail
 
-#endif
+#endif // _ONEMKL_DFT_SRC_EXECUTE_HELPER_ROCFFT_HPP_

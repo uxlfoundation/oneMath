@@ -527,9 +527,9 @@ inline sycl::event potrf_batch(const char* func_name, Func func, sycl::queue& qu
             for (int64_t i = 0; i < group_count; i++) {
                 auto** a_ = reinterpret_cast<rocmDataType**>(a_dev);
                 auto* info_ = reinterpret_cast<rocblas_int*>(info);
-                ROCSOLVER_ERROR_FUNC_T(func_name, func, err, handle, get_rocblas_fill_mode(uplo[i]),
-                                       (int)n[i], a_ + offset, (int)lda[i], info_ + offset,
-                                       (int)group_sizes[i]);
+                rocsolver_native_named_func(func_name, func, err, handle,
+                                            get_rocblas_fill_mode(uplo[i]), (int)n[i], a_ + offset,
+                                            (int)lda[i], info_ + offset, (int)group_sizes[i]);
                 offset += group_sizes[i];
             }
         });
@@ -627,9 +627,10 @@ inline sycl::event potrs_batch(const char* func_name, Func func, sycl::queue& qu
             for (int64_t i = 0; i < group_count; i++) {
                 auto** a_ = reinterpret_cast<rocmDataType**>(a_dev);
                 auto** b_ = reinterpret_cast<rocmDataType**>(b_dev);
-                ROCSOLVER_ERROR_FUNC_T(func_name, func, err, handle, get_rocblas_fill_mode(uplo[i]),
-                                       (int)n[i], (int)nrhs[i], a_ + offset, (int)lda[i],
-                                       b_ + offset, (int)ldb[i], (int)group_sizes[i]);
+                rocsolver_native_named_func(func_name, func, err, handle,
+                                            get_rocblas_fill_mode(uplo[i]), (int)n[i], (int)nrhs[i],
+                                            a_ + offset, (int)lda[i], b_ + offset, (int)ldb[i],
+                                            (int)group_sizes[i]);
                 offset += group_sizes[i];
             }
         });

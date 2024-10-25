@@ -21,16 +21,16 @@
 
 #include "oneapi/mkl/detail/config.hpp"
 
-#ifdef ENABLE_MKLCPU_BACKEND
+#ifdef ONEMKL_ENABLE_MKLCPU_BACKEND
 #include "oneapi/mkl/lapack/detail/mklcpu/lapack_ct.hpp"
 #endif
-#ifdef ENABLE_MKLGPU_BACKEND
+#ifdef ONEMKL_ENABLE_MKLGPU_BACKEND
 #include "oneapi/mkl/lapack/detail/mklgpu/lapack_ct.hpp"
 #endif
-#ifdef ENABLE_CUSOLVER_BACKEND
+#ifdef ONEMKL_ENABLE_CUSOLVER_BACKEND
 #include "oneapi/mkl/lapack/detail/cusolver/lapack_ct.hpp"
 #endif
-#ifdef ENABLE_ROCSOLVER_BACKEND
+#ifdef ONEMKL_ENABLE_ROCSOLVER_BACKEND
 #include "oneapi/mkl/lapack/detail/rocsolver/lapack_ct.hpp"
 #endif
 

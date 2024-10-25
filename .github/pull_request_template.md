@@ -13,7 +13,6 @@ Fixes # (GitHub issue)
 ## All Submissions
 
 - [ ] Do all unit tests pass locally? Attach a log.
-- [ ] Have you formatted the code using clang-format?
 
 ## New interfaces
 

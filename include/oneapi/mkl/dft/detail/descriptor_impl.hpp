@@ -71,23 +71,23 @@ public:
 
     void commit(sycl::queue& queue);
 
-#ifdef ENABLE_MKLCPU_BACKEND
+#ifdef ONEMKL_ENABLE_MKLCPU_BACKEND
     void commit(backend_selector<backend::mklcpu> selector);
 #endif
 
-#ifdef ENABLE_MKLGPU_BACKEND
+#ifdef ONEMKL_ENABLE_MKLGPU_BACKEND
     void commit(backend_selector<backend::mklgpu> selector);
 #endif
 
-#ifdef ENABLE_CUFFT_BACKEND
+#ifdef ONEMKL_ENABLE_CUFFT_BACKEND
     void commit(backend_selector<backend::cufft> selector);
 #endif
 
-#ifdef ENABLE_ROCFFT_BACKEND
+#ifdef ONEMKL_ENABLE_ROCFFT_BACKEND
     void commit(backend_selector<backend::rocfft> selector);
 #endif
 
-#ifdef ENABLE_PORTFFT_BACKEND
+#ifdef ONEMKL_ENABLE_PORTFFT_BACKEND
     void commit(backend_selector<backend::portfft> selector);
 #endif
 

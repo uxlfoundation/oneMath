@@ -22,9 +22,7 @@
 
 #include "oneapi/mkl/dft/detail/cufft/onemkl_dft_cufft.hpp"
 
-namespace oneapi {
-namespace mkl {
-namespace dft {
+namespace oneapi::mkl::dft::detail {
 
 template <precision prec, domain dom>
 void descriptor<prec, dom>::commit(backend_selector<backend::cufft> selector) {
@@ -44,6 +42,4 @@ template void descriptor<precision::DOUBLE, domain::COMPLEX>::commit(
     backend_selector<backend::cufft>);
 template void descriptor<precision::DOUBLE, domain::REAL>::commit(backend_selector<backend::cufft>);
 
-} //namespace dft
-} //namespace mkl
-} //namespace oneapi
+} //namespace oneapi::mkl::dft::detail

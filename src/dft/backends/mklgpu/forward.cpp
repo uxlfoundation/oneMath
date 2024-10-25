@@ -31,8 +31,13 @@
 
 #include "mklgpu_helpers.hpp"
 
+#include "mkl_version.h"
 // MKLGPU header
-#include "oneapi/mkl/dfti.hpp"
+#if INTEL_MKL_VERSION < 20250000
+#include <oneapi/mkl/dfti.hpp>
+#else
+#include <oneapi/mkl/dft.hpp>
+#endif
 
 /**
 Note that in this file, the Intel oneMKL-GPU library's interface mirrors the

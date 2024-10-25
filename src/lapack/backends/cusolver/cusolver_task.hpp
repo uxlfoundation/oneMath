@@ -34,8 +34,8 @@
 // After Plugin Interface removal in DPC++ ur.hpp is the new include
 #if __has_include(<sycl/detail/ur.hpp>)
 #include <sycl/detail/ur.hpp>
-#ifndef ONEAPI_ONEMKL_PI_INTERFACE_REMOVED
-#define ONEAPI_ONEMKL_PI_INTERFACE_REMOVED
+#ifndef ONEMKL_PI_INTERFACE_REMOVED
+#define ONEMKL_PI_INTERFACE_REMOVED
 #endif
 #elif __has_include(<sycl/detail/pi.hpp>)
 #include <sycl/detail/pi.hpp>
@@ -50,10 +50,13 @@ namespace cusolver {
 
 template <typename H, typename F>
 static inline void host_task_internal(H& cgh, sycl::queue queue, F f) {
+#ifdef SYCL_EXT_ONEAPI_ENQUEUE_NATIVE_COMMAND
+    cgh.ext_codeplay_enqueue_native_command([f, queue](sycl::interop_handle ih) {
+#else
     cgh.host_task([f, queue](sycl::interop_handle ih) {
+#endif
         auto sc = CusolverScopedContextHandler(queue, ih);
         f(sc);
-        sc.wait_stream(queue);
     });
 }
 

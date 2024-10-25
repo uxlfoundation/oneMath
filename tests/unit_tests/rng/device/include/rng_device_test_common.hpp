@@ -190,8 +190,8 @@ struct statistics_device<oneapi::mkl::rng::device::uniform<Fp, Method>> {
 template <typename Method>
 struct statistics_device<oneapi::mkl::rng::device::uniform<std::int32_t, Method>> {
     template <typename AllocType>
-    bool check(const std::vector<int32_t, AllocType>& r,
-               const oneapi::mkl::rng::device::uniform<int32_t, Method>& distr) {
+    bool check(const std::vector<std::int32_t, AllocType>& r,
+               const oneapi::mkl::rng::device::uniform<std::int32_t, Method>& distr) {
         double tM, tD, tQ;
         double a = distr.a();
         double b = distr.b();
@@ -209,8 +209,46 @@ struct statistics_device<oneapi::mkl::rng::device::uniform<std::int32_t, Method>
 template <typename Method>
 struct statistics_device<oneapi::mkl::rng::device::uniform<std::uint32_t, Method>> {
     template <typename AllocType>
-    bool check(const std::vector<uint32_t, AllocType>& r,
-               const oneapi::mkl::rng::device::uniform<uint32_t, Method>& distr) {
+    bool check(const std::vector<std::uint32_t, AllocType>& r,
+               const oneapi::mkl::rng::device::uniform<std::uint32_t, Method>& distr) {
+        double tM, tD, tQ;
+        double a = distr.a();
+        double b = distr.b();
+
+        // Theoretical moments
+        tM = (a + b - 1.0) / 2.0;
+        tD = ((b - a) * (b - a) - 1.0) / 12.0;
+        tQ = (((b - a) * (b - a)) * ((1.0 / 80.0) * (b - a) * (b - a) - (1.0 / 24.0))) +
+             (7.0 / 240.0);
+
+        return compare_moments(r, tM, tD, tQ);
+    }
+};
+
+template <typename Method>
+struct statistics_device<oneapi::mkl::rng::device::uniform<std::int64_t, Method>> {
+    template <typename AllocType>
+    bool check(const std::vector<std::int64_t, AllocType>& r,
+               const oneapi::mkl::rng::device::uniform<std::int64_t, Method>& distr) {
+        double tM, tD, tQ;
+        double a = distr.a();
+        double b = distr.b();
+
+        // Theoretical moments
+        tM = (a + b - 1.0) / 2.0;
+        tD = ((b - a) * (b - a) - 1.0) / 12.0;
+        tQ = (((b - a) * (b - a)) * ((1.0 / 80.0) * (b - a) * (b - a) - (1.0 / 24.0))) +
+             (7.0 / 240.0);
+
+        return compare_moments(r, tM, tD, tQ);
+    }
+};
+
+template <typename Method>
+struct statistics_device<oneapi::mkl::rng::device::uniform<std::uint64_t, Method>> {
+    template <typename AllocType>
+    bool check(const std::vector<std::uint64_t, AllocType>& r,
+               const oneapi::mkl::rng::device::uniform<std::uint64_t, Method>& distr) {
         double tM, tD, tQ;
         double a = distr.a();
         double b = distr.b();
@@ -309,6 +347,52 @@ struct statistics_device<oneapi::mkl::rng::device::bernoulli<Fp, Method>> {
         tM = p;
         tD = p * (1.0 - p);
         tQ = p * (1.0 - 4.0 * p + 6.0 * p * p - 3.0 * p * p * p);
+
+        return compare_moments(r, tM, tD, tQ);
+    }
+};
+
+template <typename Fp, typename Method>
+struct statistics_device<oneapi::mkl::rng::device::beta<Fp, Method>> {
+    template <typename AllocType>
+    bool check(const std::vector<Fp, AllocType>& r,
+               const oneapi::mkl::rng::device::beta<Fp, Method>& distr) {
+        double tM, tD, tQ;
+        double b, c, d, e, e2, b2, sum_pq;
+        Fp p = distr.p();
+        Fp q = distr.q();
+        Fp a = distr.a();
+        Fp beta = distr.b();
+
+        b2 = beta * beta;
+        sum_pq = p + q;
+        b = (p + 1.0) / (sum_pq + 1.0);
+        c = (p + 2.0) / (sum_pq + 2.0);
+        d = (p + 3.0) / (sum_pq + 3.0);
+        e = p / sum_pq;
+        e2 = e * e;
+
+        tM = a + e * beta;
+        tD = b2 * p * q / (sum_pq * sum_pq * (sum_pq + 1.0));
+        tQ = b2 * b2 * (e * b * c * d - 4.0 * e2 * b * c + 6.0 * e2 * e * b - 3.0 * e2 * e2);
+
+        return compare_moments(r, tM, tD, tQ);
+    }
+};
+
+template <typename Fp, typename Method>
+struct statistics_device<oneapi::mkl::rng::device::gamma<Fp, Method>> {
+    template <typename AllocType>
+    bool check(const std::vector<Fp, AllocType>& r,
+               const oneapi::mkl::rng::device::gamma<Fp, Method>& distr) {
+        double tM, tD, tQ;
+        Fp a = distr.a();
+        Fp alpha = distr.alpha();
+        Fp beta = distr.beta();
+
+        tM = a + beta * alpha;
+        tD = beta * beta * alpha;
+        tQ = beta * beta * beta * beta * 3 * alpha * (alpha + 2);
 
         return compare_moments(r, tM, tD, tQ);
     }

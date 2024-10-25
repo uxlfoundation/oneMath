@@ -56,8 +56,7 @@ bool check_dependency(sycl::queue queue, sycl::event in_event, sycl::event func_
 
     do {
         func_status = func_event.get_info<sycl::info::event::command_execution_status>();
-    } while (func_status != sycl::info::event_command_status::running &&
-             func_status != sycl::info::event_command_status::complete);
+    } while (func_status != sycl::info::event_command_status::complete);
     in_status = in_event.get_info<sycl::info::event::command_execution_status>();
 
     /* Print results */

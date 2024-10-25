@@ -57,6 +57,18 @@ struct icdf {};
 using by_default = icdf;
 } // namespace bernoulli_method
 
+namespace beta_method {
+struct cja {};
+struct cja_accurate {};
+using by_default = cja;
+} // namespace beta_method
+
+namespace gamma_method {
+struct marsaglia {};
+struct marsaglia_accurate {};
+using by_default = marsaglia;
+} // namespace gamma_method
+
 } // namespace oneapi::mkl::rng::device
 
 #endif // _MKL_RNG_DEVICE_TYPES_HPP_

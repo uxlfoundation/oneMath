@@ -17,8 +17,8 @@
 * SPDX-License-Identifier: Apache-2.0
 *******************************************************************************/
 
-#ifndef _ONEMKL_DFT_SRC_CUFFT_EXECUTE_HPP_
-#define _ONEMKL_DFT_SRC_CUFFT_EXECUTE_HPP_
+#ifndef _ONEMKL_DFT_SRC_EXECUTE_HELPER_CUFFT_HPP_
+#define _ONEMKL_DFT_SRC_EXECUTE_HELPER_CUFFT_HPP_
 
 #if __has_include(<sycl/sycl.hpp>)
 #include <sycl/sycl.hpp>
@@ -125,12 +125,16 @@ void cufft_execute(const std::string& func, CUstream stream, cufftHandle plan, v
             }
         }
     }
-
+#ifndef SYCL_EXT_ONEAPI_ENQUEUE_NATIVE_COMMAND
+    // If not using the enqueue native extension, the host task must wait on the
+    // asynchronous operation to complete. Otherwise it report the operation
+    // as complete early.
     auto result = cuStreamSynchronize(stream);
     if (result != CUDA_SUCCESS) {
         throw oneapi::mkl::exception("dft/backends/cufft", func,
                                      "cuStreamSynchronize returned " + std::to_string(result));
     }
+#endif
 }
 
 inline CUstream setup_stream(const std::string& func, sycl::interop_handle ih, cufftHandle plan) {
@@ -145,4 +149,4 @@ inline CUstream setup_stream(const std::string& func, sycl::interop_handle ih, c
 
 } // namespace oneapi::mkl::dft::cufft::detail
 
-#endif
+#endif // _ONEMKL_DFT_SRC_EXECUTE_HELPER_CUFFT_HPP_

@@ -23,9 +23,9 @@ following:
 
   git clone https://github.com/Reference-LAPACK/lapack.git 
   cd lapack; mkdir -p build; cd build 
-  cmake -DCMAKE_INSTALL_PREFIX=~/lapack -DCBLAS=True -DLAPACK=True -DLAPACKE=True -DBUILD_INDEX64=True -DBUILD_SHARED_LIBS=True .. 
+  cmake -DCMAKE_INSTALL_PREFIX=~/lapack -DCBLAS=True -DLAPACK=True -DLAPACKE=True -DBUILD_INDEX64=True -DBUILD_SHARED_LIBS=True ..
   cmake --build . -j --target install 
-  cmake -DCMAKE_INSTALL_PREFIX=~/lapack -DCBLAS=True -DLAPACK=True -DLAPACKE=True -DBUILD_INDEX64=False -DBUILD_SHARED_LIBS=True .. 
+  cmake -DCMAKE_INSTALL_PREFIX=~/lapack -DCBLAS=True -DLAPACK=True -DLAPACKE=True -DBUILD_INDEX64=False -DBUILD_SHARED_LIBS=True ..
   cmake --build . -j --target install
 
 and then used in oneMKL by setting ``-REF_BLAS_ROOT=/path/to/lapack/install``
@@ -46,6 +46,3 @@ To run the tests, either run test binaries individually, or use ``ctest`` CMake 
 
 For more ``ctest`` options, refer to `ctest manual page <https://cmake.org/cmake/help/v3.13/manual/ctest.1.html>`_.
 
-When running tests you may encounter the issue ``BACKEND NOT FOUND EXCEPTION``,
-you may need to add your ``<oneMKL build directory>/lib`` to your
-``LD_LIBRARY_PATH`` on Linux.

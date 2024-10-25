@@ -209,7 +209,6 @@ int test_spsv(sycl::device* dev, sycl::property_list queue_properties,
                                 y_ref_host.data());
 
     // Compare the results of reference implementation and DPC++ implementation.
-    // Increase default relative error margin for tests that lead to large numeric values.
     ev_copy.wait_and_throw();
     bool valid = check_equal_vector(y_host, y_ref_host);
 

@@ -22,7 +22,7 @@
 
 #include "oneapi/mkl/dft/detail/portfft/onemkl_dft_portfft.hpp"
 
-namespace oneapi::mkl::dft {
+namespace oneapi::mkl::dft::detail {
 
 template <precision prec, domain dom>
 void descriptor<prec, dom>::commit(backend_selector<backend::portfft> selector) {
@@ -44,4 +44,4 @@ template void descriptor<precision::DOUBLE, domain::COMPLEX>::commit(
 template void descriptor<precision::DOUBLE, domain::REAL>::commit(
     backend_selector<backend::portfft>);
 
-} // namespace oneapi::mkl::dft
+} // namespace oneapi::mkl::dft::detail

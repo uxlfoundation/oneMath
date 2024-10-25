@@ -173,6 +173,16 @@ public:
     hipError_t hip_err;                                                    \
     HIP_ERROR_FUNC(hipStreamSynchronize, hip_err, currentStreamId);
 
+template <class Func, class... Types>
+inline void rocblas_native_func(Func func, rocblas_status err, rocblas_handle handle,
+                                Types... args) {
+#ifdef SYCL_EXT_ONEAPI_ENQUEUE_NATIVE_COMMAND
+    ROCBLAS_ERROR_FUNC(func, err, handle, args...)
+#else
+    ROCBLAS_ERROR_FUNC_SYNC(func, err, handle, args...)
+#endif
+};
+
 inline rocblas_operation get_rocblas_operation(oneapi::mkl::transpose trn) {
     switch (trn) {
         case oneapi::mkl::transpose::nontrans: return rocblas_operation_none;

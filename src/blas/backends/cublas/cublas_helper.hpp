@@ -190,6 +190,12 @@ public:
     CUBLAS_ERROR_FUNC(cublasGetStream, err, handle, &currentStreamId);    \
     cuStreamSynchronize(currentStreamId);
 
+#define CUBLAS_ERROR_FUNC_T(name, func, err, handle, ...)                \
+    err = func(handle, __VA_ARGS__);                                     \
+    if (err != CUBLAS_STATUS_SUCCESS) {                                  \
+        throw cublas_error(std::string(name) + std::string(" : "), err); \
+    }
+
 #define CUBLAS_ERROR_FUNC_T_SYNC(name, func, err, handle, ...)           \
     err = func(handle, __VA_ARGS__);                                     \
     if (err != CUBLAS_STATUS_SUCCESS) {                                  \
@@ -198,6 +204,26 @@ public:
     cudaStream_t currentStreamId;                                        \
     CUBLAS_ERROR_FUNC(cublasGetStream, err, handle, &currentStreamId);   \
     cuStreamSynchronize(currentStreamId);
+
+template <class Func, class... Types>
+inline void cublas_native_func(Func func, cublasStatus_t err, cublasHandle_t handle,
+                               Types... args) {
+#ifdef SYCL_EXT_ONEAPI_ENQUEUE_NATIVE_COMMAND
+    CUBLAS_ERROR_FUNC(func, err, handle, args...)
+#else
+    CUBLAS_ERROR_FUNC_SYNC(func, err, handle, args...)
+#endif
+};
+
+template <class Func, class... Types>
+inline void cublas_native_named_func(const char* func_name, Func func, cublasStatus_t err,
+                                     cublasHandle_t handle, Types... args) {
+#ifdef SYCL_EXT_ONEAPI_ENQUEUE_NATIVE_COMMAND
+    CUBLAS_ERROR_FUNC_T(func_name, func, err, handle, args...)
+#else
+    CUBLAS_ERROR_FUNC_T_SYNC(func_name, func, err, handle, args...)
+#endif
+};
 
 inline cublasOperation_t get_cublas_operation(oneapi::mkl::transpose trn) {
     switch (trn) {

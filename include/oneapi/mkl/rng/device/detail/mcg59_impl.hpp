@@ -27,7 +27,7 @@ class mcg59;
 
 namespace detail {
 
-template <std::int32_t VecSize>
+template <std::uint32_t VecSize>
 constexpr sycl::vec<uint64_t, VecSize> select_vector_a_mcg59() {
     if constexpr (VecSize == 1)
         return sycl::vec<uint64_t, 1>(UINT64_C(1));
@@ -57,7 +57,7 @@ constexpr sycl::vec<uint64_t, VecSize> select_vector_a_mcg59() {
 // hipSYCL (AdaptiveCpp) doesn't support constexpr sycl::vec constructor
 // that's why in case of hipSYCL backend sycl::vec is created as a local variable
 #ifndef __HIPSYCL__
-template <std::int32_t VecSize>
+template <std::uint32_t VecSize>
 struct mcg59_vector_a {
     static constexpr sycl::vec<std::uint64_t, VecSize> vector_a =
         select_vector_a_mcg59<VecSize>(); // powers of a
@@ -165,7 +165,7 @@ protected:
 
     auto generate() -> typename std::conditional<VecSize == 1, std::uint32_t,
                                                  sycl::vec<std::uint32_t, VecSize>>::type {
-        return mcg59_impl::generate(this->state_);
+        return mcg59_impl::generate(this->state_).template convert<std::uint32_t>();
     }
 
     auto generate_bits() -> typename std::conditional<VecSize == 1, std::uint64_t,

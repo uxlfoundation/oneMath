@@ -33,7 +33,7 @@ def usage(err = None):
         print('error: %s' % err)
     print('''\
 Script to generate CT API instantiations for backend based on general_ct_templates.hpp
-Note: requires clang-format 9.0.0 tool to be installed
+Note: requires clang-format tool to be installed
 Usage:
 
     {script} <path/to/general_ct_templates.hpp> <path/to/out_ct_header.hpp> <path/to/backend_include.hpp> <backend> <namespace>

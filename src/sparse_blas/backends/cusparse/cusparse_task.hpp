@@ -419,6 +419,7 @@ sycl::event dispatch_submit_native_ext(const std::string& function_name, sycl::q
 // When the extension is enabled, host_task are still used for out-of-order queues, see description of dispatch_submit_impl_fp_int.
 inline void synchronize_if_needed(bool is_in_order_queue, CUstream cu_stream) {
 #ifndef SYCL_EXT_ONEAPI_ENQUEUE_NATIVE_COMMAND
+    (void)is_in_order_queue;
     CUDA_ERROR_FUNC(cuStreamSynchronize, cu_stream);
 #else
     if (!is_in_order_queue) {

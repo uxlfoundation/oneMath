@@ -68,10 +68,7 @@ protected:
     auto generate(EngineType& engine) ->
         typename std::conditional<EngineType::vec_size == 1, RealType,
                                   sycl::vec<RealType, EngineType::vec_size>>::type {
-        using OutType = typename std::conditional<EngineType::vec_size == 1, RealType,
-                                                  sycl::vec<RealType, EngineType::vec_size>>::type;
-
-        OutType res = engine.generate(RealType(0), RealType(1));
+        auto res = engine.generate(RealType(0), RealType(1));
         if constexpr (EngineType::vec_size == 1) {
             res = ln_wrapper(res);
         }
@@ -82,7 +79,19 @@ protected:
         }
         res = a_ - res * beta_;
         if constexpr (std::is_same<Method, exponential_method::icdf_accurate>::value) {
-            res = sycl::fmax(res, OutType{ a_ });
+#ifndef __HIPSYCL__
+            res = sycl::fmax(res, a_);
+#else
+            // a workaround for hipSYCL (AdaptiveCpp)
+            if constexpr (EngineType::vec_size == 1) {
+                res = std::fmax(res, a_);
+            }
+            else {
+                for (int i = 0; i < EngineType::vec_size; i++) {
+                    res[i] = std::fmax(res[i], a_);
+                }
+            }
+#endif
         }
         return res;
     }
@@ -93,7 +102,19 @@ protected:
         res = ln_wrapper(res);
         res = a_ - res * beta_;
         if constexpr (std::is_same<Method, exponential_method::icdf_accurate>::value) {
+#ifndef __HIPSYCL__
             res = sycl::fmax(res, a_);
+#else
+            // a workaround for hipSYCL (AdaptiveCpp)
+            if constexpr (EngineType::vec_size == 1) {
+                res = std::fmax(res, a_);
+            }
+            else {
+                for (int i = 0; i < EngineType::vec_size; i++) {
+                    res[i] = std::fmax(res[i], a_);
+                }
+            }
+#endif
         }
         return res;
     }
@@ -105,6 +126,13 @@ protected:
         oneapi::mkl::rng::device::poisson<std::int32_t, poisson_method::devroye>>;
     friend class distribution_base<
         oneapi::mkl::rng::device::poisson<std::uint32_t, poisson_method::devroye>>;
+    friend class distribution_base<oneapi::mkl::rng::device::gamma<float, gamma_method::marsaglia>>;
+    friend class distribution_base<
+        oneapi::mkl::rng::device::gamma<double, gamma_method::marsaglia>>;
+    friend class distribution_base<
+        oneapi::mkl::rng::device::gamma<float, gamma_method::marsaglia_accurate>>;
+    friend class distribution_base<
+        oneapi::mkl::rng::device::gamma<double, gamma_method::marsaglia_accurate>>;
 };
 
 } // namespace oneapi::mkl::rng::device::detail

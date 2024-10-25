@@ -18,7 +18,15 @@
 #===============================================================================
 
 # Build object from all test sources
-set(EXTENSIONS_SOURCES "gemm_bias.cpp" "gemmt.cpp" "gemm_bias_usm.cpp" "gemmt_usm.cpp" "omatcopy.cpp" "omatcopy_usm.cpp" "imatcopy.cpp" "imatcopy_usm.cpp" "omatadd.cpp" "omatadd_usm.cpp" "omatcopy2.cpp" "omatcopy2_usm.cpp")
+# TODO: add list of tests without Netlib dependency
+set(EXTENSIONS_SOURCES)
+
+set(EXTENSIONS_SOURCES_W_CBLAS "gemm_bias.cpp" "gemmt.cpp" "gemm_bias_usm.cpp" "gemmt_usm.cpp" "omatcopy.cpp" "omatcopy_usm.cpp" "imatcopy.cpp" "imatcopy_usm.cpp" "omatadd.cpp" "omatadd_usm.cpp" "omatcopy2.cpp" "omatcopy2_usm.cpp")
+
+if(CBLAS_FOUND)
+  list(APPEND EXTENSIONS_SOURCES ${EXTENSIONS_SOURCES_W_CBLAS})
+endif()
+
 
 if(BUILD_SHARED_LIBS)
   add_library(blas_extensions_rt OBJECT ${EXTENSIONS_SOURCES})
@@ -29,7 +37,7 @@ if(BUILD_SHARED_LIBS)
       PUBLIC ${PROJECT_SOURCE_DIR}/include
       PUBLIC ${PROJECT_SOURCE_DIR}/deps/googletest/include
       PUBLIC ${CMAKE_BINARY_DIR}/bin
-      PUBLIC ${CBLAS_INCLUDE}
+      $<$<BOOL:${CBLAS_FOUND}>:${CBLAS_INCLUDE}>
   )
   if (USE_ADD_SYCL_TO_TARGET_INTEGRATION)
     add_sycl_to_target(TARGET blas_extensions_rt SOURCES ${EXTENSIONS_SOURCES})
@@ -46,7 +54,7 @@ target_include_directories(blas_extensions_ct
     PUBLIC ${PROJECT_SOURCE_DIR}/include
     PUBLIC ${PROJECT_SOURCE_DIR}/deps/googletest/include
     PUBLIC ${CMAKE_BINARY_DIR}/bin
-    PUBLIC ${CBLAS_INCLUDE}
+    $<$<BOOL:${CBLAS_FOUND}>:${CBLAS_INCLUDE}>
 )
 if (USE_ADD_SYCL_TO_TARGET_INTEGRATION)
   add_sycl_to_target(TARGET blas_extensions_ct  SOURCES ${EXTENSIONS_SOURCES})

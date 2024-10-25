@@ -63,7 +63,7 @@ struct dense_matrix_handle : public detail::generic_dense_matrix_handle<void*> {
 namespace oneapi::mkl::sparse::detail {
 
 /**
- * Internal sparse_matrix_handle type for MKL backends.
+ * Internal sparse_matrix_handle type for MKLCPU and MKLGPU backends.
  * Here \p matrix_handle_t is the type of the backend's handle.
  * The user-facing incomplete type matrix_handle_t must be kept incomplete.
  * Internally matrix_handle_t is reinterpret_cast as

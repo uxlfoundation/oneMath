@@ -50,12 +50,6 @@ during the build. To check for the existence of backends, CMake's ``if(TARGET
         message(FATAL_ERROR "oneMKL Interfaces was not built with CuFFT backend")
     endif()
 
-
-If oneMKL Interfaces has been installed to a non-standard location, the
-operating system may not find the backend libraries when they're lazily loaded
-at runtime. To make sure they're found you may need to set
-``LD_LIBRARY_PATH=<onemkl_install_dir>/lib:$LD_LIBRARY_PATH`` on Linux.
-
 .. _using_with_fetchcontent:
 
 Using CMake's FetchContent
@@ -92,11 +86,5 @@ To link against the main library with run-time dispatching, use the target
 against particular backends (as required for static dispatch of oneAPI calls to
 a particular backend), use the target ``onemkl_<domain>_<backend>``. For
 example, ``onemkl_dft_cufft``.
-
-When using the run-time dispatch mechanism, it is likely that the operating
-system will not find the backend libraries when they're loaded at runtime. To
-make sure they're found you may need to set
-``LD_LIBRARY_PATH=<onemkl_install_dir>/lib:$LD_LIBRARY_PATH`` on Linux.
-
 
 .. _FetchContent: https://cmake.org/cmake/help/latest/module/FetchContent.html

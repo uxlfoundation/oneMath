@@ -35,7 +35,7 @@ namespace cublas {
  * takes place if no other element in the container has a key equivalent to
  * the one being emplaced (keys in a map container are unique).
  */
-#ifdef ONEAPI_ONEMKL_PI_INTERFACE_REMOVED
+#ifdef ONEMKL_PI_INTERFACE_REMOVED
 thread_local cublas_handle<ur_context_handle_t> CublasScopedContextHandler::handle_helper =
     cublas_handle<ur_context_handle_t>{};
 #else
@@ -97,7 +97,7 @@ cublasHandle_t CublasScopedContextHandler::get_handle(const sycl::queue& queue) 
     CUresult cuErr;
     CUcontext desired;
     CUDA_ERROR_FUNC(cuDevicePrimaryCtxRetain, cuErr, &desired, cudaDevice);
-#ifdef ONEAPI_ONEMKL_PI_INTERFACE_REMOVED
+#ifdef ONEMKL_PI_INTERFACE_REMOVED
     auto piPlacedContext_ = reinterpret_cast<ur_context_handle_t>(desired);
 #else
     auto piPlacedContext_ = reinterpret_cast<pi_context>(desired);

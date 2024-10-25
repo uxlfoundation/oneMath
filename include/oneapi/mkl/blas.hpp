@@ -34,22 +34,22 @@
 #include "oneapi/mkl/detail/get_device_id.hpp"
 
 #include "oneapi/mkl/blas/detail/blas_loader.hpp"
-#ifdef ENABLE_CUBLAS_BACKEND
+#ifdef ONEMKL_ENABLE_CUBLAS_BACKEND
 #include "oneapi/mkl/blas/detail/cublas/blas_ct.hpp"
 #endif
-#ifdef ENABLE_ROCBLAS_BACKEND
+#ifdef ONEMKL_ENABLE_ROCBLAS_BACKEND
 #include "oneapi/mkl/blas/detail/rocblas/blas_ct.hpp"
 #endif
-#ifdef ENABLE_MKLCPU_BACKEND
+#ifdef ONEMKL_ENABLE_MKLCPU_BACKEND
 #include "oneapi/mkl/blas/detail/mklcpu/blas_ct.hpp"
 #endif
-#ifdef ENABLE_MKLGPU_BACKEND
+#ifdef ONEMKL_ENABLE_MKLGPU_BACKEND
 #include "oneapi/mkl/blas/detail/mklgpu/blas_ct.hpp"
 #endif
-#ifdef ENABLE_NETLIB_BACKEND
+#ifdef ONEMKL_ENABLE_NETLIB_BACKEND
 #include "oneapi/mkl/blas/detail/netlib/blas_ct.hpp"
 #endif
-#ifdef ENABLE_PORTBLAS_BACKEND
+#ifdef ONEMKL_ENABLE_PORTBLAS_BACKEND
 #include "oneapi/mkl/blas/detail/portblas/blas_ct.hpp"
 #endif
 

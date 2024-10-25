@@ -166,6 +166,16 @@ public:
     hipError_t hip_err;                                                      \
     HIP_ERROR_FUNC(hipStreamSynchronize, hip_err, currentStreamId);
 
+template <class Func, class... Types>
+inline void rocsolver_native_named_func(const char* func_name, Func func, rocsolver_status err,
+                                        rocsolver_handle handle, Types... args) {
+#ifdef SYCL_EXT_ONEAPI_ENQUEUE_NATIVE_COMMAND
+    ROCSOLVER_ERROR_FUNC_T(func_name, func, err, handle, args...)
+#else
+    ROCSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, args...)
+#endif
+};
+
 inline rocblas_eform get_rocsolver_itype(std::int64_t itype) {
     switch (itype) {
         case 1: return rocblas_eform_ax;

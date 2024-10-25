@@ -17,6 +17,11 @@
 # SPDX-License-Identifier: Apache-2.0
 #===============================================================================
 
+# Add compile definitions for the reference libraries
+add_compile_definitions(
+  ONEMKL_REF_BLAS_LIBNAME="${ONEMKL_REF_BLAS_LIBNAME}"
+  ONEMKL_REF_CBLAS_LIBNAME="${ONEMKL_REF_CBLAS_LIBNAME}")
+
 add_subdirectory(level1)
 add_subdirectory(level2)
 add_subdirectory(level3)

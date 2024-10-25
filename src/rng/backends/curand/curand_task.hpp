@@ -36,23 +36,39 @@ static inline void host_task_internal(H& cgh, E e, F f) {
 #else
 template <typename H, typename A, typename E, typename F>
 static inline void host_task_internal(H& cgh, A acc, E e, F f) {
+#ifdef SYCL_EXT_ONEAPI_ENQUEUE_NATIVE_COMMAND
+    cgh.ext_codeplay_enqueue_native_command([=](sycl::interop_handle ih) {
+#else
     cgh.host_task([=](sycl::interop_handle ih) {
+#endif
         curandStatus_t status;
         auto stream = ih.get_native_queue<sycl::backend::ext_oneapi_cuda>();
         CURAND_CALL(curandSetStream, status, e, stream);
         auto r_ptr = reinterpret_cast<typename A::value_type*>(
             ih.get_native_mem<sycl::backend::ext_oneapi_cuda>(acc));
         f(r_ptr);
+#ifndef SYCL_EXT_ONEAPI_ENQUEUE_NATIVE_COMMAND
+        CUresult err;
+        CUDA_ERROR_FUNC(cuStreamSynchronize, err, stream);
+#endif
     });
 }
 
 template <typename H, typename E, typename F>
 static inline void host_task_internal(H& cgh, E e, F f) {
+#ifdef SYCL_EXT_ONEAPI_ENQUEUE_NATIVE_COMMAND
+    cgh.ext_codeplay_enqueue_native_command([=](sycl::interop_handle ih) {
+#else
     cgh.host_task([=](sycl::interop_handle ih) {
+#endif
         curandStatus_t status;
         auto stream = ih.get_native_queue<sycl::backend::ext_oneapi_cuda>();
         CURAND_CALL(curandSetStream, status, e, stream);
         f(ih);
+#ifndef SYCL_EXT_ONEAPI_ENQUEUE_NATIVE_COMMAND
+        CUresult err;
+        CUDA_ERROR_FUNC(cuStreamSynchronize, err, stream);
+#endif
     });
 }
 #endif

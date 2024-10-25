@@ -40,47 +40,53 @@
 namespace oneapi {
 namespace mkl {
 
-enum class device : uint16_t { x86cpu, intelgpu, nvidiagpu, amdgpu };
+enum class device : uint16_t { x86cpu, intelgpu, nvidiagpu, amdgpu, generic_device };
 enum class domain : uint16_t { blas, dft, lapack, rng, sparse_blas };
 
 static std::map<domain, std::map<device, std::vector<const char*>>> libraries = {
     { domain::blas,
       { { device::x86cpu,
           {
-#ifdef ENABLE_MKLCPU_BACKEND
+#ifdef ONEMKL_ENABLE_MKLCPU_BACKEND
               LIB_NAME("blas_mklcpu"),
 #endif
-#ifdef ENABLE_NETLIB_BACKEND
+#ifdef ONEMKL_ENABLE_NETLIB_BACKEND
               LIB_NAME("blas_netlib"),
 #endif
-#ifdef ENABLE_PORTBLAS_BACKEND_INTEL_CPU
+#ifdef ONEMKL_ENABLE_PORTBLAS_BACKEND_INTEL_CPU
               LIB_NAME("blas_portblas"),
 #endif
           } },
         { device::intelgpu,
           {
-#ifdef ENABLE_MKLGPU_BACKEND
+#ifdef ONEMKL_ENABLE_MKLGPU_BACKEND
               LIB_NAME("blas_mklgpu"),
 #endif
-#ifdef ENABLE_PORTBLAS_BACKEND_INTEL_GPU
+#ifdef ONEMKL_ENABLE_PORTBLAS_BACKEND_INTEL_GPU
               LIB_NAME("blas_portblas"),
 #endif
           } },
         { device::amdgpu,
           {
-#ifdef ENABLE_ROCBLAS_BACKEND
+#ifdef ONEMKL_ENABLE_ROCBLAS_BACKEND
               LIB_NAME("blas_rocblas"),
 #endif
-#ifdef ENABLE_PORTBLAS_BACKEND_AMD_GPU
+#ifdef ONEMKL_ENABLE_PORTBLAS_BACKEND_AMD_GPU
               LIB_NAME("blas_portblas"),
 #endif
           } },
         { device::nvidiagpu,
           {
-#ifdef ENABLE_CUBLAS_BACKEND
+#ifdef ONEMKL_ENABLE_CUBLAS_BACKEND
               LIB_NAME("blas_cublas"),
 #endif
-#ifdef ENABLE_PORTBLAS_BACKEND_NVIDIA_GPU
+#ifdef ONEMKL_ENABLE_PORTBLAS_BACKEND_NVIDIA_GPU
+              LIB_NAME("blas_portblas"),
+#endif
+          } },
+        { device::generic_device,
+          {
+#ifdef ENABLE_PORTBLAS_BACKEND
               LIB_NAME("blas_portblas"),
 #endif
           } } } },
@@ -88,63 +94,69 @@ static std::map<domain, std::map<device, std::vector<const char*>>> libraries = 
     { domain::dft,
       { { device::x86cpu,
           {
-#ifdef ENABLE_MKLCPU_BACKEND
+#ifdef ONEMKL_ENABLE_MKLCPU_BACKEND
               LIB_NAME("dft_mklcpu")
 #endif
-#ifdef ENABLE_PORTFFT_BACKEND
+#ifdef ONEMKL_ENABLE_PORTFFT_BACKEND
                   LIB_NAME("dft_portfft")
 #endif
           } },
         { device::intelgpu,
           {
-#ifdef ENABLE_MKLGPU_BACKEND
+#ifdef ONEMKL_ENABLE_MKLGPU_BACKEND
               LIB_NAME("dft_mklgpu")
 #endif
-#ifdef ENABLE_PORTFFT_BACKEND
+#ifdef ONEMKL_ENABLE_PORTFFT_BACKEND
                   LIB_NAME("dft_portfft")
 #endif
           } },
         { device::amdgpu,
           {
-#ifdef ENABLE_ROCFFT_BACKEND
+#ifdef ONEMKL_ENABLE_ROCFFT_BACKEND
               LIB_NAME("dft_rocfft")
 #endif
-#ifdef ENABLE_PORTFFT_BACKEND
+#ifdef ONEMKL_ENABLE_PORTFFT_BACKEND
                   LIB_NAME("dft_portfft")
 #endif
           } },
         { device::nvidiagpu,
           {
-#ifdef ENABLE_CUFFT_BACKEND
+#ifdef ONEMKL_ENABLE_CUFFT_BACKEND
               LIB_NAME("dft_cufft")
 #endif
-#ifdef ENABLE_PORTFFT_BACKEND
+#ifdef ONEMKL_ENABLE_PORTFFT_BACKEND
                   LIB_NAME("dft_portfft")
+#endif
+          } },
+        { device::generic_device,
+          {
+#ifdef ENABLE_PORTFFT_BACKEND
+              LIB_NAME("dft_portfft"),
 #endif
           } } } },
 
     { domain::lapack,
       { { device::x86cpu,
           {
-#ifdef ENABLE_MKLCPU_BACKEND
+#ifdef ONEMKL_ENABLE_MKLCPU_BACKEND
               LIB_NAME("lapack_mklcpu")
 #endif
           } },
         { device::intelgpu,
           {
-#ifdef ENABLE_MKLGPU_BACKEND
+#ifdef ONEMKL_ENABLE_MKLGPU_BACKEND
               LIB_NAME("lapack_mklgpu")
 #endif
           } },
         { device::amdgpu,
           {
-#ifdef ENABLE_ROCSOLVER_BACKEND
+#ifdef ONEMKL_ENABLE_ROCSOLVER_BACKEND
               LIB_NAME("lapack_rocsolver")
 #endif
           } },
         { device::nvidiagpu,
           {
-#ifdef ENABLE_CUSOLVER_BACKEND
+#ifdef ONEMKL_ENABLE_CUSOLVER_BACKEND
               LIB_NAME("lapack_cusolver")
 #endif
           } } } },
@@ -152,25 +164,25 @@ static std::map<domain, std::map<device, std::vector<const char*>>> libraries = 
     { domain::rng,
       { { device::x86cpu,
           {
-#ifdef ENABLE_MKLCPU_BACKEND
+#ifdef ONEMKL_ENABLE_MKLCPU_BACKEND
               LIB_NAME("rng_mklcpu")
 #endif
           } },
         { device::intelgpu,
           {
-#ifdef ENABLE_MKLGPU_BACKEND
+#ifdef ONEMKL_ENABLE_MKLGPU_BACKEND
               LIB_NAME("rng_mklgpu")
 #endif
           } },
         { device::amdgpu,
           {
-#ifdef ENABLE_ROCRAND_BACKEND
+#ifdef ONEMKL_ENABLE_ROCRAND_BACKEND
               LIB_NAME("rng_rocrand")
 #endif
           } },
         { device::nvidiagpu,
           {
-#ifdef ENABLE_CURAND_BACKEND
+#ifdef ONEMKL_ENABLE_CURAND_BACKEND
               LIB_NAME("rng_curand")
 #endif
           } } } },
@@ -178,19 +190,19 @@ static std::map<domain, std::map<device, std::vector<const char*>>> libraries = 
     { domain::sparse_blas,
       { { device::x86cpu,
           {
-#ifdef ENABLE_MKLCPU_BACKEND
+#ifdef ONEMKL_ENABLE_MKLCPU_BACKEND
               LIB_NAME("sparse_blas_mklcpu")
 #endif
           } },
         { device::intelgpu,
           {
-#ifdef ENABLE_MKLGPU_BACKEND
+#ifdef ONEMKL_ENABLE_MKLGPU_BACKEND
               LIB_NAME("sparse_blas_mklgpu")
 #endif
           } },
         { device::nvidiagpu,
           {
-#ifdef ENABLE_CUSPARSE_BACKEND
+#ifdef ONEMKL_ENABLE_CUSPARSE_BACKEND
               LIB_NAME("sparse_blas_cusparse")
 #endif
           } } } },

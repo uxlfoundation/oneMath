@@ -23,8 +23,13 @@
 #include "oneapi/mkl/detail/exceptions.hpp"
 #include "oneapi/mkl/dft/detail/types_impl.hpp"
 
+#include "mkl_version.h"
 // MKLGPU header
-#include "oneapi/mkl/dfti.hpp"
+#if INTEL_MKL_VERSION < 20250000
+#include <oneapi/mkl/dfti.hpp>
+#else
+#include <oneapi/mkl/dft.hpp>
+#endif
 
 namespace oneapi {
 namespace mkl {
@@ -64,13 +69,10 @@ inline constexpr dft::config_param to_mklgpu(dft::detail::config_param param) {
         case iparam::FORWARD_SCALE: return oparam::FORWARD_SCALE;
         case iparam::NUMBER_OF_TRANSFORMS: return oparam::NUMBER_OF_TRANSFORMS;
         case iparam::COMPLEX_STORAGE: return oparam::COMPLEX_STORAGE;
-        case iparam::REAL_STORAGE: return oparam::REAL_STORAGE;
         case iparam::CONJUGATE_EVEN_STORAGE: return oparam::CONJUGATE_EVEN_STORAGE;
         case iparam::FWD_DISTANCE: return oparam::FWD_DISTANCE;
         case iparam::BWD_DISTANCE: return oparam::BWD_DISTANCE;
         case iparam::WORKSPACE: return oparam::WORKSPACE;
-        case iparam::ORDERING: return oparam::ORDERING;
-        case iparam::TRANSPOSE: return oparam::TRANSPOSE;
         case iparam::PACKED_FORMAT: return oparam::PACKED_FORMAT;
         case iparam::WORKSPACE_PLACEMENT: return oparam::WORKSPACE; // Same as WORKSPACE
         case iparam::WORKSPACE_EXTERNAL_BYTES: return oparam::WORKSPACE_BYTES;

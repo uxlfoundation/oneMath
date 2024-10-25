@@ -18,7 +18,10 @@
 #===============================================================================
 
 #Build object from all test sources
-set(LAPACK_SOURCES
+# TODO: add list of tests without Netlib dependency
+set(LAPACK_SOURCES)
+
+set(LAPACK_SOURCES_W_LAPACKE
     "gebrd.cpp"
     "geqrf.cpp"
     "geqrf_batch_group.cpp"
@@ -68,6 +71,10 @@ set(LAPACK_SOURCES
     "unmtr.cpp"
 )
 
+if(LAPACKE_FOUND)
+  list(APPEND LAPACK_SOURCES ${LAPACK_SOURCES_W_LAPACKE})
+endif()
+
 if(BUILD_SHARED_LIBS)
   add_library(lapack_source_rt OBJECT ${LAPACK_SOURCES})
   target_compile_options(lapack_source_rt PRIVATE -DCALL_RT_API -DNOMINMAX)
@@ -77,7 +84,7 @@ if(BUILD_SHARED_LIBS)
       PUBLIC ${PROJECT_SOURCE_DIR}/include
       PUBLIC ${PROJECT_SOURCE_DIR}/deps/googletest/include
       PUBLIC ${CMAKE_BINARY_DIR}/bin
-      PUBLIC ${LAPACKE_INCLUDE}
+      $<$<BOOL:${LAPACKE_FOUND}>:${LAPACKE_INCLUDE}>
   )
   target_link_libraries(lapack_source_rt PUBLIC ONEMKL::SYCL::SYCL)
 endif()
@@ -90,6 +97,6 @@ target_include_directories(lapack_source_ct
     PUBLIC ${PROJECT_SOURCE_DIR}/include
     PUBLIC ${PROJECT_SOURCE_DIR}/deps/googletest/include
     PUBLIC ${CMAKE_BINARY_DIR}/bin
-    PUBLIC ${LAPACKE_INCLUDE}
+    $<$<BOOL:${LAPACKE_FOUND}>:${LAPACKE_INCLUDE}>
 )
 target_link_libraries(lapack_source_ct PUBLIC ONEMKL::SYCL::SYCL)

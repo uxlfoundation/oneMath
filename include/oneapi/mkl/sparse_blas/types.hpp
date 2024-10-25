@@ -26,7 +26,7 @@
 #include "detail/operation_types.hpp"
 
 /**
- * @file Include and define the sparse types that are common between close-source MKL API and oneMKL API.
+ * @file Include and define the sparse types that are common between Intel(R) oneMKL API and oneMKL interfaces API.
 */
 
 namespace oneapi {

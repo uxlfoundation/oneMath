@@ -53,6 +53,12 @@ class bits;
 template <typename RealType = float, typename Method = exponential_method::by_default>
 class exponential;
 
+template <typename RealType = float, typename Method = beta_method::by_default>
+class beta;
+
+template <typename RealType = float, typename Method = gamma_method::by_default>
+class gamma;
+
 template <typename IntType = std::int32_t, typename Method = poisson_method::by_default>
 class poisson;
 
@@ -69,5 +75,7 @@ class bernoulli;
 #include "oneapi/mkl/rng/device/detail/exponential_impl.hpp"
 #include "oneapi/mkl/rng/device/detail/poisson_impl.hpp"
 #include "oneapi/mkl/rng/device/detail/bernoulli_impl.hpp"
+#include "oneapi/mkl/rng/device/detail/beta_impl.hpp"
+#include "oneapi/mkl/rng/device/detail/gamma_impl.hpp"
 
 #endif // _MKL_RNG_DISTRIBUTION_BASE_HPP_
