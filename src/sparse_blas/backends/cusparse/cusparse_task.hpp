@@ -79,7 +79,7 @@ void submit_host_task(sycl::handler& cgh, sycl::queue& queue, Functor functor,
 
 template <typename Functor, typename... CaptureOnlyAcc>
 void submit_host_task_with_acc(sycl::handler& cgh, sycl::queue& queue, Functor functor,
-                               sycl::accessor<std::uint8_t> workspace_placeholder_acc,
+                               sycl::accessor<std::uint8_t> workspace_acc,
                                CaptureOnlyAcc... capture_only_accessors) {
     // Only capture the accessors to ensure the dependencies are properly
     // handled. The accessors's pointer have already been set to the native
@@ -88,12 +88,12 @@ void submit_host_task_with_acc(sycl::handler& cgh, sycl::queue& queue, Functor f
     // specification but should be true for all the implementations. This
     // assumption avoids the overhead of resetting the pointer of all data
     // handles for each enqueued command.
-    cgh.host_task([functor, queue, workspace_placeholder_acc,
-                   capture_only_accessors...](sycl::interop_handle ih) {
-        auto unused = std::make_tuple(capture_only_accessors...);
-        (void)unused;
-        functor(ih, workspace_placeholder_acc);
-    });
+    cgh.host_task(
+        [functor, queue, workspace_acc, capture_only_accessors...](sycl::interop_handle ih) {
+            auto unused = std::make_tuple(capture_only_accessors...);
+            (void)unused;
+            functor(ih, workspace_acc);
+        });
 }
 
 template <typename Functor, typename... CaptureOnlyAcc>
@@ -137,7 +137,7 @@ void submit_native_command_ext(sycl::handler& cgh, sycl::queue& queue, Functor f
 template <typename Functor, typename... CaptureOnlyAcc>
 void submit_native_command_ext_with_acc(sycl::handler& cgh, sycl::queue& queue, Functor functor,
                                         const std::vector<sycl::event>& dependencies,
-                                        sycl::accessor<std::uint8_t> workspace_placeholder_acc,
+                                        sycl::accessor<std::uint8_t> workspace_acc,
                                         CaptureOnlyAcc... capture_only_accessors) {
     // Only capture the accessors to ensure the dependencies are properly
     // handled. The accessors's pointer have already been set to the native
@@ -147,8 +147,7 @@ void submit_native_command_ext_with_acc(sycl::handler& cgh, sycl::queue& queue, 
     // assumption avoids the overhead of resetting the pointer of all data
     // handles for each enqueued command.
 #ifdef SYCL_EXT_ONEAPI_ENQUEUE_NATIVE_COMMAND
-    cgh.ext_codeplay_enqueue_native_command([functor, queue, dependencies,
-                                             workspace_placeholder_acc,
+    cgh.ext_codeplay_enqueue_native_command([functor, queue, dependencies, workspace_acc,
                                              capture_only_accessors...](sycl::interop_handle ih) {
         auto unused = std::make_tuple(capture_only_accessors...);
         (void)unused;
@@ -166,12 +165,11 @@ void submit_native_command_ext_with_acc(sycl::handler& cgh, sycl::queue& queue, 
         for (auto event : dependencies) {
             event.wait();
         }
-        functor(ih, workspace_placeholder_acc);
+        functor(ih, workspace_acc);
     });
 #else
     (void)dependencies;
-    submit_host_task_with_acc(cgh, queue, functor, workspace_placeholder_acc,
-                              capture_only_accessors...);
+    submit_host_task_with_acc(cgh, queue, functor, workspace_acc, capture_only_accessors...);
 #endif
 }
 
@@ -179,9 +177,9 @@ void submit_native_command_ext_with_acc(sycl::handler& cgh, sycl::queue& queue, 
 /// \p other_containers and ensure the dependencies of buffers are respected.
 /// The accessors are not directly used as the underlying data pointer has
 /// already been captured in previous functions.
-/// \p workspace_placeholder_acc is a placeholder accessor that will be bound to
-/// the cgh if not empty and given to the functor as a last argument.
-/// \p UseWorkspace must be true to use the placeholder accessor.
+/// \p workspace_buffer is an optional buffer. Its accessor will be given to the
+/// functor as a last argument if \p UseWorkspace is true.
+/// \p UseWorkspace must be true to use the given \p workspace_buffer.
 /// \p UseEnqueueNativeCommandExt controls whether host_task are used or the
 /// extension ext_codeplay_enqueue_native_command is used to launch tasks. The
 /// extension should only be used for asynchronous functions using native
