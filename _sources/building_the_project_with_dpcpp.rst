@@ -104,6 +104,9 @@ The most important supported build options are:
    * - ENABLE_CURAND_BACKEND
      - True, False
      - False     
+   * - ENABLE_CUSPARSE_BACKEND
+     - True, False
+     - False     
    * - ENABLE_NETLIB_BACKEND
      - True, False
      - False     
@@ -183,8 +186,8 @@ Building for CUDA
 ^^^^^^^^^^^^^^^^^
 
 The CUDA backends can be enabled with ``ENABLE_CUBLAS_BACKEND``,
-``ENABLE_CUFFT_BACKEND``, ``ENABLE_CURAND_BACKEND``, and
-``ENABLE_CUSOLVER_BACKEND``.
+``ENABLE_CUFFT_BACKEND``, ``ENABLE_CURAND_BACKEND``,
+``ENABLE_CUSOLVER_BACKEND``, and ``ENABLE_CUSPARSE_BACKEND``.
 
 No additional parameters are required for using CUDA libraries. In most cases,
 the CUDA libraries should be found automatically by CMake.
@@ -371,6 +374,7 @@ disabled using the Ninja build system:
       -DENABLE_CUBLAS_BACKEND=True \
       -DENABLE_CUSOLVER_BACKEND=True \
       -DENABLE_CURAND_BACKEND=True \
+      -DENABLE_CUSPARSE_BACKEND=True \
       -DBUILD_FUNCTIONAL_TESTS=False
 
 ``$ONEMKL_DIR`` points at the oneMKL source directly. The x86 CPU (``MKLCPU``)

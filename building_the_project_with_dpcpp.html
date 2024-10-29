@@ -648,47 +648,51 @@ additional external libraries for the BLAS and LAPACK domains. See the section
 <td><p>True, False</p></td>
 <td><p>False</p></td>
 </tr>
-<tr class="row-even"><td><p>ENABLE_NETLIB_BACKEND</p></td>
+<tr class="row-even"><td><p>ENABLE_CUSPARSE_BACKEND</p></td>
 <td><p>True, False</p></td>
 <td><p>False</p></td>
 </tr>
-<tr class="row-odd"><td><p>ENABLE_ROCBLAS_BACKEND</p></td>
+<tr class="row-odd"><td><p>ENABLE_NETLIB_BACKEND</p></td>
 <td><p>True, False</p></td>
 <td><p>False</p></td>
 </tr>
-<tr class="row-even"><td><p>ENABLE_ROCFFT_BACKEND</p></td>
+<tr class="row-even"><td><p>ENABLE_ROCBLAS_BACKEND</p></td>
 <td><p>True, False</p></td>
 <td><p>False</p></td>
 </tr>
-<tr class="row-odd"><td><p>ENABLE_ROCSOLVER_BACKEND</p></td>
+<tr class="row-odd"><td><p>ENABLE_ROCFFT_BACKEND</p></td>
 <td><p>True, False</p></td>
 <td><p>False</p></td>
 </tr>
-<tr class="row-even"><td><p>ENABLE_ROCRAND_BACKEND</p></td>
+<tr class="row-even"><td><p>ENABLE_ROCSOLVER_BACKEND</p></td>
 <td><p>True, False</p></td>
 <td><p>False</p></td>
 </tr>
-<tr class="row-odd"><td><p>ENABLE_MKLCPU_THREAD_TBB</p></td>
+<tr class="row-odd"><td><p>ENABLE_ROCRAND_BACKEND</p></td>
+<td><p>True, False</p></td>
+<td><p>False</p></td>
+</tr>
+<tr class="row-even"><td><p>ENABLE_MKLCPU_THREAD_TBB</p></td>
 <td><p>True, False</p></td>
 <td><p>True</p></td>
 </tr>
-<tr class="row-even"><td><p>ENABLE_PORTBLAS_BACKEND</p></td>
+<tr class="row-odd"><td><p>ENABLE_PORTBLAS_BACKEND</p></td>
 <td><p>True, False</p></td>
 <td><p>False</p></td>
 </tr>
-<tr class="row-odd"><td><p>ENABLE_PORTFFT_BACKEND</p></td>
+<tr class="row-even"><td><p>ENABLE_PORTFFT_BACKEND</p></td>
 <td><p>True, False</p></td>
 <td><p>False</p></td>
 </tr>
-<tr class="row-even"><td><p>BUILD_FUNCTIONAL_TESTS</p></td>
+<tr class="row-odd"><td><p>BUILD_FUNCTIONAL_TESTS</p></td>
 <td><p>True, False</p></td>
 <td><p>True</p></td>
 </tr>
-<tr class="row-odd"><td><p>BUILD_EXAMPLES</p></td>
+<tr class="row-even"><td><p>BUILD_EXAMPLES</p></td>
 <td><p>True, False</p></td>
 <td><p>True</p></td>
 </tr>
-<tr class="row-even"><td><p>TARGET_DOMAINS (list)</p></td>
+<tr class="row-odd"><td><p>TARGET_DOMAINS (list)</p></td>
 <td><p>blas, lapack, rng, dft, sparse_blas</p></td>
 <td><p>All domains</p></td>
 </tr>
@@ -726,8 +730,8 @@ environment script provided by the package.</p>
 <section id="building-for-cuda">
 <span id="build-for-cuda-dpcpp"></span><h3>Building for CUDA<a class="headerlink" href="#building-for-cuda" title="Link to this heading">#</a></h3>
 <p>The CUDA backends can be enabled with <code class="docutils literal notranslate"><span class="pre">ENABLE_CUBLAS_BACKEND</span></code>,
-<code class="docutils literal notranslate"><span class="pre">ENABLE_CUFFT_BACKEND</span></code>, <code class="docutils literal notranslate"><span class="pre">ENABLE_CURAND_BACKEND</span></code>, and
-<code class="docutils literal notranslate"><span class="pre">ENABLE_CUSOLVER_BACKEND</span></code>.</p>
+<code class="docutils literal notranslate"><span class="pre">ENABLE_CUFFT_BACKEND</span></code>, <code class="docutils literal notranslate"><span class="pre">ENABLE_CURAND_BACKEND</span></code>,
+<code class="docutils literal notranslate"><span class="pre">ENABLE_CUSOLVER_BACKEND</span></code>, and <code class="docutils literal notranslate"><span class="pre">ENABLE_CUSPARSE_BACKEND</span></code>.</p>
 <p>No additional parameters are required for using CUDA libraries. In most cases,
 the CUDA libraries should be found automatically by CMake.</p>
 </section>
@@ -893,6 +897,7 @@ disabled using the Ninja build system:</p>
 <span class="w">    </span>-DENABLE_CUBLAS_BACKEND<span class="o">=</span>True<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>-DENABLE_CUSOLVER_BACKEND<span class="o">=</span>True<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>-DENABLE_CURAND_BACKEND<span class="o">=</span>True<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-DENABLE_CUSPARSE_BACKEND<span class="o">=</span>True<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>-DBUILD_FUNCTIONAL_TESTS<span class="o">=</span>False
 </pre></div>
 </div>

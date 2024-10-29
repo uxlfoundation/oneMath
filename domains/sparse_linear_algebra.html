@@ -525,6 +525,13 @@ document.write(`
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#onemkl-intel-cpu-and-gpu-backends">OneMKL Intel CPU and GPU backends</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cusparse-backend">cuSPARSE backend</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#operation-algorithms-mapping">Operation algorithms mapping</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spmm">spmm</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spmv">spmv</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spsv">spsv</a></li>
+</ul>
+</li>
 </ul>
             </nav>
         </div>
@@ -551,25 +558,185 @@ algorithm.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">oneapi::mkl::sparse::set_csr_data</span></code> and
 <code class="docutils literal notranslate"><span class="pre">oneapi::mkl::sparse::set_coo_data</span></code> functions cannot be used on a handle
 that has already been used for an operation or its optimize function. Doing so
-will throw an <code class="docutils literal notranslate"><span class="pre">oneapi::mkl::unimplemented</span></code> exception.</p></li>
+will throw a <code class="docutils literal notranslate"><span class="pre">oneapi::mkl::unimplemented</span></code> exception.</p></li>
 <li><p>Using <code class="docutils literal notranslate"><span class="pre">spsv</span></code> with the <code class="docutils literal notranslate"><span class="pre">oneapi::mkl::sparse::spsv_alg::no_optimize_alg</span></code> and
 a sparse matrix that does not have the
-<code class="docutils literal notranslate"><span class="pre">oneapi::mkl::sparse::matrix_property::sorted</span></code> property will throw an
+<code class="docutils literal notranslate"><span class="pre">oneapi::mkl::sparse::matrix_property::sorted</span></code> property will throw a
 <code class="docutils literal notranslate"><span class="pre">oneapi::mkl::unimplemented</span></code> exception.</p></li>
 <li><p>Using <code class="docutils literal notranslate"><span class="pre">spmm</span></code> on Intel GPU with a sparse matrix that is
 <code class="docutils literal notranslate"><span class="pre">oneapi::mkl::transpose::conjtrans</span></code> and has the
-<code class="docutils literal notranslate"><span class="pre">oneapi::mkl::sparse::matrix_property::symmetric</span></code> property will throw an
+<code class="docutils literal notranslate"><span class="pre">oneapi::mkl::sparse::matrix_property::symmetric</span></code> property will throw a
 <code class="docutils literal notranslate"><span class="pre">oneapi::mkl::unimplemented</span></code> exception.</p></li>
 <li><p>Using <code class="docutils literal notranslate"><span class="pre">spmv</span></code> with a sparse matrix that is
 <code class="docutils literal notranslate"><span class="pre">oneapi::mkl::transpose::conjtrans</span></code> with a <code class="docutils literal notranslate"><span class="pre">type_view</span></code>
-<code class="docutils literal notranslate"><span class="pre">matrix_descr::symmetric</span></code> or <code class="docutils literal notranslate"><span class="pre">matrix_descr::hermitian</span></code> will throw an
+<code class="docutils literal notranslate"><span class="pre">matrix_descr::symmetric</span></code> or <code class="docutils literal notranslate"><span class="pre">matrix_descr::hermitian</span></code> will throw a
 <code class="docutils literal notranslate"><span class="pre">oneapi::mkl::unimplemented</span></code> exception.</p></li>
 <li><p>Using <code class="docutils literal notranslate"><span class="pre">spsv</span></code> on Intel GPU with a sparse matrix that is
-<code class="docutils literal notranslate"><span class="pre">oneapi::mkl::transpose::conjtrans</span></code> and will throw an
+<code class="docutils literal notranslate"><span class="pre">oneapi::mkl::transpose::conjtrans</span></code> and will throw a
 <code class="docutils literal notranslate"><span class="pre">oneapi::mkl::unimplemented</span></code> exception.</p></li>
 <li><p>Scalar parameters <code class="docutils literal notranslate"><span class="pre">alpha</span></code> and <code class="docutils literal notranslate"><span class="pre">beta</span></code> should be host pointers to prevent
 synchronizations and copies to the host.</p></li>
 </ul>
+</section>
+<section id="cusparse-backend">
+<h2>cuSPARSE backend<a class="headerlink" href="#cusparse-backend" title="Link to this heading">#</a></h2>
+<p>Currently known limitations:</p>
+<ul class="simple">
+<li><p>The COO format requires the indices to be sorted by row. See the <a class="reference external" href="https://docs.nvidia.com/cuda/cusparse/index.html#coordinate-coo">cuSPARSE
+documentation</a>. Sparse
+operations using matrices with the COO format without the property
+<code class="docutils literal notranslate"><span class="pre">matrix_property::sorted_by_rows</span></code> or <code class="docutils literal notranslate"><span class="pre">matrix_property::sorted</span></code> will throw
+a <code class="docutils literal notranslate"><span class="pre">oneapi::mkl::unimplemented</span></code> exception.</p></li>
+<li><p>Using <code class="docutils literal notranslate"><span class="pre">spmm</span></code> with the algorithm <code class="docutils literal notranslate"><span class="pre">spmm_alg::csr_alg3</span></code> and an <code class="docutils literal notranslate"><span class="pre">opA</span></code> other
+than <code class="docutils literal notranslate"><span class="pre">transpose::nontrans</span></code> or an <code class="docutils literal notranslate"><span class="pre">opB</span></code> <code class="docutils literal notranslate"><span class="pre">transpose::conjtrans</span></code> will throw
+a <code class="docutils literal notranslate"><span class="pre">oneapi::mkl::unimplemented</span></code> exception.</p></li>
+<li><p>Using <code class="docutils literal notranslate"><span class="pre">spmm</span></code> with the algorithm <code class="docutils literal notranslate"><span class="pre">spmm_alg::csr_alg3</span></code>,
+<code class="docutils literal notranslate"><span class="pre">opB=transpose::trans</span></code> and real fp64 precision will throw a
+<code class="docutils literal notranslate"><span class="pre">oneapi::mkl::unimplemented</span></code> exception. This configuration can fail as of
+CUDA 12.6.2, see the related issue
+<a href="#id1"><span class="problematic" id="id2">`here&lt;https://forums.developer.nvidia.com/t/cusparse-spmm-sample-failing-with-misaligned-address/311022&gt;`_</span></a>.</p></li>
+<li><p>Using <code class="docutils literal notranslate"><span class="pre">spmv</span></code> with a <code class="docutils literal notranslate"><span class="pre">type_view</span></code> other than <code class="docutils literal notranslate"><span class="pre">matrix_descr::general</span></code> will
+throw a <code class="docutils literal notranslate"><span class="pre">oneapi::mkl::unimplemented</span></code> exception.</p></li>
+<li><p>Using <code class="docutils literal notranslate"><span class="pre">spsv</span></code> with the algorithm <code class="docutils literal notranslate"><span class="pre">spsv_alg::no_optimize_alg</span></code> may still
+perform some mandatory preprocessing.</p></li>
+<li><p>oneMKL Interface does not provide a way to use non-default algorithms without
+calling preprocess functions such as <code class="docutils literal notranslate"><span class="pre">cusparseSpMM_preprocess</span></code> or
+<code class="docutils literal notranslate"><span class="pre">cusparseSpMV_preprocess</span></code>. Feel free to create an issue if this is needed.</p></li>
+</ul>
+</section>
+<section id="operation-algorithms-mapping">
+<h2>Operation algorithms mapping<a class="headerlink" href="#operation-algorithms-mapping" title="Link to this heading">#</a></h2>
+<p>The following tables describe how a oneMKL SYCL Interface algorithm maps to the
+backend’s algorithms. Refer to the backend’s documentation for a more detailed
+explanation of the algorithms.</p>
+<p>Backends with no equivalent algorithms will fallback to the backend’s default
+behavior.</p>
+<section id="spmm">
+<h3>spmm<a class="headerlink" href="#spmm" title="Link to this heading">#</a></h3>
+<table class="table">
+<colgroup>
+<col style="width: 11.8%" />
+<col style="width: 35.3%" />
+<col style="width: 52.9%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p><code class="docutils literal notranslate"><span class="pre">spmm_alg</span></code> value</p></th>
+<th class="head"><p>MKLCPU/MKLGPU</p></th>
+<th class="head"><p>cuSPARSE</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">default_alg</span></code></p></td>
+<td><p>none</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">CUSPARSE_SPMM_ALG_DEFAULT</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">no_optimize_alg</span></code></p></td>
+<td><p>none</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">CUSPARSE_SPMM_ALG_DEFAULT</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">coo_alg1</span></code></p></td>
+<td><p>none</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">CUSPARSE_SPMM_COO_ALG1</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">coo_alg2</span></code></p></td>
+<td><p>none</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">CUSPARSE_SPMM_COO_ALG2</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">coo_alg3</span></code></p></td>
+<td><p>none</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">CUSPARSE_SPMM_COO_ALG3</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">coo_alg4</span></code></p></td>
+<td><p>none</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">CUSPARSE_SPMM_COO_ALG4</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">csr_alg1</span></code></p></td>
+<td><p>none</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">CUSPARSE_SPMM_CSR_ALG1</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">csr_alg2</span></code></p></td>
+<td><p>none</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">CUSPARSE_SPMM_CSR_ALG2</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">csr_alg3</span></code></p></td>
+<td><p>none</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">CUSPARSE_SPMM_CSR_ALG3</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="spmv">
+<h3>spmv<a class="headerlink" href="#spmv" title="Link to this heading">#</a></h3>
+<table class="table">
+<colgroup>
+<col style="width: 11.8%" />
+<col style="width: 35.3%" />
+<col style="width: 52.9%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p><code class="docutils literal notranslate"><span class="pre">spmv_alg</span></code> value</p></th>
+<th class="head"><p>MKLCPU/MKLGPU</p></th>
+<th class="head"><p>cuSPARSE</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">default_alg</span></code></p></td>
+<td><p>none</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">CUSPARSE_SPMV_ALG_DEFAULT</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">no_optimize_alg</span></code></p></td>
+<td><p>none</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">CUSPARSE_SPMV_ALG_DEFAULT</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">coo_alg1</span></code></p></td>
+<td><p>none</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">CUSPARSE_SPMV_COO_ALG1</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">coo_alg2</span></code></p></td>
+<td><p>none</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">CUSPARSE_SPMV_COO_ALG2</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">csr_alg1</span></code></p></td>
+<td><p>none</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">CUSPARSE_SPMV_CSR_ALG1</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">csr_alg2</span></code></p></td>
+<td><p>none</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">CUSPARSE_SPMV_CSR_ALG2</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">csr_alg3</span></code></p></td>
+<td><p>none</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">CUSPARSE_SPMV_ALG_DEFAULT</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="spsv">
+<h3>spsv<a class="headerlink" href="#spsv" title="Link to this heading">#</a></h3>
+<table class="table">
+<colgroup>
+<col style="width: 11.8%" />
+<col style="width: 35.3%" />
+<col style="width: 52.9%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p><code class="docutils literal notranslate"><span class="pre">spsv_alg</span></code> value</p></th>
+<th class="head"><p>MKLCPU/MKLGPU</p></th>
+<th class="head"><p>cuSPARSE</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">default_alg</span></code></p></td>
+<td><p>none</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">CUSPARSE_SPSV_ALG_DEFAULT</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">no_optimize_alg</span></code></p></td>
+<td><p>none</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">CUSPARSE_SPSV_ALG_DEFAULT</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</section>
 </section>
 </section>
 
@@ -619,6 +786,13 @@ synchronizations and copies to the host.</p></li>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#onemkl-intel-cpu-and-gpu-backends">OneMKL Intel CPU and GPU backends</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cusparse-backend">cuSPARSE backend</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#operation-algorithms-mapping">Operation algorithms mapping</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spmm">spmm</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spmv">spmv</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spsv">spsv</a></li>
+</ul>
+</li>
 </ul>
   </nav></div>
 
