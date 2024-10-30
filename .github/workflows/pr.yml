@@ -82,8 +82,8 @@ jobs:
       uses: rscohn2/setup-oneapi@2ad0cf6b74bc2426bdcee825cf88f9db719dd727 # v0.1.0
       with:
         components: |
-          icx@2024.1.0
-          mkl@2024.1.0
+          icx@2025.0.0
+          mkl@2025.0.0
     - name: Configure/Build for a domain
       if: steps.domain_check.outputs.result == 'true'
       run: |
