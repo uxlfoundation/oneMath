@@ -38,10 +38,6 @@ struct matrix_view {
     matrix_descr type_view = matrix_descr::general;
     uplo uplo_view = uplo::lower;
     diag diag_view = diag::nonunit;
-
-    matrix_view() = default;
-
-    matrix_view(matrix_descr type_view) : type_view(type_view) {}
 };
 
 } // namespace sparse

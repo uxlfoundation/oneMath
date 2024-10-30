@@ -58,9 +58,12 @@ void test_helper_with_format(testFunctorI32 test_functor_i32, testFunctorI64 tes
     oneapi::mkl::index_base index_zero = oneapi::mkl::index_base::zero;
     oneapi::mkl::sparse::spsv_alg default_alg = oneapi::mkl::sparse::spsv_alg::default_alg;
     oneapi::mkl::sparse::spsv_alg no_optimize_alg = oneapi::mkl::sparse::spsv_alg::no_optimize_alg;
-    oneapi::mkl::sparse::matrix_view default_A_view(oneapi::mkl::sparse::matrix_descr::triangular);
-    oneapi::mkl::sparse::matrix_view upper_A_view(oneapi::mkl::sparse::matrix_descr::triangular);
-    upper_A_view.uplo_view = oneapi::mkl::uplo::upper;
+    oneapi::mkl::sparse::matrix_view default_A_view{
+        oneapi::mkl::sparse::matrix_descr::triangular
+    };
+    oneapi::mkl::sparse::matrix_view upper_A_view{ oneapi::mkl::sparse::matrix_descr::triangular,
+                                                   oneapi::mkl::uplo::upper,
+                                                   oneapi::mkl::diag::nonunit };
     bool no_reset_data = false;
     bool no_scalars_on_device = false;
 
@@ -99,20 +102,24 @@ void test_helper_with_format(testFunctorI32 test_functor_i32, testFunctorI64 tes
                          no_reset_data, no_scalars_on_device),
         num_passed, num_skipped);
     // Test lower triangular unit diagonal matrix
-    oneapi::mkl::sparse::matrix_view triangular_unit_A_view(
-        oneapi::mkl::sparse::matrix_descr::triangular);
-    triangular_unit_A_view.diag_view = oneapi::mkl::diag::unit;
+    oneapi::mkl::sparse::matrix_view lower_unit_A_view{
+        oneapi::mkl::sparse::matrix_descr::triangular, oneapi::mkl::uplo::lower,
+        oneapi::mkl::diag::unit
+    };
     EXPECT_TRUE_OR_FUTURE_SKIP(
         test_functor_i32(dev, queue_properties, format, m, density_A_matrix, index_zero,
-                         transpose_val, alpha, default_alg, triangular_unit_A_view,
-                         default_properties, no_reset_data, no_scalars_on_device),
+                         transpose_val, alpha, default_alg, lower_unit_A_view, default_properties,
+                         no_reset_data, no_scalars_on_device),
         num_passed, num_skipped);
     // Test upper triangular unit diagonal matrix
-    triangular_unit_A_view.uplo_view = oneapi::mkl::uplo::upper;
+    oneapi::mkl::sparse::matrix_view upper_unit_A_view{
+        oneapi::mkl::sparse::matrix_descr::triangular, oneapi::mkl::uplo::upper,
+        oneapi::mkl::diag::unit
+    };
     EXPECT_TRUE_OR_FUTURE_SKIP(
         test_functor_i32(dev, queue_properties, format, m, density_A_matrix, index_zero,
-                         transpose_val, alpha, default_alg, triangular_unit_A_view,
-                         default_properties, no_reset_data, no_scalars_on_device),
+                         transpose_val, alpha, default_alg, upper_unit_A_view, default_properties,
+                         no_reset_data, no_scalars_on_device),
         num_passed, num_skipped);
     // Test non-default alpha
     EXPECT_TRUE_OR_FUTURE_SKIP(

@@ -128,8 +128,9 @@ void test_helper_with_format_with_transpose(
                          default_properties, no_reset_data, no_scalars_on_device),
         num_passed, num_skipped);
     // Lower triangular
-    oneapi::mkl::sparse::matrix_view triangular_A_view(
-        oneapi::mkl::sparse::matrix_descr::triangular);
+    oneapi::mkl::sparse::matrix_view triangular_A_view{
+        oneapi::mkl::sparse::matrix_descr::triangular
+    };
     EXPECT_TRUE_OR_FUTURE_SKIP(
         test_functor_i32(dev, queue_properties, format, nrows_A, ncols_A, density_A_matrix,
                          index_zero, transpose_val, fp_one, fp_zero, default_alg, triangular_A_view,
@@ -143,8 +144,9 @@ void test_helper_with_format_with_transpose(
                          default_properties, no_reset_data, no_scalars_on_device),
         num_passed, num_skipped);
     // Lower triangular unit diagonal
-    oneapi::mkl::sparse::matrix_view triangular_unit_A_view(
-        oneapi::mkl::sparse::matrix_descr::triangular);
+    oneapi::mkl::sparse::matrix_view triangular_unit_A_view{
+        oneapi::mkl::sparse::matrix_descr::triangular
+    };
     triangular_unit_A_view.diag_view = oneapi::mkl::diag::unit;
     EXPECT_TRUE_OR_FUTURE_SKIP(
         test_functor_i32(dev, queue_properties, format, nrows_A, ncols_A, density_A_matrix,
@@ -161,7 +163,7 @@ void test_helper_with_format_with_transpose(
                          no_scalars_on_device),
         num_passed, num_skipped);
     // Lower symmetric
-    oneapi::mkl::sparse::matrix_view symmetric_view(oneapi::mkl::sparse::matrix_descr::symmetric);
+    oneapi::mkl::sparse::matrix_view symmetric_view{ oneapi::mkl::sparse::matrix_descr::symmetric };
     EXPECT_TRUE_OR_FUTURE_SKIP(
         test_functor_i32(dev, queue_properties, format, nrows_A, ncols_A, density_A_matrix,
                          index_zero, transpose_val, fp_one, fp_zero, default_alg, symmetric_view,
@@ -175,7 +177,7 @@ void test_helper_with_format_with_transpose(
                          default_properties, no_reset_data, no_scalars_on_device),
         num_passed, num_skipped);
     // Lower hermitian
-    oneapi::mkl::sparse::matrix_view hermitian_view(oneapi::mkl::sparse::matrix_descr::hermitian);
+    oneapi::mkl::sparse::matrix_view hermitian_view{ oneapi::mkl::sparse::matrix_descr::hermitian };
     EXPECT_TRUE_OR_FUTURE_SKIP(
         test_functor_i32(dev, queue_properties, format, nrows_A, ncols_A, density_A_matrix,
                          index_zero, transpose_val, fp_one, fp_zero, default_alg, hermitian_view,
