@@ -81,12 +81,12 @@ jobs:
       if: steps.domain_check.outputs.result == 'true'
       run: |
         wget https://registrationcenter-download.intel.com/akdlm/IRC_NAS/ac92f2bb-4818-4e53-a432-f8b34d502f23/intel-dpcpp-cpp-compiler-2025.0.0.740_offline.sh
-        sudo bash intel-dpcpp-cpp-compiler-2025.0.0.740_offline.sh -s -a -s action install --eula accept
+        sudo bash intel-dpcpp-cpp-compiler-2025.0.0.740_offline.sh -s -a -s --action install --eula accept
     - name: Install MKL
       if: steps.domain_check.outputs.result == 'true'
       run: |
         wget https://registrationcenter-download.intel.com/akdlm/IRC_NAS/79153e0f-74d7-45af-b8c2-258941adf58a/intel-onemkl-2025.0.0.940_offline.sh
-        sudo bash intel-onemkl-2025.0.0.940_offline.sh -s -a -s action install --eula accept
+        sudo bash intel-onemkl-2025.0.0.940_offline.sh -s -a -s --action install --eula accept
     - name: Configure/Build for a domain
       if: steps.domain_check.outputs.result == 'true'
       run: |
