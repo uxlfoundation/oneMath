@@ -31,6 +31,7 @@ jobs:
     runs-on: ubuntu-latest
     # One runner for each domain
     strategy:
+      fail-fast: false
       matrix:
         include:
         - config: portBLAS
