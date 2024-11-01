@@ -81,7 +81,7 @@ jobs:
     - name: Install compiler
       if: steps.domain_check.outputs.result == 'true'
       run: |
-        wget https://registrationcenter-download.intel.com/akdlm/IRC_NAS/ac92f2bb-4818-4e53-a432-f8b34d502f23/intel-dpcpp-cpp-compiler-2025.0.0.740_offline.sh
+        wget --progress=dot:giga https://registrationcenter-download.intel.com/akdlm/IRC_NAS/ac92f2bb-4818-4e53-a432-f8b34d502f23/intel-dpcpp-cpp-compiler-2025.0.0.740_offline.sh
         sudo bash intel-dpcpp-cpp-compiler-2025.0.0.740_offline.sh -s -a -s --action install --eula accept
     - name: Install Intel oneMKL
       if: steps.domain_check.outputs.result == 'true'
