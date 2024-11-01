@@ -197,6 +197,11 @@ foreach(domain ${TEST_TARGET_DOMAINS})
     list(APPEND ONEMKL_LIBRARIES_${domain} onemkl_${domain}_cusparse)
   endif()
 
+  if(domain STREQUAL "sparse_blas" AND ENABLE_ROCSPARSE_BACKEND)
+    add_dependencies(test_main_${domain}_ct onemkl_${domain}_rocsparse)
+    list(APPEND ONEMKL_LIBRARIES_${domain} onemkl_${domain}_rocsparse)
+  endif()
+
   target_link_libraries(test_main_${domain}_ct PUBLIC
       gtest
       gtest_main

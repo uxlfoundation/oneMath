@@ -18,8 +18,8 @@ oneMKL is part of the [UXL Foundation](http://www.uxlfoundation.org).
     </thead>
     <tbody>
         <tr>
-            <td rowspan=13 align="center">oneMKL interface</td>
-            <td rowspan=13 align="center">oneMKL selector</td>
+            <td rowspan=14 align="center">oneMKL interface</td>
+            <td rowspan=14 align="center">oneMKL selector</td>
             <td align="center"><a href="https://software.intel.com/en-us/oneapi/onemkl">Intel(R) oneAPI Math Kernel Library (oneMKL)</a></td>
             <td align="center">x86 CPU, Intel GPU</td>
         </tr>
@@ -61,7 +61,11 @@ oneMKL is part of the [UXL Foundation](http://www.uxlfoundation.org).
             <td align="center">AMD GPU</td>
         </tr>
         <tr>
-            <td align="center"><a href="https://github.com/ROCmSoftwarePlatform/rocFFT">AMD rocFFT</a></td>
+            <td align="center"><a href="https://github.com/ROCmSoftwarePlatform/rocFFT"> AMD rocFFT</a></td>
+            <td align="center">AMD GPU</td>
+        </tr>
+        <tr>
+            <td align="center"><a href="https://github.com/ROCmSoftwarePlatform/rocSPARSE"> AMD rocSPARSE</a></td>
             <td align="center">AMD GPU</td>
         </tr>
         <tr>
@@ -333,7 +337,7 @@ Supported compilers include:
             <td align="center">Dynamic, Static</td>
         </tr>
         <tr>
-            <td rowspan=3 align="center">SPARSE_BLAS</td>
+            <td rowspan=4 align="center">SPARSE_BLAS</td>
             <td align="center">x86 CPU</td>
             <td align="center">Intel(R) oneMKL</td>
             <td align="center">Intel DPC++</td>
@@ -348,6 +352,12 @@ Supported compilers include:
         <tr>
             <td align="center">NVIDIA GPU</td>
             <td align="center">NVIDIA cuSPARSE</td>
+            <td align="center">Open DPC++</td>
+            <td align="center">Dynamic, Static</td>
+        </tr>
+        <tr>
+            <td align="center">AMD GPU</td>
+            <td align="center">AMD rocSPARSE</td>
             <td align="center">Open DPC++</td>
             <td align="center">Dynamic, Static</td>
         </tr>

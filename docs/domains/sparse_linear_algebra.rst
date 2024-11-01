@@ -68,6 +68,31 @@ Currently known limitations:
   ``cusparseSpMV_preprocess``. Feel free to create an issue if this is needed.
 
 
+rocSPARSE backend
+----------------
+
+Currently known limitations:
+
+- Using ``spmv`` with a ``type_view`` other than ``matrix_descr::general`` will
+  throw a ``oneapi::mkl::unimplemented`` exception.
+- The COO format requires the indices to be sorted by row then by column. See
+  the `rocSPARSE COO documentation
+  <https://rocm.docs.amd.com/projects/rocSPARSE/en/latest/how-to/basics.html#coo-storage-format>`_.
+  Sparse operations using matrices with the COO format without the property
+  ``matrix_property::sorted`` will throw a ``oneapi::mkl::unimplemented``
+  exception.
+- The CSR format requires the column indices to be sorted within each row. See
+  the `rocSPARSE CSR documentation
+  <https://rocm.docs.amd.com/projects/rocSPARSE/en/latest/how-to/basics.html#csr-storage-format>`_.
+  Sparse operations using matrices with the CSR format without the property
+  ``matrix_property::sorted`` will throw a ``oneapi::mkl::unimplemented``
+  exception.
+- The same sparse matrix handle cannot be reused for multiple operations
+  ``spmm``, ``spmv``, or ``spsv``. Doing so will throw a
+  ``oneapi::mkl::unimplemented`` exception. See `#332
+  <https://github.com/ROCm/rocSPARSE/issues/332>`_.
+
+
 Operation algorithms mapping
 ----------------------------
 
@@ -89,33 +114,43 @@ spmm
    * - ``spmm_alg`` value
      - MKLCPU/MKLGPU
      - cuSPARSE
+     - rocSPARSE
    * - ``default_alg``
      - none
      - ``CUSPARSE_SPMM_ALG_DEFAULT``
+     - ``rocsparse_spmm_alg_default``
    * - ``no_optimize_alg``
      - none
      - ``CUSPARSE_SPMM_ALG_DEFAULT``
+     - ``rocsparse_spmm_alg_default``
    * - ``coo_alg1``
      - none
      - ``CUSPARSE_SPMM_COO_ALG1``
+     - ``rocsparse_spmm_alg_coo_segmented``
    * - ``coo_alg2``
      - none
      - ``CUSPARSE_SPMM_COO_ALG2``
+     - ``rocsparse_spmm_alg_coo_atomic``
    * - ``coo_alg3``
      - none
      - ``CUSPARSE_SPMM_COO_ALG3``
+     - ``rocsparse_spmm_alg_coo_segmented_atomic``
    * - ``coo_alg4``
      - none
      - ``CUSPARSE_SPMM_COO_ALG4``
+     - ``rocsparse_spmm_alg_default``
    * - ``csr_alg1``
      - none
      - ``CUSPARSE_SPMM_CSR_ALG1``
+     - ``rocsparse_spmm_alg_csr``
    * - ``csr_alg2``
      - none
      - ``CUSPARSE_SPMM_CSR_ALG2``
+     - ``rocsparse_spmm_alg_csr_row_split``
    * - ``csr_alg3``
      - none
      - ``CUSPARSE_SPMM_CSR_ALG3``
+     - ``rocsparse_spmm_alg_csr_merge``
 
 
 spmv
@@ -128,27 +163,35 @@ spmv
    * - ``spmv_alg`` value
      - MKLCPU/MKLGPU
      - cuSPARSE
+     - rocSPARSE
    * - ``default_alg``
      - none
      - ``CUSPARSE_SPMV_ALG_DEFAULT``
+     - ``rocsparse_spmv_alg_default``
    * - ``no_optimize_alg``
      - none
      - ``CUSPARSE_SPMV_ALG_DEFAULT``
+     - ``rocsparse_spmv_alg_default``
    * - ``coo_alg1``
      - none
      - ``CUSPARSE_SPMV_COO_ALG1``
+     - ``rocsparse_spmv_alg_coo``
    * - ``coo_alg2``
      - none
      - ``CUSPARSE_SPMV_COO_ALG2``
+     - ``rocsparse_spmv_alg_coo_atomic``
    * - ``csr_alg1``
      - none
      - ``CUSPARSE_SPMV_CSR_ALG1``
+     - ``rocsparse_spmv_alg_csr_adaptive``
    * - ``csr_alg2``
      - none
      - ``CUSPARSE_SPMV_CSR_ALG2``
+     - ``rocsparse_spmv_alg_csr_stream``
    * - ``csr_alg3``
      - none
      - ``CUSPARSE_SPMV_ALG_DEFAULT``
+     - ``rocsparse_spmv_alg_csr_lrb``
 
 
 spsv
@@ -161,9 +204,12 @@ spsv
    * - ``spsv_alg`` value
      - MKLCPU/MKLGPU
      - cuSPARSE
+     - rocSPARSE
    * - ``default_alg``
      - none
      - ``CUSPARSE_SPSV_ALG_DEFAULT``
+     - ``rocsparse_spsv_alg_default``
    * - ``no_optimize_alg``
      - none
      - ``CUSPARSE_SPSV_ALG_DEFAULT``
+     - ``rocsparse_spsv_alg_default``

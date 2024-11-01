@@ -17,30 +17,17 @@
 *
 **************************************************************************/
 
-#ifndef _ONEMKL_SPARSE_BLAS_HPP_
-#define _ONEMKL_SPARSE_BLAS_HPP_
+#ifndef _ONEMKL_SPARSE_BLAS_DETAIL_ROCSPARSE_ONEMKL_SPARSE_BLAS_ROCSPARSE_HPP_
+#define _ONEMKL_SPARSE_BLAS_DETAIL_ROCSPARSE_ONEMKL_SPARSE_BLAS_ROCSPARSE_HPP_
 
-#if __has_include(<sycl/sycl.hpp>)
-#include <sycl/sycl.hpp>
-#else
-#include <CL/sycl.hpp>
-#endif
+#include "oneapi/mkl/detail/export.hpp"
+#include "oneapi/mkl/sparse_blas/detail/helper_types.hpp"
+#include "oneapi/mkl/sparse_blas/types.hpp"
 
-#include "oneapi/mkl/detail/config.hpp"
+namespace oneapi::mkl::sparse::rocsparse {
 
-#ifdef ONEMKL_ENABLE_MKLCPU_BACKEND
-#include "sparse_blas/detail/mklcpu/sparse_blas_ct.hpp"
-#endif
-#ifdef ONEMKL_ENABLE_MKLGPU_BACKEND
-#include "sparse_blas/detail/mklgpu/sparse_blas_ct.hpp"
-#endif
-#ifdef ONEMKL_ENABLE_CUSPARSE_BACKEND
-#include "sparse_blas/detail/cusparse/sparse_blas_ct.hpp"
-#endif
-#ifdef ONEMKL_ENABLE_ROCSPARSE_BACKEND
-#include "sparse_blas/detail/rocsparse/sparse_blas_ct.hpp"
-#endif
+#include "oneapi/mkl/sparse_blas/detail/onemkl_sparse_blas_backends.hxx"
 
-#include "sparse_blas/detail/sparse_blas_rt.hpp"
+} // namespace oneapi::mkl::sparse::rocsparse
 
-#endif // _ONEMKL_SPARSE_BLAS_HPP_
+#endif // _ONEMKL_SPARSE_BLAS_DETAIL_ROCSPARSE_ONEMKL_SPARSE_BLAS_ROCSPARSE_HPP_

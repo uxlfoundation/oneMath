@@ -17,30 +17,16 @@
 *
 **************************************************************************/
 
-#ifndef _ONEMKL_SPARSE_BLAS_HPP_
-#define _ONEMKL_SPARSE_BLAS_HPP_
+#include "oneapi/mkl/sparse_blas/types.hpp"
 
-#if __has_include(<sycl/sycl.hpp>)
-#include <sycl/sycl.hpp>
-#else
-#include <CL/sycl.hpp>
-#endif
+#include "oneapi/mkl/sparse_blas/detail/rocsparse/onemkl_sparse_blas_rocsparse.hpp"
 
-#include "oneapi/mkl/detail/config.hpp"
+#include "sparse_blas/function_table.hpp"
 
-#ifdef ONEMKL_ENABLE_MKLCPU_BACKEND
-#include "sparse_blas/detail/mklcpu/sparse_blas_ct.hpp"
-#endif
-#ifdef ONEMKL_ENABLE_MKLGPU_BACKEND
-#include "sparse_blas/detail/mklgpu/sparse_blas_ct.hpp"
-#endif
-#ifdef ONEMKL_ENABLE_CUSPARSE_BACKEND
-#include "sparse_blas/detail/cusparse/sparse_blas_ct.hpp"
-#endif
-#ifdef ONEMKL_ENABLE_ROCSPARSE_BACKEND
-#include "sparse_blas/detail/rocsparse/sparse_blas_ct.hpp"
-#endif
+#define WRAPPER_VERSION 1
+#define BACKEND         rocsparse
 
-#include "sparse_blas/detail/sparse_blas_rt.hpp"
-
-#endif // _ONEMKL_SPARSE_BLAS_HPP_
+extern "C" sparse_blas_function_table_t mkl_sparse_blas_table = {
+    WRAPPER_VERSION,
+#include "sparse_blas/backends/backend_wrappers.cxx"
+};

@@ -41,6 +41,7 @@ enum class backend {
     rocfft,
     portfft,
     cusparse,
+    rocsparse,
     unsupported
 };
 
@@ -63,6 +64,7 @@ static backendmap backend_map = { { backend::mklcpu, "mklcpu" },
                                   { backend::rocfft, "rocfft" },
                                   { backend::portfft, "portfft" },
                                   { backend::cusparse, "cusparse" },
+                                  { backend::rocsparse, "rocsparse" },
                                   { backend::unsupported, "unsupported" } };
 // clang-format on
 

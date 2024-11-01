@@ -134,7 +134,7 @@ int main(int argc, char** argv) {
 #if !defined(ONEMKL_ENABLE_ROCBLAS_BACKEND) && !defined(ONEMKL_ENABLE_ROCRAND_BACKEND) &&         \
     !defined(ONEMKL_ENABLE_ROCSOLVER_BACKEND) &&                                                  \
     !defined(ONEMKL_ENABLE_PORTBLAS_BACKEND_AMD_GPU) && !defined(ONEMKL_ENABLE_ROCFFT_BACKEND) && \
-    !defined(ONEMKL_ENABLE_PORTFFT_BACKEND)
+    !defined(ONEMKL_ENABLE_PORTFFT_BACKEND) && !defined(ONEMKL_ENABLE_ROCSPARSE_BACKEND)
                         if (dev.is_gpu() && vendor_id == AMD_ID)
                             continue;
 #endif

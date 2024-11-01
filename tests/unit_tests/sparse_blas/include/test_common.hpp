@@ -65,6 +65,10 @@ inline std::set<oneapi::mkl::sparse::matrix_property> get_default_matrix_propert
     if (vendor_id == oneapi::mkl::device::nvidiagpu && format == sparse_matrix_format_t::COO) {
         return { oneapi::mkl::sparse::matrix_property::sorted_by_rows };
     }
+    if (vendor_id == oneapi::mkl::device::amdgpu &&
+        (format == sparse_matrix_format_t::COO || format == sparse_matrix_format_t::CSR)) {
+        return { oneapi::mkl::sparse::matrix_property::sorted };
+    }
     return {};
 }
 
@@ -78,6 +82,11 @@ get_all_matrix_properties_combinations(sycl::queue queue, sparse_matrix_format_t
                  { oneapi::mkl::sparse::matrix_property::sorted_by_rows,
                    oneapi::mkl::sparse::matrix_property::symmetric },
                  { oneapi::mkl::sparse::matrix_property::sorted,
+                   oneapi::mkl::sparse::matrix_property::symmetric } };
+    }
+    if (vendor_id == oneapi::mkl::device::amdgpu &&
+        (format == sparse_matrix_format_t::COO || format == sparse_matrix_format_t::CSR)) {
+        return { { oneapi::mkl::sparse::matrix_property::sorted,
                    oneapi::mkl::sparse::matrix_property::symmetric } };
     }
 
@@ -229,7 +238,7 @@ void rand_matrix(std::vector<fpType>& m, oneapi::mkl::layout layout_val, std::si
 }
 
 /// Generate random value in the range [-0.5, 0.5]
-/// The amplitude is guaranteed to be >= 0.1 if is_diag is true
+/// The amplitude is guaranteed to be >= 10 if is_diag is true
 template <typename fpType>
 fpType generate_data(bool is_diag) {
     rand_scalar<fpType> rand_data;

@@ -183,6 +183,13 @@
 #define TEST_RUN_NVIDIAGPU_CUSPARSE_SELECT(q, func, ...)
 #endif
 
+#ifdef ONEMKL_ENABLE_ROCSPARSE_BACKEND
+#define TEST_RUN_AMDGPU_ROCSPARSE_SELECT(q, func, ...) \
+    func(oneapi::mkl::backend_selector<oneapi::mkl::backend::rocsparse>{ q }, __VA_ARGS__)
+#else
+#define TEST_RUN_AMDGPU_ROCSPARSE_SELECT(q, func, ...)
+#endif
+
 #ifndef __HIPSYCL__
 #define CHECK_HOST_OR_CPU(q) q.get_device().is_cpu()
 #else
@@ -277,6 +284,9 @@
             }                                                              \
             else if (vendor_id == NVIDIA_ID) {                             \
                 TEST_RUN_NVIDIAGPU_CUSPARSE_SELECT(q, func, __VA_ARGS__);  \
+            }                                                              \
+            else if (vendor_id == AMD_ID) {                                \
+                TEST_RUN_AMDGPU_ROCSPARSE_SELECT(q, func, __VA_ARGS__);    \
             }                                                              \
         }                                                                  \
     } while (0);

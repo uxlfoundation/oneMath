@@ -20,9 +20,10 @@
 #include "oneapi/mkl/sparse_blas/detail/cusparse/onemkl_sparse_blas_cusparse.hpp"
 
 #include "sparse_blas/backends/cusparse/cusparse_error.hpp"
+#include "sparse_blas/backends/cusparse/cusparse_handles.hpp"
 #include "sparse_blas/backends/cusparse/cusparse_helper.hpp"
 #include "sparse_blas/backends/cusparse/cusparse_task.hpp"
-#include "sparse_blas/backends/cusparse/cusparse_handles.hpp"
+#include "sparse_blas/backends/cusparse/cusparse_scope_handle.hpp"
 #include "sparse_blas/common_op_verification.hpp"
 #include "sparse_blas/macros.hpp"
 #include "sparse_blas/matrix_view_comparison.hpp"

@@ -31,3 +31,7 @@ endif()
 if(ENABLE_CUSPARSE_BACKEND)
   add_subdirectory(cusparse)
 endif()
+
+if(ENABLE_ROCSPARSE_BACKEND)
+  add_subdirectory(rocsparse)
+endif()
