@@ -34,6 +34,9 @@
 #ifdef ONEMATH_ENABLE_MKLGPU_BACKEND
 #include "sparse_blas/detail/mklgpu/sparse_blas_ct.hpp"
 #endif
+#ifdef ONEMATH_ENABLE_CUSPARSE_BACKEND
+#include "sparse_blas/detail/cusparse/sparse_blas_ct.hpp"
+#endif
 
 #include "sparse_blas/detail/sparse_blas_rt.hpp"
 

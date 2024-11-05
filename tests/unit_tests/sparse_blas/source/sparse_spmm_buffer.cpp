@@ -28,8 +28,9 @@ extern std::vector<sycl::device*> devices;
 namespace {
 
 template <typename fpType, typename intType>
-int test_spmm(sycl::device* dev, sparse_matrix_format_t format, intType nrows_A, intType ncols_A,
-              intType ncols_C, double density_A_matrix, oneapi::math::index_base index,
+int test_spmm(sycl::device* dev, sycl::property_list queue_properties,
+              sparse_matrix_format_t format, intType nrows_A, intType ncols_A, intType ncols_C,
+              double density_A_matrix, oneapi::math::index_base index,
               oneapi::math::layout dense_matrix_layout, oneapi::math::transpose transpose_A,
               oneapi::math::transpose transpose_B, fpType alpha, fpType beta, intType ldb,
               intType ldc, oneapi::math::sparse::spmm_alg alg,
@@ -40,7 +41,7 @@ int test_spmm(sycl::device* dev, sparse_matrix_format_t format, intType nrows_A,
         // Scalars on the device is not planned to be supported with the buffer API
         return 1;
     }
-    sycl::queue main_queue(*dev, exception_handler_t());
+    sycl::queue main_queue(*dev, exception_handler_t(), queue_properties);
 
     if (require_square_matrix(A_view, matrix_properties)) {
         ncols_A = nrows_A;
@@ -51,8 +52,6 @@ int test_spmm(sycl::device* dev, sparse_matrix_format_t format, intType nrows_A,
     auto [opa_nrows, opa_ncols] = swap_if_transposed<std::size_t>(transpose_A, nrows_A, ncols_A);
     auto [opb_nrows, opb_ncols] = swap_if_transposed<std::int64_t>(transpose_B, opa_ncols, ncols_C);
     intType indexing = (index == oneapi::math::index_base::zero) ? 0 : 1;
-    const bool is_sorted = matrix_properties.find(oneapi::math::sparse::matrix_property::sorted) !=
-                           matrix_properties.cend();
     const bool is_symmetric =
         matrix_properties.find(oneapi::math::sparse::matrix_property::symmetric) !=
         matrix_properties.cend();
@@ -73,10 +72,9 @@ int test_spmm(sycl::device* dev, sparse_matrix_format_t format, intType nrows_A,
     std::vector<fpType> c_ref_host(c_host);
 
     // Shuffle ordering of column indices/values to test sortedness
-    if (!is_sorted) {
-        shuffle_sparse_matrix(format, indexing, ia_host.data(), ja_host.data(), a_host.data(), nnz,
-                              static_cast<std::size_t>(nrows_A));
-    }
+    shuffle_sparse_matrix_if_needed(format, matrix_properties, indexing, ia_host.data(),
+                                    ja_host.data(), a_host.data(), nnz,
+                                    static_cast<std::size_t>(nrows_A));
 
     auto ia_buf = make_buffer(ia_host);
     auto ja_buf = make_buffer(ja_host);
@@ -120,10 +118,9 @@ int test_spmm(sycl::device* dev, sparse_matrix_format_t format, intType nrows_A,
             intType reset_nnz = generate_random_matrix<fpType, intType>(
                 format, nrows_A, ncols_A, density_A_matrix, indexing, ia_host, ja_host, a_host,
                 is_symmetric);
-            if (!is_sorted) {
-                shuffle_sparse_matrix(format, indexing, ia_host.data(), ja_host.data(),
-                                      a_host.data(), reset_nnz, static_cast<std::size_t>(nrows_A));
-            }
+            shuffle_sparse_matrix_if_needed(format, matrix_properties, indexing, ia_host.data(),
+                                            ja_host.data(), a_host.data(), reset_nnz,
+                                            static_cast<std::size_t>(nrows_A));
             if (reset_nnz > nnz) {
                 ia_buf = make_buffer(ia_host);
                 ja_buf = make_buffer(ja_host);

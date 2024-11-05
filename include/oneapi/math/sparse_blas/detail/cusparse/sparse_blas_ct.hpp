@@ -17,57 +17,24 @@
 *
 **************************************************************************/
 
-#ifndef _ONEMATH_SPARSE_BLAS_TYPES_HPP_
-#define _ONEMATH_SPARSE_BLAS_TYPES_HPP_
+#ifndef _ONEMATH_SPARSE_BLAS_DETAIL_CUSPARSE_SPARSE_BLAS_CT_HPP_
+#define _ONEMATH_SPARSE_BLAS_DETAIL_CUSPARSE_SPARSE_BLAS_CT_HPP_
 
-#include "oneapi/math/types.hpp"
-#include "matrix_view.hpp"
-#include "detail/handles.hpp"
-#include "detail/operation_types.hpp"
+#include "oneapi/math/detail/backends.hpp"
+#include "oneapi/math/detail/backend_selector.hpp"
 
-/**
- * @file Include and define the sparse types that are common between Intel(R) oneMKL API and oneMath API.
-*/
+#include "onemath_sparse_blas_cusparse.hpp"
 
 namespace oneapi {
 namespace math {
 namespace sparse {
 
-enum class matrix_property {
-    symmetric,
-    sorted,
-    sorted_by_rows,
-};
+#define BACKEND cusparse
+#include "oneapi/math/sparse_blas/detail/sparse_blas_ct.hxx"
+#undef BACKEND
 
-enum class spmm_alg {
-    default_alg,
-    no_optimize_alg,
-    coo_alg1,
-    coo_alg2,
-    coo_alg3,
-    coo_alg4,
-    csr_alg1,
-    csr_alg2,
-    csr_alg3,
-};
+} //namespace sparse
+} //namespace math
+} //namespace oneapi
 
-enum class spmv_alg {
-    default_alg,
-    no_optimize_alg,
-    coo_alg1,
-    coo_alg2,
-    csr_alg1,
-    csr_alg2,
-    csr_alg3,
-};
-
-enum class spsv_alg {
-    default_alg,
-    no_optimize_alg,
-};
-
-} // namespace sparse
-} // namespace math
-} // namespace oneapi
-
-#endif // _ONEMATH_SPARSE_BLAS_TYPES_HPP_
+#endif // _ONEMATH_SPARSE_BLAS_DETAIL_CUSPARSE_SPARSE_BLAS_CT_HPP_

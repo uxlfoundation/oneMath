@@ -37,7 +37,7 @@ if(is_dpcpp)
     # Check if the Nvidia target is supported. PortFFT uses this for choosing default configuration.
     check_cxx_compiler_flag("-fsycl -fsycl-targets=nvptx64-nvidia-cuda" dpcpp_supports_nvptx64)
 
-    if(ENABLE_CURAND_BACKEND OR ENABLE_CUSOLVER_BACKEND)
+    if(ENABLE_CURAND_BACKEND OR ENABLE_CUSOLVER_BACKEND OR ENABLE_CUSPARSE_BACKEND)
       list(APPEND UNIX_INTERFACE_COMPILE_OPTIONS
         -fsycl-targets=nvptx64-nvidia-cuda -fsycl-unnamed-lambda)
       list(APPEND UNIX_INTERFACE_LINK_OPTIONS
@@ -51,7 +51,7 @@ if(is_dpcpp)
         -fsycl-targets=amdgcn-amd-amdhsa -Xsycl-target-backend 
 	--offload-arch=${HIP_TARGETS})
     endif()
-    if(ENABLE_CURAND_BACKEND OR ENABLE_CUSOLVER_BACKEND OR ENABLE_ROCBLAS_BACKEND
+    if(ENABLE_CURAND_BACKEND OR ENABLE_CUSOLVER_BACKEND OR ENABLE_CUSPARSE_BACKEND OR ENABLE_ROCBLAS_BACKEND
 	    OR ENABLE_ROCRAND_BACKEND OR ENABLE_ROCSOLVER_BACKEND)
       set_target_properties(ONEMATH::SYCL::SYCL PROPERTIES
         INTERFACE_COMPILE_OPTIONS "${UNIX_INTERFACE_COMPILE_OPTIONS}"

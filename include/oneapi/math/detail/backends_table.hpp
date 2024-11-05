@@ -199,6 +199,12 @@ static std::map<domain, std::map<device, std::vector<const char*>>> libraries = 
 #ifdef ONEMATH_ENABLE_MKLGPU_BACKEND
               LIB_NAME("sparse_blas_mklgpu")
 #endif
+          } },
+        { device::nvidiagpu,
+          {
+#ifdef ONEMATH_ENABLE_CUSPARSE_BACKEND
+              LIB_NAME("sparse_blas_cusparse")
+#endif
           } } } },
 };
 

@@ -4,7 +4,7 @@ oneMath offers examples with the following routines:
 - rng: uniform_usm
 - lapack: getrs_usm
 - dft: complex_fwd_usm, real_fwd_usm
-- sparse_blas: sparse_gemv_usm
+- sparse_blas: sparse_spmv_usm
 
 Each routine has one run-time dispatching example and one compile-time dispatching example (which uses both mklcpu and cuda backends), located in `example/<$domain>/run_time_dispatching` and `example/<$domain>/compile_time_dispatching` subfolders, respectively.
 
@@ -485,111 +485,119 @@ Unsupported Configuration:
 Run-time dispatching examples with mklcpu backend
 ```
 $ export ONEAPI_DEVICE_SELECTOR="opencl:cpu"
-$ ./bin/example_sparse_blas_gemv_usm
+$ ./bin/example_sparse_blas_spmv_usm
 
 ########################################################################
-# Sparse Matrix-Vector Multiply Example: 
-# 
+# Sparse Matrix-Vector Multiply Example:
+#
 # y = alpha * op(A) * x + beta * y
-# 
+#
 # where A is a sparse matrix in CSR format, x and y are dense vectors
 # and alpha, beta are floating point type precision scalars.
-# 
+#
 # Using apis:
-#   sparse::gemv
-# 
+#   sparse::spmv
+#
 # Using single precision (float) data type
-# 
+#
 # Device will be selected during runtime.
 # The environment variable ONEAPI_DEVICE_SELECTOR can be used to specify
 # available devices
-# 
+#
 ########################################################################
 
-Running Sparse BLAS GEMV USM example on CPU device.
-Device name is: Intel(R) Core(TM) i7-6700K CPU @ 4.00GHz
+Running Sparse BLAS SPMV USM example on CPU device.
+Device name is: Intel(R) Xeon(R) Gold 6326 CPU @ 2.90GHz
 Running with single precision real data type:
 
-		sparse::gemv parameters:
-			transA = nontrans
-			nrows = 64
-			alpha = 1, beta = 0
+                sparse::spmv parameters:
+                        transA = nontrans
+                        nrows = 64
+                        alpha = 1, beta = 0
 
-		 sparse::gemv example passed
-	Finished
-Sparse BLAS GEMV USM example ran OK.
+                 sparse::spmv example passed
+        Finished
+Sparse BLAS SPMV USM example ran OK.
 ```
 
 Run-time dispatching examples with mklgpu backend
 ```
 $ export ONEAPI_DEVICE_SELECTOR="level_zero:gpu"
-$ ./bin/example_sparse_blas_gemv_usm
+$ ./bin/example_sparse_blas_spmv_usm
 
 ########################################################################
-# Sparse Matrix-Vector Multiply Example: 
-# 
+# Sparse Matrix-Vector Multiply Example:
+#
 # y = alpha * op(A) * x + beta * y
-# 
+#
 # where A is a sparse matrix in CSR format, x and y are dense vectors
 # and alpha, beta are floating point type precision scalars.
-# 
+#
 # Using apis:
-#   sparse::gemv
-# 
+#   sparse::spmv
+#
 # Using single precision (float) data type
-# 
+#
 # Device will be selected during runtime.
 # The environment variable ONEAPI_DEVICE_SELECTOR can be used to specify
 # available devices
-# 
+#
 ########################################################################
 
-Running Sparse BLAS GEMV USM example on GPU device.
+Running Sparse BLAS SPMV USM example on GPU device.
 Device name is: Intel(R) HD Graphics 530 [0x1912]
 Running with single precision real data type:
 
-		sparse::gemv parameters:
-			transA = nontrans
-			nrows = 64
-			alpha = 1, beta = 0
+                sparse::spmv parameters:
+                        transA = nontrans
+                        nrows = 64
+                        alpha = 1, beta = 0
 
-		 sparse::gemv example passed
-	Finished
-Sparse BLAS GEMV USM example ran OK.
+                 sparse::spmv example passed
+        Finished
+Sparse BLAS SPMV USM example ran OK.
 ```
 
-Compile-time dispatching example with mklcpu backend
+Compile-time dispatching example with both mklcpu and cusparse backend
 ```
-$ export ONEAPI_DEVICE_SELECTOR="opencl:cpu"
-$ ./bin/example_sparse_blas_gemv_usm_mklcpu
+$ ./bin/sparse_blas_spmv_usm_mklcpu_cusparse
 
 ########################################################################
-# Sparse Matrix-Vector Multiply Example: 
-# 
+# Sparse Matrix-Vector Multiply Example:
+#
 # y = alpha * op(A) * x + beta * y
-# 
-# where A is a sparse matrix in CSR format, x and y are dense vectors
+#
+# where A is a sparse matrix in COO format, x and y are dense vectors
 # and alpha, beta are floating point type precision scalars.
-# 
+#
 # Using apis:
-#   sparse::gemv
-# 
+#   sparse::spmv
+#
 # Using single precision (float) data type
-# 
-# Running on Intel CPU device
-# 
+#
+# Running on both Intel CPU and Nvidia GPU devices
+#
 ########################################################################
 
-Running Sparse BLAS GEMV USM example on CPU device.
-Device name is: Intel(R) Core(TM) i7-6700K CPU @ 4.00GHz
+Running Sparse BLAS SPMV USM example on:
+        CPU device: Intel(R) Xeon(R) Gold 6326 CPU @ 2.90GHz
+        GPU device: NVIDIA A100-PCIE-40GB
 Running with single precision real data type:
 
-		sparse::gemv parameters:
-			transA = nontrans
-			nrows = 64
-			alpha = 1, beta = 0
+                sparse::spmv parameters:
+                        transA = nontrans
+                        size = 8
+                        alpha = 1, beta = 0
 
-		 sparse::gemv example passed
-	Finished
-Sparse BLAS GEMV USM example ran OK.
+                 sparse::spmv example passed
+        Finished
+
+                sparse::spmv parameters:
+                        transA = nontrans
+                        size = 8
+                        alpha = 1, beta = 0
+
+                 sparse::spmv example passed
+        Finished
+Sparse BLAS SPMV USM example ran OK on MKLCPU and CUSPARSE.
 ```

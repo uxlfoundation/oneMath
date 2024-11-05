@@ -17,20 +17,17 @@
 *
 **************************************************************************/
 
-#include "common_onemkl_conversion.hpp"
-#include "sparse_blas/backends/mkl_common/mkl_dispatch.hpp"
-#include "sparse_blas/backends/mkl_common/mkl_handles.hpp"
-#include "sparse_blas/common_op_verification.hpp"
-#include "sparse_blas/macros.hpp"
-#include "sparse_blas/matrix_view_comparison.hpp"
-#include "sparse_blas/sycl_helper.hpp"
+#ifndef _ONEMATH_SPARSE_BLAS_DETAIL_CUSPARSE_ONEMATH_SPARSE_BLAS_CUSPARSE_HPP_
+#define _ONEMATH_SPARSE_BLAS_DETAIL_CUSPARSE_ONEMATH_SPARSE_BLAS_CUSPARSE_HPP_
 
-#include "oneapi/math/sparse_blas/detail/mklgpu/onemath_sparse_blas_mklgpu.hpp"
+#include "oneapi/math/detail/export.hpp"
+#include "oneapi/math/sparse_blas/detail/helper_types.hpp"
+#include "oneapi/math/sparse_blas/types.hpp"
 
-#define BACKEND mklgpu
+namespace oneapi::math::sparse::cusparse {
 
-#include "sparse_blas/backends/mkl_common/mkl_spmm.cxx"
-#include "sparse_blas/backends/mkl_common/mkl_spmv.cxx"
-#include "sparse_blas/backends/mkl_common/mkl_spsv.cxx"
+#include "oneapi/math/sparse_blas/detail/onemath_sparse_blas_backends.hxx"
 
-#undef BACKEND
+} // namespace oneapi::math::sparse::cusparse
+
+#endif // _ONEMATH_SPARSE_BLAS_DETAIL_CUSPARSE_ONEMATH_SPARSE_BLAS_CUSPARSE_HPP_

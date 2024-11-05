@@ -33,6 +33,9 @@ endif()
 if(ENABLE_MKLGPU_BACKEND)
   list(APPEND DEVICE_FILTERS "level_zero:gpu")
 endif()
+if(ENABLE_CUSPARSE_BACKEND)
+  list(APPEND DEVICE_FILTERS "cuda:gpu")
+endif()
 
 message(STATUS "ONEAPI_DEVICE_SELECTOR will be set to the following value(s): [${DEVICE_FILTERS}] for run-time dispatching examples")
 

@@ -24,6 +24,8 @@
 #include <oneapi/mkl/spblas.hpp>
 
 #include "sparse_blas/generic_container.hpp"
+#include "sparse_blas/macros.hpp"
+#include "sparse_blas/sycl_helper.hpp"
 
 namespace oneapi::math::sparse {
 
@@ -57,6 +59,8 @@ struct dense_matrix_handle : public detail::generic_dense_matrix_handle<void*> {
 } // namespace oneapi::math::sparse
 
 namespace oneapi::math::sparse::detail {
+
+using namespace oneapi::math::detail;
 
 /**
  * Internal sparse_matrix_handle type for MKLCPU and MKLGPU backends.

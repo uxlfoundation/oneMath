@@ -40,20 +40,31 @@ enum class backend {
     cufft,
     rocfft,
     portfft,
+    cusparse,
     unsupported
 };
 
 typedef std::map<backend, std::string> backendmap;
 
-static backendmap backend_map = {
-    { backend::mklcpu, "mklcpu" },       { backend::mklgpu, "mklgpu" },
-    { backend::cublas, "cublas" },       { backend::cusolver, "cusolver" },
-    { backend::curand, "curand" },       { backend::netlib, "netlib" },
-    { backend::rocblas, "rocblas" },     { backend::rocrand, "rocrand" },
-    { backend::rocsolver, "rocsolver" }, { backend::portblas, "portblas" },
-    { backend::cufft, "cufft" },         { backend::rocfft, "rocfft" },
-    { backend::portfft, "portfft" },     { backend::unsupported, "unsupported" }
-};
+// clang-format alternate the formatting depending on the parity of the number of backends
+// It is disabled to reduce noise
+// clang-format off
+static backendmap backend_map = { { backend::mklcpu, "mklcpu" },
+                                  { backend::mklgpu, "mklgpu" },
+                                  { backend::cublas, "cublas" },
+                                  { backend::cusolver, "cusolver" },
+                                  { backend::curand, "curand" },
+                                  { backend::netlib, "netlib" },
+                                  { backend::rocblas, "rocblas" },
+                                  { backend::rocrand, "rocrand" },
+                                  { backend::rocsolver, "rocsolver" },
+                                  { backend::portblas, "portblas" },
+                                  { backend::cufft, "cufft" },
+                                  { backend::rocfft, "rocfft" },
+                                  { backend::portfft, "portfft" },
+                                  { backend::cusparse, "cusparse" },
+                                  { backend::unsupported, "unsupported" } };
+// clang-format on
 
 } //namespace math
 } //namespace oneapi

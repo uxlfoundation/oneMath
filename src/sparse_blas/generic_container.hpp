@@ -40,10 +40,12 @@ struct generic_container {
     // USM pointer, nullptr if the provided data is a buffer.
     void* usm_ptr;
 
-    // Buffer pointer, nullptr if the provided data is a USM pointer.
-    // The buffer is needed to properly handle the dependencies when the handle is used.
-    // Use a void* type for the buffer to avoid using template arguments in every function using data handles.
-    // Using reinterpret does not solve the issue as the returned buffer needs the type of the original buffer for the aligned_allocator.
+    // Buffer pointer, nullptr if the provided data is a USM pointer. The buffer
+    // is needed to properly handle the dependencies when the handle is used.
+    // Use a void* type for the buffer to avoid using template arguments in
+    // every function using data handles. Using `sycl::buffer::reinterpret` does
+    // not solve the issue as the returned buffer needs the type of the original
+    // buffer for the aligned_allocator.
     std::shared_ptr<void> buffer_ptr;
 
     // Underlying USM or buffer data type
@@ -61,6 +63,10 @@ struct generic_container {
             : usm_ptr(nullptr),
               buffer_ptr(std::make_shared<sycl::buffer<T, 1>>(buffer)),
               data_type(get_data_type<T>()) {}
+
+    bool use_buffer() const {
+        return static_cast<bool>(buffer_ptr);
+    }
 
     template <typename T>
     void set_usm_ptr(T* ptr) {
@@ -109,7 +115,7 @@ struct generic_dense_handle {
               value_container(value_buffer) {}
 
     bool all_use_buffer() const {
-        return static_cast<bool>(value_container.buffer_ptr);
+        return value_container.use_buffer();
     }
 
     data_type get_value_type() const {
@@ -202,6 +208,8 @@ struct generic_dense_matrix_handle : public detail::generic_dense_handle<Backend
     }
 };
 
+enum class sparse_format { CSR, COO };
+
 /// Generic sparse_matrix_handle used by all backends
 template <typename BackendHandleT>
 struct generic_sparse_handle {
@@ -211,34 +219,51 @@ struct generic_sparse_handle {
     generic_container col_container;
     generic_container value_container;
 
+    sparse_format format;
+    std::int64_t num_rows;
+    std::int64_t num_cols;
+    std::int64_t nnz;
+    index_base index;
     std::int32_t properties_mask;
     bool can_be_reset;
 
     template <typename fpType, typename intType>
     generic_sparse_handle(BackendHandleT backend_handle, intType* row_ptr, intType* col_ptr,
-                          fpType* value_ptr)
+                          fpType* value_ptr, sparse_format format, std::int64_t num_rows,
+                          std::int64_t num_cols, std::int64_t nnz, index_base index)
             : backend_handle(backend_handle),
               row_container(generic_container(row_ptr)),
               col_container(generic_container(col_ptr)),
               value_container(generic_container(value_ptr)),
+              format(format),
+              num_rows(num_rows),
+              num_cols(num_cols),
+              nnz(nnz),
+              index(index),
               properties_mask(0),
               can_be_reset(true) {}
 
     template <typename fpType, typename intType>
     generic_sparse_handle(BackendHandleT backend_handle, const sycl::buffer<intType, 1> row_buffer,
                           const sycl::buffer<intType, 1> col_buffer,
-                          const sycl::buffer<fpType, 1> value_buffer)
+                          const sycl::buffer<fpType, 1> value_buffer, sparse_format format,
+                          std::int64_t num_rows, std::int64_t num_cols, std::int64_t nnz,
+                          index_base index)
             : backend_handle(backend_handle),
               row_container(row_buffer),
               col_container(col_buffer),
               value_container(value_buffer),
+              format(format),
+              num_rows(num_rows),
+              num_cols(num_cols),
+              nnz(nnz),
+              index(index),
               properties_mask(0),
               can_be_reset(true) {}
 
     bool all_use_buffer() const {
-        return static_cast<bool>(value_container.buffer_ptr) &&
-               static_cast<bool>(row_container.buffer_ptr) &&
-               static_cast<bool>(col_container.buffer_ptr);
+        return value_container.use_buffer() && row_container.use_buffer() &&
+               col_container.use_buffer();
     }
 
     data_type get_value_type() const {
@@ -249,19 +274,20 @@ struct generic_sparse_handle {
         return row_container.data_type;
     }
 
-    void set_matrix_property(oneapi::math::sparse::matrix_property property) {
+    void set_matrix_property(matrix_property property) {
         properties_mask |= matrix_property_to_mask(property);
     }
 
-    bool has_matrix_property(oneapi::math::sparse::matrix_property property) {
+    bool has_matrix_property(matrix_property property) {
         return properties_mask & matrix_property_to_mask(property);
     }
 
 private:
-    std::int32_t matrix_property_to_mask(oneapi::math::sparse::matrix_property property) {
+    std::int32_t matrix_property_to_mask(matrix_property property) {
         switch (property) {
-            case oneapi::math::sparse::matrix_property::symmetric: return 1 << 0;
-            case oneapi::math::sparse::matrix_property::sorted: return 1 << 1;
+            case matrix_property::symmetric: return 1 << 0;
+            case matrix_property::sorted: return 1 << 1;
+            case matrix_property::sorted_by_rows: return 1 << 2;
             default:
                 throw oneapi::math::invalid_argument(
                     "sparse_blas", "set_matrix_property",
@@ -322,12 +348,38 @@ void check_all_containers_compatible(const std::string& function_name,
     }
 }
 
-template <typename T, typename DependenciesT>
-sycl::event submit_release(sycl::queue& queue, T* ptr, const DependenciesT& dependencies) {
-    return queue.submit([&](sycl::handler& cgh) {
-        cgh.depends_on(dependencies);
-        cgh.host_task([=]() { delete ptr; });
-    });
+template <typename fpType, typename InternalHandleT>
+void check_can_reset_value_handle(const std::string& function_name,
+                                  InternalHandleT* internal_handle, bool expect_buffer) {
+    if (internal_handle->get_value_type() != detail::get_data_type<fpType>()) {
+        throw oneapi::math::invalid_argument(
+            "sparse_blas", function_name,
+            "Incompatible data types expected " +
+                data_type_to_str(internal_handle->get_value_type()) + " but got " +
+                data_type_to_str(detail::get_data_type<fpType>()));
+    }
+    if (internal_handle->all_use_buffer() != expect_buffer) {
+        throw oneapi::math::invalid_argument(
+            "sparse_blas", function_name, "Cannot change the container type between buffer or USM");
+    }
+}
+
+template <typename fpType, typename intType, typename InternalHandleT>
+void check_can_reset_sparse_handle(const std::string& function_name,
+                                   InternalHandleT* internal_smhandle, bool expect_buffer) {
+    check_can_reset_value_handle<fpType>(function_name, internal_smhandle, expect_buffer);
+    if (internal_smhandle->get_int_type() != detail::get_data_type<intType>()) {
+        throw oneapi::math::invalid_argument(
+            "sparse_blas", function_name,
+            "Incompatible data types expected " +
+                data_type_to_str(internal_smhandle->get_int_type()) + " but got " +
+                data_type_to_str(detail::get_data_type<intType>()));
+    }
+    if (!internal_smhandle->can_be_reset) {
+        throw oneapi::math::unimplemented(
+            "sparse_blas", function_name,
+            "The backend does not support reseting the matrix handle's data after it was used in a computation.");
+    }
 }
 
 } // namespace oneapi::math::sparse::detail

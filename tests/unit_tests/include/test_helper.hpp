@@ -176,6 +176,13 @@
 #define TEST_RUN_PORTFFT_SELECT(q, func, ...)
 #endif
 
+#ifdef ONEMATH_ENABLE_CUSPARSE_BACKEND
+#define TEST_RUN_NVIDIAGPU_CUSPARSE_SELECT(q, func, ...) \
+    func(oneapi::math::backend_selector<oneapi::math::backend::cusparse>{ q }, __VA_ARGS__)
+#else
+#define TEST_RUN_NVIDIAGPU_CUSPARSE_SELECT(q, func, ...)
+#endif
+
 #ifndef __HIPSYCL__
 #define CHECK_HOST_OR_CPU(q) q.get_device().is_cpu()
 #else
@@ -267,6 +274,9 @@
                 q.get_device().get_info<sycl::info::device::vendor_id>()); \
             if (vendor_id == INTEL_ID) {                                   \
                 TEST_RUN_INTELGPU_SELECT(q, func, __VA_ARGS__);            \
+            }                                                              \
+            else if (vendor_id == NVIDIA_ID) {                             \
+                TEST_RUN_NVIDIAGPU_CUSPARSE_SELECT(q, func, __VA_ARGS__);  \
             }                                                              \
         }                                                                  \
     } while (0);

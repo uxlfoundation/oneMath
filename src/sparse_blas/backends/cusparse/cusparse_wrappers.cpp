@@ -17,20 +17,16 @@
 *
 **************************************************************************/
 
-#include "common_onemkl_conversion.hpp"
-#include "sparse_blas/backends/mkl_common/mkl_dispatch.hpp"
-#include "sparse_blas/backends/mkl_common/mkl_handles.hpp"
-#include "sparse_blas/common_op_verification.hpp"
-#include "sparse_blas/macros.hpp"
-#include "sparse_blas/matrix_view_comparison.hpp"
-#include "sparse_blas/sycl_helper.hpp"
+#include "oneapi/math/sparse_blas/types.hpp"
 
-#include "oneapi/math/sparse_blas/detail/mklgpu/onemath_sparse_blas_mklgpu.hpp"
+#include "oneapi/math/sparse_blas/detail/cusparse/onemath_sparse_blas_cusparse.hpp"
 
-#define BACKEND mklgpu
+#include "sparse_blas/function_table.hpp"
 
-#include "sparse_blas/backends/mkl_common/mkl_spmm.cxx"
-#include "sparse_blas/backends/mkl_common/mkl_spmv.cxx"
-#include "sparse_blas/backends/mkl_common/mkl_spsv.cxx"
+#define WRAPPER_VERSION 1
+#define BACKEND         cusparse
 
-#undef BACKEND
+extern "C" sparse_blas_function_table_t onemath_sparse_blas_table = {
+    WRAPPER_VERSION,
+#include "sparse_blas/backends/backend_wrappers.cxx"
+};

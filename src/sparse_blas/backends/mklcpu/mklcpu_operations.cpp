@@ -17,10 +17,13 @@
 *
 **************************************************************************/
 
+#include "common_onemkl_conversion.hpp"
+#include "sparse_blas/backends/mkl_common/mkl_dispatch.hpp"
 #include "sparse_blas/backends/mkl_common/mkl_handles.hpp"
-#include "sparse_blas/backends/mkl_common/mkl_helper.hpp"
+#include "sparse_blas/common_op_verification.hpp"
 #include "sparse_blas/macros.hpp"
 #include "sparse_blas/matrix_view_comparison.hpp"
+#include "sparse_blas/sycl_helper.hpp"
 
 #include "oneapi/math/sparse_blas/detail/mklcpu/onemath_sparse_blas_mklcpu.hpp"
 

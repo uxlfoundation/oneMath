@@ -192,6 +192,11 @@ foreach(domain ${TEST_TARGET_DOMAINS})
     list(APPEND ONEMATH_LIBRARIES_${domain} onemath_dft_portfft)
   endif()
 
+  if(domain STREQUAL "sparse_blas" AND ENABLE_CUSPARSE_BACKEND)
+    add_dependencies(test_main_${domain}_ct onemath_${domain}_cusparse)
+    list(APPEND ONEMATH_LIBRARIES_${domain} onemath_${domain}_cusparse)
+  endif()
+
   target_link_libraries(test_main_${domain}_ct PUBLIC
       gtest
       gtest_main

@@ -36,10 +36,91 @@
     FOR_EACH_FP_AND_INT_TYPE_HELPER(DEFINE_MACRO, std::int32_t, _i32); \
     FOR_EACH_FP_AND_INT_TYPE_HELPER(DEFINE_MACRO, std::int64_t, _i64)
 
+#define INSTANTIATE_DENSE_VECTOR_FUNCS(FP_TYPE, FP_SUFFIX)                             \
+    template void init_dense_vector<FP_TYPE>(                                          \
+        sycl::queue & queue, oneapi::math::sparse::dense_vector_handle_t * p_dvhandle, \
+        std::int64_t size, sycl::buffer<FP_TYPE, 1> val);                              \
+    template void init_dense_vector<FP_TYPE>(                                          \
+        sycl::queue & queue, oneapi::math::sparse::dense_vector_handle_t * p_dvhandle, \
+        std::int64_t size, FP_TYPE* val);                                              \
+    template void set_dense_vector_data<FP_TYPE>(                                      \
+        sycl::queue & queue, oneapi::math::sparse::dense_vector_handle_t dvhandle,     \
+        std::int64_t size, sycl::buffer<FP_TYPE, 1> val);                              \
+    template void set_dense_vector_data<FP_TYPE>(                                      \
+        sycl::queue & queue, oneapi::math::sparse::dense_vector_handle_t dvhandle,     \
+        std::int64_t size, FP_TYPE* val)
+
+#define INSTANTIATE_DENSE_MATRIX_FUNCS(FP_TYPE, FP_SUFFIX)                             \
+    template void init_dense_matrix<FP_TYPE>(                                          \
+        sycl::queue & queue, oneapi::math::sparse::dense_matrix_handle_t * p_dmhandle, \
+        std::int64_t num_rows, std::int64_t num_cols, std::int64_t ld,                 \
+        oneapi::math::layout dense_layout, sycl::buffer<FP_TYPE, 1> val);              \
+    template void init_dense_matrix<FP_TYPE>(                                          \
+        sycl::queue & queue, oneapi::math::sparse::dense_matrix_handle_t * p_dmhandle, \
+        std::int64_t num_rows, std::int64_t num_cols, std::int64_t ld,                 \
+        oneapi::math::layout dense_layout, FP_TYPE* val);                              \
+    template void set_dense_matrix_data<FP_TYPE>(                                      \
+        sycl::queue & queue, oneapi::math::sparse::dense_matrix_handle_t dmhandle,     \
+        std::int64_t num_rows, std::int64_t num_cols, std::int64_t ld,                 \
+        oneapi::math::layout dense_layout, sycl::buffer<FP_TYPE, 1> val);              \
+    template void set_dense_matrix_data<FP_TYPE>(                                      \
+        sycl::queue & queue, oneapi::math::sparse::dense_matrix_handle_t dmhandle,     \
+        std::int64_t num_rows, std::int64_t num_cols, std::int64_t ld,                 \
+        oneapi::math::layout dense_layout, FP_TYPE* val)
+
+#define INSTANTIATE_COO_MATRIX_FUNCS(FP_TYPE, FP_SUFFIX, INT_TYPE, INT_SUFFIX)               \
+    template void init_coo_matrix<FP_TYPE, INT_TYPE>(                                        \
+        sycl::queue & queue, oneapi::math::sparse::matrix_handle_t * p_smhandle,             \
+        std::int64_t num_rows, std::int64_t num_cols, std::int64_t nnz,                      \
+        oneapi::math::index_base index, sycl::buffer<INT_TYPE, 1> row_ind,                   \
+        sycl::buffer<INT_TYPE, 1> col_ind, sycl::buffer<FP_TYPE, 1> val);                    \
+    template void init_coo_matrix<FP_TYPE, INT_TYPE>(                                        \
+        sycl::queue & queue, oneapi::math::sparse::matrix_handle_t * p_smhandle,             \
+        std::int64_t num_rows, std::int64_t num_cols, std::int64_t nnz,                      \
+        oneapi::math::index_base index, INT_TYPE* row_ind, INT_TYPE* col_ind, FP_TYPE* val); \
+    template void set_coo_matrix_data<FP_TYPE, INT_TYPE>(                                    \
+        sycl::queue & queue, oneapi::math::sparse::matrix_handle_t smhandle,                 \
+        std::int64_t num_rows, std::int64_t num_cols, std::int64_t nnz,                      \
+        oneapi::math::index_base index, sycl::buffer<INT_TYPE, 1> row_ind,                   \
+        sycl::buffer<INT_TYPE, 1> col_ind, sycl::buffer<FP_TYPE, 1> val);                    \
+    template void set_coo_matrix_data<FP_TYPE, INT_TYPE>(                                    \
+        sycl::queue & queue, oneapi::math::sparse::matrix_handle_t smhandle,                 \
+        std::int64_t num_rows, std::int64_t num_cols, std::int64_t nnz,                      \
+        oneapi::math::index_base index, INT_TYPE* row_ind, INT_TYPE* col_ind, FP_TYPE* val)
+
+#define INSTANTIATE_CSR_MATRIX_FUNCS(FP_TYPE, FP_SUFFIX, INT_TYPE, INT_SUFFIX)               \
+    template void init_csr_matrix<FP_TYPE, INT_TYPE>(                                        \
+        sycl::queue & queue, oneapi::math::sparse::matrix_handle_t * p_smhandle,             \
+        std::int64_t num_rows, std::int64_t num_cols, std::int64_t nnz,                      \
+        oneapi::math::index_base index, sycl::buffer<INT_TYPE, 1> row_ptr,                   \
+        sycl::buffer<INT_TYPE, 1> col_ind, sycl::buffer<FP_TYPE, 1> val);                    \
+    template void init_csr_matrix<FP_TYPE, INT_TYPE>(                                        \
+        sycl::queue & queue, oneapi::math::sparse::matrix_handle_t * p_smhandle,             \
+        std::int64_t num_rows, std::int64_t num_cols, std::int64_t nnz,                      \
+        oneapi::math::index_base index, INT_TYPE* row_ptr, INT_TYPE* col_ind, FP_TYPE* val); \
+    template void set_csr_matrix_data<FP_TYPE, INT_TYPE>(                                    \
+        sycl::queue & queue, oneapi::math::sparse::matrix_handle_t smhandle,                 \
+        std::int64_t num_rows, std::int64_t num_cols, std::int64_t nnz,                      \
+        oneapi::math::index_base index, sycl::buffer<INT_TYPE, 1> row_ptr,                   \
+        sycl::buffer<INT_TYPE, 1> col_ind, sycl::buffer<FP_TYPE, 1> val);                    \
+    template void set_csr_matrix_data<FP_TYPE, INT_TYPE>(                                    \
+        sycl::queue & queue, oneapi::math::sparse::matrix_handle_t smhandle,                 \
+        std::int64_t num_rows, std::int64_t num_cols, std::int64_t nnz,                      \
+        oneapi::math::index_base index, INT_TYPE* row_ptr, INT_TYPE* col_ind, FP_TYPE* val)
+
 #define THROW_IF_NULLPTR(FUNC_NAME, PTR)                                        \
     if (!(PTR)) {                                                               \
         throw math::uninitialized("sparse_blas", FUNC_NAME,                     \
                                   std::string(#PTR) + " must not be nullptr."); \
     }
+
+#define CHECK_DESCR_MATCH(descr, argument, optimize_func_name)                                    \
+    do {                                                                                          \
+        if (descr->last_optimized_##argument != argument) {                                       \
+            throw math::invalid_argument(                                                         \
+                "sparse_blas", __func__,                                                          \
+                #argument " argument must match with the previous call to " #optimize_func_name); \
+        }                                                                                         \
+    } while (0)
 
 #endif // _ONEMATH_SPARSE_BLAS_MACROS_HPP_

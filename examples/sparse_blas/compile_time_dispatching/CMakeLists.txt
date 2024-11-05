@@ -18,27 +18,24 @@
 #===============================================================================
 
 #Build object from all sources
-set(SPARSE_BLAS_BACKENDS "")
-
-if(ENABLE_MKLCPU_BACKEND)
-  list(APPEND SPARSE_BLAS_BACKENDS "mklcpu")
+set(SPARSE_CT_SOURCES "")
+if(ENABLE_MKLCPU_BACKEND AND ENABLE_CUSPARSE_BACKEND)
+  list(APPEND SPARSE_CT_SOURCES "sparse_blas_spmv_usm_mklcpu_cusparse")
 endif()
 
 include(WarningsUtils)
 
-foreach(backend ${SPARSE_BLAS_BACKENDS})
-  set(EXAMPLE_NAME example_sparse_blas_spmv_usm_${backend})
-  add_executable(${EXAMPLE_NAME} sparse_blas_spmv_usm_${backend}.cpp)
-  target_include_directories(${EXAMPLE_NAME}
+foreach(sparse_ct_source ${SPARSE_CT_SOURCES})
+  add_executable(${sparse_ct_source} ${sparse_ct_source}.cpp)
+  target_include_directories(${sparse_ct_source}
       PUBLIC ${PROJECT_SOURCE_DIR}/examples/include
       PUBLIC ${PROJECT_SOURCE_DIR}/include
       PUBLIC ${CMAKE_BINARY_DIR}/bin
   )
 
-  add_dependencies(${EXAMPLE_NAME} onemath_sparse_blas_${backend})
-  target_link_libraries(${EXAMPLE_NAME} PRIVATE ONEMATH::SYCL::SYCL onemath_sparse_blas_${backend})
+  target_link_libraries(${sparse_ct_source} PRIVATE ONEMATH::SYCL::SYCL onemath_sparse_blas_mklcpu onemath_sparse_blas_cusparse)
 
   # Register example as ctest
-  add_test(NAME sparse_blas/EXAMPLE/CT/sparse_blas_spmv_usm_${backend} COMMAND ${EXAMPLE_NAME})
-endforeach(backend)
+  add_test(NAME sparse_blas/EXAMPLE/CT/${sparse_ct_source} COMMAND ${sparse_ct_source})
+endforeach(sparse_ct_source)
 

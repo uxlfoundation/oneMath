@@ -19,7 +19,9 @@
 
 #include "oneapi/math/sparse_blas/detail/mklcpu/onemath_sparse_blas_mklcpu.hpp"
 
-#include "sparse_blas/backends/mkl_common/mkl_helper.hpp"
+#include "common_onemkl_conversion.hpp"
+
+#include "sparse_blas/backends/mkl_common/mkl_dispatch.hpp"
 #include "sparse_blas/backends/mkl_common/mkl_handles.hpp"
 
 namespace oneapi::math::sparse::mklcpu {

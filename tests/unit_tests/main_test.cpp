@@ -127,7 +127,8 @@ int main(int argc, char** argv) {
 #if !defined(ONEMATH_ENABLE_CUBLAS_BACKEND) && !defined(ONEMATH_ENABLE_CURAND_BACKEND) && \
     !defined(ONEMATH_ENABLE_CUSOLVER_BACKEND) &&                                          \
     !defined(ONEMATH_ENABLE_PORTBLAS_BACKEND_NVIDIA_GPU) &&                               \
-    !defined(ONEMATH_ENABLE_CUFFT_BACKEND) && !defined(ONEMATH_ENABLE_PORTFFT_BACKEND)
+    !defined(ONEMATH_ENABLE_CUFFT_BACKEND) && !defined(ONEMATH_ENABLE_PORTFFT_BACKEND) && \
+    !defined(ONEMATH_ENABLE_CUSPARSE_BACKEND)
                         if (dev.is_gpu() && vendor_id == NVIDIA_ID)
                             continue;
 #endif
