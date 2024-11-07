@@ -69,20 +69,5 @@ public:
     }
 };
 
-namespace blas {
-
-namespace column_major {
-
-#include "mkl_blas_backend.hxx"
-
-}
-
-namespace row_major {
-
-#include "mkl_blas_backend.hxx"
-
-}
-
-} // namespace blas
 } // namespace math
 } // namespace oneapi

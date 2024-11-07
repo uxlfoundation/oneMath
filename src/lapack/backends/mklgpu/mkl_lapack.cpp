@@ -29,7 +29,8 @@
 #include "oneapi/math/types.hpp"
 #include "oneapi/math/lapack/types.hpp"
 #include "oneapi/math/lapack/detail/mklgpu/onemath_lapack_mklgpu.hpp"
-#include "../mkl_common/mkl_lapack_backend.hpp"
+
+#include "common_onemkl_conversion.hpp"
 
 namespace oneapi {
 namespace math {
