@@ -437,7 +437,7 @@ Supported compilers include:
 Backend | Supported Operating System
 :--- | :---
 x86 CPU    | Red Hat Enterprise Linux* 9 (RHEL* 9)
-Intel GPU  | Ubuntu 22.04 LTS
+Intel GPU  | Ubuntu 24.04 LTS
 NVIDIA GPU | Ubuntu 22.04 LTS
 
 #### Windows*
