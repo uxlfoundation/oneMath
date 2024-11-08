@@ -25,7 +25,6 @@
 #endif
 #include <memory>
 #include <thread>
-#include <unordered_map>
 #include "cublas_helper.hpp"
 #include "cublas_handle.hpp"
 namespace oneapi {

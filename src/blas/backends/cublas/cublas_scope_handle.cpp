@@ -33,32 +33,32 @@ namespace cublas {
 thread_local cublas_handle<CUdevice> CublasScopedContextHandler::handle_helper =
     cublas_handle<CUdevice>{};
 
-CublasScopedContextHandler::CublasScopedContextHandler(sycl::queue queue, sycl::interop_handle& ih)
-        : ih(ih) {}
+CublasScopedContextHandler::CublasScopedContextHandler(sycl::interop_handle& ih) : ih(ih) {}
 
 cublasHandle_t CublasScopedContextHandler::get_handle(const sycl::queue& queue) {
     CUdevice device = ih.get_native_device<sycl::backend::ext_oneapi_cuda>();
     CUstream streamId = get_stream(queue);
     cublasStatus_t err;
 
-    if (handle_helper.cublas_handle_mapper_.count(device) > 0) {
-      cublasHandle_t handle = handle_helper.cublas_handle_mapper_[device];
-      cudaStream_t currentStreamId;
-      CUBLAS_ERROR_FUNC(cublasGetStream, err, handle, &currentStreamId);
-      if (currentStreamId != streamId) {
-          CUBLAS_ERROR_FUNC(cublasSetStream, err, handle, streamId);
-      }
-      return handle;
+    auto it = handle_helper.cublas_handle_mapper_.find(device);
+    if (it != handle_helper.cublas_handle_mapper_.end()) {
+        cublasHandle_t nativeHandle = it->second;
+        cudaStream_t currentStreamId;
+        CUBLAS_ERROR_FUNC(cublasGetStream, err, nativeHandle, &currentStreamId);
+        if (currentStreamId != streamId) {
+            CUBLAS_ERROR_FUNC(cublasSetStream, err, nativeHandle, streamId);
+        }
+        return nativeHandle;
     }
 
-    cublasHandle_t handle;
-    CUBLAS_ERROR_FUNC(cublasCreate, err, &handle);
-    CUBLAS_ERROR_FUNC(cublasSetStream, err, handle, streamId);
+    cublasHandle_t nativeHandle;
+    CUBLAS_ERROR_FUNC(cublasCreate, err, &nativeHandle);
+    CUBLAS_ERROR_FUNC(cublasSetStream, err, nativeHandle, streamId);
 
-    auto insert_iter = handle_helper.cublas_handle_mapper_.insert(
-                  std::make_pair(device, handle));
+    auto insert_iter =
+        handle_helper.cublas_handle_mapper_.insert(std::make_pair(device, nativeHandle));
 
-    return handle;
+    return nativeHandle;
 }
 
 CUstream CublasScopedContextHandler::get_stream(const sycl::queue& queue) {

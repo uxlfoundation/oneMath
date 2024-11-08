@@ -24,10 +24,8 @@
 #include <CL/sycl.hpp>
 #endif
 
-#include <atomic>
 #include <memory>
 #include <thread>
-#include <unordered_map>
 #include "cublas_helper.hpp"
 #include "cublas_handle.hpp"
 
@@ -69,7 +67,7 @@ class CublasScopedContextHandler {
     sycl::context get_context(const sycl::queue& queue);
 
 public:
-    CublasScopedContextHandler(sycl::queue queue, sycl::interop_handle& ih);
+    CublasScopedContextHandler(sycl::interop_handle& ih);
 
     /**
    * @brief get_handle: creates the handle by implicitly impose the advice

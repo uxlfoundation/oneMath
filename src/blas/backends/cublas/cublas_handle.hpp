@@ -18,7 +18,6 @@
 **************************************************************************/
 #ifndef CUBLAS_HANDLE_HPP
 #define CUBLAS_HANDLE_HPP
-#include <atomic>
 #include <unordered_map>
 
 namespace oneapi {
@@ -28,26 +27,12 @@ namespace cublas {
 
 template <typename T>
 struct cublas_handle {
-    using handle_container_t = std::unordered_map<T, std::atomic<cublasHandle_t>*>;
+    using handle_container_t = std::unordered_map<T, cublasHandle_t>;
     handle_container_t cublas_handle_mapper_{};
     ~cublas_handle() noexcept(false) {
         for (auto& handle_pair : cublas_handle_mapper_) {
             cublasStatus_t err;
-            if (handle_pair.second != nullptr) {
-                auto handle = handle_pair.second->exchange(nullptr);
-                if (handle != nullptr) {
-                    CUBLAS_ERROR_FUNC(cublasDestroy, err, handle);
-                    handle = nullptr;
-                }
-                else {
-                    // if the handle is nullptr it means the handle was already
-                    // destroyed by the ContextCallback and we're free to delete the
-                    // atomic object.
-                    delete handle_pair.second;
-                }
-
-                handle_pair.second = nullptr;
-            }
+            CUBLAS_ERROR_FUNC(cublasDestroy, err, handle_pair.second);
         }
         cublas_handle_mapper_.clear();
     }
