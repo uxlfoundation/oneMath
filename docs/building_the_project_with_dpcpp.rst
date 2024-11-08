@@ -3,7 +3,7 @@
 Building the Project with DPC++
 ===============================
 
-This page describes building the oneMath with either the Intel(R) oneAPI DPC++
+This page describes building oneMath with either the Intel(R) oneAPI DPC++
 Compiler or open-source oneAPI DPC++ Compiler. For guidance on building the
 project with AdaptiveCpp, see :ref:`building_the_project_with_adaptivecpp`.
 
