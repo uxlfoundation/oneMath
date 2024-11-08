@@ -19,18 +19,27 @@
 #ifndef CUBLAS_HANDLE_HPP
 #define CUBLAS_HANDLE_HPP
 #include <unordered_map>
+#include "cublas_helper.hpp"
 
 namespace oneapi {
 namespace mkl {
 namespace blas {
 namespace cublas {
 
-template <typename T>
 struct cublas_handle {
-    using handle_container_t = std::unordered_map<T, cublasHandle_t>;
+    using handle_container_t = std::unordered_map<CUdevice, cublasHandle_t>;
     handle_container_t cublas_handle_mapper_{};
     ~cublas_handle() noexcept(false) {
+        CUresult err;
+        CUcontext original;
+        CUDA_ERROR_FUNC(cuCtxGetCurrent, err, &original);
         for (auto& handle_pair : cublas_handle_mapper_) {
+            CUcontext desired;
+            CUDA_ERROR_FUNC(cuDevicePrimaryCtxRetain, err, &desired, handle_pair.first);
+            if (original != desired) {
+                // Sets the desired context as the active one for the thread in order to destroy its corresponding cublasHandle_t.
+                CUDA_ERROR_FUNC(cuCtxSetCurrent, err, desired);
+            }
             cublasStatus_t err;
             CUBLAS_ERROR_FUNC(cublasDestroy, err, handle_pair.second);
         }

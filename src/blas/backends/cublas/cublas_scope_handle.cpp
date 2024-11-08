@@ -30,8 +30,7 @@ namespace cublas {
  * takes place if no other element in the container has a key equivalent to
  * the one being emplaced (keys in a map container are unique).
  */
-thread_local cublas_handle<CUdevice> CublasScopedContextHandler::handle_helper =
-    cublas_handle<CUdevice>{};
+thread_local cublas_handle CublasScopedContextHandler::handle_helper = cublas_handle{};
 
 CublasScopedContextHandler::CublasScopedContextHandler(sycl::interop_handle& ih) : ih(ih) {}
 
