@@ -48,13 +48,23 @@ function(add_deprecated_library target_name)
 endfunction()
 
 
-# Due to using the same file name for different headers in this library and in
-# the Intel(R) oneAPI Math Kernel Library, the compiler may not include the
-# expected header. Using `-iquote` lets us include this project's headers when
-# double quotes are used and external headers when angle brackets are used.
-function(target_add_onemath_include target_name)
-  target_compile_options(${target_name}
-    BEFORE PRIVATE -iquote $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+# Due to using the same directory structure and file name for different headers
+# in this library and in the Intel(R) oneAPI Math Kernel Library, the compiler
+# may not include the expected headers.
+# Intel oneMKL include path is set as system include meaning it is always
+# searched last no matter the order the order of the include flag in the command
+# line argument.
+# Using the -iquote flag is not supported on Windows.
+# To avoid confusion the include paths are set up with a different "root" folder
+# i.e.:
+#   * the oneMath include path is `${PROJECT_SOURCE_DIR}/include` and its
+#     deprecated headers can be included using `#include "oneapi/mkl/mkl.hpp"`
+#     for instance.
+#   * the Intel oneMKL include path is `${MKL_INCLUDE}/include/oneapi` and its
+#     headers can be included using `#include "mkl/mkl.hpp"` for instance.
+function(target_add_intel_onemkl_include target_name)
+  target_include_directories(${target_name}
+    PRIVATE ${MKL_INCLUDE}/oneapi
   )
 endfunction()
 

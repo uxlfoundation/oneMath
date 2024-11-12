@@ -23,7 +23,7 @@
 
 // Intel(R) oneMKL headers
 #include <mkl_version.h>
-#include <oneapi/mkl/blas.hpp>
+#include <mkl/blas.hpp>
 
 #include "common_onemkl_conversion.hpp"
 #include "oneapi/math/types.hpp"

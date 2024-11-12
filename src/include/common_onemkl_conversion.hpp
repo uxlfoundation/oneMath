@@ -23,8 +23,8 @@
 // The file is used to convert oneMath types to Intel(R) oneMKL types for all the common types shared across domains.
 // The file assumes that the common types are identical between the 2 libraries, except for their namespace.
 
-#include <oneapi/mkl/exceptions.hpp>
-#include <oneapi/mkl/types.hpp>
+#include <mkl/exceptions.hpp>
+#include <mkl/types.hpp>
 
 #include "oneapi/math/types.hpp"
 #include "oneapi/math/exceptions.hpp"

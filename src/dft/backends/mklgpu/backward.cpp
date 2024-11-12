@@ -34,9 +34,9 @@
 // Intel(R) oneMKL headers
 #include <mkl_version.h>
 #if INTEL_MKL_VERSION < 20250000
-#include <oneapi/mkl/dfti.hpp>
+#include <mkl/dfti.hpp>
 #else
-#include <oneapi/mkl/dft.hpp>
+#include <mkl/dft.hpp>
 #endif
 
 namespace oneapi::math::dft::mklgpu {

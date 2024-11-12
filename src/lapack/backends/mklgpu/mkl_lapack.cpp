@@ -24,7 +24,7 @@
 #endif
 
 // Intel(R) oneMKL header
-#include <oneapi/mkl/lapack.hpp>
+#include <mkl/lapack.hpp>
 
 #include "oneapi/math/types.hpp"
 #include "oneapi/math/lapack/types.hpp"

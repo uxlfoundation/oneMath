@@ -54,6 +54,7 @@ else()
     PRIVATE onemath_warnings
   )
 endif()
+target_add_intel_onemkl_include(${LIB_OBJ})
 
 set_target_properties(${LIB_OBJ} PROPERTIES
   POSITION_INDEPENDENT_CODE ON

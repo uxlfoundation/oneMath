@@ -22,7 +22,7 @@
 
 // Convert oneMath RNG distribution types to Intel(R) oneMKL equivalents
 
-#include <oneapi/mkl/rng.hpp>
+#include <mkl/rng.hpp>
 
 #include "common_onemkl_conversion.hpp"
 #include "oneapi/math/rng/distributions.hpp"

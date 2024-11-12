@@ -28,10 +28,9 @@ add_library(${LIB_OBJ} OBJECT
 )
 add_dependencies(onemath_backend_libs_blas ${LIB_NAME})
 
-target_add_onemath_include(${LIB_OBJ})
-
 target_include_directories(${LIB_OBJ}
-  PRIVATE ${PROJECT_SOURCE_DIR}/src
+  PRIVATE ${PROJECT_SOURCE_DIR}/include
+          ${PROJECT_SOURCE_DIR}/src
           ${PROJECT_SOURCE_DIR}/src/include
           ${CMAKE_BINARY_DIR}/bin
           ${ONEMATH_GENERATED_INCLUDE_PATH}
@@ -44,6 +43,7 @@ if(TARGET MKL::MKL_SYCL::BLAS)
 else()
   target_link_libraries(${LIB_OBJ} PUBLIC ONEMATH::SYCL::SYCL MKL::MKL_DPCPP)
 endif()
+target_add_intel_onemkl_include(${LIB_OBJ})
 
 set_target_properties(${LIB_OBJ} PROPERTIES
   POSITION_INDEPENDENT_CODE ON

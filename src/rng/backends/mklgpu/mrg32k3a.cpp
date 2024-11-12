@@ -26,7 +26,7 @@
 
 // Intel(R) oneMKL headers
 #include <mkl_version.h>
-#include <oneapi/mkl/rng.hpp>
+#include <mkl/rng.hpp>
 
 #include "oneapi/math/rng/detail/engine_impl.hpp"
 #include "oneapi/math/rng/engines.hpp"

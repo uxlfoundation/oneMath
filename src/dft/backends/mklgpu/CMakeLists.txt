@@ -37,10 +37,9 @@ target_include_directories(${LIB_NAME}
   PUBLIC ${ONEMATH_INCLUDE_DIRS}
 )
 
-target_add_onemath_include(${LIB_OBJ})
-
 target_include_directories(${LIB_OBJ}
-  PRIVATE ${PROJECT_SOURCE_DIR}/src
+  PRIVATE ${PROJECT_SOURCE_DIR}/include
+          ${PROJECT_SOURCE_DIR}/src
           ${PROJECT_SOURCE_DIR}/src/include
           ${CMAKE_BINARY_DIR}/bin
           ${ONEMATH_GENERATED_INCLUDE_PATH}
@@ -61,6 +60,7 @@ else()
     PRIVATE onemath_warnings
   )
 endif()
+target_add_intel_onemkl_include(${LIB_OBJ})
 
 set_target_properties(${LIB_OBJ} PROPERTIES
   POSITION_INDEPENDENT_CODE ON

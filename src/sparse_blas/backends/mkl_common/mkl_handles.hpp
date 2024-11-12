@@ -21,7 +21,7 @@
 #define _ONEMATH_SRC_SPARSE_BLAS_BACKENDS_MKL_COMMON_MKL_HANDLES_HPP_
 
 // Intel(R) oneMKL header
-#include <oneapi/mkl/spblas.hpp>
+#include <mkl/spblas.hpp>
 
 #include "sparse_blas/generic_container.hpp"
 #include "sparse_blas/macros.hpp"

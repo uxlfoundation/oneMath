@@ -29,18 +29,11 @@ add_library(${LIB_OBJ} OBJECT
 add_dependencies(onemath_backend_libs_lapack ${LIB_NAME})
 
 target_include_directories(${LIB_OBJ}
-  PRIVATE ${PROJECT_SOURCE_DIR}/src
+  PRIVATE ${PROJECT_SOURCE_DIR}/include
+          ${PROJECT_SOURCE_DIR}/src
           ${PROJECT_SOURCE_DIR}/src/include
           ${CMAKE_BINARY_DIR}/bin
           ${ONEMATH_GENERATED_INCLUDE_PATH}
-)
-
-# Due to using the same file name for different headers in this library and in
-# the Intel(R) oneAPI Math Kernel Library, we force the compiler to follow C++
-# Core Guideline SF.12 using the flag "-iquote" to avoid conflicts and find the
-# correct header.
-target_compile_options(${LIB_OBJ}
-  BEFORE PRIVATE -iquote $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
 )
 
 target_compile_options(${LIB_OBJ} PRIVATE ${ONEMATH_BUILD_COPT})
@@ -50,6 +43,7 @@ if(TARGET MKL::MKL_SYCL::LAPACK)
 else()
   target_link_libraries(${LIB_OBJ} PUBLIC ONEMATH::SYCL::SYCL MKL::MKL_DPCPP)
 endif()
+target_add_intel_onemkl_include(${LIB_OBJ})
 
 set_target_properties(${LIB_OBJ} PROPERTIES
   POSITION_INDEPENDENT_CODE ON
