@@ -35,18 +35,6 @@
 #else
 #include "cublas_scope_handle_hipsycl.hpp"
 
-// After Plugin Interface removal in DPC++ ur.hpp is the new include
-#if __has_include(<sycl/detail/ur.hpp>)
-#include <sycl/detail/ur.hpp>
-#ifndef ONEMATH_PI_INTERFACE_REMOVED
-#define ONEMATH_PI_INTERFACE_REMOVED
-#endif
-#elif __has_include(<sycl/detail/pi.hpp>)
-#include <sycl/detail/pi.hpp>
-#else
-#include <CL/sycl/detail/pi.hpp>
-#endif
-
 namespace sycl {
 using interop_handler = sycl::interop_handle;
 }
@@ -72,7 +60,7 @@ static inline void host_task_internal(H& cgh, sycl::queue queue, F f) {
 #else
     cgh.host_task([f, queue](sycl::interop_handle ih) {
 #endif
-        auto sc = CublasScopedContextHandler(queue, ih);
+        auto sc = CublasScopedContextHandler(ih);
         f(sc);
     });
 }

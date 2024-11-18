@@ -23,32 +23,9 @@
 #else
 #include <CL/sycl.hpp>
 #endif
-#if __has_include(<sycl/context.hpp>)
-#if __SYCL_COMPILER_VERSION <= 20220930
-#include <sycl/backend/cuda.hpp>
-#endif
-#include <sycl/context.hpp>
-#else
-#include <CL/sycl/backend/cuda.hpp>
-#include <CL/sycl/context.hpp>
-#endif
 
-// After Plugin Interface removal in DPC++ ur.hpp is the new include
-#if __has_include(<sycl/detail/ur.hpp>)
-#include <sycl/detail/ur.hpp>
-#ifndef ONEMATH_PI_INTERFACE_REMOVED
-#define ONEMATH_PI_INTERFACE_REMOVED
-#endif
-#elif __has_include(<sycl/detail/pi.hpp>)
-#include <sycl/detail/pi.hpp>
-#else
-#include <CL/sycl/detail/pi.hpp>
-#endif
-
-#include <atomic>
 #include <memory>
 #include <thread>
-#include <unordered_map>
 #include "cublas_helper.hpp"
 #include "cublas_handle.hpp"
 
@@ -84,22 +61,14 @@ the handle must be destroyed when the context goes out of scope. This will bind 
 **/
 
 class CublasScopedContextHandler {
-    CUcontext original_;
-    sycl::context* placedContext_;
-    bool needToRecover_;
     sycl::interop_handle& ih;
-#ifdef ONEMATH_PI_INTERFACE_REMOVED
-    static thread_local cublas_handle<ur_context_handle_t> handle_helper;
-#else
-    static thread_local cublas_handle<pi_context> handle_helper;
-#endif
+    static thread_local cublas_handle handle_helper;
     CUstream get_stream(const sycl::queue& queue);
     sycl::context get_context(const sycl::queue& queue);
 
 public:
-    CublasScopedContextHandler(sycl::queue queue, sycl::interop_handle& ih);
+    CublasScopedContextHandler(sycl::interop_handle& ih);
 
-    ~CublasScopedContextHandler() noexcept(false);
     /**
    * @brief get_handle: creates the handle by implicitly impose the advice
    * given by nvidia for creating a cublas_handle. (e.g. one cuStream per device
