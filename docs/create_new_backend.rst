@@ -38,13 +38,13 @@ If there is no need for multiple wrappers only ``<domain>`` and ``<3rd-party lib
 For each new backend library, you should create the following two header files:
 
 * Header file with a declaration of entry points to the new third-party library wrappers
-* Compiler-time dispatching interface (see `oneMKL Usage Models <../README.md#supported-usage-models>`_) for new third-party libraries
+* Compile-time dispatching interface (see `oneMKL Usage Models <../README.md#supported-usage-models>`_) for new third-party libraries
 
 **Header File Example**: command to generate the header file with a declaration of BLAS entry points in the oneapi::mkl::newlib namespace 
 
 .. code-block:: bash
 
-    python scripts/generate_backend_api.py include/oneapi/mkl/blas.hpp \                                  # Base header file
+    python scripts/generate_backend_api.py include/oneapi/mkl/blas.hxx \                                  # Base header file
                                            include/oneapi/mkl/blas/detail/newlib/onemkl_blas_newlib.hpp \ # Output header file
                                            oneapi::mkl::newlib                                            # Wrappers namespace
 
@@ -61,9 +61,12 @@ Code snippet of the generated header file ``include/oneapi/mkl/blas/detail/newli
 
 
 
-**Compile-time Dispatching Interface Example**: command to generate the compile-time dispatching interface template instantiations for ``newlib`` and supported device ``newdevice``
+**Compile-time Dispatching Interface Example**: commands to generate the compile-time dispatching interface template instantiations for ``newlib`` and supported device ``newdevice``
 
 .. code-block:: bash
+
+    python scripts/generate_ct_templates.py include/oneapi/mkl/blas.hxx \                                  # Base header file
+                                            include/oneapi/mkl/blas/detail/blas_ct_templates.hpp           # Output header file
 
     python scripts/generate_ct_instant.py   include/oneapi/mkl/blas/detail/blas_ct_templates.hpp \         # Base header file
                                             include/oneapi/mkl/blas/detail/newlib/blas_ct.hpp \            # Output header file
@@ -71,6 +74,17 @@ Code snippet of the generated header file ``include/oneapi/mkl/blas/detail/newli
                                             newlib \                                                       # Library name
                                             newdevice \                                                    # Backend name
                                             oneapi::mkl::newlib                                            # Wrappers namespace
+
+Code snippet of the generated template header file ``include/oneapi/mkl/blas/detail/blas_ct_templates.hpp``
+
+.. code-block:: cpp
+
+    #include "oneapi/mkl/types.hpp"
+    #include "oneapi/mkl/detail/backends.hpp"
+
+    template <oneapi::mkl::backend backend>
+    static inline void asum(sycl::queue &queue, std::int64_t n, sycl::buffer<std::complex<float>, 1> &x,
+                            std::int64_t incx, sycl::buffer<float, 1> &result);
 
 Code snippet of the generated header file ``include/oneapi/mkl/blas/detail/newlib/blas_ct.hpp``
 
@@ -124,6 +138,7 @@ Below you can see structure of oneMKL top-level include directory:
                         <other backends>/
                 <other domains>/
 
+Note: The actual structure may be different than what is shown here. To ensure your addition of a new backend is correct, verify that the above scripts correctly generate sample header files from the new files you have added.
 
 To integrate the new third-party library to a oneMKL header-based part, following files from this structure should be updated:
 
@@ -402,7 +417,7 @@ Here is the list of files that should be created/updated to integrate the new wr
         +       PUBLIC ONEMKL::NEWLIB::NEWLIB
             )
 
-Now you can build the backend library for ``newlib`` to make sure the third-party library integration was completed successfully (for more information, see `Build with cmake <../README.md#building-with-cmake>`_)
+Now you can build the backend library for ``newlib`` to make sure the third-party library integration was completed successfully (for more information, see `Building the Project with DPC++ <https://oneapi-src.github.io/oneMKL/building_the_project_with_dpcpp.html>`_)
 
 .. code-block:: bash
 
@@ -499,7 +514,7 @@ Update the following files to enable the new third-party library for unit tests:
      +      devices.push_back(sycl::device(sycl::host_selector()));
      +  #endif
 
-Now you can build and run functional testing for enabled third-party libraries (for more information see `Build with cmake <../README.md#building-with-cmake>`_).
+Now you can build and run functional testing for enabled third-party libraries (for more information see `Building the Project with DPC++ <https://oneapi-src.github.io/oneMKL/building_the_project_with_dpcpp.html>`_).
 
 .. code-block:: bash
 
