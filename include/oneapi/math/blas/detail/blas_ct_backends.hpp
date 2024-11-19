@@ -51,7 +51,7 @@ namespace column_major {
 #define BACKEND netlib
 #include "blas_ct_backends.hxx"
 #undef BACKEND
-#define BACKEND portblas
+#define BACKEND generic
 #include "blas_ct_backends.hxx"
 #undef BACKEND
 
@@ -73,7 +73,7 @@ namespace row_major {
 #define BACKEND netlib
 #include "blas_ct_backends.hxx"
 #undef BACKEND
-#define BACKEND portblas
+#define BACKEND generic
 #include "blas_ct_backends.hxx"
 #undef BACKEND
 

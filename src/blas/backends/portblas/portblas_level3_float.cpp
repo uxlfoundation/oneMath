@@ -30,7 +30,7 @@
 namespace oneapi {
 namespace math {
 namespace blas {
-namespace portblas {
+namespace generic {
 
 using real_t = float;
 
@@ -56,7 +56,7 @@ constexpr bool is_column_major() {
 #undef ROW_MAJOR
 
 } // namespace row_major
-} // namespace portblas
+} // namespace generic
 } // namespace blas
 } // namespace math
 } // namespace oneapi

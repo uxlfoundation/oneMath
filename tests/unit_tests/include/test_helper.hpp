@@ -141,7 +141,7 @@
 
 #ifdef ONEMATH_ENABLE_PORTBLAS_BACKEND
 #define TEST_RUN_PORTBLAS_SELECT(q, func, ...) \
-    func(oneapi::math::backend_selector<oneapi::math::backend::portblas>{ q }, __VA_ARGS__)
+    func(oneapi::math::backend_selector<oneapi::math::backend::generic>{ q }, __VA_ARGS__)
 #else
 #define TEST_RUN_PORTBLAS_SELECT(q, func, ...)
 #endif

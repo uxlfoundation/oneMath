@@ -42,7 +42,7 @@ using oneapi::math::diag;
 using oneapi::math::offset;
 
 namespace blas {
-namespace portblas {
+namespace generic {
 namespace column_major {
 
 #include "oneapi/math/blas/detail/onemath_blas_backends.hxx"
@@ -53,7 +53,7 @@ namespace row_major {
 #include "oneapi/math/blas/detail/onemath_blas_backends.hxx"
 
 } //namespace row_major
-} // namespace portblas
+} // namespace generic
 } // namespace blas
 } // namespace math
 } // namespace oneapi

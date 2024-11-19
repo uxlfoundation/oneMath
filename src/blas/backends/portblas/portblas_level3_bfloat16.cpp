@@ -29,7 +29,7 @@
 namespace oneapi {
 namespace math {
 namespace blas {
-namespace portblas {
+namespace generic {
 namespace column_major {
 
 // BUFFER
@@ -72,7 +72,7 @@ sycl::event gemm(sycl::queue& queue, oneapi::math::transpose transa, oneapi::mat
 }
 
 } // namespace row_major
-} // namespace portblas
+} // namespace generic
 } // namespace blas
 } // namespace math
 } // namespace oneapi

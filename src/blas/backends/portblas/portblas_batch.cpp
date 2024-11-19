@@ -30,7 +30,7 @@
 namespace oneapi {
 namespace math {
 namespace blas {
-namespace portblas {
+namespace generic {
 namespace column_major {
 
 #define COLUMN_MAJOR
@@ -51,7 +51,7 @@ constexpr bool is_column_major() {
 #undef ROW_MAJOR
 
 } // namespace row_major
-} // namespace portblas
+} // namespace generic
 } // namespace blas
 } // namespace math
 } // namespace oneapi

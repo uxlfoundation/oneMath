@@ -30,7 +30,7 @@
 namespace oneapi {
 namespace math {
 namespace blas {
-namespace portblas {
+namespace generic {
 
 namespace detail {
 // portBLAS handle type. Constructed with sycl::queue.
@@ -231,7 +231,7 @@ struct throw_if_unsupported_by_device {
         throw unimplemented("blas", "portBLAS function");                         \
     }
 
-} // namespace portblas
+} // namespace generic
 } // namespace blas
 } // namespace math
 } // namespace oneapi

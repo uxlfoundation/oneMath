@@ -30,7 +30,7 @@
 namespace oneapi {
 namespace math {
 namespace blas {
-namespace portblas {
+namespace generic {
 
 using real_t = double;
 #define ENABLE_MIXED_PRECISION_WITH_DOUBLE
@@ -56,7 +56,7 @@ constexpr bool is_column_major() {
 
 #undef ENABLE_MIXED_PRECISION_WITH_DOUBLE
 } // namespace row_major
-} // namespace portblas
+} // namespace generic
 } // namespace blas
 } // namespace math
 } // namespace oneapi

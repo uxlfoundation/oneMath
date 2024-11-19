@@ -10,7 +10,7 @@
 
 extern "C" ONEMATH_EXPORT blas_function_table_t onemath_blas_table = {
     WRAPPER_VERSION,
-#define BACKEND portblas
+#define BACKEND generic
 #define MAJOR   column_major
 #include "../backend_wrappers.cxx"
 #undef MAJOR
