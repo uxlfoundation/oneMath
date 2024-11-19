@@ -20,7 +20,7 @@
 #ifndef _PORTBLAS_COMMON_HPP_
 #define _PORTBLAS_COMMON_HPP_
 
-#include "portblas.hpp"
+#include "onemath_sycl_blas.hpp"
 #include "oneapi/math/types.hpp"
 #include "oneapi/math/exceptions.hpp"
 

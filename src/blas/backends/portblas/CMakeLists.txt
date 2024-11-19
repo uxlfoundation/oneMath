@@ -136,9 +136,9 @@ endif()
 
 # If find_package doesn't work, download portBLAS from Github. This is
 # intended to make oneMath easier to use.
-message(STATUS "Looking for portBLAS")
-find_package(PORTBLAS QUIET)
-if (NOT PORTBLAS_FOUND)
+message(STATUS "Looking for oneMATH blas kernels")
+find_package(ONEMATH_SYCL_BLAS QUIET)
+if (NOT ONEMATH_SYCL_BLAS_FOUND)
   message(STATUS "Looking for portBLAS - could not find portBLAS with PORTBLAS_DIR")
   include(FetchContent)
   set(INSTALL_HEADER_ONLY ON)
@@ -164,8 +164,8 @@ if (NOT PORTBLAS_FOUND)
   message(STATUS "Looking for portBLAS - downloaded")
 
 else()
-  message(STATUS "Looking for portBLAS - found")
-  add_library(portblas ALIAS PORTBLAS::portblas)
+  message(STATUS "Looking for oneMath blas kernels - found")
+  add_library(onemath_sycl_blas ALIAS ONEMATH_SYCL_BLAS::onemath_sycl_blas)
 endif()
 
 set(SOURCES
@@ -193,7 +193,7 @@ target_include_directories(${LIB_OBJ}
 )
 
 target_compile_options(${LIB_OBJ} PRIVATE ${ONEMATH_BUILD_COPT})
-target_link_libraries(${LIB_OBJ} PUBLIC ONEMATH::SYCL::SYCL portblas)
+target_link_libraries(${LIB_OBJ} PUBLIC ONEMKL::SYCL::SYCL onemath_sycl_blas)
 
 set_target_properties(${LIB_OBJ} PROPERTIES
   POSITION_INDEPENDENT_CODE ON)
