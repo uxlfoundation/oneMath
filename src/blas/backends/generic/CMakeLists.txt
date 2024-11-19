@@ -17,11 +17,11 @@
 #
 #=========================================================================
 
-set(LIB_NAME onemath_blas_portblas)
+set(LIB_NAME onemath_blas_generic)
 set(LIB_OBJ ${LIB_NAME}_obj)
 
-if(NOT DEFINED PORTBLAS_TUNING_TARGET)
-  option(PORTBLAS_TUNING_TARGET "Set a TUNING_TARGET for portBLAS" "")
+if(NOT DEFINED GENERIC_BLAS_TUNING_TARGET)
+  option(GENERIC_BLAS_TUNING_TARGET "Set a TUNING_TARGET for generic backend" "")
 endif()
 
 # Parse compiler flags and return a list of SYCL targets
@@ -33,9 +33,9 @@ function(get_sycl_targets FLAGS)
   set(SYCL_TARGETS ${SYCL_TARGETS} PARENT_SCOPE)
 endfunction(get_sycl_targets)
 
-# portBLAS supports tuning for some device types, but can only be compiled
-# for one at a time currently. Work out which device to tune for based on the
-# DPC++ target triple specified via -fsycl-targets
+# Generic blas backend supports tuning for some device types, but can only be
+# compiled for one at a time currently. Work out which device to tune for based
+# on the DPC++ target triple specified via -fsycl-targets
 if(TARGET ONEMATH::SYCL::SYCL)
   get_target_property(ONEMATH_COMPILE_OPTIONS ONEMATH::SYCL::SYCL INTERFACE_COMPILE_OPTIONS)
 endif()
@@ -46,20 +46,20 @@ if(NUM_TARGETS EQUAL 0)
   list(LENGTH SYCL_TARGETS NUM_TARGETS)
 endif()
 
-if(PORTBLAS_TUNING_TARGET)
+if(GENERIC_BLAS_TUNING_TARGET)
   # Allow the user to manually enable a specific device type 
-  # for tuned portBLAS configurations and sets sycl-target.
-  if(PORTBLAS_TUNING_TARGET STREQUAL "INTEL_CPU")
-    set(ONEMATH_ENABLE_PORTBLAS_BACKEND_INTEL_CPU "ON" CACHE INTERNAL "")
-    set(PORTBLAS_TUNING_TARGET "")
+  # for tuned generic backend configurations and sets sycl-target.
+  if(GENERIC_BLAS_TUNING_TARGET STREQUAL "INTEL_CPU")
+    set(ONEMATH_ENABLE_GENERIC_BLAS_BACKEND_INTEL_CPU "ON" CACHE INTERNAL "")
+    set(GENERIC_BLAS_TUNING_TARGET "")
     target_compile_options(ONEMATH::SYCL::SYCL INTERFACE
       -fsycl-targets=spir64_x86_64 -fsycl-unnamed-lambda)
     target_link_options(ONEMATH::SYCL::SYCL INTERFACE
       -fsycl-targets=spir64_x86_64)
-  elseif(PORTBLAS_TUNING_TARGET STREQUAL "INTEL_GPU")
-    set(ONEMATH_ENABLE_PORTBLAS_BACKEND_INTEL_GPU "ON" CACHE INTERNAL "")
-  elseif(PORTBLAS_TUNING_TARGET STREQUAL "AMD_GPU")
-    set(ONEMATH_ENABLE_PORTBLAS_BACKEND_AMD_GPU "ON" CACHE INTERNAL "")
+  elseif(GENERIC_BLAS_TUNING_TARGET STREQUAL "INTEL_GPU")
+    set(ONEMATH_ENABLE_GENERIC_BLAS_BACKEND_INTEL_GPU "ON" CACHE INTERNAL "")
+  elseif(GENERIC_BLAS_TUNING_TARGET STREQUAL "AMD_GPU")
+    set(ONEMATH_ENABLE_GENERIC_BLAS_BACKEND_AMD_GPU "ON" CACHE INTERNAL "")
     if (is_dpcpp)
       target_compile_options(ONEMATH::SYCL::SYCL INTERFACE
         -fsycl-targets=amdgcn-amd-amdhsa -fsycl-unnamed-lambda
@@ -68,11 +68,11 @@ if(PORTBLAS_TUNING_TARGET)
         -fsycl-targets=amdgcn-amd-amdhsa -Xsycl-target-backend --offload-arch=${HIP_TARGETS})
     else()
       message(WARNING "Compiler is not supported."
-      " Unable to automatically set the required flags for the target '${PORTBLAS_TUNING_TARGET}'."
+      " Unable to automatically set the required flags for the target '${GENERIC_BLAS_TUNING_TARGET}'."
       " Compilation may fail.")
     endif()
-  elseif(PORTBLAS_TUNING_TARGET STREQUAL "NVIDIA_GPU")
-    set(ONEMATH_ENABLE_PORTBLAS_BACKEND_NVIDIA_GPU "ON" CACHE INTERNAL "")
+  elseif(GENERIC_BLAS_TUNING_TARGET STREQUAL "NVIDIA_GPU")
+    set(ONEMATH_ENABLE_GENERIC_BLAS_BACKEND_NVIDIA_GPU "ON" CACHE INTERNAL "")
     if (is_dpcpp)
       target_compile_options(ONEMATH::SYCL::SYCL INTERFACE
         -fsycl-targets=nvptx64-nvidia-cuda -fsycl-unnamed-lambda)
@@ -86,73 +86,73 @@ if(PORTBLAS_TUNING_TARGET)
       endif()
     else()
       message(WARNING "Compiler is not supported."
-      " Unable to automatically set the required flags for the target '${PORTBLAS_TUNING_TARGET}'."
+      " Unable to automatically set the required flags for the target '${GENERIC_BLAS_TUNING_TARGET}'."
       " Compilation may fail.")
     endif()
   else()
-    message(FATAL_ERROR "Unsupported PORTBLAS_TUNING_TARGET: '${PORTBLAS_TUNING_TARGET}'")
+    message(FATAL_ERROR "Unsupported GENERIC_BLAS_TUNING_TARGET: '${GENERIC_BLAS_TUNING_TARGET}'")
   endif()
 elseif(NUM_TARGETS EQUAL 0)
-  # Enable portBLAS backend for all devices types
-  set(ONEMATH_ENABLE_PORTBLAS_BACKEND_INTEL_CPU "ON" CACHE INTERNAL "")
-  set(ONEMATH_ENABLE_PORTBLAS_BACKEND_INTEL_GPU "ON" CACHE INTERNAL "")
-  set(ONEMATH_ENABLE_PORTBLAS_BACKEND_AMD_GPU "ON" CACHE INTERNAL "")
-  set(ONEMATH_ENABLE_PORTBLAS_BACKEND_NVIDIA_GPU "ON" CACHE INTERNAL "")
+  # Enable generic backend for all devices types
+  set(ONEMATH_ENABLE_GENERIC_BLAS_BACKEND_INTEL_CPU "ON" CACHE INTERNAL "")
+  set(ONEMATH_ENABLE_GENERIC_BLAS_BACKEND_INTEL_GPU "ON" CACHE INTERNAL "")
+  set(ONEMATH_ENABLE_GENERIC_BLAS_BACKEND_AMD_GPU "ON" CACHE INTERNAL "")
+  set(ONEMATH_ENABLE_GENERIC_BLAS_BACKEND_NVIDIA_GPU "ON" CACHE INTERNAL "")
 else()
-  # Try to automatically detect the PORTBLAS_TUNING_TARGET
+  # Try to automatically detect the GENERIC_BLAS_TUNING_TARGET
   foreach(SYCL_TARGET IN LISTS SYCL_TARGETS)
     if(SYCL_TARGETS MATCHES "^intel_gpu" OR SYCL_TARGETS MATCHES "^spir64_gen")
-      set(ONEMATH_ENABLE_PORTBLAS_BACKEND_INTEL_GPU "ON" CACHE INTERNAL "")
-      set(PORTBLAS_TUNING_TARGET "INTEL_GPU")
+      set(ONEMATH_ENABLE_GENERIC_BLAS_BACKEND_INTEL_GPU "ON" CACHE INTERNAL "")
+      set(GENERIC_BLAS_TUNING_TARGET "INTEL_GPU")
     elseif(SYCL_TARGETS MATCHES "^spir64_x86_64")
-      set(ONEMATH_ENABLE_PORTBLAS_BACKEND_INTEL_CPU "ON" CACHE INTERNAL "")
+      set(ONEMATH_ENABLE_GENERIC_BLAS_BACKEND_INTEL_CPU "ON" CACHE INTERNAL "")
     elseif(SYCL_TARGETS MATCHES "^spir64")
-      set(ONEMATH_ENABLE_PORTBLAS_BACKEND_INTEL_CPU "ON" CACHE INTERNAL "")
-      set(ONEMATH_ENABLE_PORTBLAS_BACKEND_INTEL_GPU "ON" CACHE INTERNAL "")
-      set(PORTBLAS_TUNING_TARGET "INTEL_GPU")
+      set(ONEMATH_ENABLE_GENERIC_BLAS_BACKEND_INTEL_CPU "ON" CACHE INTERNAL "")
+      set(ONEMATH_ENABLE_GENERIC_BLAS_BACKEND_INTEL_GPU "ON" CACHE INTERNAL "")
+      set(GENERIC_BLAS_TUNING_TARGET "INTEL_GPU")
     elseif(SYCL_TARGETS MATCHES "^amd_gpu" OR SYCL_TARGETS MATCHES "-amd-")
-      set(ONEMATH_ENABLE_PORTBLAS_BACKEND_AMD_GPU "ON" CACHE INTERNAL "")
-      set(PORTBLAS_TUNING_TARGET "AMD_GPU")
+      set(ONEMATH_ENABLE_GENERIC_BLAS_BACKEND_AMD_GPU "ON" CACHE INTERNAL "")
+      set(GENERIC_BLAS_TUNING_TARGET "AMD_GPU")
     elseif(SYCL_TARGETS MATCHES "^nvidia_gpu" OR SYCL_TARGETS MATCHES "-nvidia-")
-      set(ONEMATH_ENABLE_PORTBLAS_BACKEND_NVIDIA_GPU "ON" CACHE INTERNAL "")
-      set(PORTBLAS_TUNING_TARGET "NVIDIA_GPU")
+      set(ONEMATH_ENABLE_GENERIC_BLAS_BACKEND_NVIDIA_GPU "ON" CACHE INTERNAL "")
+      set(GENERIC_BLAS_TUNING_TARGET "NVIDIA_GPU")
     endif()
   endforeach()
-  # Currently portBLAS can only be tuned for one type of device.
+  # Currently generic can only be tuned for one type of device.
   if(NUM_TARGETS GREATER 1)
-    set(PORTBLAS_TUNING_TARGET "")
+    set(GENERIC_BLAS_TUNING_TARGET "")
   endif()
 endif()
 
-if(PORTBLAS_TUNING_TARGET STREQUAL "INTEL_GPU")
-  message(STATUS "Tuning portBLAS for Intel GPU devices")
-elseif(PORTBLAS_TUNING_TARGET STREQUAL "AMD_GPU")
-  message(STATUS "Tuning portBLAS for AMD GPU devices")
-elseif(PORTBLAS_TUNING_TARGET STREQUAL "NVIDIA_GPU")
-  message(STATUS "Tuning portBLAS for Nvidia GPU devices")
+if(GENERIC_BLAS_TUNING_TARGET STREQUAL "INTEL_GPU")
+  message(STATUS "Tuning generic BLAS for Intel GPU devices")
+elseif(GENERIC_BLAS_TUNING_TARGET STREQUAL "AMD_GPU")
+  message(STATUS "Tuning generic BLAS for AMD GPU devices")
+elseif(GENERIC_BLAS_TUNING_TARGET STREQUAL "NVIDIA_GPU")
+  message(STATUS "Tuning generic BLAS for Nvidia GPU devices")
 else()
-  message(STATUS "portBLAS is not tuned for any device which can impact performance")
+  message(STATUS "generic BLAS is not tuned for any device which can impact performance")
 endif()
 
-# If find_package doesn't work, download portBLAS from Github. This is
+# If find_package doesn't work, download onemath_sycl_blas from Github. This is
 # intended to make oneMath easier to use.
 message(STATUS "Looking for oneMATH blas kernels")
 find_package(ONEMATH_SYCL_BLAS QUIET)
 if (NOT ONEMATH_SYCL_BLAS_FOUND)
-  message(STATUS "Looking for portBLAS - could not find portBLAS with PORTBLAS_DIR")
+  message(STATUS "Looking for onemath_sycl_blas for generic backend - could not find onemath_sycl_blas with ONEMATH_SYCL_BLAS_DIR")
   include(FetchContent)
   set(INSTALL_HEADER_ONLY ON)
   set(BLAS_BUILD_SAMPLES OFF)
   set(BLAS_ENABLE_BENCHMARK OFF)
   set(BLAS_ENABLE_TESTING OFF)
   set(ENABLE_EXPRESSION_TESTS OFF)
-  if(NOT PORTBLAS_TUNING_TARGET)
-    set(PORTBLAS_TUNING_TARGET "DEFAULT")
+  if(NOT GENERIC_BLAS_TUNING_TARGET)
+    set(GENERIC_BLAS_TUNING_TARGET "DEFAULT")
   endif()
-  # Following variable TUNING_TARGET will be used in portBLAS internal configuration
-  set(TUNING_TARGET ${PORTBLAS_TUNING_TARGET})
+  # Following variable TUNING_TARGET will be used in generic blas internal configuration
+  set(TUNING_TARGET ${GENERIC_BLAS_TUNING_TARGET})
   set(BLAS_ENABLE_COMPLEX ON)
-  # Set the policy to forward variables to portBLAS configure step
+  # Set the policy to forward variables to generic blas configure step
   set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
   set(FETCHCONTENT_BASE_DIR "${CMAKE_BINARY_DIR}/deps")
   FetchContent_Declare(
@@ -160,8 +160,8 @@ if (NOT ONEMATH_SYCL_BLAS_FOUND)
     GIT_REPOSITORY https://github.com/codeplaysoftware/portBLAS
     GIT_TAG        main
   )
-  FetchContent_MakeAvailable(portblas)
-  message(STATUS "Looking for portBLAS - downloaded")
+  FetchContent_MakeAvailable(onemath_sycl_blas)
+  message(STATUS "Looking for onemath_sycl_blas - downloaded")
 
 else()
   message(STATUS "Looking for oneMath blas kernels - found")
@@ -193,7 +193,7 @@ target_include_directories(${LIB_OBJ}
 )
 
 target_compile_options(${LIB_OBJ} PRIVATE ${ONEMATH_BUILD_COPT})
-target_link_libraries(${LIB_OBJ} PUBLIC ONEMKL::SYCL::SYCL onemath_sycl_blas)
+target_link_libraries(${LIB_OBJ} PUBLIC ONEMATH::SYCL::SYCL onemath_sycl_blas)
 
 set_target_properties(${LIB_OBJ} PROPERTIES
   POSITION_INDEPENDENT_CODE ON)
