@@ -30,7 +30,7 @@
 
 #include "oneapi/math/types.hpp"
 #include "oneapi/math/detail/backend_selector.hpp"
-#include "oneapi/math/blas/detail/portblas/onemath_blas_portblas.hpp"
+#include "oneapi/math/blas/detail/generic/onemath_blas_generic.hpp"
 #include "oneapi/math/blas/detail/blas_ct_backends.hpp"
 
 namespace oneapi {

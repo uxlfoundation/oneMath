@@ -48,15 +48,15 @@ using sycl_complex_t = sycl::ext::oneapi::experimental::complex<ElemT>;
  *  types.
  * 
  *  @tparam InputT is the oneMath type.
- *  portblas_type<InputT>::type should be the equivalent portBLAS type.
+ *  generic_type<InputT>::type should be the equivalent portBLAS type.
 **/
 template <typename InputT>
-struct portblas_type;
+struct generic_type;
 
-#define DEF_PORTBLAS_TYPE(onemath_t, portblas_t) \
+#define DEF_PORTBLAS_TYPE(onemath_t, generic_t) \
     template <>                                  \
-    struct portblas_type<onemath_t> {            \
-        using type = portblas_t;                 \
+    struct generic_type<onemath_t> {            \
+        using type = generic_t;                 \
     };
 
 DEF_PORTBLAS_TYPE(sycl::queue, handle_t)
@@ -76,28 +76,28 @@ DEF_PORTBLAS_TYPE(::blas::gemm_batch_type_t, ::blas::gemm_batch_type_t)
 #undef DEF_PORTBLAS_TYPE
 
 template <typename ElemT>
-struct portblas_type<sycl::buffer<ElemT, 1>> {
+struct generic_type<sycl::buffer<ElemT, 1>> {
     using type = buffer_iterator_t<ElemT>;
 };
 
 template <typename ElemT>
-struct portblas_type<ElemT*> {
+struct generic_type<ElemT*> {
     using type = ElemT*;
 };
 
 // USM Complex
 template <typename ElemT>
-struct portblas_type<std::complex<ElemT>*> {
+struct generic_type<std::complex<ElemT>*> {
     using type = sycl_complex_t<ElemT>*;
 };
 
 template <typename ElemT>
-struct portblas_type<const std::complex<ElemT>*> {
+struct generic_type<const std::complex<ElemT>*> {
     using type = const sycl_complex_t<ElemT>*;
 };
 
 template <>
-struct portblas_type<std::vector<sycl::event>> {
+struct generic_type<std::vector<sycl::event>> {
     using type = std::vector<sycl::event>;
 };
 
@@ -108,12 +108,12 @@ struct portblas_type<std::vector<sycl::event>> {
  *  @return The portBLAS value with appropriate type.
 **/
 template <typename InputT>
-inline typename portblas_type<InputT>::type convert_to_portblas_type(InputT& input) {
-    return typename portblas_type<InputT>::type(input);
+inline typename generic_type<InputT>::type convert_to_generic_type(InputT& input) {
+    return typename generic_type<InputT>::type(input);
 }
 
 template <>
-inline char convert_to_portblas_type<oneapi::math::transpose>(oneapi::math::transpose& trans) {
+inline char convert_to_generic_type<oneapi::math::transpose>(oneapi::math::transpose& trans) {
     if (trans == oneapi::math::transpose::nontrans) {
         return 'n';
     }
@@ -126,7 +126,7 @@ inline char convert_to_portblas_type<oneapi::math::transpose>(oneapi::math::tran
 }
 
 template <>
-inline char convert_to_portblas_type<oneapi::math::uplo>(oneapi::math::uplo& upper_lower) {
+inline char convert_to_generic_type<oneapi::math::uplo>(oneapi::math::uplo& upper_lower) {
     if (upper_lower == oneapi::math::uplo::upper) {
         return 'u';
     }
@@ -136,7 +136,7 @@ inline char convert_to_portblas_type<oneapi::math::uplo>(oneapi::math::uplo& upp
 }
 
 template <>
-inline char convert_to_portblas_type<oneapi::math::side>(oneapi::math::side& left_right) {
+inline char convert_to_generic_type<oneapi::math::side>(oneapi::math::side& left_right) {
     if (left_right == oneapi::math::side::left) {
         return 'l';
     }
@@ -146,7 +146,7 @@ inline char convert_to_portblas_type<oneapi::math::side>(oneapi::math::side& lef
 }
 
 template <>
-inline char convert_to_portblas_type<oneapi::math::diag>(oneapi::math::diag& unit_diag) {
+inline char convert_to_generic_type<oneapi::math::diag>(oneapi::math::diag& unit_diag) {
     if (unit_diag == oneapi::math::diag::unit) {
         return 'u';
     }
@@ -156,8 +156,8 @@ inline char convert_to_portblas_type<oneapi::math::diag>(oneapi::math::diag& uni
 }
 
 template <typename... ArgT>
-inline auto convert_to_portblas_type(ArgT... args) {
-    return std::make_tuple(convert_to_portblas_type(args)...);
+inline auto convert_to_generic_type(ArgT... args) {
+    return std::make_tuple(convert_to_generic_type(args)...);
 }
 
 /** Throw an unsupported_device exception if a certain argument type is found in
@@ -195,7 +195,7 @@ struct throw_if_unsupported_by_device {
             " portBLAS function requiring fp64 support", __VA_ARGS__);                          \
         detail::throw_if_unsupported_by_device<sycl::buffer<sycl::half>, sycl::aspect::fp16>{}( \
             " portBLAS function requiring fp16 support", __VA_ARGS__);                          \
-        auto args = detail::convert_to_portblas_type(__VA_ARGS__);                              \
+        auto args = detail::convert_to_generic_type(__VA_ARGS__);                              \
         auto fn = [](auto&&... targs) {                                                         \
             portBLASFunc(std::forward<decltype(targs)>(targs)...);                              \
         };                                                                                      \
@@ -210,15 +210,15 @@ struct throw_if_unsupported_by_device {
         throw unimplemented("blas", "portBLAS function");                                       \
     }
 
-#define CALL_PORTBLAS_USM_FN(portblasFunc, ...)                                   \
+#define CALL_PORTBLAS_USM_FN(genericFunc, ...)                                   \
     if constexpr (is_column_major()) {                                            \
         detail::throw_if_unsupported_by_device<double, sycl::aspect::fp64>{}(     \
             " portBLAS function requiring fp64 support", __VA_ARGS__);            \
         detail::throw_if_unsupported_by_device<sycl::half, sycl::aspect::fp16>{}( \
             " portBLAS function requiring fp16 support", __VA_ARGS__);            \
-        auto args = detail::convert_to_portblas_type(__VA_ARGS__);                \
+        auto args = detail::convert_to_generic_type(__VA_ARGS__);                \
         auto fn = [](auto&&... targs) {                                           \
-            return portblasFunc(std::forward<decltype(targs)>(targs)...).back();  \
+            return genericFunc(std::forward<decltype(targs)>(targs)...).back();  \
         };                                                                        \
         try {                                                                     \
             return std::apply(fn, args);                                          \

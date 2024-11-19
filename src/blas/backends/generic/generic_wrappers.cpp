@@ -4,7 +4,7 @@
 
 #include "blas/function_table.hpp"
 
-#include "oneapi/math/blas/detail/portblas/onemath_blas_portblas.hpp"
+#include "oneapi/math/blas/detail/generic/onemath_blas_generic.hpp"
 
 #define WRAPPER_VERSION 1
 

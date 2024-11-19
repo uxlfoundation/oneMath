@@ -41,5 +41,5 @@ if(ENABLE_ROCBLAS_BACKEND AND UNIX)
 endif()
 
 if(ENABLE_PORTBLAS_BACKEND AND UNIX)
-  add_subdirectory(portblas)
+  add_subdirectory(generic)
 endif()

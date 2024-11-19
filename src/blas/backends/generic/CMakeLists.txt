@@ -169,12 +169,12 @@ else()
 endif()
 
 set(SOURCES
-  portblas_level1_double.cpp portblas_level1_float.cpp
-  portblas_level2_double.cpp portblas_level2_float.cpp
-  portblas_level3_double.cpp portblas_level3_float.cpp
-  portblas_level3_half.cpp portblas_level3_bfloat16.cpp
-  portblas_batch.cpp
-  $<$<BOOL:${BUILD_SHARED_LIBS}>: portblas_wrappers.cpp>)
+  generic_level1_double.cpp generic_level1_float.cpp
+  generic_level2_double.cpp generic_level2_float.cpp
+  generic_level3_double.cpp generic_level3_float.cpp
+  generic_level3_half.cpp generic_level3_bfloat16.cpp
+  generic_batch.cpp
+  $<$<BOOL:${BUILD_SHARED_LIBS}>: generic_wrappers.cpp>)
 add_library(${LIB_NAME})
 add_deprecated_library(${LIB_NAME})
 add_library(${LIB_OBJ} OBJECT ${SOURCES})
