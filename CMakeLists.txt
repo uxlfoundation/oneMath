@@ -45,7 +45,7 @@ endif()
 option(ENABLE_CUBLAS_BACKEND "Enable the cuBLAS backend for the BLAS interface" OFF)
 option(ENABLE_ROCBLAS_BACKEND "Enable the rocBLAS backend for the BLAS interface" OFF)
 option(ENABLE_NETLIB_BACKEND "Enable the Netlib backend for the BLAS interface" OFF)
-option(ENABLE_PORTBLAS_BACKEND "Enable the portBLAS backend for the BLAS interface. Cannot be used with other BLAS backends." OFF)
+option(ENABLE_GENERIC_BLAS_BACKEND "Enable the portBLAS backend for the BLAS interface. Cannot be used with other BLAS backends." OFF)
 
 # rand
 option(ENABLE_CURAND_BACKEND "Enable the cuRAND backend for the RNG interface" OFF)
@@ -82,7 +82,7 @@ if(ENABLE_MKLCPU_BACKEND
         OR ENABLE_CUBLAS_BACKEND
         OR ENABLE_ROCBLAS_BACKEND
         OR ENABLE_NETLIB_BACKEND
-        OR ENABLE_PORTBLAS_BACKEND)
+        OR ENABLE_GENERIC_BLAS_BACKEND)
   list(APPEND DOMAINS_LIST "blas")
 endif()
 if(ENABLE_MKLCPU_BACKEND
@@ -110,13 +110,13 @@ if(ENABLE_MKLCPU_BACKEND
   list(APPEND DOMAINS_LIST "sparse_blas")
 endif()
 
-if(ENABLE_PORTBLAS_BACKEND
+if(ENABLE_GENERIC_BLAS_BACKEND
 	AND (ENABLE_MKLCPU_BACKEND
 		OR ENABLE_MKLGPU_BACKEND
 		OR ENABLE_CUBLAS_BACKEND
 		OR ENABLE_ROCBLAS_BACKEND
 		OR ENABLE_NETLIB_BACKEND))
-	message(FATAL_ERROR "ENABLE_PORTBLAS_BACKEND cannot be enabled at the same time as other BLAS backends.")
+	message(FATAL_ERROR "ENABLE_GENERIC_BLAS_BACKEND cannot be enabled at the same time as other BLAS backends.")
 endif()
 
 if (ENABLE_PORTFFT_BACKEND

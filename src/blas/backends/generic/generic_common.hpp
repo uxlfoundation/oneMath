@@ -17,8 +17,8 @@
 * SPDX-License-Identifier: Apache-2.0
 *******************************************************************************/
 
-#ifndef _PORTBLAS_COMMON_HPP_
-#define _PORTBLAS_COMMON_HPP_
+#ifndef _GENERIC_BLAS_COMMON_HPP_
+#define _GENERIC_BLAS_COMMON_HPP_
 
 #include "onemath_sycl_blas.hpp"
 #include "oneapi/math/types.hpp"
@@ -53,27 +53,27 @@ using sycl_complex_t = sycl::ext::oneapi::experimental::complex<ElemT>;
 template <typename InputT>
 struct generic_type;
 
-#define DEF_PORTBLAS_TYPE(onemath_t, generic_t) \
+#define DEF_GENERIC_BLAS_TYPE(onemath_t, generic_t) \
     template <>                                  \
     struct generic_type<onemath_t> {            \
         using type = generic_t;                 \
     };
 
-DEF_PORTBLAS_TYPE(sycl::queue, handle_t)
-DEF_PORTBLAS_TYPE(int64_t, int64_t)
-DEF_PORTBLAS_TYPE(sycl::half, sycl::half)
-DEF_PORTBLAS_TYPE(float, float)
-DEF_PORTBLAS_TYPE(double, double)
-DEF_PORTBLAS_TYPE(oneapi::math::transpose, char)
-DEF_PORTBLAS_TYPE(oneapi::math::uplo, char)
-DEF_PORTBLAS_TYPE(oneapi::math::side, char)
-DEF_PORTBLAS_TYPE(oneapi::math::diag, char)
-DEF_PORTBLAS_TYPE(std::complex<float>, sycl_complex_t<float>)
-DEF_PORTBLAS_TYPE(std::complex<double>, sycl_complex_t<double>)
+DEF_GENERIC_BLAS_TYPE(sycl::queue, handle_t)
+DEF_GENERIC_BLAS_TYPE(int64_t, int64_t)
+DEF_GENERIC_BLAS_TYPE(sycl::half, sycl::half)
+DEF_GENERIC_BLAS_TYPE(float, float)
+DEF_GENERIC_BLAS_TYPE(double, double)
+DEF_GENERIC_BLAS_TYPE(oneapi::math::transpose, char)
+DEF_GENERIC_BLAS_TYPE(oneapi::math::uplo, char)
+DEF_GENERIC_BLAS_TYPE(oneapi::math::side, char)
+DEF_GENERIC_BLAS_TYPE(oneapi::math::diag, char)
+DEF_GENERIC_BLAS_TYPE(std::complex<float>, sycl_complex_t<float>)
+DEF_GENERIC_BLAS_TYPE(std::complex<double>, sycl_complex_t<double>)
 // Passthrough of portBLAS arg types for more complex wrapping.
-DEF_PORTBLAS_TYPE(::blas::gemm_batch_type_t, ::blas::gemm_batch_type_t)
+DEF_GENERIC_BLAS_TYPE(::blas::gemm_batch_type_t, ::blas::gemm_batch_type_t)
 
-#undef DEF_PORTBLAS_TYPE
+#undef DEF_GENERIC_BLAS_TYPE
 
 template <typename ElemT>
 struct generic_type<sycl::buffer<ElemT, 1>> {
@@ -189,7 +189,7 @@ struct throw_if_unsupported_by_device {
 
 } // namespace detail
 
-#define CALL_PORTBLAS_FN(portBLASFunc, ...)                                                     \
+#define CALL_GENERIC_BLAS_FN(portBLASFunc, ...)                                                     \
     if constexpr (is_column_major()) {                                                          \
         detail::throw_if_unsupported_by_device<sycl::buffer<double>, sycl::aspect::fp64>{}(     \
             " portBLAS function requiring fp64 support", __VA_ARGS__);                          \
@@ -210,7 +210,7 @@ struct throw_if_unsupported_by_device {
         throw unimplemented("blas", "portBLAS function");                                       \
     }
 
-#define CALL_PORTBLAS_USM_FN(genericFunc, ...)                                   \
+#define CALL_GENERIC_BLAS_USM_FN(genericFunc, ...)                                   \
     if constexpr (is_column_major()) {                                            \
         detail::throw_if_unsupported_by_device<double, sycl::aspect::fp64>{}(     \
             " portBLAS function requiring fp64 support", __VA_ARGS__);            \
@@ -236,4 +236,4 @@ struct throw_if_unsupported_by_device {
 } // namespace math
 } // namespace oneapi
 
-#endif // _PORTBLAS_COMMON_HPP_
+#endif // _GENERIC_BLAS_COMMON_HPP_

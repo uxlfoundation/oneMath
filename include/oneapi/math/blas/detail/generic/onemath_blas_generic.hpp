@@ -17,8 +17,8 @@
 * SPDX-License-Identifier: Apache-2.0
 *******************************************************************************/
 
-#ifndef _ONEMATH_BLAS_PORTBLAS_HPP_
-#define _ONEMATH_BLAS_PORTBLAS_HPP_
+#ifndef _ONEMATH_BLAS_GENERIC_BLAS_HPP_
+#define _ONEMATH_BLAS_GENERIC_BLAS_HPP_
 
 #if __has_include(<sycl/sycl.hpp>)
 #include <sycl/sycl.hpp>
@@ -58,4 +58,4 @@ namespace row_major {
 } // namespace math
 } // namespace oneapi
 
-#endif // _ONEMATH_BLAS_PORTBLAS_HPP_
+#endif // _ONEMATH_BLAS_GENERIC_BLAS_HPP_

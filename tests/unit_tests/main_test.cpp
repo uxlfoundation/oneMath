@@ -113,20 +113,20 @@ int main(int argc, char** argv) {
                         unique_devices.end()) {
                         unique_devices.insert(dev.get_info<sycl::info::device::name>());
 #if !defined(ONEMATH_ENABLE_MKLCPU_BACKEND) &&             \
-    !defined(ONEMATH_ENABLE_PORTBLAS_BACKEND_INTEL_CPU) && \
+    !defined(ONEMATH_ENABLE_GENERIC_BLAS_BACKEND_INTEL_CPU) && \
     !defined(ONEMATH_ENABLE_PORTFFT_BACKEND) && !defined(ONEMATH_ENABLE_NETLIB_BACKEND)
                         if (dev.is_cpu())
                             continue;
 #endif
 #if !defined(ONEMATH_ENABLE_MKLGPU_BACKEND) &&             \
-    !defined(ONEMATH_ENABLE_PORTBLAS_BACKEND_INTEL_GPU) && \
+    !defined(ONEMATH_ENABLE_GENERIC_BLAS_BACKEND_INTEL_GPU) && \
     !defined(ONEMATH_ENABLE_PORTFFT_BACKEND)
                         if (dev.is_gpu() && vendor_id == INTEL_ID)
                             continue;
 #endif
 #if !defined(ONEMATH_ENABLE_CUBLAS_BACKEND) && !defined(ONEMATH_ENABLE_CURAND_BACKEND) && \
     !defined(ONEMATH_ENABLE_CUSOLVER_BACKEND) &&                                          \
-    !defined(ONEMATH_ENABLE_PORTBLAS_BACKEND_NVIDIA_GPU) &&                               \
+    !defined(ONEMATH_ENABLE_GENERIC_BLAS_BACKEND_NVIDIA_GPU) &&                               \
     !defined(ONEMATH_ENABLE_CUFFT_BACKEND) && !defined(ONEMATH_ENABLE_PORTFFT_BACKEND) && \
     !defined(ONEMATH_ENABLE_CUSPARSE_BACKEND)
                         if (dev.is_gpu() && vendor_id == NVIDIA_ID)
@@ -134,7 +134,7 @@ int main(int argc, char** argv) {
 #endif
 #if !defined(ONEMATH_ENABLE_ROCBLAS_BACKEND) && !defined(ONEMATH_ENABLE_ROCRAND_BACKEND) && \
     !defined(ONEMATH_ENABLE_ROCSOLVER_BACKEND) &&                                           \
-    !defined(ONEMATH_ENABLE_PORTBLAS_BACKEND_AMD_GPU) &&                                    \
+    !defined(ONEMATH_ENABLE_GENERIC_BLAS_BACKEND_AMD_GPU) &&                                    \
     !defined(ONEMATH_ENABLE_ROCFFT_BACKEND) && !defined(ONEMATH_ENABLE_PORTFFT_BACKEND)
                         if (dev.is_gpu() && vendor_id == AMD_ID)
                             continue;

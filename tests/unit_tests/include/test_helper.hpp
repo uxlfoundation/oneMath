@@ -139,11 +139,11 @@
 #define TEST_RUN_AMDGPU_ROCSOLVER_SELECT(q, func, ...)
 #endif
 
-#ifdef ONEMATH_ENABLE_PORTBLAS_BACKEND
-#define TEST_RUN_PORTBLAS_SELECT(q, func, ...) \
+#ifdef ONEMATH_ENABLE_GENERIC_BLAS_BACKEND
+#define TEST_RUN_GENERIC_BLAS_SELECT(q, func, ...) \
     func(oneapi::math::backend_selector<oneapi::math::backend::generic>{ q }, __VA_ARGS__)
 #else
-#define TEST_RUN_PORTBLAS_SELECT(q, func, ...)
+#define TEST_RUN_GENERIC_BLAS_SELECT(q, func, ...)
 #endif
 
 #ifdef ONEMATH_ENABLE_CUFFT_BACKEND
@@ -226,7 +226,7 @@
                 TEST_RUN_AMDGPU_ROCBLAS_SELECT(q, func, __VA_ARGS__);      \
             }                                                              \
         }                                                                  \
-        TEST_RUN_PORTBLAS_SELECT(q, func, __VA_ARGS__);                    \
+        TEST_RUN_GENERIC_BLAS_SELECT(q, func, __VA_ARGS__);                    \
     } while (0);
 
 #define TEST_RUN_RNG_CT_SELECT(q, func, ...)                               \

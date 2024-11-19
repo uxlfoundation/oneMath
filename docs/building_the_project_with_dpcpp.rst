@@ -124,7 +124,7 @@ The most important supported build options are:
    * - ENABLE_MKLCPU_THREAD_TBB
      - True, False
      - True      
-   * - ENABLE_PORTBLAS_BACKEND
+   * - ENABLE_GENERIC_BLAS_BACKEND
      - True, False
      - False      
    * - ENABLE_PORTFFT_BACKEND
@@ -266,7 +266,7 @@ Building for portBLAS
 ---------------------
 
 `portBLAS <https://github.com/codeplaysoftware/portBLAS>`_ is
-enabled by setting ``-DENABLE_PORTBLAS_BACKEND=True``.
+enabled by setting ``-DENABLE_GENERIC_BLAS_BACKEND=True``.
 
 By default, the portBLAS backend is not tuned for any specific device.
 This tuning is required to achieve best performance.
@@ -274,7 +274,7 @@ portBLAS can be tuned for a specific hardware target by adding compiler
 definitions in 2 ways:
 
 #.
-  Manually specify a tuning target with ``-DPORTBLAS_TUNING_TARGET=<target>``.
+  Manually specify a tuning target with ``-DGENERIC_BLAS_TUNING_TARGET=<target>``.
   The list of portBLAS targets can be found
   `here <https://github.com/codeplaysoftware/portBLAS#cmake-options>`_.
   This will automatically set ``-fsycl-targets`` if needed.
@@ -435,7 +435,7 @@ Build oneMath for the BLAS domain on a generic SYCL device:
       -DCMAKE_C_COMPILER=clang \ 
       -DENABLE_MKLCPU_BACKEND=False \ 
       -DENABLE_MKLGPU_BACKEND=False \
-      -DENABLE_PORTBLAS_BACKEND=True
+      -DENABLE_GENERIC_BLAS_BACKEND=True
 
 Note that this is not a tested configuration. This builds oneMath with the
 portBLAS backend only, for a generic SYCL device supported by the Open DPC++

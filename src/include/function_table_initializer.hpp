@@ -67,7 +67,7 @@ public:
     }
 
 private:
-#if defined(ENABLE_PORTBLAS_BACKEND) || defined(ENABLE_PORTFFT_BACKEND)
+#if defined(ENABLE_GENERIC_BLAS_BACKEND) || defined(ENABLE_PORTFFT_BACKEND)
     static constexpr bool is_generic_device_supported = true;
 #else
     static constexpr bool is_generic_device_supported = false;

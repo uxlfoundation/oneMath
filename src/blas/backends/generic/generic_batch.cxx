@@ -118,14 +118,14 @@ void dgmm_batch(sycl::queue& queue, oneapi::math::side left_right, std::int64_t 
 void axpy_batch(sycl::queue& queue, std::int64_t n, float alpha, sycl::buffer<float, 1>& x,
                 std::int64_t incx, std::int64_t stridex, sycl::buffer<float, 1>& y,
                 std::int64_t incy, std::int64_t stridey, std::int64_t batch_size) {
-    CALL_PORTBLAS_FN(::blas::_axpy_batch, queue, n, alpha, x, incx, stridex, y, incy, stridey,
+    CALL_GENERIC_BLAS_FN(::blas::_axpy_batch, queue, n, alpha, x, incx, stridex, y, incy, stridey,
                      batch_size);
 }
 
 void axpy_batch(sycl::queue& queue, std::int64_t n, double alpha, sycl::buffer<double, 1>& x,
                 std::int64_t incx, std::int64_t stridex, sycl::buffer<double, 1>& y,
                 std::int64_t incy, std::int64_t stridey, std::int64_t batch_size) {
-    CALL_PORTBLAS_FN(::blas::_axpy_batch, queue, n, alpha, x, incx, stridex, y, incy, stridey,
+    CALL_GENERIC_BLAS_FN(::blas::_axpy_batch, queue, n, alpha, x, incx, stridex, y, incy, stridey,
                      batch_size);
 }
 
@@ -172,7 +172,7 @@ void gemm_batch(sycl::queue& queue, oneapi::math::transpose transa, oneapi::math
                 sycl::buffer<float, 1>& b, std::int64_t ldb, std::int64_t stride_b, float beta,
                 sycl::buffer<float, 1>& c, std::int64_t ldc, std::int64_t stride_c,
                 std::int64_t batch_size) {
-    CALL_PORTBLAS_FN(::blas::_gemm_strided_batched, queue, transa, transb, m, n, k, alpha, a, lda,
+    CALL_GENERIC_BLAS_FN(::blas::_gemm_strided_batched, queue, transa, transb, m, n, k, alpha, a, lda,
                      stride_a, b, ldb, stride_b, beta, c, ldc, stride_c, batch_size);
 }
 
@@ -182,7 +182,7 @@ void gemm_batch(sycl::queue& queue, oneapi::math::transpose transa, oneapi::math
                 sycl::buffer<double, 1>& b, std::int64_t ldb, std::int64_t stride_b, double beta,
                 sycl::buffer<double, 1>& c, std::int64_t ldc, std::int64_t stride_c,
                 std::int64_t batch_size) {
-    CALL_PORTBLAS_FN(::blas::_gemm_strided_batched, queue, transa, transb, m, n, k, alpha, a, lda,
+    CALL_GENERIC_BLAS_FN(::blas::_gemm_strided_batched, queue, transa, transb, m, n, k, alpha, a, lda,
                      stride_a, b, ldb, stride_b, beta, c, ldc, stride_c, batch_size);
 }
 
@@ -277,7 +277,7 @@ void omatcopy_batch(sycl::queue& queue, oneapi::math::transpose trans, std::int6
                     std::int64_t n, float alpha, sycl::buffer<float, 1>& a, std::int64_t lda,
                     std::int64_t stride_a, sycl::buffer<float, 1>& b, std::int64_t ldb,
                     std::int64_t stride_b, std::int64_t batch_size) {
-    CALL_PORTBLAS_FN(::blas::_omatcopy_batch, queue, trans, m, n, alpha, a, lda, stride_a, b, ldb,
+    CALL_GENERIC_BLAS_FN(::blas::_omatcopy_batch, queue, trans, m, n, alpha, a, lda, stride_a, b, ldb,
                      stride_b, batch_size);
 }
 
@@ -285,7 +285,7 @@ void omatcopy_batch(sycl::queue& queue, oneapi::math::transpose trans, std::int6
                     std::int64_t n, double alpha, sycl::buffer<double, 1>& a, std::int64_t lda,
                     std::int64_t stride_a, sycl::buffer<double, 1>& b, std::int64_t ldb,
                     std::int64_t stride_b, std::int64_t batch_size) {
-    CALL_PORTBLAS_FN(::blas::_omatcopy_batch, queue, trans, m, n, alpha, a, lda, stride_a, b, ldb,
+    CALL_GENERIC_BLAS_FN(::blas::_omatcopy_batch, queue, trans, m, n, alpha, a, lda, stride_a, b, ldb,
                      stride_b, batch_size);
 }
 
@@ -337,7 +337,7 @@ void omatadd_batch(sycl::queue& queue, oneapi::math::transpose transa,
                    sycl::buffer<float, 1>& b, std::int64_t ldb, std::int64_t stride_b,
                    sycl::buffer<float, 1>& c, std::int64_t ldc, std::int64_t stride_c,
                    std::int64_t batch_size) {
-    CALL_PORTBLAS_FN(::blas::_omatadd_batch, queue, transa, transb, m, n, alpha, a, lda, stride_a,
+    CALL_GENERIC_BLAS_FN(::blas::_omatadd_batch, queue, transa, transb, m, n, alpha, a, lda, stride_a,
                      beta, b, ldb, stride_b, c, ldc, stride_c, batch_size);
 }
 
@@ -347,7 +347,7 @@ void omatadd_batch(sycl::queue& queue, oneapi::math::transpose transa,
                    sycl::buffer<double, 1>& b, std::int64_t ldb, std::int64_t stride_b,
                    sycl::buffer<double, 1>& c, std::int64_t ldc, std::int64_t stride_c,
                    std::int64_t batch_size) {
-    CALL_PORTBLAS_FN(::blas::_omatadd_batch, queue, transa, transb, m, n, alpha, a, lda, stride_a,
+    CALL_GENERIC_BLAS_FN(::blas::_omatadd_batch, queue, transa, transb, m, n, alpha, a, lda, stride_a,
                      beta, b, ldb, stride_b, c, ldc, stride_c, batch_size);
 }
 
@@ -605,7 +605,7 @@ sycl::event axpy_batch(sycl::queue& queue, std::int64_t n, float alpha, const fl
                        std::int64_t incx, std::int64_t stridex, float* y, std::int64_t incy,
                        std::int64_t stridey, std::int64_t batch_size,
                        const std::vector<sycl::event>& dependencies) {
-    CALL_PORTBLAS_USM_FN(::blas::_axpy_batch, queue, n, alpha, x, incx, stridex, y, incy, stridey,
+    CALL_GENERIC_BLAS_USM_FN(::blas::_axpy_batch, queue, n, alpha, x, incx, stridex, y, incy, stridey,
                          batch_size, dependencies);
 }
 
@@ -613,7 +613,7 @@ sycl::event axpy_batch(sycl::queue& queue, std::int64_t n, double alpha, const d
                        std::int64_t incx, std::int64_t stridex, double* y, std::int64_t incy,
                        std::int64_t stridey, std::int64_t batch_size,
                        const std::vector<sycl::event>& dependencies) {
-    CALL_PORTBLAS_USM_FN(::blas::_axpy_batch, queue, n, alpha, x, incx, stridex, y, incy, stridey,
+    CALL_GENERIC_BLAS_USM_FN(::blas::_axpy_batch, queue, n, alpha, x, incx, stridex, y, incy, stridey,
                          batch_size, dependencies);
 }
 
@@ -764,7 +764,7 @@ sycl::event gemm_batch(sycl::queue& queue, oneapi::math::transpose transa,
                        std::int64_t stride_b, float beta, float* c, std::int64_t ldc,
                        std::int64_t stride_c, std::int64_t batch_size,
                        const std::vector<sycl::event>& dependencies) {
-    CALL_PORTBLAS_USM_FN(::blas::_gemm_strided_batched, queue, transa, transb, m, n, k, alpha, a,
+    CALL_GENERIC_BLAS_USM_FN(::blas::_gemm_strided_batched, queue, transa, transb, m, n, k, alpha, a,
                          lda, stride_a, b, ldb, stride_b, beta, c, ldc, stride_c, batch_size,
                          dependencies);
 }
@@ -776,7 +776,7 @@ sycl::event gemm_batch(sycl::queue& queue, oneapi::math::transpose transa,
                        std::int64_t stride_b, double beta, double* c, std::int64_t ldc,
                        std::int64_t stride_c, std::int64_t batch_size,
                        const std::vector<sycl::event>& dependencies) {
-    CALL_PORTBLAS_USM_FN(::blas::_gemm_strided_batched, queue, transa, transb, m, n, k, alpha, a,
+    CALL_GENERIC_BLAS_USM_FN(::blas::_gemm_strided_batched, queue, transa, transb, m, n, k, alpha, a,
                          lda, stride_a, b, ldb, stride_b, beta, c, ldc, stride_c, batch_size,
                          dependencies);
 }
@@ -920,7 +920,7 @@ sycl::event omatcopy_batch(sycl::queue& queue, oneapi::math::transpose trans, st
                            std::int64_t n, float alpha, const float* a, std::int64_t lda,
                            std::int64_t stride_a, float* b, std::int64_t ldb, std::int64_t stride_b,
                            std::int64_t batch_size, const std::vector<sycl::event>& dependencies) {
-    CALL_PORTBLAS_USM_FN(::blas::_omatcopy_batch, queue, trans, m, n, alpha, a, lda, stride_a, b,
+    CALL_GENERIC_BLAS_USM_FN(::blas::_omatcopy_batch, queue, trans, m, n, alpha, a, lda, stride_a, b,
                          ldb, stride_b, batch_size, dependencies);
 }
 
@@ -929,7 +929,7 @@ sycl::event omatcopy_batch(sycl::queue& queue, oneapi::math::transpose trans, st
                            std::int64_t stride_a, double* b, std::int64_t ldb,
                            std::int64_t stride_b, std::int64_t batch_size,
                            const std::vector<sycl::event>& dependencies) {
-    CALL_PORTBLAS_USM_FN(::blas::_omatcopy_batch, queue, trans, m, n, alpha, a, lda, stride_a, b,
+    CALL_GENERIC_BLAS_USM_FN(::blas::_omatcopy_batch, queue, trans, m, n, alpha, a, lda, stride_a, b,
                          ldb, stride_b, batch_size, dependencies);
 }
 
@@ -983,7 +983,7 @@ sycl::event omatadd_batch(sycl::queue& queue, oneapi::math::transpose transa,
                           float beta, const float* b, std::int64_t ldb, std::int64_t stride_b,
                           float* c, std::int64_t ldc, std::int64_t stride_c,
                           std::int64_t batch_size, const std::vector<sycl::event>& dependencies) {
-    CALL_PORTBLAS_USM_FN(::blas::_omatadd_batch, queue, transa, transb, m, n, alpha, a, lda,
+    CALL_GENERIC_BLAS_USM_FN(::blas::_omatadd_batch, queue, transa, transb, m, n, alpha, a, lda,
                          stride_a, beta, b, ldb, stride_b, c, ldc, stride_c, batch_size,
                          dependencies);
 }
@@ -994,7 +994,7 @@ sycl::event omatadd_batch(sycl::queue& queue, oneapi::math::transpose transa,
                           double beta, const double* b, std::int64_t ldb, std::int64_t stride_b,
                           double* c, std::int64_t ldc, std::int64_t stride_c,
                           std::int64_t batch_size, const std::vector<sycl::event>& dependencies) {
-    CALL_PORTBLAS_USM_FN(::blas::_omatadd_batch, queue, transa, transb, m, n, alpha, a, lda,
+    CALL_GENERIC_BLAS_USM_FN(::blas::_omatadd_batch, queue, transa, transb, m, n, alpha, a, lda,
                          stride_a, beta, b, ldb, stride_b, c, ldc, stride_c, batch_size,
                          dependencies);
 }
