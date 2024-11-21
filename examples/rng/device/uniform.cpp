@@ -109,7 +109,7 @@ int run_example(sycl::queue& queue) {
 
     int err = 0;
     Type res_host;
-    for (int i = 0; i < n; i++) {
+    for (std::size_t i = 0; i < n; i++) {
         res_host = oneapi::mkl::rng::device::generate(distr, engine);
         if (res_host != r_dev[i]) {
             std::cout << "error in " << i << " element " << res_host << " " << r_dev[i]

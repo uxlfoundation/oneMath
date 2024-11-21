@@ -35,7 +35,7 @@ auto get_multi_ptr(T acc) {
 #else
     return acc.get_pointer();
 #endif
-};
+}
 
 template <typename T, typename std::enable_if<!has_member_code_meta<T>::value>::type* = nullptr>
 auto get_multi_ptr(T acc) {
@@ -45,6 +45,6 @@ auto get_multi_ptr(T acc) {
 #else
     return acc.get_pointer();
 #endif
-};
+}
 
 #endif // _RNG_EXAMPLE_HELPER_HPP__

@@ -140,7 +140,6 @@ protected:
                     return generate_single_int<FpType, OutType>(engine);
 
                 if constexpr (EngineType::vec_size == 1) {
-                    std::uint32_t res_1, res_2;
                     std::uint64_t res_64, leftover;
 
                     generate_leftover<EngineType>(
@@ -270,7 +269,6 @@ protected:
                     return res;
                 }
 
-                std::uint32_t res_1, res_2;
                 std::uint64_t res_64, leftover;
 
                 generate_leftover<EngineType>(

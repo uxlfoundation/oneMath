@@ -364,9 +364,8 @@ protected:
                     flInv = RealType(1.0) / (q_ + flW);
                     flTmp[0] = flKoef1 * flInv;
                     flTmp[1] = flU1 * flU1 * flU2;
-                    for (int i = 0; i < 2; i++) {
-                        flTmp[i] = ln_wrapper(flTmp[i]);
-                    }
+                    flTmp[0] = ln_wrapper(flTmp[0]);
+                    flTmp[1] = ln_wrapper(flTmp[1]);
 
                     if (flKoef1 * flTmp[0] + flKoef3 * flV - log4<RealType>() >= flTmp[1]) {
                         z[i] = flW * flInv;
