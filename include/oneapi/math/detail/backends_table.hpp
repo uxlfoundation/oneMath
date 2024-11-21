@@ -54,7 +54,7 @@ static std::map<domain, std::map<device, std::vector<const char*>>> libraries = 
               LIB_NAME("blas_netlib"),
 #endif
 #ifdef ONEMATH_ENABLE_GENERIC_BLAS_BACKEND_INTEL_CPU
-              LIB_NAME("blas_portblas"),
+              LIB_NAME("blas_generic"),
 #endif
           } },
         { device::intelgpu,
@@ -63,7 +63,7 @@ static std::map<domain, std::map<device, std::vector<const char*>>> libraries = 
               LIB_NAME("blas_mklgpu"),
 #endif
 #ifdef ONEMATH_ENABLE_GENERIC_BLAS_BACKEND_INTEL_GPU
-              LIB_NAME("blas_portblas"),
+              LIB_NAME("blas_generic"),
 #endif
           } },
         { device::amdgpu,
@@ -72,7 +72,7 @@ static std::map<domain, std::map<device, std::vector<const char*>>> libraries = 
               LIB_NAME("blas_rocblas"),
 #endif
 #ifdef ONEMATH_ENABLE_GENERIC_BLAS_BACKEND_AMD_GPU
-              LIB_NAME("blas_portblas"),
+              LIB_NAME("blas_generic"),
 #endif
           } },
         { device::nvidiagpu,
@@ -81,7 +81,7 @@ static std::map<domain, std::map<device, std::vector<const char*>>> libraries = 
               LIB_NAME("blas_cublas"),
 #endif
 #ifdef ONEMATH_ENABLE_GENERIC_BLAS_BACKEND_NVIDIA_GPU
-              LIB_NAME("blas_portblas"),
+              LIB_NAME("blas_generic"),
 #endif
           } },
         { device::generic_device,

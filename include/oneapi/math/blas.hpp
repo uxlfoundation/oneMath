@@ -49,8 +49,8 @@
 #ifdef ONEMATH_ENABLE_NETLIB_BACKEND
 #include "oneapi/math/blas/detail/netlib/blas_ct.hpp"
 #endif
-#ifdef ONEMATH_ENABLE_PORTBLAS_BACKEND
-#include "oneapi/math/blas/detail/portblas/blas_ct.hpp"
+#ifdef ONEMATH_ENABLE_GENERIC_BLAS_BACKEND
+#include "oneapi/math/blas/detail/generic/blas_ct.hpp"
 #endif
 
 namespace oneapi {
