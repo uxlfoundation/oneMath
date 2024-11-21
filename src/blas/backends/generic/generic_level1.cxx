@@ -58,7 +58,7 @@ void asum(sycl::queue& queue, std::int64_t n, sycl::buffer<std::complex<real_t>,
 
 void asum(sycl::queue& queue, std::int64_t n, sycl::buffer<real_t, 1>& x, std::int64_t incx,
           sycl::buffer<real_t, 1>& result) {
-    // portBLAS asum implementation requires that result is initialized to zero
+    // Generic BLAS asum implementation requires that result is initialized to zero
     // before performing the computation.
     queue.submit([&](sycl::handler& cgh) {
         auto result_acc = result.template get_access<sycl::access::mode::write>(cgh);
@@ -101,7 +101,7 @@ void copy(sycl::queue& queue, std::int64_t n, sycl::buffer<std::complex<real_t>,
 
 void dot(sycl::queue& queue, std::int64_t n, sycl::buffer<real_t, 1>& x, std::int64_t incx,
          sycl::buffer<real_t, 1>& y, std::int64_t incy, sycl::buffer<real_t, 1>& result) {
-    // portBLAS dot implementation requires that result is initialized to zero
+    // Generic BLAS dot implementation requires that result is initialized to zero
     // before performing the computation.
     queue.submit([&](sycl::handler& cgh) {
         auto result_acc = result.template get_access<sycl::access::mode::write>(cgh);
@@ -120,7 +120,7 @@ void dot(sycl::queue& queue, std::int64_t n, sycl::buffer<float, 1>& x, std::int
 void sdsdot(sycl::queue& queue, std::int64_t n, real_t sb, sycl::buffer<real_t, 1>& x,
             std::int64_t incx, sycl::buffer<real_t, 1>& y, std::int64_t incy,
             sycl::buffer<real_t, 1>& result) {
-    // portBLAS sdsdot implementation requires that result is initialized to zero
+    // Generic BLAS sdsdot implementation requires that result is initialized to zero
     // before performing the computation.
     queue.submit([&](sycl::handler& cgh) {
         auto result_acc = result.template get_access<sycl::access::mode::write>(cgh);
@@ -136,7 +136,7 @@ void nrm2(sycl::queue& queue, std::int64_t n, sycl::buffer<std::complex<real_t>,
 
 void nrm2(sycl::queue& queue, std::int64_t n, sycl::buffer<real_t, 1>& x, std::int64_t incx,
           sycl::buffer<real_t, 1>& result) {
-    // portBLAS nrm2 implementation requires that result is initialized to zero
+    // Generic BLAS nrm2 implementation requires that result is initialized to zero
     // before performing the computation.
     queue.submit([&](sycl::handler& cgh) {
         auto result_acc = result.template get_access<sycl::access::mode::write>(cgh);
@@ -245,7 +245,7 @@ sycl::event asum(sycl::queue& queue, std::int64_t n, const std::complex<real_t>*
 
 sycl::event asum(sycl::queue& queue, std::int64_t n, const real_t* x, std::int64_t incx,
                  real_t* result, const std::vector<sycl::event>& dependencies) {
-    // portBLAS asum implementation requires result to be initializes to zero
+    // Generic BLAS asum implementation requires result to be initializes to zero
     // before starting the computation.
     auto init_res_val = queue.submit(
         [&](sycl::handler& cgh) { cgh.single_task([=]() { result[0] = real_t(0); }); });
@@ -293,7 +293,7 @@ sycl::event copy(sycl::queue& queue, std::int64_t n, const std::complex<real_t>*
 sycl::event dot(sycl::queue& queue, std::int64_t n, const real_t* x, std::int64_t incx,
                 const real_t* y, std::int64_t incy, real_t* result,
                 const std::vector<sycl::event>& dependencies) {
-    // portBLAS dot implementation requires result to be initializes to zero
+    // Generic BLAS dot implementation requires result to be initializes to zero
     // before starting the computation.
     auto init_res_val = queue.submit(
         [&](sycl::handler& cgh) { cgh.single_task([=]() { result[0] = real_t(0); }); });
@@ -313,7 +313,7 @@ sycl::event dot(sycl::queue& queue, std::int64_t n, const float* x, std::int64_t
 sycl::event sdsdot(sycl::queue& queue, std::int64_t n, real_t sb, const real_t* x,
                    std::int64_t incx, const real_t* y, std::int64_t incy, real_t* result,
                    const std::vector<sycl::event>& dependencies) {
-    // portBLAS sdsdot implementation requires result to be initializes to zero
+    // Generic BLAS sdsdot implementation requires result to be initializes to zero
     // before starting the computation.
     auto init_res_val = queue.submit(
         [&](sycl::handler& cgh) { cgh.single_task([=]() { result[0] = real_t(0); }); });
@@ -329,7 +329,7 @@ sycl::event nrm2(sycl::queue& queue, std::int64_t n, const std::complex<real_t>*
 
 sycl::event nrm2(sycl::queue& queue, std::int64_t n, const real_t* x, std::int64_t incx,
                  real_t* result, const std::vector<sycl::event>& dependencies) {
-    // portBLAS nrm2 implementation requires result to be initializes to zero
+    // Generic BLAS nrm2 implementation requires result to be initializes to zero
     // before starting the computation.
     auto init_res_val = queue.submit(
         [&](sycl::handler& cgh) { cgh.single_task([=]() { result[0] = real_t(0); }); });

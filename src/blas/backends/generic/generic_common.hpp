@@ -33,10 +33,10 @@ namespace blas {
 namespace generic {
 
 namespace detail {
-// portBLAS handle type. Constructed with sycl::queue.
+// onemath_sycl_blas handle type. Constructed with sycl::queue.
 using handle_t = ::blas::SB_Handle;
 
-// portBLAS buffer iterator. Constructed with sycl::buffer<ElemT,1>
+// onemath_sycl_blas buffer iterator. Constructed with sycl::buffer<ElemT,1>
 template <typename ElemT>
 using buffer_iterator_t = ::blas::BufferIterator<ElemT>;
 
@@ -44,11 +44,11 @@ using buffer_iterator_t = ::blas::BufferIterator<ElemT>;
 template <typename ElemT>
 using sycl_complex_t = sycl::ext::oneapi::experimental::complex<ElemT>;
 
-/** A trait for obtaining equivalent portBLAS API types from oneMath API
+/** A trait for obtaining equivalent onemath_sycl_blas API types from oneMath API
  *  types.
  * 
  *  @tparam InputT is the oneMath type.
- *  generic_type<InputT>::type should be the equivalent portBLAS type.
+ *  generic_type<InputT>::type should be the equivalent onemath_sycl_blas type.
 **/
 template <typename InputT>
 struct generic_type;
@@ -70,7 +70,7 @@ DEF_GENERIC_BLAS_TYPE(oneapi::math::side, char)
 DEF_GENERIC_BLAS_TYPE(oneapi::math::diag, char)
 DEF_GENERIC_BLAS_TYPE(std::complex<float>, sycl_complex_t<float>)
 DEF_GENERIC_BLAS_TYPE(std::complex<double>, sycl_complex_t<double>)
-// Passthrough of portBLAS arg types for more complex wrapping.
+// Passthrough of onemath_sycl_blas arg types for more complex wrapping.
 DEF_GENERIC_BLAS_TYPE(::blas::gemm_batch_type_t, ::blas::gemm_batch_type_t)
 
 #undef DEF_GENERIC_BLAS_TYPE
@@ -101,11 +101,11 @@ struct generic_type<std::vector<sycl::event>> {
     using type = std::vector<sycl::event>;
 };
 
-/** Convert a oneMath argument to the type required for portBLAS.
+/** Convert a oneMath argument to the type required for onemath_sycl_blas.
  *  
  *  @tparam InputT The oneMath type.
  *  @param input The value of the oneMath type.
- *  @return The portBLAS value with appropriate type.
+ *  @return The onemath_sycl_blas value with appropriate type.
 **/
 template <typename InputT>
 inline typename generic_type<InputT>::type convert_to_generic_type(InputT& input) {
@@ -189,15 +189,15 @@ struct throw_if_unsupported_by_device {
 
 } // namespace detail
 
-#define CALL_GENERIC_BLAS_FN(portBLASFunc, ...)                                                     \
+#define CALL_GENERIC_BLAS_FN(genericFunc, ...)                                                  \
     if constexpr (is_column_major()) {                                                          \
         detail::throw_if_unsupported_by_device<sycl::buffer<double>, sycl::aspect::fp64>{}(     \
-            " portBLAS function requiring fp64 support", __VA_ARGS__);                          \
+            " generic BLAS function requiring fp64 support", __VA_ARGS__);                      \
         detail::throw_if_unsupported_by_device<sycl::buffer<sycl::half>, sycl::aspect::fp16>{}( \
-            " portBLAS function requiring fp16 support", __VA_ARGS__);                          \
-        auto args = detail::convert_to_generic_type(__VA_ARGS__);                              \
+            " generic BLAS function requiring fp16 support", __VA_ARGS__);                      \
+        auto args = detail::convert_to_generic_type(__VA_ARGS__);                               \
         auto fn = [](auto&&... targs) {                                                         \
-            portBLASFunc(std::forward<decltype(targs)>(targs)...);                              \
+            genericFunc(std::forward<decltype(targs)>(targs)...);                               \
         };                                                                                      \
         try {                                                                                   \
             std::apply(fn, args);                                                               \
@@ -207,16 +207,16 @@ struct throw_if_unsupported_by_device {
         }                                                                                       \
     }                                                                                           \
     else {                                                                                      \
-        throw unimplemented("blas", "portBLAS function");                                       \
+        throw unimplemented("blas", "onemath_sycl_blas function");                              \
     }
 
 #define CALL_GENERIC_BLAS_USM_FN(genericFunc, ...)                                   \
     if constexpr (is_column_major()) {                                            \
         detail::throw_if_unsupported_by_device<double, sycl::aspect::fp64>{}(     \
-            " portBLAS function requiring fp64 support", __VA_ARGS__);            \
+            " generic BLAS function requiring fp64 support", __VA_ARGS__);        \
         detail::throw_if_unsupported_by_device<sycl::half, sycl::aspect::fp16>{}( \
-            " portBLAS function requiring fp16 support", __VA_ARGS__);            \
-        auto args = detail::convert_to_generic_type(__VA_ARGS__);                \
+            " generic BLAS function requiring fp16 support", __VA_ARGS__);        \
+        auto args = detail::convert_to_generic_type(__VA_ARGS__);                 \
         auto fn = [](auto&&... targs) {                                           \
             return genericFunc(std::forward<decltype(targs)>(targs)...).back();  \
         };                                                                        \
@@ -228,7 +228,7 @@ struct throw_if_unsupported_by_device {
         }                                                                         \
     }                                                                             \
     else {                                                                        \
-        throw unimplemented("blas", "portBLAS function");                         \
+        throw unimplemented("blas", "onemath_sycl_blas function");                \
     }
 
 } // namespace generic

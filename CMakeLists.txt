@@ -45,7 +45,7 @@ endif()
 option(ENABLE_CUBLAS_BACKEND "Enable the cuBLAS backend for the BLAS interface" OFF)
 option(ENABLE_ROCBLAS_BACKEND "Enable the rocBLAS backend for the BLAS interface" OFF)
 option(ENABLE_NETLIB_BACKEND "Enable the Netlib backend for the BLAS interface" OFF)
-option(ENABLE_GENERIC_BLAS_BACKEND "Enable the portBLAS backend for the BLAS interface. Cannot be used with other BLAS backends." OFF)
+option(ENABLE_GENERIC_BLAS_BACKEND "Enable the generic BLAS backend for the BLAS interface. Cannot be used with other BLAS backends." OFF)
 
 # rand
 option(ENABLE_CURAND_BACKEND "Enable the cuRAND backend for the RNG interface" OFF)

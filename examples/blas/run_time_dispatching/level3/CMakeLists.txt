@@ -48,7 +48,7 @@ if(ENABLE_GENERIC_BLAS_BACKEND)
       list(APPEND DEVICE_FILTERS "*:gpu")
     endif()
   else()
-    # portBLAS default sycl-target is spir64, testing runtime on both supported
+    # onemath_sycl_blas default sycl-target is spir64, testing runtime on both supported
     # devices.
     list(APPEND DEVICE_FILTERS "opencl:cpu;level_zero:gpu")
   endif()
