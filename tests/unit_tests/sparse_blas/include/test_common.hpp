@@ -76,20 +76,6 @@ inline std::set<oneapi::mkl::sparse::matrix_property> get_default_matrix_propert
 inline std::vector<std::set<oneapi::mkl::sparse::matrix_property>>
 get_all_matrix_properties_combinations(sycl::queue queue, sparse_matrix_format_t format) {
     auto vendor_id = oneapi::mkl::get_device_id(queue);
-    if (vendor_id == oneapi::mkl::device::nvidiagpu && format == sparse_matrix_format_t::COO) {
-        // Ensure all the sets have the sorted or sorted_by_rows properties
-        return { { oneapi::mkl::sparse::matrix_property::sorted },
-                 { oneapi::mkl::sparse::matrix_property::sorted_by_rows,
-                   oneapi::mkl::sparse::matrix_property::symmetric },
-                 { oneapi::mkl::sparse::matrix_property::sorted,
-                   oneapi::mkl::sparse::matrix_property::symmetric } };
-    }
-    if (vendor_id == oneapi::mkl::device::amdgpu &&
-        (format == sparse_matrix_format_t::COO || format == sparse_matrix_format_t::CSR)) {
-        return { { oneapi::mkl::sparse::matrix_property::sorted,
-                   oneapi::mkl::sparse::matrix_property::symmetric } };
-    }
-
     std::vector<std::set<oneapi::mkl::sparse::matrix_property>> properties_combinations{
         { oneapi::mkl::sparse::matrix_property::sorted },
         { oneapi::mkl::sparse::matrix_property::symmetric },
@@ -98,6 +84,10 @@ get_all_matrix_properties_combinations(sycl::queue queue, sparse_matrix_format_t
     };
     if (format == sparse_matrix_format_t::COO) {
         properties_combinations.push_back({ oneapi::mkl::sparse::matrix_property::sorted_by_rows });
+    }
+    if (vendor_id == oneapi::mkl::device::nvidiagpu || vendor_id == oneapi::mkl::device::amdgpu) {
+        // Test without any properties set since for backends for which this is not the default behavior
+        properties_combinations.push_back({});
     }
     return properties_combinations;
 }

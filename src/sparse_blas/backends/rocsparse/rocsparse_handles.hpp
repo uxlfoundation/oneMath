@@ -93,6 +93,12 @@ public:
                 "sparse_blas", function_name,
                 "The backend does not support unsorted COO format. Use `set_matrix_property` to set the property `matrix_property::sorted`");
         }
+        if (this->format == detail::sparse_format::CSR &&
+            !this->has_matrix_property(matrix_property::sorted)) {
+            throw mkl::unimplemented(
+                "sparse_blas", function_name,
+                "The backend does not support unsorted CSR format. Use `set_matrix_property` to set the property `matrix_property::sorted`");
+        }
     }
 
     void mark_used() {
