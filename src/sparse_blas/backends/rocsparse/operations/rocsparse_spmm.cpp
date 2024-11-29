@@ -304,11 +304,11 @@ sycl::event spmm(sycl::queue& queue, oneapi::mkl::transpose opA, oneapi::mkl::tr
     detail::check_valid_spmm(__func__, A_view, A_handle, B_handle, C_handle,
                              is_alpha_host_accessible, is_beta_host_accessible);
     A_handle->mark_used();
-    auto& buffer_size = spmm_descr->temp_buffer_size;
     bool is_in_order_queue = queue.is_in_order();
-    auto compute_functor = [=, &buffer_size](void* workspace_ptr) {
+    auto compute_functor = [=](void* workspace_ptr) {
         auto roc_handle = spmm_descr->roc_handle;
         auto hip_stream = spmm_descr->hip_stream;
+        auto buffer_size = spmm_descr->temp_buffer_size;
         auto roc_a = A_handle->backend_handle;
         auto roc_b = B_handle->backend_handle;
         auto roc_c = C_handle->backend_handle;
@@ -324,7 +324,7 @@ sycl::event spmm(sycl::queue& queue, oneapi::mkl::transpose opA, oneapi::mkl::tr
         detail::synchronize_if_needed(is_in_order_queue, hip_stream);
     };
     // The accessor can only be created if the buffer size is greater than 0
-    if (A_handle->all_use_buffer() && buffer_size > 0) {
+    if (A_handle->all_use_buffer() && spmm_descr->temp_buffer_size > 0) {
         auto functor_buffer = [=](sycl::interop_handle ih,
                                   sycl::accessor<std::uint8_t> workspace_acc) {
             auto workspace_ptr = detail::get_mem(ih, workspace_acc);
