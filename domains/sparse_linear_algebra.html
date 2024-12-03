@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Sparse Linear Algebra &#8212; oneAPI Math Kernel Library Interfaces 0.1 documentation</title>
+    <title>Sparse Linear Algebra &#8212; oneMath 0.1 documentation</title>
   
   
   
@@ -44,8 +44,8 @@
     <link rel="icon" href="../_static/favicons.png"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Integrating a Third-Party Library to oneAPI Math Kernel Library (oneMKL) Interfaces" href="../create_new_backend.html" />
-    <link rel="prev" title="ungqr_batch_scratchpad_size" href="lapack/ungqr_batch_scratchpad_size.html" />
+    <link rel="next" title="Integrating a Third-Party Library to oneAPI Math Library (oneMath)" href="../create_new_backend.html" />
+    <link rel="prev" title="Using oneMath in your project with CMake" href="../using_onemath_with_cmake.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -134,8 +134,8 @@
       
     
     
-    <img src="../_static/oneAPI-rgb-rev-100.png" class="logo__image only-light" alt="oneAPI Math Kernel Library Interfaces 0.1 documentation - Home"/>
-    <script>document.write(`<img src="../_static/oneAPI-rgb-rev-100.png" class="logo__image only-dark" alt="oneAPI Math Kernel Library Interfaces 0.1 documentation - Home"/>`);</script>
+    <img src="../_static/oneAPI-rgb-rev-100.png" class="logo__image only-light" alt="oneMath 0.1 documentation - Home"/>
+    <script>document.write(`<img src="../_static/oneAPI-rgb-rev-100.png" class="logo__image only-dark" alt="oneMath 0.1 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -162,173 +162,12 @@
 <li class="toctree-l1"><a class="reference internal" href="../building_the_project_with_dpcpp.html">Building the Project with DPC++</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../building_the_project_with_adaptivecpp.html">Building the Project with AdaptiveCpp</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../building_and_running_tests.html">Building and Running Tests</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../using_onemkl_with_cmake.html">Using the oneMKL Interfaces in your project with CMake</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../using_onemath_with_cmake.html">Using oneMath in your project with CMake</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Developer Reference</span></p>
 <ul class="current nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../onemkl-datatypes.html">oneMKL Defined Datatypes</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="dense_linear_algebra.html">Dense Linear Algebra</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="matrix-storage.html">Matrix Storage</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="blas/blas.html">BLAS Routines</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="blas/blas-level-1-routines.html">BLAS Level 1 Routines</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="blas/asum.html">asum</a></li>
-<li class="toctree-l4"><a class="reference internal" href="blas/axpy.html">axpy</a></li>
-<li class="toctree-l4"><a class="reference internal" href="blas/copy.html">copy</a></li>
-<li class="toctree-l4"><a class="reference internal" href="blas/dot.html">dot</a></li>
-<li class="toctree-l4"><a class="reference internal" href="blas/sdsdot.html">sdsdot</a></li>
-<li class="toctree-l4"><a class="reference internal" href="blas/dotc.html">dotc</a></li>
-<li class="toctree-l4"><a class="reference internal" href="blas/dotu.html">dotu</a></li>
-<li class="toctree-l4"><a class="reference internal" href="blas/nrm2.html">nrm2</a></li>
-<li class="toctree-l4"><a class="reference internal" href="blas/rot.html">rot</a></li>
-<li class="toctree-l4"><a class="reference internal" href="blas/rotg.html">rotg</a></li>
-<li class="toctree-l4"><a class="reference internal" href="blas/rotm.html">rotm</a></li>
-<li class="toctree-l4"><a class="reference internal" href="blas/rotmg.html">rotmg</a></li>
-<li class="toctree-l4"><a class="reference internal" href="blas/scal.html">scal</a></li>
-<li class="toctree-l4"><a class="reference internal" href="blas/swap.html">swap</a></li>
-<li class="toctree-l4"><a class="reference internal" href="blas/iamax.html">iamax</a></li>
-<li class="toctree-l4"><a class="reference internal" href="blas/iamin.html">iamin</a></li>
-</ul>
-</li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="blas/blas-level-2-routines.html">BLAS Level 2 Routines</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="blas/gbmv.html">gbmv</a></li>
-<li class="toctree-l4"><a class="reference internal" href="blas/gemv.html">gemv</a></li>
-<li class="toctree-l4"><a class="reference internal" href="blas/ger.html">ger</a></li>
-<li class="toctree-l4"><a class="reference internal" href="blas/gerc.html">gerc</a></li>
-<li class="toctree-l4"><a class="reference internal" href="blas/geru.html">geru</a></li>
-<li class="toctree-l4"><a class="reference internal" href="blas/hbmv.html">hbmv</a></li>
-<li class="toctree-l4"><a class="reference internal" href="blas/hemv.html">hemv</a></li>
-<li class="toctree-l4"><a class="reference internal" href="blas/her.html">her</a></li>
-<li class="toctree-l4"><a class="reference internal" href="blas/her2.html">her2</a></li>
-<li class="toctree-l4"><a class="reference internal" href="blas/hpmv.html">hpmv</a></li>
-<li class="toctree-l4"><a class="reference internal" href="blas/hpr.html">hpr</a></li>
-<li class="toctree-l4"><a class="reference internal" href="blas/hpr2.html">hpr2</a></li>
-<li class="toctree-l4"><a class="reference internal" href="blas/sbmv.html">sbmv</a></li>
-<li class="toctree-l4"><a class="reference internal" href="blas/spmv.html">spmv</a></li>
-<li class="toctree-l4"><a class="reference internal" href="blas/spr.html">spr</a></li>
-<li class="toctree-l4"><a class="reference internal" href="blas/spr2.html">spr2</a></li>
-<li class="toctree-l4"><a class="reference internal" href="blas/symv.html">symv</a></li>
-<li class="toctree-l4"><a class="reference internal" href="blas/syr.html">syr</a></li>
-<li class="toctree-l4"><a class="reference internal" href="blas/syr2.html">syr2</a></li>
-<li class="toctree-l4"><a class="reference internal" href="blas/tbmv.html">tbmv</a></li>
-<li class="toctree-l4"><a class="reference internal" href="blas/tbsv.html">tbsv</a></li>
-<li class="toctree-l4"><a class="reference internal" href="blas/tpmv.html">tpmv</a></li>
-<li class="toctree-l4"><a class="reference internal" href="blas/tpsv.html">tpsv</a></li>
-<li class="toctree-l4"><a class="reference internal" href="blas/trmv.html">trmv</a></li>
-<li class="toctree-l4"><a class="reference internal" href="blas/trsv.html">trsv</a></li>
-</ul>
-</li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="blas/blas-level-3-routines.html">BLAS Level 3 Routines</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="blas/gemm.html">gemm</a></li>
-<li class="toctree-l4"><a class="reference internal" href="blas/hemm.html">hemm</a></li>
-<li class="toctree-l4"><a class="reference internal" href="blas/herk.html">herk</a></li>
-<li class="toctree-l4"><a class="reference internal" href="blas/her2k.html">her2k</a></li>
-<li class="toctree-l4"><a class="reference internal" href="blas/symm.html">symm</a></li>
-<li class="toctree-l4"><a class="reference internal" href="blas/syrk.html">syrk</a></li>
-<li class="toctree-l4"><a class="reference internal" href="blas/syr2k.html">syr2k</a></li>
-<li class="toctree-l4"><a class="reference internal" href="blas/trmm.html">trmm</a></li>
-<li class="toctree-l4"><a class="reference internal" href="blas/trsm.html">trsm</a></li>
-</ul>
-</li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="blas/blas-like-extensions.html">BLAS-like Extensions</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="blas/axpy_batch.html">axpy_batch</a></li>
-<li class="toctree-l4"><a class="reference internal" href="blas/axpby.html">axpby</a></li>
-<li class="toctree-l4"><a class="reference internal" href="blas/copy_batch.html">copy_batch</a></li>
-<li class="toctree-l4"><a class="reference internal" href="blas/dgmm_batch.html">dgmm_batch</a></li>
-<li class="toctree-l4"><a class="reference internal" href="blas/gemm_batch.html">gemm_batch</a></li>
-<li class="toctree-l4"><a class="reference internal" href="blas/gemv_batch.html">gemv_batch</a></li>
-<li class="toctree-l4"><a class="reference internal" href="blas/syrk_batch.html">syrk_batch</a></li>
-<li class="toctree-l4"><a class="reference internal" href="blas/trsm_batch.html">trsm_batch</a></li>
-<li class="toctree-l4"><a class="reference internal" href="blas/gemmt.html">gemmt</a></li>
-<li class="toctree-l4"><a class="reference internal" href="blas/gemm_bias.html">gemm_bias</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="lapack/lapack.html">LAPACK Routines</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-7"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="lapack/geqrf.html">geqrf</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/geqrf_scratchpad_size.html">geqrf_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/gerqf.html">gerqf</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/gerqf_scratchpad_size.html">gerqf_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/getrf.html">getrf</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/getrf_scratchpad_size.html">getrf_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/getri.html">getri</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/getri_scratchpad_size.html">getri_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/getrs.html">getrs</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/getrs_scratchpad_size.html">getrs_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/hetrf.html">hetrf</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/hetrf_scratchpad_size.html">hetrf_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/orgqr.html">orgqr</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/orgqr_scratchpad_size.html">orgqr_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/ormqr.html">ormqr</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/ormqr_scratchpad_size.html">ormqr_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/ormrq.html">ormrq</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/ormrq_scratchpad_size.html">ormrq_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/potrf.html">potrf</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/potrf_scratchpad_size.html">potrf_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/potri.html">potri</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/potri_scratchpad_size.html">potri_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/potrs.html">potrs</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/potrs_scratchpad_size.html">potrs_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/sytrf.html">sytrf</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/sytrf_scratchpad_size.html">sytrf_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/trtrs.html">trtrs</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/trtrs_scratchpad_size.html">trtrs_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/ungqr.html">ungqr</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/ungqr_scratchpad_size.html">ungqr_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/unmqr.html">unmqr</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/unmqr_scratchpad_size.html">unmqr_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/unmrq.html">unmrq</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/unmrq_scratchpad_size.html">unmrq_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/gebrd.html">gebrd</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/gebrd_scratchpad_size.html">gebrd_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/gesvd.html">gesvd</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/gesvd_scratchpad_size.html">gesvd_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/heevd.html">heevd</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/heevd_scratchpad_size.html">heevd_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/hegvd.html">hegvd</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/hegvd_scratchpad_size.html">hegvd_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/hetrd.html">hetrd</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/hetrd_scratchpad_size.html">hetrd_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/orgbr.html">orgbr</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/orgbr_scratchpad_size.html">orgbr_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/orgtr.html">orgtr</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/orgtr_scratchpad_size.html">orgtr_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/ormtr.html">ormtr</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/ormtr_scratchpad_size.html">ormtr_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/syevd.html">syevd</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/syevd_scratchpad_size.html">syevd_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/sygvd.html">sygvd</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/sygvd_scratchpad_size.html">sygvd_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/sytrd.html">sytrd</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/sytrd_scratchpad_size.html">sytrd_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/ungbr.html">ungbr</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/ungbr_scratchpad_size.html">ungbr_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/ungtr.html">ungtr</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/ungtr_scratchpad_size.html">ungtr_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/unmtr.html">unmtr</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/unmtr_scratchpad_size.html">unmtr_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/geqrf_batch.html">geqrf_batch</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/geqrf_batch_scratchpad_size.html">geqrf_batch_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/getrf_batch.html">getrf_batch</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/getrf_batch_scratchpad_size.html">getrf_batch_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/getri_batch.html">getri_batch</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/getri_batch_scratchpad_size.html">getri_batch_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/getrs_batch.html">getrs_batch</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/getrs_batch_scratchpad_size.html">getrs_batch_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/orgqr_batch.html">orgqr_batch</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/orgqr_batch_scratchpad_size.html">orgqr_batch_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/potrf_batch.html">potrf_batch</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/potrf_batch_scratchpad_size.html">potrf_batch_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/potrs_batch.html">potrs_batch</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/potrs_batch_scratchpad_size.html">potrs_batch_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/ungqr_batch.html">ungqr_batch</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lapack/ungqr_batch_scratchpad_size.html">ungqr_batch_scratchpad_size</a></li>
-</ul>
-</li>
-</ul>
-</li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Sparse Linear Algebra</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../create_new_backend.html">Integrating a Third-Party Library to oneAPI Math Kernel Library (oneMKL) Interfaces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../create_new_backend.html">Integrating a Third-Party Library to oneAPI Math Library (oneMath)</a></li>
 </ul>
 
     </div>
@@ -383,7 +222,7 @@
       
       
       
-      <li><a href="https://github.com/oneapi-src/oneMKL/edit/develop/docs/domains/sparse_linear_algebra.rst" target="_blank"
+      <li><a href="https://github.com/uxlfoundation/oneMath/edit/develop/docs/domains/sparse_linear_algebra.rst" target="_blank"
    class="btn btn-sm btn-source-edit-button dropdown-item"
    title="Suggest edit"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -400,7 +239,7 @@
       
       
       
-      <li><a href="https://github.com/oneapi-src/oneMKL/issues/new?title=Issue%20on%20page%20%2Fdomains/sparse_linear_algebra.html&body=Your%20issue%20content%20here." target="_blank"
+      <li><a href="https://github.com/uxlfoundation/oneMath/issues/new?title=Issue%20on%20page%20%2Fdomains/sparse_linear_algebra.html&body=Your%20issue%20content%20here." target="_blank"
    class="btn btn-sm btn-source-issues-button dropdown-item"
    title="Open an issue"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -544,8 +383,8 @@ document.write(`
                 <article class="bd-article">
                   
   <section id="sparse-linear-algebra">
-<span id="onemkl-sparse-linear-algebra"></span><h1>Sparse Linear Algebra<a class="headerlink" href="#sparse-linear-algebra" title="Link to this heading">#</a></h1>
-<p>See the latest specification for the sparse domain <a class="reference external" href="https://oneapi-spec.uxlfoundation.org/specifications/oneapi/latest/elements/onemkl/source/domains/spblas/spblas">here</a>.</p>
+<span id="onemath-sparse-linear-algebra"></span><h1>Sparse Linear Algebra<a class="headerlink" href="#sparse-linear-algebra" title="Link to this heading">#</a></h1>
+<p>See the latest specification for the sparse domain <a class="reference external" href="https://oneapi-spec.uxlfoundation.org/specifications/oneapi/latest/elements/onemath/source/domains/spblas/spblas">here</a>.</p>
 <p>This page documents implementation specific or backend specific details of the
 sparse domain.</p>
 <section id="onemkl-intel-cpu-and-gpu-backends">
@@ -555,25 +394,25 @@ sparse domain.</p>
 <li><p>All operations’ algorithms except <code class="docutils literal notranslate"><span class="pre">no_optimize_alg</span></code> map to the default
 algorithm.</p></li>
 <li><p>The required external workspace size is always 0 bytes.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">oneapi::mkl::sparse::set_csr_data</span></code> and
-<code class="docutils literal notranslate"><span class="pre">oneapi::mkl::sparse::set_coo_data</span></code> functions cannot be used on a handle
+<li><p><code class="docutils literal notranslate"><span class="pre">oneapi::math::sparse::set_csr_data</span></code> and
+<code class="docutils literal notranslate"><span class="pre">oneapi::math::sparse::set_coo_data</span></code> functions cannot be used on a handle
 that has already been used for an operation or its optimize function. Doing so
-will throw a <code class="docutils literal notranslate"><span class="pre">oneapi::mkl::unimplemented</span></code> exception.</p></li>
-<li><p>Using <code class="docutils literal notranslate"><span class="pre">spsv</span></code> with the <code class="docutils literal notranslate"><span class="pre">oneapi::mkl::sparse::spsv_alg::no_optimize_alg</span></code> and
+will throw a <code class="docutils literal notranslate"><span class="pre">oneapi::math::unimplemented</span></code> exception.</p></li>
+<li><p>Using <code class="docutils literal notranslate"><span class="pre">spsv</span></code> with the <code class="docutils literal notranslate"><span class="pre">oneapi::math::sparse::spsv_alg::no_optimize_alg</span></code> and
 a sparse matrix that does not have the
-<code class="docutils literal notranslate"><span class="pre">oneapi::mkl::sparse::matrix_property::sorted</span></code> property will throw a
-<code class="docutils literal notranslate"><span class="pre">oneapi::mkl::unimplemented</span></code> exception.</p></li>
+<code class="docutils literal notranslate"><span class="pre">oneapi::math::sparse::matrix_property::sorted</span></code> property will throw a
+<code class="docutils literal notranslate"><span class="pre">oneapi::math::unimplemented</span></code> exception.</p></li>
 <li><p>Using <code class="docutils literal notranslate"><span class="pre">spmm</span></code> on Intel GPU with a sparse matrix that is
-<code class="docutils literal notranslate"><span class="pre">oneapi::mkl::transpose::conjtrans</span></code> and has the
-<code class="docutils literal notranslate"><span class="pre">oneapi::mkl::sparse::matrix_property::symmetric</span></code> property will throw a
-<code class="docutils literal notranslate"><span class="pre">oneapi::mkl::unimplemented</span></code> exception.</p></li>
+<code class="docutils literal notranslate"><span class="pre">oneapi::math::transpose::conjtrans</span></code> and has the
+<code class="docutils literal notranslate"><span class="pre">oneapi::math::sparse::matrix_property::symmetric</span></code> property will throw a
+<code class="docutils literal notranslate"><span class="pre">oneapi::math::unimplemented</span></code> exception.</p></li>
 <li><p>Using <code class="docutils literal notranslate"><span class="pre">spmv</span></code> with a sparse matrix that is
-<code class="docutils literal notranslate"><span class="pre">oneapi::mkl::transpose::conjtrans</span></code> with a <code class="docutils literal notranslate"><span class="pre">type_view</span></code>
+<code class="docutils literal notranslate"><span class="pre">oneapi::math::transpose::conjtrans</span></code> with a <code class="docutils literal notranslate"><span class="pre">type_view</span></code>
 <code class="docutils literal notranslate"><span class="pre">matrix_descr::symmetric</span></code> or <code class="docutils literal notranslate"><span class="pre">matrix_descr::hermitian</span></code> will throw a
-<code class="docutils literal notranslate"><span class="pre">oneapi::mkl::unimplemented</span></code> exception.</p></li>
+<code class="docutils literal notranslate"><span class="pre">oneapi::math::unimplemented</span></code> exception.</p></li>
 <li><p>Using <code class="docutils literal notranslate"><span class="pre">spsv</span></code> on Intel GPU with a sparse matrix that is
-<code class="docutils literal notranslate"><span class="pre">oneapi::mkl::transpose::conjtrans</span></code> and will throw a
-<code class="docutils literal notranslate"><span class="pre">oneapi::mkl::unimplemented</span></code> exception.</p></li>
+<code class="docutils literal notranslate"><span class="pre">oneapi::math::transpose::conjtrans</span></code> and will throw a
+<code class="docutils literal notranslate"><span class="pre">oneapi::math::unimplemented</span></code> exception.</p></li>
 <li><p>Scalar parameters <code class="docutils literal notranslate"><span class="pre">alpha</span></code> and <code class="docutils literal notranslate"><span class="pre">beta</span></code> should be host pointers to prevent
 synchronizations and copies to the host.</p></li>
 </ul>
@@ -586,29 +425,29 @@ synchronizations and copies to the host.</p></li>
 documentation</a>. Sparse
 operations using matrices with the COO format without the property
 <code class="docutils literal notranslate"><span class="pre">matrix_property::sorted_by_rows</span></code> or <code class="docutils literal notranslate"><span class="pre">matrix_property::sorted</span></code> will throw
-a <code class="docutils literal notranslate"><span class="pre">oneapi::mkl::unimplemented</span></code> exception.</p></li>
+a <code class="docutils literal notranslate"><span class="pre">oneapi::math::unimplemented</span></code> exception.</p></li>
 <li><p>Using <code class="docutils literal notranslate"><span class="pre">spmm</span></code> with the algorithm <code class="docutils literal notranslate"><span class="pre">spmm_alg::csr_alg3</span></code> and an <code class="docutils literal notranslate"><span class="pre">opA</span></code> other
 than <code class="docutils literal notranslate"><span class="pre">transpose::nontrans</span></code> or an <code class="docutils literal notranslate"><span class="pre">opB</span></code> <code class="docutils literal notranslate"><span class="pre">transpose::conjtrans</span></code> will throw
-a <code class="docutils literal notranslate"><span class="pre">oneapi::mkl::unimplemented</span></code> exception.</p></li>
+a <code class="docutils literal notranslate"><span class="pre">oneapi::math::unimplemented</span></code> exception.</p></li>
 <li><p>Using <code class="docutils literal notranslate"><span class="pre">spmm</span></code> with the algorithm <code class="docutils literal notranslate"><span class="pre">spmm_alg::csr_alg3</span></code>,
 <code class="docutils literal notranslate"><span class="pre">opB=transpose::trans</span></code> and real fp64 precision will throw a
-<code class="docutils literal notranslate"><span class="pre">oneapi::mkl::unimplemented</span></code> exception. This configuration can fail as of
+<code class="docutils literal notranslate"><span class="pre">oneapi::math::unimplemented</span></code> exception. This configuration can fail as of
 CUDA 12.6.2, see the related issue
 <a href="#id1"><span class="problematic" id="id2">`here&lt;https://forums.developer.nvidia.com/t/cusparse-spmm-sample-failing-with-misaligned-address/311022&gt;`_</span></a>.</p></li>
 <li><p>Using <code class="docutils literal notranslate"><span class="pre">spmv</span></code> with a <code class="docutils literal notranslate"><span class="pre">type_view</span></code> other than <code class="docutils literal notranslate"><span class="pre">matrix_descr::general</span></code> will
-throw a <code class="docutils literal notranslate"><span class="pre">oneapi::mkl::unimplemented</span></code> exception.</p></li>
+throw a <code class="docutils literal notranslate"><span class="pre">oneapi::math::unimplemented</span></code> exception.</p></li>
 <li><p>Using <code class="docutils literal notranslate"><span class="pre">spsv</span></code> with the algorithm <code class="docutils literal notranslate"><span class="pre">spsv_alg::no_optimize_alg</span></code> may still
 perform some mandatory preprocessing.</p></li>
-<li><p>oneMKL Interface does not provide a way to use non-default algorithms without
+<li><p>oneMath does not provide a way to use non-default algorithms without
 calling preprocess functions such as <code class="docutils literal notranslate"><span class="pre">cusparseSpMM_preprocess</span></code> or
 <code class="docutils literal notranslate"><span class="pre">cusparseSpMV_preprocess</span></code>. Feel free to create an issue if this is needed.</p></li>
 </ul>
 </section>
 <section id="operation-algorithms-mapping">
 <h2>Operation algorithms mapping<a class="headerlink" href="#operation-algorithms-mapping" title="Link to this heading">#</a></h2>
-<p>The following tables describe how a oneMKL SYCL Interface algorithm maps to the
-backend’s algorithms. Refer to the backend’s documentation for a more detailed
-explanation of the algorithms.</p>
+<p>The following tables describe how a oneMath algorithm maps to the backend’s
+algorithms. Refer to the backend’s documentation for a more detailed explanation
+of the algorithms.</p>
 <p>Backends with no equivalent algorithms will fallback to the backend’s default
 behavior.</p>
 <section id="spmm">
@@ -752,12 +591,12 @@ behavior.</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="lapack/ungqr_batch_scratchpad_size.html"
+       href="../using_onemath_with_cmake.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">ungqr_batch_scratchpad_size</p>
+        <p class="prev-next-title">Using oneMath in your project with CMake</p>
       </div>
     </a>
     <a class="right-next"
@@ -765,7 +604,7 @@ behavior.</p>
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Integrating a Third-Party Library to oneAPI Math Kernel Library (oneMKL) Interfaces</p>
+        <p class="prev-next-title">Integrating a Third-Party Library to oneAPI Math Library (oneMath)</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

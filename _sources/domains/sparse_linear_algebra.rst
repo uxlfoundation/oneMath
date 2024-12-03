@@ -1,10 +1,10 @@
-.. _onemkl_sparse_linear_algebra:
+.. _onemath_sparse_linear_algebra:
 
 Sparse Linear Algebra
 =====================
 
 See the latest specification for the sparse domain `here
-<https://oneapi-spec.uxlfoundation.org/specifications/oneapi/latest/elements/onemkl/source/domains/spblas/spblas>`_.
+<https://oneapi-spec.uxlfoundation.org/specifications/oneapi/latest/elements/onemath/source/domains/spblas/spblas>`_.
 
 This page documents implementation specific or backend specific details of the
 sparse domain.
@@ -17,25 +17,25 @@ Currently known limitations:
 - All operations' algorithms except ``no_optimize_alg`` map to the default
   algorithm.
 - The required external workspace size is always 0 bytes.
-- ``oneapi::mkl::sparse::set_csr_data`` and
-  ``oneapi::mkl::sparse::set_coo_data`` functions cannot be used on a handle
+- ``oneapi::math::sparse::set_csr_data`` and
+  ``oneapi::math::sparse::set_coo_data`` functions cannot be used on a handle
   that has already been used for an operation or its optimize function. Doing so
-  will throw a ``oneapi::mkl::unimplemented`` exception.
-- Using ``spsv`` with the ``oneapi::mkl::sparse::spsv_alg::no_optimize_alg`` and
+  will throw a ``oneapi::math::unimplemented`` exception.
+- Using ``spsv`` with the ``oneapi::math::sparse::spsv_alg::no_optimize_alg`` and
   a sparse matrix that does not have the
-  ``oneapi::mkl::sparse::matrix_property::sorted`` property will throw a
-  ``oneapi::mkl::unimplemented`` exception.
+  ``oneapi::math::sparse::matrix_property::sorted`` property will throw a
+  ``oneapi::math::unimplemented`` exception.
 - Using ``spmm`` on Intel GPU with a sparse matrix that is
-  ``oneapi::mkl::transpose::conjtrans`` and has the
-  ``oneapi::mkl::sparse::matrix_property::symmetric`` property will throw a
-  ``oneapi::mkl::unimplemented`` exception.
+  ``oneapi::math::transpose::conjtrans`` and has the
+  ``oneapi::math::sparse::matrix_property::symmetric`` property will throw a
+  ``oneapi::math::unimplemented`` exception.
 - Using ``spmv`` with a sparse matrix that is
-  ``oneapi::mkl::transpose::conjtrans`` with a ``type_view``
+  ``oneapi::math::transpose::conjtrans`` with a ``type_view``
   ``matrix_descr::symmetric`` or ``matrix_descr::hermitian`` will throw a
-  ``oneapi::mkl::unimplemented`` exception.
+  ``oneapi::math::unimplemented`` exception.
 - Using ``spsv`` on Intel GPU with a sparse matrix that is
-  ``oneapi::mkl::transpose::conjtrans`` and will throw a
-  ``oneapi::mkl::unimplemented`` exception.
+  ``oneapi::math::transpose::conjtrans`` and will throw a
+  ``oneapi::math::unimplemented`` exception.
 - Scalar parameters ``alpha`` and ``beta`` should be host pointers to prevent
   synchronizations and copies to the host.
 
@@ -50,20 +50,20 @@ Currently known limitations:
   <https://docs.nvidia.com/cuda/cusparse/index.html#coordinate-coo>`_. Sparse
   operations using matrices with the COO format without the property
   ``matrix_property::sorted_by_rows`` or ``matrix_property::sorted`` will throw
-  a ``oneapi::mkl::unimplemented`` exception.
+  a ``oneapi::math::unimplemented`` exception.
 - Using ``spmm`` with the algorithm ``spmm_alg::csr_alg3`` and an ``opA`` other
   than ``transpose::nontrans`` or an ``opB`` ``transpose::conjtrans`` will throw
-  a ``oneapi::mkl::unimplemented`` exception.
+  a ``oneapi::math::unimplemented`` exception.
 - Using ``spmm`` with the algorithm ``spmm_alg::csr_alg3``,
   ``opB=transpose::trans`` and real fp64 precision will throw a
-  ``oneapi::mkl::unimplemented`` exception. This configuration can fail as of
+  ``oneapi::math::unimplemented`` exception. This configuration can fail as of
   CUDA 12.6.2, see the related issue
   `here<https://forums.developer.nvidia.com/t/cusparse-spmm-sample-failing-with-misaligned-address/311022>`_.
 - Using ``spmv`` with a ``type_view`` other than ``matrix_descr::general`` will
-  throw a ``oneapi::mkl::unimplemented`` exception.
+  throw a ``oneapi::math::unimplemented`` exception.
 - Using ``spsv`` with the algorithm ``spsv_alg::no_optimize_alg`` may still
   perform some mandatory preprocessing.
-- oneMKL Interface does not provide a way to use non-default algorithms without
+- oneMath does not provide a way to use non-default algorithms without
   calling preprocess functions such as ``cusparseSpMM_preprocess`` or
   ``cusparseSpMV_preprocess``. Feel free to create an issue if this is needed.
 
@@ -71,9 +71,9 @@ Currently known limitations:
 Operation algorithms mapping
 ----------------------------
 
-The following tables describe how a oneMKL SYCL Interface algorithm maps to the
-backend's algorithms. Refer to the backend's documentation for a more detailed
-explanation of the algorithms.
+The following tables describe how a oneMath algorithm maps to the backend's
+algorithms. Refer to the backend's documentation for a more detailed explanation
+of the algorithms.
 
 Backends with no equivalent algorithms will fallback to the backend's default
 behavior.

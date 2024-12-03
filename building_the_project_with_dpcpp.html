@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Building the Project with DPC++ &#8212; oneAPI Math Kernel Library Interfaces 0.1 documentation</title>
+    <title>Building the Project with DPC++ &#8212; oneMath 0.1 documentation</title>
   
   
   
@@ -134,8 +134,8 @@
       
     
     
-    <img src="_static/oneAPI-rgb-rev-100.png" class="logo__image only-light" alt="oneAPI Math Kernel Library Interfaces 0.1 documentation - Home"/>
-    <script>document.write(`<img src="_static/oneAPI-rgb-rev-100.png" class="logo__image only-dark" alt="oneAPI Math Kernel Library Interfaces 0.1 documentation - Home"/>`);</script>
+    <img src="_static/oneAPI-rgb-rev-100.png" class="logo__image only-light" alt="oneMath 0.1 documentation - Home"/>
+    <script>document.write(`<img src="_static/oneAPI-rgb-rev-100.png" class="logo__image only-dark" alt="oneMath 0.1 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -162,173 +162,12 @@
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Building the Project with DPC++</a></li>
 <li class="toctree-l1"><a class="reference internal" href="building_the_project_with_adaptivecpp.html">Building the Project with AdaptiveCpp</a></li>
 <li class="toctree-l1"><a class="reference internal" href="building_and_running_tests.html">Building and Running Tests</a></li>
-<li class="toctree-l1"><a class="reference internal" href="using_onemkl_with_cmake.html">Using the oneMKL Interfaces in your project with CMake</a></li>
+<li class="toctree-l1"><a class="reference internal" href="using_onemath_with_cmake.html">Using oneMath in your project with CMake</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Developer Reference</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="onemkl-datatypes.html">oneMKL Defined Datatypes</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="domains/dense_linear_algebra.html">Dense Linear Algebra</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="domains/matrix-storage.html">Matrix Storage</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="domains/blas/blas.html">BLAS Routines</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="domains/blas/blas-level-1-routines.html">BLAS Level 1 Routines</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="domains/blas/asum.html">asum</a></li>
-<li class="toctree-l4"><a class="reference internal" href="domains/blas/axpy.html">axpy</a></li>
-<li class="toctree-l4"><a class="reference internal" href="domains/blas/copy.html">copy</a></li>
-<li class="toctree-l4"><a class="reference internal" href="domains/blas/dot.html">dot</a></li>
-<li class="toctree-l4"><a class="reference internal" href="domains/blas/sdsdot.html">sdsdot</a></li>
-<li class="toctree-l4"><a class="reference internal" href="domains/blas/dotc.html">dotc</a></li>
-<li class="toctree-l4"><a class="reference internal" href="domains/blas/dotu.html">dotu</a></li>
-<li class="toctree-l4"><a class="reference internal" href="domains/blas/nrm2.html">nrm2</a></li>
-<li class="toctree-l4"><a class="reference internal" href="domains/blas/rot.html">rot</a></li>
-<li class="toctree-l4"><a class="reference internal" href="domains/blas/rotg.html">rotg</a></li>
-<li class="toctree-l4"><a class="reference internal" href="domains/blas/rotm.html">rotm</a></li>
-<li class="toctree-l4"><a class="reference internal" href="domains/blas/rotmg.html">rotmg</a></li>
-<li class="toctree-l4"><a class="reference internal" href="domains/blas/scal.html">scal</a></li>
-<li class="toctree-l4"><a class="reference internal" href="domains/blas/swap.html">swap</a></li>
-<li class="toctree-l4"><a class="reference internal" href="domains/blas/iamax.html">iamax</a></li>
-<li class="toctree-l4"><a class="reference internal" href="domains/blas/iamin.html">iamin</a></li>
-</ul>
-</li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="domains/blas/blas-level-2-routines.html">BLAS Level 2 Routines</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="domains/blas/gbmv.html">gbmv</a></li>
-<li class="toctree-l4"><a class="reference internal" href="domains/blas/gemv.html">gemv</a></li>
-<li class="toctree-l4"><a class="reference internal" href="domains/blas/ger.html">ger</a></li>
-<li class="toctree-l4"><a class="reference internal" href="domains/blas/gerc.html">gerc</a></li>
-<li class="toctree-l4"><a class="reference internal" href="domains/blas/geru.html">geru</a></li>
-<li class="toctree-l4"><a class="reference internal" href="domains/blas/hbmv.html">hbmv</a></li>
-<li class="toctree-l4"><a class="reference internal" href="domains/blas/hemv.html">hemv</a></li>
-<li class="toctree-l4"><a class="reference internal" href="domains/blas/her.html">her</a></li>
-<li class="toctree-l4"><a class="reference internal" href="domains/blas/her2.html">her2</a></li>
-<li class="toctree-l4"><a class="reference internal" href="domains/blas/hpmv.html">hpmv</a></li>
-<li class="toctree-l4"><a class="reference internal" href="domains/blas/hpr.html">hpr</a></li>
-<li class="toctree-l4"><a class="reference internal" href="domains/blas/hpr2.html">hpr2</a></li>
-<li class="toctree-l4"><a class="reference internal" href="domains/blas/sbmv.html">sbmv</a></li>
-<li class="toctree-l4"><a class="reference internal" href="domains/blas/spmv.html">spmv</a></li>
-<li class="toctree-l4"><a class="reference internal" href="domains/blas/spr.html">spr</a></li>
-<li class="toctree-l4"><a class="reference internal" href="domains/blas/spr2.html">spr2</a></li>
-<li class="toctree-l4"><a class="reference internal" href="domains/blas/symv.html">symv</a></li>
-<li class="toctree-l4"><a class="reference internal" href="domains/blas/syr.html">syr</a></li>
-<li class="toctree-l4"><a class="reference internal" href="domains/blas/syr2.html">syr2</a></li>
-<li class="toctree-l4"><a class="reference internal" href="domains/blas/tbmv.html">tbmv</a></li>
-<li class="toctree-l4"><a class="reference internal" href="domains/blas/tbsv.html">tbsv</a></li>
-<li class="toctree-l4"><a class="reference internal" href="domains/blas/tpmv.html">tpmv</a></li>
-<li class="toctree-l4"><a class="reference internal" href="domains/blas/tpsv.html">tpsv</a></li>
-<li class="toctree-l4"><a class="reference internal" href="domains/blas/trmv.html">trmv</a></li>
-<li class="toctree-l4"><a class="reference internal" href="domains/blas/trsv.html">trsv</a></li>
-</ul>
-</li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="domains/blas/blas-level-3-routines.html">BLAS Level 3 Routines</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="domains/blas/gemm.html">gemm</a></li>
-<li class="toctree-l4"><a class="reference internal" href="domains/blas/hemm.html">hemm</a></li>
-<li class="toctree-l4"><a class="reference internal" href="domains/blas/herk.html">herk</a></li>
-<li class="toctree-l4"><a class="reference internal" href="domains/blas/her2k.html">her2k</a></li>
-<li class="toctree-l4"><a class="reference internal" href="domains/blas/symm.html">symm</a></li>
-<li class="toctree-l4"><a class="reference internal" href="domains/blas/syrk.html">syrk</a></li>
-<li class="toctree-l4"><a class="reference internal" href="domains/blas/syr2k.html">syr2k</a></li>
-<li class="toctree-l4"><a class="reference internal" href="domains/blas/trmm.html">trmm</a></li>
-<li class="toctree-l4"><a class="reference internal" href="domains/blas/trsm.html">trsm</a></li>
-</ul>
-</li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="domains/blas/blas-like-extensions.html">BLAS-like Extensions</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="domains/blas/axpy_batch.html">axpy_batch</a></li>
-<li class="toctree-l4"><a class="reference internal" href="domains/blas/axpby.html">axpby</a></li>
-<li class="toctree-l4"><a class="reference internal" href="domains/blas/copy_batch.html">copy_batch</a></li>
-<li class="toctree-l4"><a class="reference internal" href="domains/blas/dgmm_batch.html">dgmm_batch</a></li>
-<li class="toctree-l4"><a class="reference internal" href="domains/blas/gemm_batch.html">gemm_batch</a></li>
-<li class="toctree-l4"><a class="reference internal" href="domains/blas/gemv_batch.html">gemv_batch</a></li>
-<li class="toctree-l4"><a class="reference internal" href="domains/blas/syrk_batch.html">syrk_batch</a></li>
-<li class="toctree-l4"><a class="reference internal" href="domains/blas/trsm_batch.html">trsm_batch</a></li>
-<li class="toctree-l4"><a class="reference internal" href="domains/blas/gemmt.html">gemmt</a></li>
-<li class="toctree-l4"><a class="reference internal" href="domains/blas/gemm_bias.html">gemm_bias</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="domains/lapack/lapack.html">LAPACK Routines</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-7"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/geqrf.html">geqrf</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/geqrf_scratchpad_size.html">geqrf_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/gerqf.html">gerqf</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/gerqf_scratchpad_size.html">gerqf_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/getrf.html">getrf</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/getrf_scratchpad_size.html">getrf_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/getri.html">getri</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/getri_scratchpad_size.html">getri_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/getrs.html">getrs</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/getrs_scratchpad_size.html">getrs_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/hetrf.html">hetrf</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/hetrf_scratchpad_size.html">hetrf_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/orgqr.html">orgqr</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/orgqr_scratchpad_size.html">orgqr_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/ormqr.html">ormqr</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/ormqr_scratchpad_size.html">ormqr_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/ormrq.html">ormrq</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/ormrq_scratchpad_size.html">ormrq_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/potrf.html">potrf</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/potrf_scratchpad_size.html">potrf_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/potri.html">potri</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/potri_scratchpad_size.html">potri_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/potrs.html">potrs</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/potrs_scratchpad_size.html">potrs_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/sytrf.html">sytrf</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/sytrf_scratchpad_size.html">sytrf_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/trtrs.html">trtrs</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/trtrs_scratchpad_size.html">trtrs_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/ungqr.html">ungqr</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/ungqr_scratchpad_size.html">ungqr_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/unmqr.html">unmqr</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/unmqr_scratchpad_size.html">unmqr_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/unmrq.html">unmrq</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/unmrq_scratchpad_size.html">unmrq_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/gebrd.html">gebrd</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/gebrd_scratchpad_size.html">gebrd_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/gesvd.html">gesvd</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/gesvd_scratchpad_size.html">gesvd_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/heevd.html">heevd</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/heevd_scratchpad_size.html">heevd_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/hegvd.html">hegvd</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/hegvd_scratchpad_size.html">hegvd_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/hetrd.html">hetrd</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/hetrd_scratchpad_size.html">hetrd_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/orgbr.html">orgbr</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/orgbr_scratchpad_size.html">orgbr_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/orgtr.html">orgtr</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/orgtr_scratchpad_size.html">orgtr_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/ormtr.html">ormtr</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/ormtr_scratchpad_size.html">ormtr_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/syevd.html">syevd</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/syevd_scratchpad_size.html">syevd_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/sygvd.html">sygvd</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/sygvd_scratchpad_size.html">sygvd_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/sytrd.html">sytrd</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/sytrd_scratchpad_size.html">sytrd_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/ungbr.html">ungbr</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/ungbr_scratchpad_size.html">ungbr_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/ungtr.html">ungtr</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/ungtr_scratchpad_size.html">ungtr_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/unmtr.html">unmtr</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/unmtr_scratchpad_size.html">unmtr_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/geqrf_batch.html">geqrf_batch</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/geqrf_batch_scratchpad_size.html">geqrf_batch_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/getrf_batch.html">getrf_batch</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/getrf_batch_scratchpad_size.html">getrf_batch_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/getri_batch.html">getri_batch</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/getri_batch_scratchpad_size.html">getri_batch_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/getrs_batch.html">getrs_batch</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/getrs_batch_scratchpad_size.html">getrs_batch_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/orgqr_batch.html">orgqr_batch</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/orgqr_batch_scratchpad_size.html">orgqr_batch_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/potrf_batch.html">potrf_batch</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/potrf_batch_scratchpad_size.html">potrf_batch_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/potrs_batch.html">potrs_batch</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/potrs_batch_scratchpad_size.html">potrs_batch_scratchpad_size</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/ungqr_batch.html">ungqr_batch</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains/lapack/ungqr_batch_scratchpad_size.html">ungqr_batch_scratchpad_size</a></li>
-</ul>
-</li>
-</ul>
-</li>
 <li class="toctree-l1"><a class="reference internal" href="domains/sparse_linear_algebra.html">Sparse Linear Algebra</a></li>
-<li class="toctree-l1"><a class="reference internal" href="create_new_backend.html">Integrating a Third-Party Library to oneAPI Math Kernel Library (oneMKL) Interfaces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="create_new_backend.html">Integrating a Third-Party Library to oneAPI Math Library (oneMath)</a></li>
 </ul>
 
     </div>
@@ -383,7 +222,7 @@
       
       
       
-      <li><a href="https://github.com/oneapi-src/oneMKL/edit/develop/docs/building_the_project_with_dpcpp.rst" target="_blank"
+      <li><a href="https://github.com/uxlfoundation/oneMath/edit/develop/docs/building_the_project_with_dpcpp.rst" target="_blank"
    class="btn btn-sm btn-source-edit-button dropdown-item"
    title="Suggest edit"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -400,7 +239,7 @@
       
       
       
-      <li><a href="https://github.com/oneapi-src/oneMKL/issues/new?title=Issue%20on%20page%20%2Fbuilding_the_project_with_dpcpp.html&body=Your%20issue%20content%20here." target="_blank"
+      <li><a href="https://github.com/uxlfoundation/oneMath/issues/new?title=Issue%20on%20page%20%2Fbuilding_the_project_with_dpcpp.html&body=Your%20issue%20content%20here." target="_blank"
    class="btn btn-sm btn-source-issues-button dropdown-item"
    title="Open an issue"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -559,18 +398,17 @@ document.write(`
                   
   <section id="building-the-project-with-dpc">
 <span id="building-the-project-with-dpcpp"></span><h1>Building the Project with DPC++<a class="headerlink" href="#building-the-project-with-dpc" title="Link to this heading">#</a></h1>
-<p>This page describes building the oneMKL Interfaces with either the Intel(R)
-oneAPI DPC++ Compiler or open-source oneAPI DPC++ Compiler. For guidance on
-building the project with AdaptiveCpp, see
-<a class="reference internal" href="building_the_project_with_adaptivecpp.html#building-the-project-with-adaptivecpp"><span class="std std-ref">Building the Project with AdaptiveCpp</span></a>.</p>
+<p>This page describes building oneMath with either the Intel(R) oneAPI DPC++
+Compiler or open-source oneAPI DPC++ Compiler. For guidance on building the
+project with AdaptiveCpp, see <a class="reference internal" href="building_the_project_with_adaptivecpp.html#building-the-project-with-adaptivecpp"><span class="std std-ref">Building the Project with AdaptiveCpp</span></a>.</p>
 <section id="environment-setup">
 <span id="build-setup-with-dpcpp"></span><h2>Environment Setup<a class="headerlink" href="#environment-setup" title="Link to this heading">#</a></h2>
 <ol class="arabic simple">
 <li><p>Install the required DPC++ compiler (Intel(R) DPC++ or Open DPC++ - see
 <a class="reference internal" href="selecting_a_compiler.html#selecting-a-compiler"><span class="std std-ref">Selecting a Compiler</span></a>).</p></li>
 <li><p>Clone this project. The root directory of the cloned repository will be
-referred to as <code class="docutils literal notranslate"><span class="pre">&lt;path</span> <span class="pre">to</span> <span class="pre">onemkl&gt;</span></code>.</p></li>
-<li><p>Build and install all <a class="reference external" href="https://github.com/oneapi-src/oneMKL?tab=readme-ov-file#software-requirements">required dependencies</a>.</p></li>
+referred to as <code class="docutils literal notranslate"><span class="pre">&lt;path</span> <span class="pre">to</span> <span class="pre">onemath&gt;</span></code>.</p></li>
+<li><p>Build and install all <a class="reference external" href="https://github.com/uxlfoundation/oneMath?tab=readme-ov-file#software-requirements">required dependencies</a>.</p></li>
 </ol>
 </section>
 <section id="build-commands">
@@ -581,7 +419,7 @@ describe the common build commands. We will discuss backend-specific details in
 the <a class="reference internal" href="#backends">Backends</a> section and provide examples in <a class="reference internal" href="#cmake-invocation-examples">CMake invocation examples</a>.</p>
 <p>On Linux, the common form of the build command looks as follows (see <a class="reference internal" href="#building-for-windows">Building
 for Windows</a> for building on Windows):</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Inside &lt;path to onemkl&gt;</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Inside &lt;path to onemath&gt;</span>
 mkdir<span class="w"> </span>build<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>build
 cmake<span class="w"> </span>..<span class="w"> </span>-DCMAKE_CXX_COMPILER<span class="o">=</span><span class="nv">$CXX_COMPILER</span><span class="w">    </span><span class="se">\ </span><span class="c1"># Should be icpx or clang++</span>
 <span class="w">        </span>-DCMAKE_C_COMPILER<span class="o">=</span><span class="nv">$C_COMPILER</span><span class="w">         </span><span class="se">\ </span><span class="c1"># Should be icx or clang</span>
@@ -598,12 +436,12 @@ cmake<span class="w"> </span>--install<span class="w"> </span>.<span class="w"> 
 <p>In the above, the <code class="docutils literal notranslate"><span class="pre">$CXX_COMPILER</span></code> and <code class="docutils literal notranslate"><span class="pre">$C_COMPILER</span></code> should be set to
 <code class="docutils literal notranslate"><span class="pre">icpx</span></code> and <code class="docutils literal notranslate"><span class="pre">icx</span></code> respectively when using the Intel(R) oneAPI DPC++ Compiler,
 or <code class="docutils literal notranslate"><span class="pre">clang++</span></code> and <code class="docutils literal notranslate"><span class="pre">clang</span></code> respectively when using the Open DPC++ Compiler.</p>
-<p>Backends should be enabled by setting <code class="docutils literal notranslate"><span class="pre">-DENABLE_&lt;BACKEND_NAME&gt;_BACKEND=True</span></code> for
-each desired backend. By default, only the <code class="docutils literal notranslate"><span class="pre">MKLGPU</span></code> and <code class="docutils literal notranslate"><span class="pre">MKLCPU</span></code> backends
-are enabled. Multiple backends for multiple device vendors can be enabled at
-once (albeit with limitations when using portBLAS and portFFT). The supported
-backends for the compilers are given in the table at <a class="reference external" href="https://github.com/oneapi-src/oneMKL?tab=readme-ov-file#supported-configurations">oneMKL supported
-configurations table</a>,
+<p>Backends should be enabled by setting <code class="docutils literal notranslate"><span class="pre">-DENABLE_&lt;BACKEND_NAME&gt;_BACKEND=True</span></code>
+for each desired backend. By default, only the <code class="docutils literal notranslate"><span class="pre">MKLGPU</span></code> and <code class="docutils literal notranslate"><span class="pre">MKLCPU</span></code>
+backends are enabled. Multiple backends for multiple device vendors can be
+enabled at once (albeit with limitations when using portBLAS and portFFT). The
+supported backends for the compilers are given in the table at <a class="reference external" href="https://github.com/uxlfoundation/oneMath?tab=readme-ov-file#supported-configurations">oneMath
+supported configurations table</a>,
 and the CMake option names are given in the table below. Some backends may
 require additional parameters to be set. See the relevant section below for
 additional guidance.</p>
@@ -701,13 +539,13 @@ additional external libraries for the BLAS and LAPACK domains. See the section
 <p>Some additional build options are given in the section <a class="reference internal" href="#additional-build-options">Additional build options</a>.</p>
 <section id="target-domains">
 <span id="build-target-domains"></span><h3>TARGET_DOMAINS<a class="headerlink" href="#target-domains" title="Link to this heading">#</a></h3>
-<p>oneMKL supports multiple domains: BLAS, DFT, LAPACK, RNG and sparse BLAS. The
-domains built by oneMKL can be selected using the <code class="docutils literal notranslate"><span class="pre">TARGET_DOMAINS</span></code> parameter.
+<p>oneMath supports multiple domains: BLAS, DFT, LAPACK, RNG and sparse BLAS. The
+domains built by oneMath can be selected using the <code class="docutils literal notranslate"><span class="pre">TARGET_DOMAINS</span></code> parameter.
 In most cases, <code class="docutils literal notranslate"><span class="pre">TARGET_DOMAINS</span></code> is set automatically according to the domains
 supported by the backend libraries enabled. However, while most backend
 libraries support only one of these domains, but some may support multiple. For
 example, the <code class="docutils literal notranslate"><span class="pre">MKLCPU</span></code> backend supports every domain. To enable support for
-only the BLAS domain in the oneMKL Interfaces whilst compiling with <code class="docutils literal notranslate"><span class="pre">MKLCPU</span></code>,
+only the BLAS domain in oneMath whilst compiling with <code class="docutils literal notranslate"><span class="pre">MKLCPU</span></code>,
 <code class="docutils literal notranslate"><span class="pre">TARGET_DOMAINS</span></code> could be set to <code class="docutils literal notranslate"><span class="pre">blas</span></code>. To enable BLAS and DFT,
 <code class="docutils literal notranslate"><span class="pre">-DTARGET_DOMAINS=&quot;blas</span> <span class="pre">dft&quot;</span></code> would be used.</p>
 </section>
@@ -715,8 +553,8 @@ only the BLAS domain in the oneMKL Interfaces whilst compiling with <code class=
 <section id="backends">
 <h2>Backends<a class="headerlink" href="#backends" title="Link to this heading">#</a></h2>
 <section id="building-for-intel-r-onemkl">
-<span id="build-for-intel-onemkl-dpcpp"></span><h3>Building for Intel(R) oneMKL<a class="headerlink" href="#building-for-intel-r-onemkl" title="Link to this heading">#</a></h3>
-<p>The Intel(R) oneMKL backend supports multiple domains on both x86 CPUs and Intel
+<span id="build-for-intel-onemath-dpcpp"></span><h3>Building for Intel(R) oneMKL<a class="headerlink" href="#building-for-intel-r-onemkl" title="Link to this heading">#</a></h3>
+<p>The Intel(R) oneMKL backends support multiple domains on both x86 CPUs and Intel
 GPUs. The MKLCPU backend using Intel(R) oneMKL for x86 CPU is enabled by
 default, and controlled with the parameter <code class="docutils literal notranslate"><span class="pre">ENABLE_MKLCPU_BACKEND</span></code>. The MKLGPU
 backend using Intel(R) oneMKL for Intel GPU is enabled by default, and
@@ -781,8 +619,8 @@ change in future versions.</p>
 <section id="building-for-other-sycl-devices">
 <span id="build-for-other-sycl-devices"></span><h3>Building for other SYCL devices<a class="headerlink" href="#building-for-other-sycl-devices" title="Link to this heading">#</a></h3>
 <p>SYCL enables portable heterogeneous computing on a wide range of accelerators.
-Consequently, it is possible to use oneMKL Interfaces with accelerators not
-anticipated by the oneMKL Interfaces team.</p>
+Consequently, it is possible to use oneMath with accelerators not anticipated by
+the project.</p>
 <p>For generic SYCL devices, only portBLAS and portFFT backend are enabled.
 The user must set the appropriate <code class="docutils literal notranslate"><span class="pre">-fsycl-targets</span></code> for their device, and also
 any other option required for performance. See <a class="reference internal" href="#building-for-portblas">Building for portBLAS</a> and
@@ -794,8 +632,8 @@ unsupported configurations.</p>
 <p><a class="reference external" href="https://github.com/codeplaysoftware/portBLAS">portBLAS</a> and <a class="reference external" href="https://github.com/codeplaysoftware/portFFT">portFFT</a> are experimental pure-SYCL
 backends that work on all SYCL targets supported by the DPC++ compiler. Since
 they support multiple targets, they cannot be enabled with other backends in the
-same domain, or the MKLCPU or MKLGPU backends. Both libraries are experimental
-and currently only support a subset of operations and features.</p>
+same domain, or the <code class="docutils literal notranslate"><span class="pre">MKLCPU</span></code> or <code class="docutils literal notranslate"><span class="pre">MKLGPU</span></code> backends. Both libraries are
+experimental and currently only support a subset of operations and features.</p>
 <p>For best performance, both libraries must be tuned. See the individual sections
 for more details.</p>
 <p>Both portBLAS and portFFT are used as header-only libraries, and will be
@@ -842,8 +680,8 @@ specified. See <a class="reference external" href="https://intel.github.io/llvm-
 </section>
 <section id="additional-build-options">
 <span id="build-additional-options-dpcpp"></span><h2>Additional Build Options<a class="headerlink" href="#additional-build-options" title="Link to this heading">#</a></h2>
-<p>When building oneMKL the SYCL implementation can be specified by setting the
-<code class="docutils literal notranslate"><span class="pre">ONEMKL_SYCL_IMPLEMENTATION</span></code> option. Possible values are:</p>
+<p>When building oneMath the SYCL implementation can be specified by setting the
+<code class="docutils literal notranslate"><span class="pre">ONEMATH_SYCL_IMPLEMENTATION</span></code> option. Possible values are:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">dpc++</span></code> (default) for the <a class="reference external" href="https://software.intel.com/en-us/oneapi/dpc-compiler">Intel(R) oneAPI DPC++ Compiler</a> and for the <a class="reference external" href="https://github.com/intel/llvm">oneAPI
 DPC++ Compiler</a> compilers.</p></li>
@@ -880,14 +718,14 @@ according to the targeted hardware. This backend has only been tested for the
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>When building with <code class="docutils literal notranslate"><span class="pre">BUILD_FUNCTIONAL_TESTS=True</span></code> (default option) only single CUDA backend can be built
-(<a class="reference external" href="https://github.com/oneapi-src/oneMKL/issues/270">#270</a>).</p>
+(<a class="reference external" href="https://github.com/uxlfoundation/oneMath/issues/270">#270</a>).</p>
 </div>
 </section>
 <section id="cmake-invocation-examples">
 <span id="build-invocation-examples-dpcpp"></span><h2>CMake invocation examples<a class="headerlink" href="#cmake-invocation-examples" title="Link to this heading">#</a></h2>
-<p>Build oneMKL with support for Nvidia GPUs with tests
+<p>Build oneMath with support for Nvidia GPUs with tests
 disabled using the Ninja build system:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake<span class="w"> </span><span class="nv">$ONEMKL_DIR</span><span class="w"> </span><span class="se">\</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake<span class="w"> </span><span class="nv">$ONEMATH_DIR</span><span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>-GNinja<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>-DCMAKE_CXX_COMPILER<span class="o">=</span>clang++<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>-DCMAKE_C_COMPILER<span class="o">=</span>clang<span class="w"> </span><span class="se">\</span>
@@ -901,13 +739,13 @@ disabled using the Ninja build system:</p>
 <span class="w">    </span>-DBUILD_FUNCTIONAL_TESTS<span class="o">=</span>False
 </pre></div>
 </div>
-<p><code class="docutils literal notranslate"><span class="pre">$ONEMKL_DIR</span></code> points at the oneMKL source directly. The x86 CPU (<code class="docutils literal notranslate"><span class="pre">MKLCPU</span></code>)
+<p><code class="docutils literal notranslate"><span class="pre">$ONEMATH_DIR</span></code> points at the oneMath source directly. The x86 CPU (<code class="docutils literal notranslate"><span class="pre">MKLCPU</span></code>)
 and Intel GPU (<code class="docutils literal notranslate"><span class="pre">MKLGPU</span></code>) backends are enabled by default, but are disabled
-here. The backends for Nvidia GPUs must all be explicilty enabled. The tests are
+here. The backends for Nvidia GPUs must all be explicitly enabled. The tests are
 disabled, but the examples will still be built.</p>
-<p>Building oneMKL with support for AMD GPUs with tests
+<p>Building oneMath with support for AMD GPUs with tests
 disabled:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake<span class="w"> </span><span class="nv">$ONEMKL_DIR</span><span class="w"> </span><span class="se">\</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake<span class="w"> </span><span class="nv">$ONEMATH_DIR</span><span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>-DCMAKE_CXX_COMPILER<span class="o">=</span>clang++<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>-DCMAKE_C_COMPILER<span class="o">=</span>clang<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>-DENABLE_MKLCPU_BACKEND<span class="o">=</span>False<span class="w"> </span><span class="se">\</span>
@@ -919,13 +757,13 @@ disabled:</p>
 <span class="w">    </span>-DBUILD_FUNCTIONAL_TESTS<span class="o">=</span>False
 </pre></div>
 </div>
-<p><code class="docutils literal notranslate"><span class="pre">$ONEMKL_DIR</span></code> points at the oneMKL source directly. The x86 CPU (<code class="docutils literal notranslate"><span class="pre">MKLCPU</span></code>)
+<p><code class="docutils literal notranslate"><span class="pre">$ONEMATH_DIR</span></code> points at the oneMath source directly. The x86 CPU (<code class="docutils literal notranslate"><span class="pre">MKLCPU</span></code>)
 and Intel GPU (<code class="docutils literal notranslate"><span class="pre">MKLGPU</span></code>) backends are enabled by default, but are disabled
-here. The backends for AMD GPUs must all be explicilty enabled. The tests are
+here. The backends for AMD GPUs must all be explicitly enabled. The tests are
 disabled, but the examples will still be built.</p>
-<p>Build oneMKL for the DFT domain only with support for x86 CPU, Intel GPU, AMD
+<p>Build oneMath for the DFT domain only with support for x86 CPU, Intel GPU, AMD
 GPU and Nvidia GPU with testing enabled:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake<span class="w"> </span><span class="nv">$ONEMKL_DIR</span><span class="w"> </span><span class="se">\</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake<span class="w"> </span><span class="nv">$ONEMATH_DIR</span><span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>-DCMAKE_CXX_COMPILER<span class="o">=</span>icpx<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>-DCMAKE_C_COMPILER<span class="o">=</span>icx<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>-DENABLE_ROCFFT_BACKEND<span class="o">=</span>True<span class="w"> </span><span class="se">\</span>
@@ -943,8 +781,8 @@ default, with backends for Nvidia GPU and AMD GPU explicitly enabled.
 set, the backend libraries to enable the use of BLAS, LAPACK and RNG with MKLGPU
 and MKLCPU would also be enabled. The build of examples is disabled. Since
 functional testing was not disabled, tests would be built.</p>
-<p>Build oneMKL for the BLAS domain on a generic SYCL device:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake<span class="w"> </span><span class="nv">$ONEMKL_DIR</span><span class="w"> </span><span class="se">\</span>
+<p>Build oneMath for the BLAS domain on a generic SYCL device:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake<span class="w"> </span><span class="nv">$ONEMATH_DIR</span><span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>-DCMAKE_CXX_COMPILER<span class="o">=</span>clang++<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>-DCMAKE_C_COMPILER<span class="o">=</span>clang<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>-DENABLE_MKLCPU_BACKEND<span class="o">=</span>False<span class="w"> </span><span class="se">\</span>
@@ -952,11 +790,11 @@ functional testing was not disabled, tests would be built.</p>
 <span class="w">    </span>-DENABLE_PORTBLAS_BACKEND<span class="o">=</span>True
 </pre></div>
 </div>
-<p>Note that this is not a tested configuration. This builds oneMKL Interfaces
-with the portBLAS backend only, for a generic SYCL device supported by the
-Open DPC++ project.</p>
-<p>Build oneMKL for the DFT domain on a generic SYCL device:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake<span class="w"> </span><span class="nv">$ONEMKL_DIR</span><span class="w"> </span><span class="se">\</span>
+<p>Note that this is not a tested configuration. This builds oneMath with the
+portBLAS backend only, for a generic SYCL device supported by the Open DPC++
+project.</p>
+<p>Build oneMath for the DFT domain on a generic SYCL device:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake<span class="w"> </span><span class="nv">$ONEMATH_DIR</span><span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>-DCMAKE_CXX_COMPILER<span class="o">=</span>clang++<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>-DCMAKE_C_COMPILER<span class="o">=</span>clang<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>-DENABLE_MKLCPU_BACKEND<span class="o">=</span>False<span class="w"> </span><span class="se">\</span>
@@ -964,9 +802,9 @@ Open DPC++ project.</p>
 <span class="w">    </span>-DENABLE_PORTFFT_BACKEND<span class="o">=</span>True
 </pre></div>
 </div>
-<p>Note that this is not a tested configuration. This builds oneMKL Interfaces
-with the portFFT backend only, for a generic SYCL device supported by the
-Open DPC++ project.</p>
+<p>Note that this is not a tested configuration. This builds oneMath with the
+portFFT backend only, for a generic SYCL device supported by the Open DPC++
+project.</p>
 </section>
 <section id="project-cleanup">
 <span id="id6"></span><h2>Project Cleanup<a class="headerlink" href="#project-cleanup" title="Link to this heading">#</a></h2>
@@ -985,10 +823,10 @@ ninja<span class="w"> </span>-t<span class="w"> </span>clean
 </section>
 <section id="building-for-windows">
 <span id="build-for-windows-dpcpp"></span><h2>Building for Windows<a class="headerlink" href="#building-for-windows" title="Link to this heading">#</a></h2>
-<p>The Windows build is similar to the Linux build, albeit that <a class="reference external" href="https://github.com/oneapi-src/oneMKL?tab=readme-ov-file#windows">fewer backends are
+<p>The Windows build is similar to the Linux build, albeit that <a class="reference external" href="https://github.com/uxlfoundation/oneMath?tab=readme-ov-file#windows">fewer backends are
 supported</a>.
 Additionally, the Ninja build system must be used. For example:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Inside &lt;path to onemkl&gt;</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Inside &lt;path to onemath&gt;</span>
 md<span class="w"> </span>build<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>build
 cmake<span class="w"> </span>..<span class="w"> </span>-G<span class="w"> </span>Ninja<span class="w"> </span><span class="o">[</span>-DCMAKE_CXX_COMPILER<span class="o">=</span>&lt;path_to_icx_compiler&gt;<span class="se">\b</span>in<span class="se">\i</span>cx<span class="o">]</span><span class="w"> </span><span class="c1"># required only if icx is not found in environment variable PATH</span>
 <span class="w">                  </span><span class="o">[</span>-DCMAKE_C_COMPILER<span class="o">=</span>&lt;path_to_icx_compiler&gt;<span class="se">\b</span>in<span class="se">\i</span>cx<span class="o">]</span><span class="w">   </span><span class="c1"># required only if icx is not found in environment variable PATH</span>
@@ -1004,14 +842,14 @@ cmake<span class="w"> </span>--install<span class="w"> </span>.<span class="w"> 
 <section id="build-faq">
 <span id="build-common-problems-dpcpp"></span><h2>Build FAQ<a class="headerlink" href="#build-faq" title="Link to this heading">#</a></h2>
 <dl class="simple">
-<dt>clangrt builtins lib not found</dt><dd><p>Encountered when trying to build oneMKL with some ROCm libraries. There are
+<dt>clangrt builtins lib not found</dt><dd><p>Encountered when trying to build oneMath with some ROCm libraries. There are
 several possible solutions:</p>
 <ul class="simple">
 <li><p>If building Open DPC++ from source, add <code class="docutils literal notranslate"><span class="pre">compiler-rt</span></code> to the external
 projects compile option: <code class="docutils literal notranslate"><span class="pre">--llvm-external-projects</span> <span class="pre">compiler-rt</span></code>.</p></li>
 <li><p>Manually set the variable <code class="docutils literal notranslate"><span class="pre">HIP_CXX_COMPILER</span></code> to HIP’s toolkit <code class="docutils literal notranslate"><span class="pre">clang++</span></code>
 path, for instance <code class="docutils literal notranslate"><span class="pre">-DHIP_CXX_COMPILER=/opt/rocm/6.1.0/llvm/bin/clang++</span></code>.
-oneMKL may fail to link if the clang versions of <code class="docutils literal notranslate"><span class="pre">icpx</span></code> and <code class="docutils literal notranslate"><span class="pre">rocm</span></code> are
+oneMath may fail to link if the clang versions of <code class="docutils literal notranslate"><span class="pre">icpx</span></code> and <code class="docutils literal notranslate"><span class="pre">rocm</span></code> are
 not compatible.</p></li>
 </ul>
 </dd>

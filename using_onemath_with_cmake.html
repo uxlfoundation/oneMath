@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Selecting a Compiler &#8212; oneMath 0.1 documentation</title>
+    <title>Using oneMath in your project with CMake &#8212; oneMath 0.1 documentation</title>
   
   
   
@@ -40,12 +40,12 @@
     <script src="_static/doctools.js?v=9a2dae69"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'selecting_a_compiler';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'using_onemath_with_cmake';</script>
     <link rel="icon" href="_static/favicons.png"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Building the Project with DPC++" href="building_the_project_with_dpcpp.html" />
-    <link rel="prev" title="Introduction" href="introduction.html" />
+    <link rel="next" title="Sparse Linear Algebra" href="domains/sparse_linear_algebra.html" />
+    <link rel="prev" title="Building and Running Tests" href="building_and_running_tests.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -158,11 +158,11 @@
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Get Started</span></p>
 <ul class="current nav bd-sidenav">
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Selecting a Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="selecting_a_compiler.html">Selecting a Compiler</a></li>
 <li class="toctree-l1"><a class="reference internal" href="building_the_project_with_dpcpp.html">Building the Project with DPC++</a></li>
 <li class="toctree-l1"><a class="reference internal" href="building_the_project_with_adaptivecpp.html">Building the Project with AdaptiveCpp</a></li>
 <li class="toctree-l1"><a class="reference internal" href="building_and_running_tests.html">Building and Running Tests</a></li>
-<li class="toctree-l1"><a class="reference internal" href="using_onemath_with_cmake.html">Using oneMath in your project with CMake</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Using oneMath in your project with CMake</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Developer Reference</span></p>
 <ul class="nav bd-sidenav">
@@ -222,7 +222,7 @@
       
       
       
-      <li><a href="https://github.com/uxlfoundation/oneMath/edit/develop/docs/selecting_a_compiler.rst" target="_blank"
+      <li><a href="https://github.com/uxlfoundation/oneMath/edit/develop/docs/using_onemath_with_cmake.rst" target="_blank"
    class="btn btn-sm btn-source-edit-button dropdown-item"
    title="Suggest edit"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -239,7 +239,7 @@
       
       
       
-      <li><a href="https://github.com/uxlfoundation/oneMath/issues/new?title=Issue%20on%20page%20%2Fselecting_a_compiler.html&body=Your%20issue%20content%20here." target="_blank"
+      <li><a href="https://github.com/uxlfoundation/oneMath/issues/new?title=Issue%20on%20page%20%2Fusing_onemath_with_cmake.html&body=Your%20issue%20content%20here." target="_blank"
    class="btn btn-sm btn-source-issues-button dropdown-item"
    title="Open an issue"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -269,7 +269,7 @@
       
       
       
-      <li><a href="_sources/selecting_a_compiler.rst" target="_blank"
+      <li><a href="_sources/using_onemath_with_cmake.rst" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -340,7 +340,9 @@ document.write(`
   </button>
 `);
 </script>
-
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
 </div></div>
       
     </div>
@@ -351,11 +353,20 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Selecting a Compiler</h1>
+    <h1>Using oneMath in your project with CMake</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
             
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#using-an-installed-onemath">Using an installed oneMath</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#using-cmake-s-fetchcontent">Using CMake’s FetchContent</a></li>
+</ul>
+            </nav>
         </div>
     </div>
 </div>
@@ -365,23 +376,75 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="selecting-a-compiler">
-<span id="id1"></span><h1>Selecting a Compiler<a class="headerlink" href="#selecting-a-compiler" title="Link to this heading">#</a></h1>
-<p>You must choose a compiler according to the required backend and the operating system of your
-application.</p>
+  <section id="using-onemath-in-your-project-with-cmake">
+<span id="using-onemath-library-with-cmake"></span><h1>Using oneMath in your project with CMake<a class="headerlink" href="#using-onemath-in-your-project-with-cmake" title="Link to this heading">#</a></h1>
+<p>The CMake build tool can help you use oneMath in your own project. Instead of
+manually linking and including directories, you can use the CMake targets
+exported by the oneMath project. You can use oneMath in one of two forms, with
+the target names depending on the approach taken:</p>
 <ul class="simple">
-<li><p>If your application requires Intel GPU, use
-<a class="reference external" href="https://software.intel.com/en-us/oneapi/dpc-compiler">Intel(R) oneAPI DPC++ Compiler</a> <code class="docutils literal notranslate"><span class="pre">icpx</span></code> on Linux or <code class="docutils literal notranslate"><span class="pre">icx</span></code> on Windows.</p></li>
-<li><p>If your Linux application requires NVIDIA GPU, build <code class="docutils literal notranslate"><span class="pre">clang++</span></code> from the latest source of
-<a class="reference external" href="https://github.com/intel/llvm">oneAPI DPC++ Compiler</a> with <a class="reference external" href="https://github.com/intel/llvm/blob/sycl/sycl/doc/GetStartedGuide.md#build-dpc-toolchain-with-support-for-nvidia-cuda">support for NVIDIA CUDA</a> or use <code class="docutils literal notranslate"><span class="pre">hipSYCL</span></code> from the <a class="reference external" href="https://github.com/illuhad/hipSYCL">hipSYCL repository</a> (except for LAPACK domain).</p></li>
-<li><p>If your Linux application requires AMD GPU, build <code class="docutils literal notranslate"><span class="pre">clang++</span></code> from the latest source of <a class="reference external" href="https://github.com/intel/llvm">oneAPI DPC++ Compiler</a> with <a class="reference external" href="https://github.com/intel/llvm/blob/sycl/sycl/doc/GetStartedGuide.md#build-dpc-toolchain-with-support-for-hip-amd">support for HIP AMD</a> or use <code class="docutils literal notranslate"><span class="pre">hipSYCL</span></code>.</p></li>
-<li><p>If no Intel GPU, NVIDIA GPU, or AMD GPU is required, on Linux you can use
-<a class="reference external" href="https://software.intel.com/en-us/oneapi/dpc-compiler">Intel(R) oneAPI DPC++ Compiler</a>
-<code class="docutils literal notranslate"><span class="pre">icpx</span></code>, <a class="reference external" href="https://github.com/intel/llvm/releases">oneAPI DPC++ Compiler</a> <code class="docutils literal notranslate"><span class="pre">clang++</span></code>, or <code class="docutils literal notranslate"><span class="pre">hipSYCL</span></code>,
-and on Windows you can use either
-<a class="reference external" href="https://software.intel.com/en-us/oneapi/dpc-compiler">Intel(R) oneAPI DPC++ Compiler</a>
-<code class="docutils literal notranslate"><span class="pre">icx</span></code> or <a class="reference external" href="https://github.com/intel/llvm/releases">oneAPI DPC++ Compiler</a> <code class="docutils literal notranslate"><span class="pre">clang-cl</span></code>.</p></li>
+<li><p>you can use a previously installed copy, either from a binary distribution or
+built from source. This can be imported using CMake’s <code class="docutils literal notranslate"><span class="pre">find_package</span></code>
+command. See the section <a class="reference internal" href="#using-from-installed-binary">using_from_installed_binary</a>.</p></li>
+<li><p>or you can have CMake automatically download and build oneMath as part of the
+build process using CMake’s <a class="reference external" href="https://cmake.org/cmake/help/latest/module/FetchContent.html">FetchContent</a> functionality.
+See the section <a class="reference internal" href="#using-with-fetchcontent">using_with_fetchcontent</a>.</p></li>
 </ul>
+<section id="using-an-installed-onemath">
+<span id="using-from-installed-binary"></span><h2>Using an installed oneMath<a class="headerlink" href="#using-an-installed-onemath" title="Link to this heading">#</a></h2>
+<p>If oneMath has been previously installed, either by building from source or as a
+distributed binary, they can be consumed using CMake using
+<code class="docutils literal notranslate"><span class="pre">find_package(oneMath</span> <span class="pre">REQUIRED)</span></code>. The compiler used for the target library or
+application should match that used to build oneMath.</p>
+<p>For example:</p>
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nb">find_package</span><span class="p">(</span><span class="s">oneMath</span><span class="w"> </span><span class="s">REQUIRED</span><span class="p">)</span>
+<span class="nb">target_link_libraries</span><span class="p">(</span><span class="s">myTarget</span><span class="w"> </span><span class="s">PRIVATE</span><span class="w"> </span><span class="s">ONEMATH::onemath</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Different targets can be used depending on the requirements of oneMath.
+To link against the entire library, the <code class="docutils literal notranslate"><span class="pre">ONEMATH::onemath</span></code> target should be used.
+For specific domains, <code class="docutils literal notranslate"><span class="pre">ONEMATH::onemath_&lt;domain&gt;</span></code> should be used.
+And for specific backends, <code class="docutils literal notranslate"><span class="pre">ONEMATH::onemath_&lt;domain&gt;_&lt;backend&gt;</span></code> should be used.</p>
+<p>When using a binary, it may be useful to know the backends that were enabled
+during the build. To check for the existence of backends, CMake’s <code class="docutils literal notranslate"><span class="pre">if(TARGET</span>
+<span class="pre">&lt;target&gt;)</span></code> construct can be used. For example, with the <code class="docutils literal notranslate"><span class="pre">cufft</span></code> backend:</p>
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nb">if</span><span class="p">(</span><span class="s">TARGET</span><span class="w"> </span><span class="s">ONEMATH::onemath_dft_cufft</span><span class="p">)</span>
+<span class="w">    </span><span class="nb">target_link_libraries</span><span class="p">(</span><span class="s">myTarget</span><span class="w"> </span><span class="s">PRIVATE</span><span class="w"> </span><span class="s">ONEMATH::onemath_dft_cufft</span><span class="p">)</span>
+<span class="nb">else</span><span class="p">()</span>
+<span class="w">    </span><span class="nb">message</span><span class="p">(</span><span class="s">FATAL_ERROR</span><span class="w"> </span><span class="s2">&quot;oneMath was not built with CuFFT backend&quot;</span><span class="p">)</span>
+<span class="nb">endif</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="using-cmake-s-fetchcontent">
+<span id="using-with-fetchcontent"></span><h2>Using CMake’s FetchContent<a class="headerlink" href="#using-cmake-s-fetchcontent" title="Link to this heading">#</a></h2>
+<p>The <a class="reference external" href="https://cmake.org/cmake/help/latest/module/FetchContent.html">FetchContent</a> functionality of CMake can be used to download, build and
+install oneMath as part of the build.</p>
+<p>For example:</p>
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nb">include</span><span class="p">(</span><span class="s">FetchContent</span><span class="p">)</span>
+<span class="nb">set</span><span class="p">(</span><span class="s">BUILD_FUNCTIONAL_TESTS</span><span class="w"> </span><span class="s">False</span><span class="p">)</span>
+<span class="nb">set</span><span class="p">(</span><span class="s">BUILD_EXAMPLES</span><span class="w"> </span><span class="s">False</span><span class="p">)</span>
+<span class="nb">set</span><span class="p">(</span><span class="s">ENABLE_&lt;BACKEND_NAME&gt;_BACKEND</span><span class="w"> </span><span class="s">True</span><span class="p">)</span>
+<span class="nb">FetchContent_Declare</span><span class="p">(</span>
+<span class="w">        </span><span class="s">onemath_library</span>
+<span class="w">        </span><span class="s">GIT_REPOSITORY</span><span class="w"> </span><span class="s">https://github.com/uxlfoundation/oneMath.git</span>
+<span class="w">        </span><span class="s">GIT_TAG</span><span class="w"> </span><span class="s">develop</span>
+<span class="p">)</span>
+<span class="nb">FetchContent_MakeAvailable</span><span class="p">(</span><span class="s">onemath_library</span><span class="p">)</span>
+
+<span class="nb">target_link_libraries</span><span class="p">(</span><span class="s">myTarget</span><span class="w"> </span><span class="s">PRIVATE</span><span class="w"> </span><span class="s">onemath</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The build parameters should be appropriately set before
+<code class="docutils literal notranslate"><span class="pre">FetchContent_Declare</span></code>. See <a class="reference internal" href="building_the_project_with_dpcpp.html#building-the-project-with-dpcpp"><span class="std std-ref">Building the Project with DPC++</span></a> or
+<a class="reference internal" href="building_the_project_with_adaptivecpp.html#building-the-project-with-adaptivecpp"><span class="std std-ref">Building the Project with AdaptiveCpp</span></a>.</p>
+<p>To link against the main library with run-time dispatching, use the target
+<code class="docutils literal notranslate"><span class="pre">onemath</span></code>. To link against particular domains, use the target
+<code class="docutils literal notranslate"><span class="pre">onemath_&lt;domain&gt;</span></code>. For example, <code class="docutils literal notranslate"><span class="pre">onemath_blas</span></code> or <code class="docutils literal notranslate"><span class="pre">onemath_dft</span></code>. To link
+against particular backends (as required for static dispatch of oneAPI calls to
+a particular backend), use the target <code class="docutils literal notranslate"><span class="pre">onemath_&lt;domain&gt;_&lt;backend&gt;</span></code>. For
+example, <code class="docutils literal notranslate"><span class="pre">onemath_dft_cufft</span></code>.</p>
+</section>
 </section>
 
 
@@ -396,20 +459,20 @@ and on Windows you can use either
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="introduction.html"
+       href="building_and_running_tests.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Introduction</p>
+        <p class="prev-next-title">Building and Running Tests</p>
       </div>
     </a>
     <a class="right-next"
-       href="building_the_project_with_dpcpp.html"
+       href="domains/sparse_linear_algebra.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Building the Project with DPC++</p>
+        <p class="prev-next-title">Sparse Linear Algebra</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -420,7 +483,21 @@ and on Windows you can use either
             
             
               
-                <div class="bd-sidebar-secondary bd-toc"></div>
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#using-an-installed-onemath">Using an installed oneMath</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#using-cmake-s-fetchcontent">Using CMake’s FetchContent</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
               
             
           </div>
