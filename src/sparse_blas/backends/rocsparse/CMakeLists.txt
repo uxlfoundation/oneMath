@@ -17,7 +17,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #===============================================================================
 
-set(LIB_NAME onemkl_sparse_blas_rocsparse)
+set(LIB_NAME onemath_sparse_blas_rocsparse)
 set(LIB_OBJ ${LIB_NAME}_obj)
 
 include(WarningsUtils)
@@ -31,16 +31,16 @@ add_library(${LIB_OBJ} OBJECT
   operations/rocsparse_spsv.cpp
   $<$<BOOL:${BUILD_SHARED_LIBS}>: rocsparse_wrappers.cpp>
 )
-add_dependencies(onemkl_backend_libs_sparse_blas ${LIB_NAME})
+add_dependencies(onemath_backend_libs_sparse_blas ${LIB_NAME})
 
 target_include_directories(${LIB_OBJ}
   PRIVATE ${PROJECT_SOURCE_DIR}/include
           ${PROJECT_SOURCE_DIR}/src
           ${CMAKE_BINARY_DIR}/bin
-          ${ONEMKL_GENERATED_INCLUDE_PATH}
+          ${ONEMATH_GENERATED_INCLUDE_PATH}
 )
 
-target_compile_options(${LIB_OBJ} PRIVATE ${ONEMKL_BUILD_COPT})
+target_compile_options(${LIB_OBJ} PRIVATE ${ONEMATH_BUILD_COPT})
 
 find_package(HIP REQUIRED)
 find_package(rocsparse REQUIRED)
@@ -48,8 +48,8 @@ find_package(rocsparse REQUIRED)
 target_link_libraries(${LIB_OBJ} PRIVATE hip::host roc::rocsparse)
 
 target_link_libraries(${LIB_OBJ}
-  PUBLIC ONEMKL::SYCL::SYCL
-  PRIVATE onemkl_warnings
+  PUBLIC ONEMATH::SYCL::SYCL
+  PRIVATE onemath_warnings
 )
 
 set_target_properties(${LIB_OBJ} PROPERTIES
@@ -57,10 +57,10 @@ set_target_properties(${LIB_OBJ} PROPERTIES
 )
 target_link_libraries(${LIB_NAME} PUBLIC ${LIB_OBJ})
 
-#Set oneMKL libraries as not transitive for dynamic
+#Set oneMATH libraries as not transitive for dynamic
 if(BUILD_SHARED_LIBS)
   set_target_properties(${LIB_NAME} PROPERTIES
-    INTERFACE_LINK_LIBRARIES ONEMKL::SYCL::SYCL
+    INTERFACE_LINK_LIBRARIES ONEMATH::SYCL::SYCL
   )
 endif()
 
@@ -73,8 +73,8 @@ set_target_properties(${LIB_NAME} PROPERTIES
 list(APPEND CMAKE_BUILD_RPATH $<TARGET_FILE_DIR:${LIB_NAME}>)
 
 # Add the library to install package
-install(TARGETS ${LIB_OBJ} EXPORT oneMKLTargets)
-install(TARGETS ${LIB_NAME} EXPORT oneMKLTargets
+install(TARGETS ${LIB_OBJ} EXPORT oneMATHTargets)
+install(TARGETS ${LIB_NAME} EXPORT oneMATHTargets
   RUNTIME DESTINATION bin
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib

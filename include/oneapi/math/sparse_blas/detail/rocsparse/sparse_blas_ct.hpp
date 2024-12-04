@@ -17,24 +17,24 @@
 *
 **************************************************************************/
 
-#ifndef _ONEMKL_SPARSE_BLAS_DETAIL_ROCSPARSE_SPARSE_BLAS_CT_HPP_
-#define _ONEMKL_SPARSE_BLAS_DETAIL_ROCSPARSE_SPARSE_BLAS_CT_HPP_
+#ifndef _ONEMATH_SPARSE_BLAS_DETAIL_ROCSPARSE_SPARSE_BLAS_CT_HPP_
+#define _ONEMATH_SPARSE_BLAS_DETAIL_ROCSPARSE_SPARSE_BLAS_CT_HPP_
 
-#include "oneapi/mkl/detail/backends.hpp"
-#include "oneapi/mkl/detail/backend_selector.hpp"
+#include "oneapi/math/detail/backends.hpp"
+#include "oneapi/math/detail/backend_selector.hpp"
 
-#include "onemkl_sparse_blas_rocsparse.hpp"
+#include "onemath_sparse_blas_rocsparse.hpp"
 
 namespace oneapi {
-namespace mkl {
+namespace math {
 namespace sparse {
 
 #define BACKEND rocsparse
-#include "oneapi/mkl/sparse_blas/detail/sparse_blas_ct.hxx"
+#include "oneapi/math/sparse_blas/detail/sparse_blas_ct.hxx"
 #undef BACKEND
 
 } //namespace sparse
-} //namespace mkl
+} //namespace math
 } //namespace oneapi
 
-#endif // _ONEMKL_SPARSE_BLAS_DETAIL_ROCSPARSE_SPARSE_BLAS_CT_HPP_
+#endif // _ONEMATH_SPARSE_BLAS_DETAIL_ROCSPARSE_SPARSE_BLAS_CT_HPP_

@@ -148,8 +148,8 @@ int run_sparse_matrix_vector_multiply_example(const sycl::device& dev) {
 
     // rocSPARSE backend requires that the property sorted is set when using matrices in CSR format.
     // Setting this property is also the best practice to get best performance.
-    oneapi::mkl::sparse::set_matrix_property(main_queue, A_handle,
-                                             oneapi::mkl::sparse::matrix_property::sorted);
+    oneapi::math::sparse::set_matrix_property(main_queue, A_handle,
+                                              oneapi::math::sparse::matrix_property::sorted);
 
     // Create and initialize dense vector handles
     oneapi::math::sparse::dense_vector_handle_t x_handle = nullptr;

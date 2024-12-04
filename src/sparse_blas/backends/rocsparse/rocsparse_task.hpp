@@ -17,13 +17,13 @@
 *
 **************************************************************************/
 
-#ifndef _ONEMKL_SPARSE_BLAS_BACKENDS_ROCSPARSE_TASK_HPP_
-#define _ONEMKL_SPARSE_BLAS_BACKENDS_ROCSPARSE_TASK_HPP_
+#ifndef _ONEMATH_SPARSE_BLAS_BACKENDS_ROCSPARSE_TASK_HPP_
+#define _ONEMATH_SPARSE_BLAS_BACKENDS_ROCSPARSE_TASK_HPP_
 
 #include "rocsparse_error.hpp"
 #include "sparse_blas/backends/common_launch_task.hpp"
 
-namespace oneapi::mkl::sparse::rocsparse::detail {
+namespace oneapi::math::sparse::rocsparse::detail {
 
 // Helper function for functors submitted to host_task or native_command.
 // When the extension is disabled, host_task are used and the synchronization is needed to ensure the sycl::event corresponds to the end of the whole functor.
@@ -39,6 +39,6 @@ inline void synchronize_if_needed(bool is_in_order_queue, hipStream_t hip_stream
 #endif
 }
 
-} // namespace oneapi::mkl::sparse::rocsparse::detail
+} // namespace oneapi::math::sparse::rocsparse::detail
 
-#endif // _ONEMKL_SPARSE_BLAS_BACKENDS_ROCSPARSE_TASK_HPP_
+#endif // _ONEMATH_SPARSE_BLAS_BACKENDS_ROCSPARSE_TASK_HPP_

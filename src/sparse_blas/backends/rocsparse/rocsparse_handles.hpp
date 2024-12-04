@@ -17,14 +17,14 @@
 *
 **************************************************************************/
 
-#ifndef _ONEMKL_SRC_SPARSE_BLAS_BACKENDS_ROCSPARSE_HANDLES_HPP_
-#define _ONEMKL_SRC_SPARSE_BLAS_BACKENDS_ROCSPARSE_HANDLES_HPP_
+#ifndef _ONEMATH_SRC_SPARSE_BLAS_BACKENDS_ROCSPARSE_HANDLES_HPP_
+#define _ONEMATH_SRC_SPARSE_BLAS_BACKENDS_ROCSPARSE_HANDLES_HPP_
 
 #include <rocsparse/rocsparse.h>
 
 #include "sparse_blas/generic_container.hpp"
 
-namespace oneapi::mkl::sparse {
+namespace oneapi::math::sparse {
 
 // Complete the definition of incomplete types dense_vector_handle, dense_matrix_handle and matrix_handle.
 
@@ -66,7 +66,7 @@ public:
     template <typename fpType, typename intType>
     matrix_handle(rocsparse_spmat_descr roc_descr, intType* row_ptr, intType* col_ptr,
                   fpType* value_ptr, detail::sparse_format format, std::int64_t num_rows,
-                  std::int64_t num_cols, std::int64_t nnz, oneapi::mkl::index_base index)
+                  std::int64_t num_cols, std::int64_t nnz, oneapi::math::index_base index)
             : detail::generic_sparse_handle<rocsparse_spmat_descr>(
                   roc_descr, row_ptr, col_ptr, value_ptr, format, num_rows, num_cols, nnz, index) {}
 
@@ -75,7 +75,7 @@ public:
                   const sycl::buffer<intType, 1> col_buffer,
                   const sycl::buffer<fpType, 1> value_buffer, detail::sparse_format format,
                   std::int64_t num_rows, std::int64_t num_cols, std::int64_t nnz,
-                  oneapi::mkl::index_base index)
+                  oneapi::math::index_base index)
             : detail::generic_sparse_handle<rocsparse_spmat_descr>(roc_descr, row_buffer,
                                                                    col_buffer, value_buffer, format,
                                                                    num_rows, num_cols, nnz, index) {
@@ -83,19 +83,19 @@ public:
 
     void check_valid_handle(const std::string& function_name) {
         if (used) {
-            throw mkl::unimplemented(
+            throw math::unimplemented(
                 "sparse_blas", function_name,
                 "The backend does not support re-using the same sparse matrix handle in multiple operations.");
         }
         if (this->format == detail::sparse_format::COO &&
             !this->has_matrix_property(matrix_property::sorted)) {
-            throw mkl::unimplemented(
+            throw math::unimplemented(
                 "sparse_blas", function_name,
                 "The backend does not support unsorted COO format. Use `set_matrix_property` to set the property `matrix_property::sorted`");
         }
         if (this->format == detail::sparse_format::CSR &&
             !this->has_matrix_property(matrix_property::sorted)) {
-            throw mkl::unimplemented(
+            throw math::unimplemented(
                 "sparse_blas", function_name,
                 "The backend does not support unsorted CSR format. Use `set_matrix_property` to set the property `matrix_property::sorted`");
         }
@@ -106,6 +106,6 @@ public:
     }
 };
 
-} // namespace oneapi::mkl::sparse
+} // namespace oneapi::math::sparse
 
-#endif // _ONEMKL_SRC_SPARSE_BLAS_BACKENDS_ROCSPARSE_HANDLES_HPP_
+#endif // _ONEMATH_SRC_SPARSE_BLAS_BACKENDS_ROCSPARSE_HANDLES_HPP_

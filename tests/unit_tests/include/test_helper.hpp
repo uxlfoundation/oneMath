@@ -183,9 +183,9 @@
 #define TEST_RUN_NVIDIAGPU_CUSPARSE_SELECT(q, func, ...)
 #endif
 
-#ifdef ONEMKL_ENABLE_ROCSPARSE_BACKEND
+#ifdef ONEMATH_ENABLE_ROCSPARSE_BACKEND
 #define TEST_RUN_AMDGPU_ROCSPARSE_SELECT(q, func, ...) \
-    func(oneapi::mkl::backend_selector<oneapi::mkl::backend::rocsparse>{ q }, __VA_ARGS__)
+    func(oneapi::math::backend_selector<oneapi::math::backend::rocsparse>{ q }, __VA_ARGS__)
 #else
 #define TEST_RUN_AMDGPU_ROCSPARSE_SELECT(q, func, ...)
 #endif

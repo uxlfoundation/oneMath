@@ -17,8 +17,8 @@
 *
 **************************************************************************/
 
-#ifndef _ONEMKL_SPARSE_BLAS_BACKENDS_ROCSPARSE_GLOBAL_HANDLE_HPP_
-#define _ONEMKL_SPARSE_BLAS_BACKENDS_ROCSPARSE_GLOBAL_HANDLE_HPP_
+#ifndef _ONEMATH_SPARSE_BLAS_BACKENDS_ROCSPARSE_GLOBAL_HANDLE_HPP_
+#define _ONEMATH_SPARSE_BLAS_BACKENDS_ROCSPARSE_GLOBAL_HANDLE_HPP_
 
 /**
  * @file Similar to blas_handle.hpp
@@ -29,7 +29,7 @@
 #include <atomic>
 #include <unordered_map>
 
-namespace oneapi::mkl::sparse::rocsparse::detail {
+namespace oneapi::math::sparse::rocsparse::detail {
 
 template <typename T>
 struct rocsparse_global_handle {
@@ -58,6 +58,6 @@ struct rocsparse_global_handle {
     }
 };
 
-} // namespace oneapi::mkl::sparse::rocsparse::detail
+} // namespace oneapi::math::sparse::rocsparse::detail
 
-#endif // _ONEMKL_SPARSE_BLAS_BACKENDS_ROCSPARSE_GLOBAL_HANDLE_HPP_
+#endif // _ONEMATH_SPARSE_BLAS_BACKENDS_ROCSPARSE_GLOBAL_HANDLE_HPP_

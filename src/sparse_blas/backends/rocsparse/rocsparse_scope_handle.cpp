@@ -23,7 +23,7 @@
 
 #include "rocsparse_scope_handle.hpp"
 
-namespace oneapi::mkl::sparse::rocsparse::detail {
+namespace oneapi::math::sparse::rocsparse::detail {
 
 /**
  * Inserts a new element in the map if its key is unique. This new element
@@ -32,7 +32,7 @@ namespace oneapi::mkl::sparse::rocsparse::detail {
  * takes place if no other element in the container has a key equivalent to
  * the one being emplaced (keys in a map container are unique).
  */
-#ifdef ONEAPI_ONEMKL_PI_INTERFACE_REMOVED
+#ifdef ONEAPI_ONEMATH_PI_INTERFACE_REMOVED
 thread_local rocsparse_handle_container<ur_context_handle_t>
     RocsparseScopedContextHandler::handle_helper =
         rocsparse_handle_container<ur_context_handle_t>{};
@@ -91,7 +91,7 @@ std::pair<rocsparse_handle, hipStream_t> RocsparseScopedContextHandler::get_hand
     auto hipDevice = ih.get_native_device<sycl::backend::ext_oneapi_hip>();
     hipCtx_t desired;
     HIP_ERROR_FUNC(hipDevicePrimaryCtxRetain, &desired, hipDevice);
-#ifdef ONEAPI_ONEMKL_PI_INTERFACE_REMOVED
+#ifdef ONEAPI_ONEMATH_PI_INTERFACE_REMOVED
     auto piPlacedContext_ = reinterpret_cast<ur_context_handle_t>(desired);
 #else
     auto piPlacedContext_ = reinterpret_cast<pi_context>(desired);
@@ -132,4 +132,4 @@ std::pair<rocsparse_handle, hipStream_t> RocsparseScopedContextHandler::get_hand
 
 #pragma clang diagnostic pop
 
-} // namespace oneapi::mkl::sparse::rocsparse::detail
+} // namespace oneapi::math::sparse::rocsparse::detail

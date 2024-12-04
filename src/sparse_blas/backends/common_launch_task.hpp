@@ -17,12 +17,12 @@
 *
 **************************************************************************/
 
-#ifndef _ONEMKL_SPARSE_BLAS_BACKENDS_COMMON_LAUNCH_TASK_HPP_
-#define _ONEMKL_SPARSE_BLAS_BACKENDS_COMMON_LAUNCH_TASK_HPP_
+#ifndef _ONEMATH_SPARSE_BLAS_BACKENDS_COMMON_LAUNCH_TASK_HPP_
+#define _ONEMATH_SPARSE_BLAS_BACKENDS_COMMON_LAUNCH_TASK_HPP_
 
 /// This file provide a helper function to submit host_task using buffers or USM seamlessly
 
-namespace oneapi::mkl::sparse::detail {
+namespace oneapi::math::sparse::detail {
 
 template <typename T, typename Container>
 auto get_value_accessor(sycl::handler& cgh, Container container) {
@@ -114,8 +114,8 @@ void submit_native_command_ext(sycl::handler& cgh, sycl::queue& queue, Functor f
             // extension ext_codeplay_enqueue_native_command is used to launch
             // the compute operation which depends on the previous optimize
             // step. In cuSPARSE the optimize step is synchronous but it is
-            // asynchronous in oneMKL Interface. The optimize step may not use
-            // the CUDA stream which would make it impossible for
+            // asynchronous in oneMath. The optimize step may not use the CUDA
+            // stream which would make it impossible for
             // ext_codeplay_enqueue_native_command to automatically ensure it
             // has completed before the compute function starts. These waits are
             // used to ensure the optimize step has completed before starting
@@ -149,16 +149,15 @@ void submit_native_command_ext_with_acc(sycl::handler& cgh, sycl::queue& queue, 
         auto unused = std::make_tuple(capture_only_accessors...);
         (void)unused;
         // The functor using ext_codeplay_enqueue_native_command need to
-        // explicitly wait on the events for the SPARSE domain. The
-        // extension ext_codeplay_enqueue_native_command is used to launch
-        // the compute operation which depends on the previous optimize
-        // step. In cuSPARSE the optimize step is synchronous but it is
-        // asynchronous in oneMKL Interface. The optimize step may not use
-        // the CUDA stream which would make it impossible for
-        // ext_codeplay_enqueue_native_command to automatically ensure it
-        // has completed before the compute function starts. These waits are
-        // used to ensure the optimize step has completed before starting
-        // the computation.
+        // explicitly wait on the events for the SPARSE domain. The extension
+        // ext_codeplay_enqueue_native_command is used to launch the compute
+        // operation which depends on the previous optimize step. In cuSPARSE
+        // the optimize step is synchronous but it is asynchronous in oneMath.
+        // The optimize step may not use the CUDA stream which would make it
+        // impossible for ext_codeplay_enqueue_native_command to automatically
+        // ensure it has completed before the compute function starts. These
+        // waits are used to ensure the optimize step has completed before
+        // starting the computation.
         for (auto event : dependencies) {
             event.wait();
         }
@@ -196,7 +195,7 @@ sycl::event dispatch_submit_impl_fp_int(const std::string& function_name, sycl::
         data_type value_type = sm_handle->get_value_type();
         data_type int_type = sm_handle->get_int_type();
 
-#define ONEMKL_SUBMIT(FP_TYPE, INT_TYPE)                                                          \
+#define ONEMATH_SUBMIT(FP_TYPE, INT_TYPE)                                                         \
     return queue.submit([&](sycl::handler& cgh) {                                                 \
         cgh.depends_on(dependencies);                                                             \
         auto fp_accs = get_fp_accessors<FP_TYPE>(cgh, sm_handle, other_containers...);            \
@@ -233,32 +232,32 @@ sycl::event dispatch_submit_impl_fp_int(const std::string& function_name, sycl::
             }                                                                                     \
         }                                                                                         \
     })
-#define ONEMKL_SUBMIT_INT(FP_TYPE)            \
-    if (int_type == data_type::int32) {       \
-        ONEMKL_SUBMIT(FP_TYPE, std::int32_t); \
-    }                                         \
-    else if (int_type == data_type::int64) {  \
-        ONEMKL_SUBMIT(FP_TYPE, std::int64_t); \
+#define ONEMATH_SUBMIT_INT(FP_TYPE)            \
+    if (int_type == data_type::int32) {        \
+        ONEMATH_SUBMIT(FP_TYPE, std::int32_t); \
+    }                                          \
+    else if (int_type == data_type::int64) {   \
+        ONEMATH_SUBMIT(FP_TYPE, std::int64_t); \
     }
 
         if (value_type == data_type::real_fp32) {
-            ONEMKL_SUBMIT_INT(float)
+            ONEMATH_SUBMIT_INT(float)
         }
         else if (value_type == data_type::real_fp64) {
-            ONEMKL_SUBMIT_INT(double)
+            ONEMATH_SUBMIT_INT(double)
         }
         else if (value_type == data_type::complex_fp32) {
-            ONEMKL_SUBMIT_INT(std::complex<float>)
+            ONEMATH_SUBMIT_INT(std::complex<float>)
         }
         else if (value_type == data_type::complex_fp64) {
-            ONEMKL_SUBMIT_INT(std::complex<double>)
+            ONEMATH_SUBMIT_INT(std::complex<double>)
         }
 
-#undef ONEMKL_SUBMIT_INT
-#undef ONEMKL_SUBMIT
+#undef ONEMATH_SUBMIT_INT
+#undef ONEMATH_SUBMIT
 
-        throw oneapi::mkl::exception("sparse_blas", function_name,
-                                     "Could not dispatch buffer kernel to a supported type");
+        throw oneapi::math::exception("sparse_blas", function_name,
+                                      "Could not dispatch buffer kernel to a supported type");
     }
     else {
         // USM submit does not need to capture accessors
@@ -279,8 +278,8 @@ sycl::event dispatch_submit_impl_fp_int(const std::string& function_name, sycl::
             });
         }
         else {
-            throw oneapi::mkl::exception("sparse_blas", function_name,
-                                         "Internal error: Cannot use accessor workspace with USM");
+            throw oneapi::math::exception("sparse_blas", function_name,
+                                          "Internal error: Cannot use accessor workspace with USM");
         }
     }
 }
@@ -293,7 +292,7 @@ sycl::event dispatch_submit_impl_fp(const std::string& function_name, sycl::queu
     if (container_handle->all_use_buffer()) {
         data_type value_type = container_handle->get_value_type();
 
-#define ONEMKL_SUBMIT(FP_TYPE)                                           \
+#define ONEMATH_SUBMIT(FP_TYPE)                                          \
     return queue.submit([&](sycl::handler& cgh) {                        \
         cgh.depends_on(dependencies);                                    \
         auto fp_accs = get_fp_accessors<FP_TYPE>(cgh, container_handle); \
@@ -301,22 +300,22 @@ sycl::event dispatch_submit_impl_fp(const std::string& function_name, sycl::queu
     })
 
         if (value_type == data_type::real_fp32) {
-            ONEMKL_SUBMIT(float);
+            ONEMATH_SUBMIT(float);
         }
         else if (value_type == data_type::real_fp64) {
-            ONEMKL_SUBMIT(double);
+            ONEMATH_SUBMIT(double);
         }
         else if (value_type == data_type::complex_fp32) {
-            ONEMKL_SUBMIT(std::complex<float>);
+            ONEMATH_SUBMIT(std::complex<float>);
         }
         else if (value_type == data_type::complex_fp64) {
-            ONEMKL_SUBMIT(std::complex<double>);
+            ONEMATH_SUBMIT(std::complex<double>);
         }
 
-#undef ONEMKL_SUBMIT
+#undef ONEMATH_SUBMIT
 
-        throw oneapi::mkl::exception("sparse_blas", function_name,
-                                     "Could not dispatch buffer kernel to a supported type");
+        throw oneapi::math::exception("sparse_blas", function_name,
+                                      "Could not dispatch buffer kernel to a supported type");
     }
     else {
         return queue.submit([&](sycl::handler& cgh) {
@@ -409,6 +408,6 @@ sycl::event dispatch_submit_native_ext(const std::string& function_name, sycl::q
         function_name, queue, {}, functor, sm_handle, no_workspace, other_containers...);
 }
 
-} // namespace oneapi::mkl::sparse::detail
+} // namespace oneapi::math::sparse::detail
 
-#endif // _ONEMKL_SPARSE_BLAS_BACKENDS_COMMON_LAUNCH_TASK_HPP_
+#endif // _ONEMATH_SPARSE_BLAS_BACKENDS_COMMON_LAUNCH_TASK_HPP_

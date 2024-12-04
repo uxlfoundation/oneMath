@@ -74,22 +74,22 @@ rocSPARSE backend
 Currently known limitations:
 
 - Using ``spmv`` with a ``type_view`` other than ``matrix_descr::general`` will
-  throw a ``oneapi::mkl::unimplemented`` exception.
+  throw a ``oneapi::math::unimplemented`` exception.
 - The COO format requires the indices to be sorted by row then by column. See
   the `rocSPARSE COO documentation
   <https://rocm.docs.amd.com/projects/rocSPARSE/en/latest/how-to/basics.html#coo-storage-format>`_.
   Sparse operations using matrices with the COO format without the property
-  ``matrix_property::sorted`` will throw a ``oneapi::mkl::unimplemented``
+  ``matrix_property::sorted`` will throw a ``oneapi::math::unimplemented``
   exception.
 - The CSR format requires the column indices to be sorted within each row. See
   the `rocSPARSE CSR documentation
   <https://rocm.docs.amd.com/projects/rocSPARSE/en/latest/how-to/basics.html#csr-storage-format>`_.
   Sparse operations using matrices with the CSR format without the property
-  ``matrix_property::sorted`` will throw a ``oneapi::mkl::unimplemented``
+  ``matrix_property::sorted`` will throw a ``oneapi::math::unimplemented``
   exception.
 - The same sparse matrix handle cannot be reused for multiple operations
   ``spmm``, ``spmv``, or ``spsv``. Doing so will throw a
-  ``oneapi::mkl::unimplemented`` exception. See `#332
+  ``oneapi::math::unimplemented`` exception. See `#332
   <https://github.com/ROCm/rocSPARSE/issues/332>`_.
 
 

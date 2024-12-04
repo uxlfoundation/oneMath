@@ -208,7 +208,7 @@ static std::map<domain, std::map<device, std::vector<const char*>>> libraries = 
           } },
         { device::amdgpu,
           {
-#ifdef ONEMKL_ENABLE_ROCSPARSE_BACKEND
+#ifdef ONEMATH_ENABLE_ROCSPARSE_BACKEND
               LIB_NAME("sparse_blas_rocsparse")
 #endif
           } } } },

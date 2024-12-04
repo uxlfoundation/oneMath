@@ -37,6 +37,9 @@
 #ifdef ONEMATH_ENABLE_CUSPARSE_BACKEND
 #include "sparse_blas/detail/cusparse/sparse_blas_ct.hpp"
 #endif
+#ifdef ONEMATH_ENABLE_ROCSPARSE_BACKEND
+#include "sparse_blas/detail/rocsparse/sparse_blas_ct.hpp"
+#endif
 
 #include "sparse_blas/detail/sparse_blas_rt.hpp"
 

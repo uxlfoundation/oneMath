@@ -17,17 +17,17 @@
 *
 **************************************************************************/
 
-#ifndef _ONEMKL_SPARSE_BLAS_DETAIL_ROCSPARSE_ONEMKL_SPARSE_BLAS_ROCSPARSE_HPP_
-#define _ONEMKL_SPARSE_BLAS_DETAIL_ROCSPARSE_ONEMKL_SPARSE_BLAS_ROCSPARSE_HPP_
+#ifndef _ONEMATH_SPARSE_BLAS_DETAIL_ROCSPARSE_ONEMATH_SPARSE_BLAS_ROCSPARSE_HPP_
+#define _ONEMATH_SPARSE_BLAS_DETAIL_ROCSPARSE_ONEMATH_SPARSE_BLAS_ROCSPARSE_HPP_
 
-#include "oneapi/mkl/detail/export.hpp"
-#include "oneapi/mkl/sparse_blas/detail/helper_types.hpp"
-#include "oneapi/mkl/sparse_blas/types.hpp"
+#include "oneapi/math/detail/export.hpp"
+#include "oneapi/math/sparse_blas/detail/helper_types.hpp"
+#include "oneapi/math/sparse_blas/types.hpp"
 
-namespace oneapi::mkl::sparse::rocsparse {
+namespace oneapi::math::sparse::rocsparse {
 
-#include "oneapi/mkl/sparse_blas/detail/onemkl_sparse_blas_backends.hxx"
+#include "oneapi/math/sparse_blas/detail/onemath_sparse_blas_backends.hxx"
 
-} // namespace oneapi::mkl::sparse::rocsparse
+} // namespace oneapi::math::sparse::rocsparse
 
-#endif // _ONEMKL_SPARSE_BLAS_DETAIL_ROCSPARSE_ONEMKL_SPARSE_BLAS_ROCSPARSE_HPP_
+#endif // _ONEMATH_SPARSE_BLAS_DETAIL_ROCSPARSE_ONEMATH_SPARSE_BLAS_ROCSPARSE_HPP_

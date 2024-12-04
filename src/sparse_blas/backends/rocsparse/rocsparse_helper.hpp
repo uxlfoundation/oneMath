@@ -16,8 +16,8 @@
 *  limitations under the License.
 *
 **************************************************************************/
-#ifndef _ONEMKL_SPARSE_BLAS_BACKENDS_ROCSPARSE_HELPER_HPP_
-#define _ONEMKL_SPARSE_BLAS_BACKENDS_ROCSPARSE_HELPER_HPP_
+#ifndef _ONEMATH_SPARSE_BLAS_BACKENDS_ROCSPARSE_HELPER_HPP_
+#define _ONEMATH_SPARSE_BLAS_BACKENDS_ROCSPARSE_HELPER_HPP_
 
 #include <complex>
 #include <cstdint>
@@ -26,14 +26,14 @@
 
 #include <rocsparse/rocsparse.h>
 
-#include "oneapi/mkl/sparse_blas/types.hpp"
+#include "oneapi/math/sparse_blas/types.hpp"
 #include "sparse_blas/enum_data_types.hpp"
 #include "sparse_blas/sycl_helper.hpp"
 #include "rocsparse_error.hpp"
 
-namespace oneapi::mkl::sparse::rocsparse::detail {
+namespace oneapi::math::sparse::rocsparse::detail {
 
-using namespace oneapi::mkl::sparse::detail;
+using namespace oneapi::math::sparse::detail;
 
 template <typename T>
 struct RocEnumType;
@@ -70,16 +70,16 @@ inline std::string cast_enum_to_str(E e) {
     return std::to_string(static_cast<char>(e));
 }
 
-inline auto get_roc_value_type(data_type onemkl_data_type) {
-    switch (onemkl_data_type) {
+inline auto get_roc_value_type(data_type onemath_data_type) {
+    switch (onemath_data_type) {
         case data_type::real_fp32: return rocsparse_datatype_f32_r;
         case data_type::real_fp64: return rocsparse_datatype_f64_r;
         case data_type::complex_fp32: return rocsparse_datatype_f32_c;
         case data_type::complex_fp64: return rocsparse_datatype_f64_c;
         default:
-            throw oneapi::mkl::invalid_argument(
+            throw oneapi::math::invalid_argument(
                 "sparse_blas", "get_roc_value_type",
-                "Invalid data type: " + cast_enum_to_str(onemkl_data_type));
+                "Invalid data type: " + cast_enum_to_str(onemath_data_type));
     }
 }
 
@@ -88,8 +88,8 @@ inline auto get_roc_order(layout l) {
         case layout::row_major: return rocsparse_order_row;
         case layout::col_major: return rocsparse_order_column;
         default:
-            throw oneapi::mkl::invalid_argument("sparse_blas", "get_roc_order",
-                                                "Unknown layout: " + cast_enum_to_str(l));
+            throw oneapi::math::invalid_argument("sparse_blas", "get_roc_order",
+                                                 "Unknown layout: " + cast_enum_to_str(l));
     }
 }
 
@@ -98,8 +98,8 @@ inline auto get_roc_index_base(index_base index) {
         case index_base::zero: return rocsparse_index_base_zero;
         case index_base::one: return rocsparse_index_base_one;
         default:
-            throw oneapi::mkl::invalid_argument("sparse_blas", "get_roc_index_base",
-                                                "Unknown index_base: " + cast_enum_to_str(index));
+            throw oneapi::math::invalid_argument("sparse_blas", "get_roc_index_base",
+                                                 "Unknown index_base: " + cast_enum_to_str(index));
     }
 }
 
@@ -109,7 +109,7 @@ inline auto get_roc_operation(transpose op) {
         case transpose::trans: return rocsparse_operation_transpose;
         case transpose::conjtrans: return rocsparse_operation_conjugate_transpose;
         default:
-            throw oneapi::mkl::invalid_argument(
+            throw oneapi::math::invalid_argument(
                 "sparse_blas", "get_roc_operation",
                 "Unknown transpose operation: " + cast_enum_to_str(op));
     }
@@ -120,8 +120,8 @@ inline auto get_roc_uplo(uplo uplo_val) {
         case uplo::upper: return rocsparse_fill_mode_upper;
         case uplo::lower: return rocsparse_fill_mode_lower;
         default:
-            throw oneapi::mkl::invalid_argument("sparse_blas", "get_roc_uplo",
-                                                "Unknown uplo: " + cast_enum_to_str(uplo_val));
+            throw oneapi::math::invalid_argument("sparse_blas", "get_roc_uplo",
+                                                 "Unknown uplo: " + cast_enum_to_str(uplo_val));
     }
 }
 
@@ -130,13 +130,13 @@ inline auto get_roc_diag(diag diag_val) {
         case diag::nonunit: return rocsparse_diag_type_non_unit;
         case diag::unit: return rocsparse_diag_type_unit;
         default:
-            throw oneapi::mkl::invalid_argument("sparse_blas", "get_roc_diag",
-                                                "Unknown diag: " + cast_enum_to_str(diag_val));
+            throw oneapi::math::invalid_argument("sparse_blas", "get_roc_diag",
+                                                 "Unknown diag: " + cast_enum_to_str(diag_val));
     }
 }
 
 inline void set_matrix_attributes(const std::string& func_name, rocsparse_spmat_descr roc_a,
-                                  oneapi::mkl::sparse::matrix_view A_view) {
+                                  oneapi::math::sparse::matrix_view A_view) {
     auto roc_fill_mode = get_roc_uplo(A_view.uplo_view);
     auto status = rocsparse_spmat_set_attribute(roc_a, rocsparse_spmat_fill_mode, &roc_fill_mode,
                                                 sizeof(roc_fill_mode));
@@ -157,6 +157,6 @@ inline void set_pointer_mode(rocsparse_handle roc_handle, bool is_ptr_accessible
                                                : rocsparse_pointer_mode_device);
 }
 
-} // namespace oneapi::mkl::sparse::rocsparse::detail
+} // namespace oneapi::math::sparse::rocsparse::detail
 
-#endif //_ONEMKL_SPARSE_BLAS_BACKENDS_ROCSPARSE_HELPER_HPP_
+#endif //_ONEMATH_SPARSE_BLAS_BACKENDS_ROCSPARSE_HELPER_HPP_

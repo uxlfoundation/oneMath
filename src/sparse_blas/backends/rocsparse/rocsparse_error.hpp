@@ -17,78 +17,78 @@
 *
 **************************************************************************/
 
-#ifndef _ONEMKL_SPARSE_BLAS_BACKENDS_ROCSPARSE_ERROR_HPP_
-#define _ONEMKL_SPARSE_BLAS_BACKENDS_ROCSPARSE_ERROR_HPP_
+#ifndef _ONEMATH_SPARSE_BLAS_BACKENDS_ROCSPARSE_ERROR_HPP_
+#define _ONEMATH_SPARSE_BLAS_BACKENDS_ROCSPARSE_ERROR_HPP_
 
 #include <string>
 
 #include <hip/hip_runtime.h>
 #include <rocsparse/rocsparse.h>
 
-#include "oneapi/mkl/exceptions.hpp"
+#include "oneapi/math/exceptions.hpp"
 
-namespace oneapi::mkl::sparse::rocsparse::detail {
+namespace oneapi::math::sparse::rocsparse::detail {
 
 inline std::string hip_result_to_str(hipError_t result) {
     switch (result) {
-#define ONEMKL_ROCSPARSE_CASE(STATUS) \
+#define ONEMATH_ROCSPARSE_CASE(STATUS) \
     case STATUS: return #STATUS
-        ONEMKL_ROCSPARSE_CASE(hipSuccess);
-        ONEMKL_ROCSPARSE_CASE(hipErrorInvalidContext);
-        ONEMKL_ROCSPARSE_CASE(hipErrorInvalidKernelFile);
-        ONEMKL_ROCSPARSE_CASE(hipErrorMemoryAllocation);
-        ONEMKL_ROCSPARSE_CASE(hipErrorInitializationError);
-        ONEMKL_ROCSPARSE_CASE(hipErrorLaunchFailure);
-        ONEMKL_ROCSPARSE_CASE(hipErrorLaunchOutOfResources);
-        ONEMKL_ROCSPARSE_CASE(hipErrorInvalidDevice);
-        ONEMKL_ROCSPARSE_CASE(hipErrorInvalidValue);
-        ONEMKL_ROCSPARSE_CASE(hipErrorInvalidDevicePointer);
-        ONEMKL_ROCSPARSE_CASE(hipErrorInvalidMemcpyDirection);
-        ONEMKL_ROCSPARSE_CASE(hipErrorUnknown);
-        ONEMKL_ROCSPARSE_CASE(hipErrorInvalidResourceHandle);
-        ONEMKL_ROCSPARSE_CASE(hipErrorNotReady);
-        ONEMKL_ROCSPARSE_CASE(hipErrorNoDevice);
-        ONEMKL_ROCSPARSE_CASE(hipErrorPeerAccessAlreadyEnabled);
-        ONEMKL_ROCSPARSE_CASE(hipErrorPeerAccessNotEnabled);
-        ONEMKL_ROCSPARSE_CASE(hipErrorRuntimeMemory);
-        ONEMKL_ROCSPARSE_CASE(hipErrorRuntimeOther);
-        ONEMKL_ROCSPARSE_CASE(hipErrorHostMemoryAlreadyRegistered);
-        ONEMKL_ROCSPARSE_CASE(hipErrorHostMemoryNotRegistered);
-        ONEMKL_ROCSPARSE_CASE(hipErrorMapBufferObjectFailed);
-        ONEMKL_ROCSPARSE_CASE(hipErrorTbd);
+        ONEMATH_ROCSPARSE_CASE(hipSuccess);
+        ONEMATH_ROCSPARSE_CASE(hipErrorInvalidContext);
+        ONEMATH_ROCSPARSE_CASE(hipErrorInvalidKernelFile);
+        ONEMATH_ROCSPARSE_CASE(hipErrorMemoryAllocation);
+        ONEMATH_ROCSPARSE_CASE(hipErrorInitializationError);
+        ONEMATH_ROCSPARSE_CASE(hipErrorLaunchFailure);
+        ONEMATH_ROCSPARSE_CASE(hipErrorLaunchOutOfResources);
+        ONEMATH_ROCSPARSE_CASE(hipErrorInvalidDevice);
+        ONEMATH_ROCSPARSE_CASE(hipErrorInvalidValue);
+        ONEMATH_ROCSPARSE_CASE(hipErrorInvalidDevicePointer);
+        ONEMATH_ROCSPARSE_CASE(hipErrorInvalidMemcpyDirection);
+        ONEMATH_ROCSPARSE_CASE(hipErrorUnknown);
+        ONEMATH_ROCSPARSE_CASE(hipErrorInvalidResourceHandle);
+        ONEMATH_ROCSPARSE_CASE(hipErrorNotReady);
+        ONEMATH_ROCSPARSE_CASE(hipErrorNoDevice);
+        ONEMATH_ROCSPARSE_CASE(hipErrorPeerAccessAlreadyEnabled);
+        ONEMATH_ROCSPARSE_CASE(hipErrorPeerAccessNotEnabled);
+        ONEMATH_ROCSPARSE_CASE(hipErrorRuntimeMemory);
+        ONEMATH_ROCSPARSE_CASE(hipErrorRuntimeOther);
+        ONEMATH_ROCSPARSE_CASE(hipErrorHostMemoryAlreadyRegistered);
+        ONEMATH_ROCSPARSE_CASE(hipErrorHostMemoryNotRegistered);
+        ONEMATH_ROCSPARSE_CASE(hipErrorMapBufferObjectFailed);
+        ONEMATH_ROCSPARSE_CASE(hipErrorTbd);
         default: return "<unknown>";
     }
 }
 
-#define HIP_ERROR_FUNC(func, ...)                                                         \
-    do {                                                                                  \
-        auto res = func(__VA_ARGS__);                                                     \
-        if (res != hipSuccess) {                                                          \
-            throw oneapi::mkl::exception("sparse_blas", #func,                            \
-                                         "hip error: " + detail::hip_result_to_str(res)); \
-        }                                                                                 \
+#define HIP_ERROR_FUNC(func, ...)                                                          \
+    do {                                                                                   \
+        auto res = func(__VA_ARGS__);                                                      \
+        if (res != hipSuccess) {                                                           \
+            throw oneapi::math::exception("sparse_blas", #func,                            \
+                                          "hip error: " + detail::hip_result_to_str(res)); \
+        }                                                                                  \
     } while (0)
 
 inline std::string rocsparse_status_to_str(rocsparse_status status) {
     switch (status) {
-#define ONEMKL_ROCSPARSE_CASE(STATUS) \
+#define ONEMATH_ROCSPARSE_CASE(STATUS) \
     case STATUS: return #STATUS
-        ONEMKL_ROCSPARSE_CASE(rocsparse_status_success);
-        ONEMKL_ROCSPARSE_CASE(rocsparse_status_invalid_handle);
-        ONEMKL_ROCSPARSE_CASE(rocsparse_status_not_implemented);
-        ONEMKL_ROCSPARSE_CASE(rocsparse_status_invalid_pointer);
-        ONEMKL_ROCSPARSE_CASE(rocsparse_status_invalid_size);
-        ONEMKL_ROCSPARSE_CASE(rocsparse_status_memory_error);
-        ONEMKL_ROCSPARSE_CASE(rocsparse_status_internal_error);
-        ONEMKL_ROCSPARSE_CASE(rocsparse_status_invalid_value);
-        ONEMKL_ROCSPARSE_CASE(rocsparse_status_arch_mismatch);
-        ONEMKL_ROCSPARSE_CASE(rocsparse_status_zero_pivot);
-        ONEMKL_ROCSPARSE_CASE(rocsparse_status_not_initialized);
-        ONEMKL_ROCSPARSE_CASE(rocsparse_status_type_mismatch);
-        ONEMKL_ROCSPARSE_CASE(rocsparse_status_requires_sorted_storage);
-        ONEMKL_ROCSPARSE_CASE(rocsparse_status_thrown_exception);
-        ONEMKL_ROCSPARSE_CASE(rocsparse_status_continue);
-#undef ONEMKL_ROCSPARSE_CASE
+        ONEMATH_ROCSPARSE_CASE(rocsparse_status_success);
+        ONEMATH_ROCSPARSE_CASE(rocsparse_status_invalid_handle);
+        ONEMATH_ROCSPARSE_CASE(rocsparse_status_not_implemented);
+        ONEMATH_ROCSPARSE_CASE(rocsparse_status_invalid_pointer);
+        ONEMATH_ROCSPARSE_CASE(rocsparse_status_invalid_size);
+        ONEMATH_ROCSPARSE_CASE(rocsparse_status_memory_error);
+        ONEMATH_ROCSPARSE_CASE(rocsparse_status_internal_error);
+        ONEMATH_ROCSPARSE_CASE(rocsparse_status_invalid_value);
+        ONEMATH_ROCSPARSE_CASE(rocsparse_status_arch_mismatch);
+        ONEMATH_ROCSPARSE_CASE(rocsparse_status_zero_pivot);
+        ONEMATH_ROCSPARSE_CASE(rocsparse_status_not_initialized);
+        ONEMATH_ROCSPARSE_CASE(rocsparse_status_type_mismatch);
+        ONEMATH_ROCSPARSE_CASE(rocsparse_status_requires_sorted_storage);
+        ONEMATH_ROCSPARSE_CASE(rocsparse_status_thrown_exception);
+        ONEMATH_ROCSPARSE_CASE(rocsparse_status_continue);
+#undef ONEMATH_ROCSPARSE_CASE
         default: return "<unknown>";
     }
 }
@@ -102,15 +102,15 @@ inline void check_status(rocsparse_status status, const std::string& function,
         error_str += "rocSPARSE status: " + rocsparse_status_to_str(status);
         switch (status) {
             case rocsparse_status_not_implemented:
-                throw oneapi::mkl::unimplemented("sparse_blas", function, error_str);
+                throw oneapi::math::unimplemented("sparse_blas", function, error_str);
             case rocsparse_status_invalid_handle:
             case rocsparse_status_invalid_pointer:
             case rocsparse_status_invalid_size:
             case rocsparse_status_invalid_value:
-                throw oneapi::mkl::invalid_argument("sparse_blas", function, error_str);
+                throw oneapi::math::invalid_argument("sparse_blas", function, error_str);
             case rocsparse_status_not_initialized:
-                throw oneapi::mkl::uninitialized("sparse_blas", function, error_str);
-            default: throw oneapi::mkl::exception("sparse_blas", function, error_str);
+                throw oneapi::math::uninitialized("sparse_blas", function, error_str);
+            default: throw oneapi::math::exception("sparse_blas", function, error_str);
         }
     }
 }
@@ -121,6 +121,6 @@ inline void check_status(rocsparse_status status, const std::string& function,
         detail::check_status(status, #func); \
     } while (0)
 
-} // namespace oneapi::mkl::sparse::rocsparse::detail
+} // namespace oneapi::math::sparse::rocsparse::detail
 
-#endif // _ONEMKL_SPARSE_BLAS_BACKENDS_ROCSPARSE_ERROR_HPP_
+#endif // _ONEMATH_SPARSE_BLAS_BACKENDS_ROCSPARSE_ERROR_HPP_
