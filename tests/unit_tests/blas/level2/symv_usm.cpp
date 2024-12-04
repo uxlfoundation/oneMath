@@ -30,9 +30,9 @@
 #include <CL/sycl.hpp>
 #endif
 #include "cblas.h"
-#include "oneapi/mkl/detail/config.hpp"
-#include "oneapi/mkl.hpp"
-#include "onemkl_blas_helper.hpp"
+#include "oneapi/math/detail/config.hpp"
+#include "oneapi/math.hpp"
+#include "onemath_blas_helper.hpp"
 #include "reference_blas_templates.hpp"
 #include "test_common.hpp"
 #include "test_helper.hpp"
@@ -47,7 +47,7 @@ extern std::vector<sycl::device*> devices;
 namespace {
 
 template <typename fp>
-int test(device* dev, oneapi::mkl::layout layout, oneapi::mkl::uplo upper_lower, int n, fp alpha,
+int test(device* dev, oneapi::math::layout layout, oneapi::math::uplo upper_lower, int n, fp alpha,
          fp beta, int incx, int incy, int lda) {
     // Catch asynchronous exceptions.
     auto exception_handler = [](exception_list exceptions) {
@@ -73,7 +73,7 @@ int test(device* dev, oneapi::mkl::layout layout, oneapi::mkl::uplo upper_lower,
     vector<fp, decltype(ua)> x(ua), y(ua), A(ua);
     rand_vector(x, n, incx);
     rand_vector(y, n, incy);
-    rand_matrix(A, layout, oneapi::mkl::transpose::nontrans, n, n, lda);
+    rand_matrix(A, layout, oneapi::math::transpose::nontrans, n, n, lda);
 
     auto y_ref = y;
 
@@ -90,30 +90,30 @@ int test(device* dev, oneapi::mkl::layout layout, oneapi::mkl::uplo upper_lower,
     try {
 #ifdef CALL_RT_API
         switch (layout) {
-            case oneapi::mkl::layout::col_major:
-                done = oneapi::mkl::blas::column_major::symv(main_queue, upper_lower, n, alpha,
-                                                             A.data(), lda, x.data(), incx, beta,
-                                                             y.data(), incy, dependencies);
+            case oneapi::math::layout::col_major:
+                done = oneapi::math::blas::column_major::symv(main_queue, upper_lower, n, alpha,
+                                                              A.data(), lda, x.data(), incx, beta,
+                                                              y.data(), incy, dependencies);
                 break;
-            case oneapi::mkl::layout::row_major:
-                done = oneapi::mkl::blas::row_major::symv(main_queue, upper_lower, n, alpha,
-                                                          A.data(), lda, x.data(), incx, beta,
-                                                          y.data(), incy, dependencies);
+            case oneapi::math::layout::row_major:
+                done = oneapi::math::blas::row_major::symv(main_queue, upper_lower, n, alpha,
+                                                           A.data(), lda, x.data(), incx, beta,
+                                                           y.data(), incy, dependencies);
                 break;
             default: break;
         }
         done.wait();
 #else
         switch (layout) {
-            case oneapi::mkl::layout::col_major:
-                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::mkl::blas::column_major::symv,
+            case oneapi::math::layout::col_major:
+                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::math::blas::column_major::symv,
                                         upper_lower, n, alpha, A.data(), lda, x.data(), incx, beta,
                                         y.data(), incy, dependencies);
                 break;
-            case oneapi::mkl::layout::row_major:
-                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::mkl::blas::row_major::symv, upper_lower,
-                                        n, alpha, A.data(), lda, x.data(), incx, beta, y.data(),
-                                        incy, dependencies);
+            case oneapi::math::layout::row_major:
+                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::math::blas::row_major::symv,
+                                        upper_lower, n, alpha, A.data(), lda, x.data(), incx, beta,
+                                        y.data(), incy, dependencies);
                 break;
             default: break;
         }
@@ -125,7 +125,7 @@ int test(device* dev, oneapi::mkl::layout layout, oneapi::mkl::uplo upper_lower,
         print_error_code(e);
     }
 
-    catch (const oneapi::mkl::unimplemented& e) {
+    catch (const oneapi::math::unimplemented& e) {
         return test_skipped;
     }
 
@@ -141,23 +141,23 @@ int test(device* dev, oneapi::mkl::layout layout, oneapi::mkl::uplo upper_lower,
 }
 
 class SymvUsmTests
-        : public ::testing::TestWithParam<std::tuple<sycl::device*, oneapi::mkl::layout>> {};
+        : public ::testing::TestWithParam<std::tuple<sycl::device*, oneapi::math::layout>> {};
 
 TEST_P(SymvUsmTests, RealSinglePrecision) {
     float alpha(2.0);
     float beta(3.0);
     EXPECT_TRUEORSKIP(test<float>(std::get<0>(GetParam()), std::get<1>(GetParam()),
-                                  oneapi::mkl::uplo::lower, 30, alpha, beta, 2, 3, 42));
+                                  oneapi::math::uplo::lower, 30, alpha, beta, 2, 3, 42));
     EXPECT_TRUEORSKIP(test<float>(std::get<0>(GetParam()), std::get<1>(GetParam()),
-                                  oneapi::mkl::uplo::upper, 30, alpha, beta, 2, 3, 42));
+                                  oneapi::math::uplo::upper, 30, alpha, beta, 2, 3, 42));
     EXPECT_TRUEORSKIP(test<float>(std::get<0>(GetParam()), std::get<1>(GetParam()),
-                                  oneapi::mkl::uplo::lower, 30, alpha, beta, -2, -3, 42));
+                                  oneapi::math::uplo::lower, 30, alpha, beta, -2, -3, 42));
     EXPECT_TRUEORSKIP(test<float>(std::get<0>(GetParam()), std::get<1>(GetParam()),
-                                  oneapi::mkl::uplo::upper, 30, alpha, beta, -2, -3, 42));
+                                  oneapi::math::uplo::upper, 30, alpha, beta, -2, -3, 42));
     EXPECT_TRUEORSKIP(test<float>(std::get<0>(GetParam()), std::get<1>(GetParam()),
-                                  oneapi::mkl::uplo::lower, 30, alpha, beta, 1, 1, 42));
+                                  oneapi::math::uplo::lower, 30, alpha, beta, 1, 1, 42));
     EXPECT_TRUEORSKIP(test<float>(std::get<0>(GetParam()), std::get<1>(GetParam()),
-                                  oneapi::mkl::uplo::upper, 30, alpha, beta, 1, 1, 42));
+                                  oneapi::math::uplo::upper, 30, alpha, beta, 1, 1, 42));
 }
 TEST_P(SymvUsmTests, RealDoublePrecision) {
     CHECK_DOUBLE_ON_DEVICE(std::get<0>(GetParam()));
@@ -165,23 +165,23 @@ TEST_P(SymvUsmTests, RealDoublePrecision) {
     double alpha(2.0);
     double beta(3.0);
     EXPECT_TRUEORSKIP(test<double>(std::get<0>(GetParam()), std::get<1>(GetParam()),
-                                   oneapi::mkl::uplo::lower, 30, alpha, beta, 2, 3, 42));
+                                   oneapi::math::uplo::lower, 30, alpha, beta, 2, 3, 42));
     EXPECT_TRUEORSKIP(test<double>(std::get<0>(GetParam()), std::get<1>(GetParam()),
-                                   oneapi::mkl::uplo::upper, 30, alpha, beta, 2, 3, 42));
+                                   oneapi::math::uplo::upper, 30, alpha, beta, 2, 3, 42));
     EXPECT_TRUEORSKIP(test<double>(std::get<0>(GetParam()), std::get<1>(GetParam()),
-                                   oneapi::mkl::uplo::lower, 30, alpha, beta, -2, -3, 42));
+                                   oneapi::math::uplo::lower, 30, alpha, beta, -2, -3, 42));
     EXPECT_TRUEORSKIP(test<double>(std::get<0>(GetParam()), std::get<1>(GetParam()),
-                                   oneapi::mkl::uplo::upper, 30, alpha, beta, -2, -3, 42));
+                                   oneapi::math::uplo::upper, 30, alpha, beta, -2, -3, 42));
     EXPECT_TRUEORSKIP(test<double>(std::get<0>(GetParam()), std::get<1>(GetParam()),
-                                   oneapi::mkl::uplo::lower, 30, alpha, beta, 1, 1, 42));
+                                   oneapi::math::uplo::lower, 30, alpha, beta, 1, 1, 42));
     EXPECT_TRUEORSKIP(test<double>(std::get<0>(GetParam()), std::get<1>(GetParam()),
-                                   oneapi::mkl::uplo::upper, 30, alpha, beta, 1, 1, 42));
+                                   oneapi::math::uplo::upper, 30, alpha, beta, 1, 1, 42));
 }
 
 INSTANTIATE_TEST_SUITE_P(SymvUsmTestSuite, SymvUsmTests,
                          ::testing::Combine(testing::ValuesIn(devices),
-                                            testing::Values(oneapi::mkl::layout::col_major,
-                                                            oneapi::mkl::layout::row_major)),
+                                            testing::Values(oneapi::math::layout::col_major,
+                                                            oneapi::math::layout::row_major)),
                          ::LayoutDeviceNamePrint());
 
 } // anonymous namespace

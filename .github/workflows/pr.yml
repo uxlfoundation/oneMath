@@ -31,6 +31,7 @@ jobs:
     runs-on: ubuntu-latest
     # One runner for each domain
     strategy:
+      fail-fast: false
       matrix:
         include:
         - config: portBLAS
@@ -40,15 +41,15 @@ jobs:
           domain: dft
           build_options: -DENABLE_PORTFFT_BACKEND=ON -DENABLE_MKLCPU_BACKEND=OFF
           test_options: -R 'DFT/CT/.*ComputeTests_in_place_COMPLEX.COMPLEX_SINGLE_in_place_buffer.sizes_8_batches_1*'
-        - config: MKL BLAS
+        - config: oneMath BLAS
           domain: blas
           build_options: -DREF_BLAS_ROOT=${PWD}/lapack/install
-        - config: MKL DFT
+        - config: oneMath DFT
           domain: dft
-        - config: MKL LAPACK
+        - config: oneMath LAPACK
           domain: lapack
           build_options: -DREF_LAPACK_ROOT=${PWD}/lapack/install
-        - config: MKL RNG
+        - config: oneMath RNG
           domain: rng
     name: unit tests ${{ matrix.config }} CPU
     steps:
@@ -77,13 +78,16 @@ jobs:
         # 64 bit int
         cmake ${SHARED_OPT} -DBUILD_INDEX64=on -B lapack/build64
         cmake --build lapack/build64 ${PARALLEL} --target install
-    - name: Install oneapi
+    - name: Install compiler
       if: steps.domain_check.outputs.result == 'true'
-      uses: rscohn2/setup-oneapi@2ad0cf6b74bc2426bdcee825cf88f9db719dd727 # v0.1.0
-      with:
-        components: |
-          icx@2024.1.0
-          mkl@2024.1.0
+      run: |
+        wget --progress=dot:giga https://registrationcenter-download.intel.com/akdlm/IRC_NAS/ac92f2bb-4818-4e53-a432-f8b34d502f23/intel-dpcpp-cpp-compiler-2025.0.0.740_offline.sh
+        sudo bash intel-dpcpp-cpp-compiler-2025.0.0.740_offline.sh -s -a -s --action install --eula accept
+    - name: Install Intel oneMKL
+      if: steps.domain_check.outputs.result == 'true'
+      run: |
+        wget --progress=dot:giga https://registrationcenter-download.intel.com/akdlm/IRC_NAS/79153e0f-74d7-45af-b8c2-258941adf58a/intel-onemkl-2025.0.0.940_offline.sh
+        sudo bash intel-onemkl-2025.0.0.940_offline.sh -s -a -s --action install --eula accept
     - name: Configure/Build for a domain
       if: steps.domain_check.outputs.result == 'true'
       run: |

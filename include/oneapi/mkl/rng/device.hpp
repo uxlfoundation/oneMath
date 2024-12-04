@@ -1,5 +1,5 @@
 /*******************************************************************************
-* Copyright 2023 Intel Corporation
+* Copyright 2024 Intel Corporation
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -17,12 +17,15 @@
 * SPDX-License-Identifier: Apache-2.0
 *******************************************************************************/
 
-#ifndef _MKL_RNG_SYCL_DEVICE_HPP__
-#define _MKL_RNG_SYCL_DEVICE_HPP__
+#ifndef ONEMATH_MKL_RNG_DEVICE_HPP
+#define ONEMATH_MKL_RNG_DEVICE_HPP
 
-#include "oneapi/mkl/rng/device/types.hpp"
-#include "oneapi/mkl/rng/device/functions.hpp"
-#include "oneapi/mkl/rng/device/distributions.hpp"
-#include "oneapi/mkl/rng/device/engines.hpp"
+// Deprecated header is planned to be removed late 2025.
+#pragma message( \
+    "Header `oneapi/mkl/rng/device.hpp` is deprecated, please use `oneapi/math/rng/math.hpp` instead")
 
-#endif // _MKL_RNG_SYCL_DEVICE_HPP__
+#include "oneapi/math/rng/device.hpp"
+
+#include "namespace_alias.hpp"
+
+#endif // ONEMATH_MKL_RNG_DEVICE_HPP

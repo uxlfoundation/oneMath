@@ -60,17 +60,17 @@
  * @file curand_helper.cpp : contains the implementation of all the routines
  * for CUDA backend
  */
-#ifndef _MKL_RNG_CURAND_HELPER_HPP_
-#define _MKL_RNG_CURAND_HELPER_HPP_
+#ifndef ONEMATH_RNG_CURAND_HELPER_HPP_
+#define ONEMATH_RNG_CURAND_HELPER_HPP_
 #include <cuda.h>
 #include <curand.h>
 
 #include <complex>
 
-#include "oneapi/mkl/types.hpp"
+#include "oneapi/math/types.hpp"
 
 namespace oneapi {
-namespace mkl {
+namespace math {
 namespace rng {
 namespace curand {
 
@@ -190,7 +190,7 @@ public:
         throw curand_error(std::string(#func) + std::string(" : "), status); \
     }
 
-// Static template functions oneapi::mkl::rng::curand::range_transform_fp for
+// Static template functions oneapi::math::rng::curand::range_transform_fp for
 // Buffer and USM APIs
 //
 // cuRAND has no built-in functionality to specify a custom range for sampling
@@ -252,7 +252,7 @@ static inline sycl::event range_transform_fp_accurate(sycl::queue& queue, T a, T
     });
 }
 
-// Static template functions oneapi::mkl::rng::curand::range_transform_int for
+// Static template functions oneapi::math::rng::curand::range_transform_int for
 // Buffer and USM APIs
 //
 // cuRAND has no built-in functionality to specify a custom range for sampling
@@ -285,7 +285,7 @@ inline sycl::event range_transform_int(sycl::queue& queue, T a, T b, std::int64_
                               [=](sycl::id<1> id) { out[id] = a + in[id] % (b - a); });
 }
 
-// Static template functions oneapi::mkl::rng::curand::sample_bernoulli for
+// Static template functions oneapi::math::rng::curand::sample_bernoulli for
 // Buffer and USM APIs
 //
 // cuRAND has no built-in functionality to sample from a Bernoulli distribution.
@@ -320,7 +320,7 @@ static inline sycl::event sample_bernoulli_from_uniform(sycl::queue& queue, floa
 
 } // namespace curand
 } // namespace rng
-} // namespace mkl
+} // namespace math
 } // namespace oneapi
 
-#endif // _MKL_RNG_CURAND_HELPER_HPP_
+#endif // ONEMATH_RNG_CURAND_HELPER_HPP_

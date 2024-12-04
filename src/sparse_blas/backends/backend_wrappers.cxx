@@ -26,7 +26,7 @@ To use this:
 #define WRAPPER_VERSION <Wrapper version number>
 #define BACKEND         <Backend name eg. mklgpu>
 
-extern "C" sparse_blas_function_table_t mkl_sparse_blas_table = {
+extern "C" sparse_blas_function_table_t onemath_sparse_blas_table = {
     WRAPPER_VERSION,
 #include "sparse_blas/backends/backend_wrappers.cxx"
 };
@@ -48,68 +48,68 @@ function template instantiations must be added to backend_sparse_blas_instantiat
 // clang-format off
 // Dense vector
 #define LIST_DENSE_VECTOR_FUNCS() \
-oneapi::mkl::sparse::BACKEND::init_dense_vector, \
-oneapi::mkl::sparse::BACKEND::init_dense_vector, \
-oneapi::mkl::sparse::BACKEND::set_dense_vector_data, \
-oneapi::mkl::sparse::BACKEND::set_dense_vector_data,
+oneapi::math::sparse::BACKEND::init_dense_vector, \
+oneapi::math::sparse::BACKEND::init_dense_vector, \
+oneapi::math::sparse::BACKEND::set_dense_vector_data, \
+oneapi::math::sparse::BACKEND::set_dense_vector_data,
 REPEAT_FOR_EACH_FP_TYPE(LIST_DENSE_VECTOR_FUNCS)
 #undef LIST_DENSE_VECTOR_FUNCS
-oneapi::mkl::sparse::BACKEND::release_dense_vector,
+oneapi::math::sparse::BACKEND::release_dense_vector,
 
 // Dense matrix
 #define LIST_DENSE_MATRIX_FUNCS() \
-oneapi::mkl::sparse::BACKEND::init_dense_matrix, \
-oneapi::mkl::sparse::BACKEND::init_dense_matrix, \
-oneapi::mkl::sparse::BACKEND::set_dense_matrix_data, \
-oneapi::mkl::sparse::BACKEND::set_dense_matrix_data,
+oneapi::math::sparse::BACKEND::init_dense_matrix, \
+oneapi::math::sparse::BACKEND::init_dense_matrix, \
+oneapi::math::sparse::BACKEND::set_dense_matrix_data, \
+oneapi::math::sparse::BACKEND::set_dense_matrix_data,
 REPEAT_FOR_EACH_FP_TYPE(LIST_DENSE_MATRIX_FUNCS)
 #undef LIST_DENSE_MATRIX_FUNCS
-oneapi::mkl::sparse::BACKEND::release_dense_matrix,
+oneapi::math::sparse::BACKEND::release_dense_matrix,
 
 // COO matrix
 #define LIST_COO_MATRIX_FUNCS() \
-oneapi::mkl::sparse::BACKEND::init_coo_matrix, \
-oneapi::mkl::sparse::BACKEND::init_coo_matrix, \
-oneapi::mkl::sparse::BACKEND::set_coo_matrix_data, \
-oneapi::mkl::sparse::BACKEND::set_coo_matrix_data,
+oneapi::math::sparse::BACKEND::init_coo_matrix, \
+oneapi::math::sparse::BACKEND::init_coo_matrix, \
+oneapi::math::sparse::BACKEND::set_coo_matrix_data, \
+oneapi::math::sparse::BACKEND::set_coo_matrix_data,
 REPEAT_FOR_EACH_FP_AND_INT_TYPE(LIST_COO_MATRIX_FUNCS)
 #undef LIST_COO_MATRIX_FUNCS
 
 // CSR matrix
 #define LIST_CSR_MATRIX_FUNCS() \
-oneapi::mkl::sparse::BACKEND::init_csr_matrix, \
-oneapi::mkl::sparse::BACKEND::init_csr_matrix, \
-oneapi::mkl::sparse::BACKEND::set_csr_matrix_data, \
-oneapi::mkl::sparse::BACKEND::set_csr_matrix_data,
+oneapi::math::sparse::BACKEND::init_csr_matrix, \
+oneapi::math::sparse::BACKEND::init_csr_matrix, \
+oneapi::math::sparse::BACKEND::set_csr_matrix_data, \
+oneapi::math::sparse::BACKEND::set_csr_matrix_data,
 REPEAT_FOR_EACH_FP_AND_INT_TYPE(LIST_CSR_MATRIX_FUNCS)
 #undef LIST_CSR_MATRIX_FUNCS
 
 // Common sparse matrix functions
-oneapi::mkl::sparse::BACKEND::release_sparse_matrix,
-oneapi::mkl::sparse::BACKEND::set_matrix_property,
+oneapi::math::sparse::BACKEND::release_sparse_matrix,
+oneapi::math::sparse::BACKEND::set_matrix_property,
 
 // SPMM
-oneapi::mkl::sparse::BACKEND::init_spmm_descr,
-oneapi::mkl::sparse::BACKEND::release_spmm_descr,
-oneapi::mkl::sparse::BACKEND::spmm_buffer_size,
-oneapi::mkl::sparse::BACKEND::spmm_optimize,
-oneapi::mkl::sparse::BACKEND::spmm_optimize,
-oneapi::mkl::sparse::BACKEND::spmm,
+oneapi::math::sparse::BACKEND::init_spmm_descr,
+oneapi::math::sparse::BACKEND::release_spmm_descr,
+oneapi::math::sparse::BACKEND::spmm_buffer_size,
+oneapi::math::sparse::BACKEND::spmm_optimize,
+oneapi::math::sparse::BACKEND::spmm_optimize,
+oneapi::math::sparse::BACKEND::spmm,
 
 // SPMV
-oneapi::mkl::sparse::BACKEND::init_spmv_descr,
-oneapi::mkl::sparse::BACKEND::release_spmv_descr,
-oneapi::mkl::sparse::BACKEND::spmv_buffer_size,
-oneapi::mkl::sparse::BACKEND::spmv_optimize,
-oneapi::mkl::sparse::BACKEND::spmv_optimize,
-oneapi::mkl::sparse::BACKEND::spmv,
+oneapi::math::sparse::BACKEND::init_spmv_descr,
+oneapi::math::sparse::BACKEND::release_spmv_descr,
+oneapi::math::sparse::BACKEND::spmv_buffer_size,
+oneapi::math::sparse::BACKEND::spmv_optimize,
+oneapi::math::sparse::BACKEND::spmv_optimize,
+oneapi::math::sparse::BACKEND::spmv,
 
 // SPSV
-oneapi::mkl::sparse::BACKEND::init_spsv_descr,
-oneapi::mkl::sparse::BACKEND::release_spsv_descr,
-oneapi::mkl::sparse::BACKEND::spsv_buffer_size,
-oneapi::mkl::sparse::BACKEND::spsv_optimize,
-oneapi::mkl::sparse::BACKEND::spsv_optimize,
-oneapi::mkl::sparse::BACKEND::spsv,
+oneapi::math::sparse::BACKEND::init_spsv_descr,
+oneapi::math::sparse::BACKEND::release_spsv_descr,
+oneapi::math::sparse::BACKEND::spsv_buffer_size,
+oneapi::math::sparse::BACKEND::spsv_optimize,
+oneapi::math::sparse::BACKEND::spsv_optimize,
+oneapi::math::sparse::BACKEND::spsv,
 
     // clang-format on

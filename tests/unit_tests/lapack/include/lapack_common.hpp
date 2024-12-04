@@ -31,7 +31,7 @@
 #include <CL/sycl.hpp>
 #endif
 
-#include "oneapi/mkl/types.hpp"
+#include "oneapi/math/types.hpp"
 
 namespace test_log {
 
@@ -123,9 +123,9 @@ inline std::complex<double> rand_scalar(uint64_t& seed) {
 }
 
 template <typename fp>
-void rand_matrix(uint64_t& seed, oneapi::mkl::transpose trans, int64_t m, int64_t n,
+void rand_matrix(uint64_t& seed, oneapi::math::transpose trans, int64_t m, int64_t n,
                  std::vector<fp>& M, int64_t ld, int64_t offset = 0) {
-    if (trans == oneapi::mkl::transpose::nontrans)
+    if (trans == oneapi::math::transpose::nontrans)
         for (int64_t col = 0; col < n; col++)
             for (int64_t row = 0; row < m; row++)
                 M[offset + row + col * ld] = rand_scalar<fp>(seed);
@@ -136,12 +136,12 @@ void rand_matrix(uint64_t& seed, oneapi::mkl::transpose trans, int64_t m, int64_
 }
 
 template <typename fp>
-void rand_matrix_diag_dom(uint64_t& seed, oneapi::mkl::transpose trans, int64_t m, int64_t n,
+void rand_matrix_diag_dom(uint64_t& seed, oneapi::math::transpose trans, int64_t m, int64_t n,
                           std::vector<fp>& M, int64_t ld, int64_t offset = 0) {
     using fp_real = typename complex_info<fp>::real_type;
     int64_t minsh;
     minsh = std::min(m, n);
-    if (trans == oneapi::mkl::transpose::nontrans)
+    if (trans == oneapi::math::transpose::nontrans)
         for (int64_t col = 0; col < n; col++)
             for (int64_t row = 0; row < m; row++) {
                 M[offset + row + col * ld] = rand_scalar<fp>(seed);
@@ -158,11 +158,11 @@ void rand_matrix_diag_dom(uint64_t& seed, oneapi::mkl::transpose trans, int64_t 
 }
 
 template <typename fp>
-void rand_symmetric_matrix(uint64_t& seed, oneapi::mkl::uplo uplo, int64_t n, std::vector<fp>& M,
+void rand_symmetric_matrix(uint64_t& seed, oneapi::math::uplo uplo, int64_t n, std::vector<fp>& M,
                            int64_t ld, int64_t offset = 0) {
     using fp_real = typename complex_info<fp>::real_type;
 
-    if (uplo == oneapi::mkl::uplo::upper)
+    if (uplo == oneapi::math::uplo::upper)
         for (int64_t col = 0; col < n; col++)
             for (int64_t row = 0; row <= col; row++)
                 M[offset + row + col * ld] = rand_scalar<fp>(seed);
@@ -173,7 +173,7 @@ void rand_symmetric_matrix(uint64_t& seed, oneapi::mkl::uplo uplo, int64_t n, st
 }
 
 template <typename fp>
-void rand_hermitian_matrix(uint64_t& seed, oneapi::mkl::uplo uplo, int64_t n, std::vector<fp>& M,
+void rand_hermitian_matrix(uint64_t& seed, oneapi::math::uplo uplo, int64_t n, std::vector<fp>& M,
                            int64_t ld, int64_t offset = 0) {
     using fp_real = typename complex_info<fp>::real_type;
 
@@ -183,7 +183,7 @@ void rand_hermitian_matrix(uint64_t& seed, oneapi::mkl::uplo uplo, int64_t n, st
 }
 
 template <typename fp>
-void rand_pos_def_matrix(uint64_t& seed, oneapi::mkl::uplo uplo, int64_t n, std::vector<fp>& M,
+void rand_pos_def_matrix(uint64_t& seed, oneapi::math::uplo uplo, int64_t n, std::vector<fp>& M,
                          int64_t ld, int64_t offset = 0) {
     using fp_real = typename complex_info<fp>::real_type;
 
@@ -194,8 +194,8 @@ void rand_pos_def_matrix(uint64_t& seed, oneapi::mkl::uplo uplo, int64_t n, std:
 }
 
 template <typename fp>
-void symmetric_to_full(oneapi::mkl::uplo uplo, int64_t n, std::vector<fp>& A, int64_t lda) {
-    if (oneapi::mkl::uplo::upper == uplo)
+void symmetric_to_full(oneapi::math::uplo uplo, int64_t n, std::vector<fp>& A, int64_t lda) {
+    if (oneapi::math::uplo::upper == uplo)
         for (int64_t col = 0; col < n; col++)
             for (int64_t row = col + 1; row < n; row++)
                 A[row + col * lda] = A[col + row * lda];
@@ -207,10 +207,10 @@ void symmetric_to_full(oneapi::mkl::uplo uplo, int64_t n, std::vector<fp>& A, in
 }
 
 template <typename fp>
-void hermitian_to_full(oneapi::mkl::uplo uplo, int64_t n, std::vector<fp>& A, int64_t lda) {
+void hermitian_to_full(oneapi::math::uplo uplo, int64_t n, std::vector<fp>& A, int64_t lda) {
     for (int64_t diag = 0; diag < n; diag++)
         A[diag + diag * lda] = get_real(A[diag + diag * lda]);
-    if (oneapi::mkl::uplo::upper == uplo)
+    if (oneapi::math::uplo::upper == uplo)
         for (int64_t col = 0; col < n; col++)
             for (int64_t row = col + 1; row < n; row++)
                 A[row + col * lda] = get_conj(A[col + row * lda]);

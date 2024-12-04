@@ -17,8 +17,8 @@
 *
 **************************************************************************/
 
-#ifndef _ONEMKL_SRC_SPARSE_BLAS_GENERIC_CONTAINER_HPP_
-#define _ONEMKL_SRC_SPARSE_BLAS_GENERIC_CONTAINER_HPP_
+#ifndef _ONEMATH_SRC_SPARSE_BLAS_GENERIC_CONTAINER_HPP_
+#define _ONEMATH_SRC_SPARSE_BLAS_GENERIC_CONTAINER_HPP_
 
 #include <memory>
 #include <string>
@@ -29,10 +29,11 @@
 #include <CL/sycl.hpp>
 #endif
 
-#include "oneapi/mkl/sparse_blas/types.hpp"
+#include "oneapi/math/exceptions.hpp"
+#include "oneapi/math/sparse_blas/types.hpp"
 #include "enum_data_types.hpp"
 
-namespace oneapi::mkl::sparse::detail {
+namespace oneapi::math::sparse::detail {
 
 /// Represent a non-templated container for USM or buffer.
 struct generic_container {
@@ -162,7 +163,7 @@ struct generic_dense_vector_handle : public detail::generic_dense_handle<Backend
             : generic_dense_handle<BackendHandleT>(backend_handle, value_buffer),
               size(size) {
         if (value_buffer.size() < static_cast<std::size_t>(size)) {
-            throw oneapi::mkl::invalid_argument(
+            throw oneapi::math::invalid_argument(
                 "sparse_blas", "init_dense_vector",
                 "Buffer size too small, expected at least " + std::to_string(size) + " but got " +
                     std::to_string(value_buffer.size()) + " elements.");
@@ -176,7 +177,7 @@ struct generic_dense_matrix_handle : public detail::generic_dense_handle<Backend
     std::int64_t num_rows;
     std::int64_t num_cols;
     std::int64_t ld;
-    oneapi::mkl::layout dense_layout;
+    oneapi::math::layout dense_layout;
 
     template <typename T>
     generic_dense_matrix_handle(BackendHandleT backend_handle, T* value_ptr, std::int64_t num_rows,
@@ -197,9 +198,9 @@ struct generic_dense_matrix_handle : public detail::generic_dense_handle<Backend
               ld(ld),
               dense_layout(dense_layout) {
         std::size_t minimum_size = static_cast<std::size_t>(
-            (dense_layout == oneapi::mkl::layout::row_major ? num_rows : num_cols) * ld);
+            (dense_layout == oneapi::math::layout::row_major ? num_rows : num_cols) * ld);
         if (value_buffer.size() < minimum_size) {
-            throw oneapi::mkl::invalid_argument(
+            throw oneapi::math::invalid_argument(
                 "sparse_blas", "init_dense_matrix",
                 "Buffer size too small, expected at least " + std::to_string(minimum_size) +
                     " but got " + std::to_string(value_buffer.size()) + " elements.");
@@ -222,14 +223,14 @@ struct generic_sparse_handle {
     std::int64_t num_rows;
     std::int64_t num_cols;
     std::int64_t nnz;
-    oneapi::mkl::index_base index;
+    index_base index;
     std::int32_t properties_mask;
     bool can_be_reset;
 
     template <typename fpType, typename intType>
     generic_sparse_handle(BackendHandleT backend_handle, intType* row_ptr, intType* col_ptr,
                           fpType* value_ptr, sparse_format format, std::int64_t num_rows,
-                          std::int64_t num_cols, std::int64_t nnz, oneapi::mkl::index_base index)
+                          std::int64_t num_cols, std::int64_t nnz, index_base index)
             : backend_handle(backend_handle),
               row_container(generic_container(row_ptr)),
               col_container(generic_container(col_ptr)),
@@ -247,7 +248,7 @@ struct generic_sparse_handle {
                           const sycl::buffer<intType, 1> col_buffer,
                           const sycl::buffer<fpType, 1> value_buffer, sparse_format format,
                           std::int64_t num_rows, std::int64_t num_cols, std::int64_t nnz,
-                          oneapi::mkl::index_base index)
+                          index_base index)
             : backend_handle(backend_handle),
               row_container(row_buffer),
               col_container(col_buffer),
@@ -288,7 +289,7 @@ private:
             case matrix_property::sorted: return 1 << 1;
             case matrix_property::sorted_by_rows: return 1 << 2;
             default:
-                throw oneapi::mkl::invalid_argument(
+                throw oneapi::math::invalid_argument(
                     "sparse_blas", "set_matrix_property",
                     "Unsupported matrix property " + std::to_string(static_cast<int>(property)));
         }
@@ -296,7 +297,7 @@ private:
 };
 
 inline void throw_incompatible_container(const std::string& function_name) {
-    throw oneapi::mkl::invalid_argument(
+    throw oneapi::math::invalid_argument(
         "sparse_blas", function_name,
         "Incompatible container types. All inputs and outputs must use the same container: buffer or USM");
 }
@@ -332,17 +333,17 @@ void check_all_containers_compatible(const std::string& function_name,
     for (const auto internal_container : { internal_containers... }) {
         const data_type other_value_type = internal_container->get_value_type();
         if (other_value_type != first_value_type) {
-            throw oneapi::mkl::invalid_argument(
+            throw oneapi::math::invalid_argument(
                 "sparse_blas", function_name,
                 "Incompatible data types expected " + data_type_to_str(first_value_type) +
                     " but got " + data_type_to_str(other_value_type));
         }
         const data_type other_int_type = internal_container->get_int_type();
         if (other_int_type != data_type::none && other_int_type != first_int_type) {
-            throw oneapi::mkl::invalid_argument("sparse_blas", function_name,
-                                                "Incompatible integer types expected " +
-                                                    data_type_to_str(first_int_type) + " but got " +
-                                                    data_type_to_str(other_int_type));
+            throw oneapi::math::invalid_argument(
+                "sparse_blas", function_name,
+                "Incompatible integer types expected " + data_type_to_str(first_int_type) +
+                    " but got " + data_type_to_str(other_int_type));
         }
     }
 }
@@ -351,14 +352,14 @@ template <typename fpType, typename InternalHandleT>
 void check_can_reset_value_handle(const std::string& function_name,
                                   InternalHandleT* internal_handle, bool expect_buffer) {
     if (internal_handle->get_value_type() != detail::get_data_type<fpType>()) {
-        throw oneapi::mkl::invalid_argument(
+        throw oneapi::math::invalid_argument(
             "sparse_blas", function_name,
             "Incompatible data types expected " +
                 data_type_to_str(internal_handle->get_value_type()) + " but got " +
                 data_type_to_str(detail::get_data_type<fpType>()));
     }
     if (internal_handle->all_use_buffer() != expect_buffer) {
-        throw oneapi::mkl::invalid_argument(
+        throw oneapi::math::invalid_argument(
             "sparse_blas", function_name, "Cannot change the container type between buffer or USM");
     }
 }
@@ -368,19 +369,19 @@ void check_can_reset_sparse_handle(const std::string& function_name,
                                    InternalHandleT* internal_smhandle, bool expect_buffer) {
     check_can_reset_value_handle<fpType>(function_name, internal_smhandle, expect_buffer);
     if (internal_smhandle->get_int_type() != detail::get_data_type<intType>()) {
-        throw oneapi::mkl::invalid_argument(
+        throw oneapi::math::invalid_argument(
             "sparse_blas", function_name,
             "Incompatible data types expected " +
                 data_type_to_str(internal_smhandle->get_int_type()) + " but got " +
                 data_type_to_str(detail::get_data_type<intType>()));
     }
     if (!internal_smhandle->can_be_reset) {
-        throw mkl::unimplemented(
+        throw oneapi::math::unimplemented(
             "sparse_blas", function_name,
             "The backend does not support reseting the matrix handle's data after it was used in a computation.");
     }
 }
 
-} // namespace oneapi::mkl::sparse::detail
+} // namespace oneapi::math::sparse::detail
 
-#endif // _ONEMKL_SRC_SPARSE_BLAS_GENERIC_CONTAINER_HPP_
+#endif // _ONEMATH_SRC_SPARSE_BLAS_GENERIC_CONTAINER_HPP_

@@ -41,9 +41,9 @@ Usage:
 Example:
 The command below will generate:
 "blas_ct.hpp" header with compile-time BLAS API based on "blas_ct_templates.hpp" for "mklgpu" backend.
-API from the backend library will be called from "oneapi::mkl::mklgpu::blas" namespace.
+API from the backend library will be called from "oneapi::math::mklgpu::blas" namespace.
 
-{script}  include/oneapi/mkl/blas/detail/blas_ct_templates.hpp include/oneapi/mkl/blas/detail/mklgpu/blas_ct.hpp include/oneapi/mkl/blas/detail/mklgpu/onemkl_blas_mklgpu.hpp mklgpu oneapi::mkl::mklgpu::blas
+{script}  include/oneapi/math/blas/detail/blas_ct_templates.hpp include/oneapi/math/blas/detail/mklgpu/blas_ct.hpp include/oneapi/math/blas/detail/mklgpu/onemath_blas_mklgpu.hpp mklgpu oneapi::math::mklgpu::blas
 '''.format(script = argv[0]))
 
 if len(argv) < 6:
@@ -101,8 +101,8 @@ out_file.write("""//
 #include <complex>
 #include <cstdint>
 
-#include "oneapi/mkl/types.hpp"
-#include "oneapi/mkl/detail/backends.hpp"
+#include "oneapi/math/types.hpp"
+#include "oneapi/math/detail/backends.hpp"
 #include "{internal_api}"
 #include "{ct_teplates}"
 

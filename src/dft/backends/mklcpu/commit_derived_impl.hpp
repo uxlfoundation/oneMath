@@ -17,18 +17,18 @@
 * SPDX-License-Identifier: Apache-2.0
 *******************************************************************************/
 
-#ifndef _ONEMKL_DFT_COMMIT_DERIVED_IMPL_HPP_
-#define _ONEMKL_DFT_COMMIT_DERIVED_IMPL_HPP_
+#ifndef _ONEMATH_DFT_COMMIT_DERIVED_IMPL_HPP_
+#define _ONEMATH_DFT_COMMIT_DERIVED_IMPL_HPP_
 
-#include "oneapi/mkl/exceptions.hpp"
-#include "oneapi/mkl/dft/detail/types_impl.hpp"
+#include "oneapi/math/exceptions.hpp"
+#include "oneapi/math/dft/detail/types_impl.hpp"
 #include "dft/backends/mklcpu/mklcpu_helpers.hpp"
 
-// MKLCPU header
-#include "mkl_dfti.h"
+// Intel(R) oneMKL header
+#include <mkl_dfti.h>
 
 namespace oneapi {
-namespace mkl {
+namespace math {
 namespace dft {
 namespace mklcpu {
 namespace detail {
@@ -82,7 +82,7 @@ using commit_derived_t = detail::commit_derived_impl<prec, dom>;
 } // namespace detail
 } // namespace mklcpu
 } // namespace dft
-} // namespace mkl
+} // namespace math
 } // namespace oneapi
 
-#endif // _ONEMKL_DFT_COMMIT_DERIVED_IMPL_HPP_
+#endif // _ONEMATH_DFT_COMMIT_DERIVED_IMPL_HPP_

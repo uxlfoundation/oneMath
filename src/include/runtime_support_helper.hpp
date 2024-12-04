@@ -17,8 +17,8 @@
 * SPDX-License-Identifier: Apache-2.0
 *******************************************************************************/
 
-#ifndef _ONEMKL_RUNTIME_SUPPORT_HELPER_HPP_
-#define _ONEMKL_RUNTIME_SUPPORT_HELPER_HPP_
+#ifndef _ONEMATH_RUNTIME_SUPPORT_HELPER_HPP_
+#define _ONEMATH_RUNTIME_SUPPORT_HELPER_HPP_
 
 #if __has_include(<sycl/sycl.hpp>)
 #include <sycl/sycl.hpp>
@@ -50,4 +50,4 @@ bool verify_support(sycl::queue q, sycl::aspect aspect) {
     }
 }
 
-#endif //_ONEMKL_RUNTIME_SUPPORT_HELPER_HPP_
+#endif //_ONEMATH_RUNTIME_SUPPORT_HELPER_HPP_

@@ -30,10 +30,10 @@
 #include <CL/sycl.hpp>
 #endif
 #include "cblas.h"
-#include "oneapi/mkl.hpp"
-#include "oneapi/mkl/detail/config.hpp"
+#include "oneapi/math.hpp"
+#include "oneapi/math/detail/config.hpp"
 #include "allocator_helper.hpp"
-#include "onemkl_blas_helper.hpp"
+#include "onemath_blas_helper.hpp"
 #include "reference_blas_templates.hpp"
 #include "test_common.hpp"
 #include "test_helper.hpp"
@@ -48,7 +48,7 @@ extern std::vector<sycl::device*> devices;
 namespace {
 
 template <typename fp>
-int test(device* dev, oneapi::mkl::layout layout, int64_t group_count) {
+int test(device* dev, oneapi::math::layout layout, int64_t group_count) {
     // Catch asynchronous exceptions.
     auto exception_handler = [](exception_list exceptions) {
         for (std::exception_ptr const& e : exceptions) {
@@ -72,17 +72,17 @@ int test(device* dev, oneapi::mkl::layout layout, int64_t group_count) {
     auto uaint = usm_allocator<int64_t, usm::alloc::shared, 64>(cxt, *dev);
     vector<int64_t, decltype(uaint)> m(uaint), n(uaint), lda(uaint), ldb(uaint), group_size(uaint);
 
-    auto uatranspose = usm_allocator<oneapi::mkl::transpose, usm::alloc::shared, 64>(cxt, *dev);
-    vector<oneapi::mkl::transpose, decltype(uatranspose)> trans(uatranspose);
+    auto uatranspose = usm_allocator<oneapi::math::transpose, usm::alloc::shared, 64>(cxt, *dev);
+    vector<oneapi::math::transpose, decltype(uatranspose)> trans(uatranspose);
 
-    auto uaside = usm_allocator<oneapi::mkl::side, usm::alloc::shared, 64>(cxt, *dev);
-    vector<oneapi::mkl::side, decltype(uaside)> left_right(uaside);
+    auto uaside = usm_allocator<oneapi::math::side, usm::alloc::shared, 64>(cxt, *dev);
+    vector<oneapi::math::side, decltype(uaside)> left_right(uaside);
 
-    auto uauplo = usm_allocator<oneapi::mkl::uplo, usm::alloc::shared, 64>(cxt, *dev);
-    vector<oneapi::mkl::uplo, decltype(uauplo)> upper_lower(uauplo);
+    auto uauplo = usm_allocator<oneapi::math::uplo, usm::alloc::shared, 64>(cxt, *dev);
+    vector<oneapi::math::uplo, decltype(uauplo)> upper_lower(uauplo);
 
-    auto uadiag = usm_allocator<oneapi::mkl::diag, usm::alloc::shared, 64>(cxt, *dev);
-    vector<oneapi::mkl::diag, decltype(uadiag)> unit_nonunit(uadiag);
+    auto uadiag = usm_allocator<oneapi::math::diag, usm::alloc::shared, 64>(cxt, *dev);
+    vector<oneapi::math::diag, decltype(uadiag)> unit_nonunit(uadiag);
 
     auto uafp = usm_allocator<fp, usm::alloc::shared, 64>(cxt, *dev);
     vector<fp, decltype(uafp)> alpha(uafp);
@@ -112,18 +112,18 @@ int test(device* dev, oneapi::mkl::layout layout, int64_t group_count) {
         ldb[i] = std::max(n[i], m[i]);
         alpha[i] = rand_scalar<fp>();
         if ((std::is_same<fp, float>::value) || (std::is_same<fp, double>::value)) {
-            trans[i] = (oneapi::mkl::transpose)(std::rand() % 2);
+            trans[i] = (oneapi::math::transpose)(std::rand() % 2);
         }
         else {
             tmp = std::rand() % 3;
             if (tmp == 2)
-                trans[i] = oneapi::mkl::transpose::conjtrans;
+                trans[i] = oneapi::math::transpose::conjtrans;
             else
-                trans[i] = (oneapi::mkl::transpose)tmp;
+                trans[i] = (oneapi::math::transpose)tmp;
         }
-        left_right[i] = (oneapi::mkl::side)(std::rand() % 2);
-        upper_lower[i] = (oneapi::mkl::uplo)(std::rand() % 2);
-        unit_nonunit[i] = (oneapi::mkl::diag)(std::rand() % 2);
+        left_right[i] = (oneapi::math::side)(std::rand() % 2);
+        upper_lower[i] = (oneapi::math::uplo)(std::rand() % 2);
+        unit_nonunit[i] = (oneapi::math::diag)(std::rand() % 2);
 
         total_batch_count += group_size[i];
     }
@@ -137,16 +137,17 @@ int test(device* dev, oneapi::mkl::layout layout, int64_t group_count) {
 
     idx = 0;
     for (i = 0; i < group_count; i++) {
-        size_a = lda[i] * (left_right[i] == oneapi::mkl::side::left ? m[i] : n[i]);
-        Arank = left_right[i] == oneapi::mkl::side::left ? m[i] : n[i];
-        size_b = ldb[i] * ((layout == oneapi::mkl::layout::col_major) ? n[i] : m[i]);
+        size_a = lda[i] * (left_right[i] == oneapi::math::side::left ? m[i] : n[i]);
+        Arank = left_right[i] == oneapi::math::side::left ? m[i] : n[i];
+        size_b = ldb[i] * ((layout == oneapi::math::layout::col_major) ? n[i] : m[i]);
         for (j = 0; j < group_size[i]; j++) {
-            a_array[idx] = (fp*)oneapi::mkl::malloc_shared(64, sizeof(fp) * size_a, *dev, cxt);
-            b_array[idx] = (fp*)oneapi::mkl::malloc_shared(64, sizeof(fp) * size_b, *dev, cxt);
-            b_ref_array[idx] = (fp*)oneapi::mkl::malloc_shared(64, sizeof(fp) * size_b, *dev, cxt);
+            a_array[idx] = (fp*)oneapi::math::malloc_shared(64, sizeof(fp) * size_a, *dev, cxt);
+            b_array[idx] = (fp*)oneapi::math::malloc_shared(64, sizeof(fp) * size_b, *dev, cxt);
+            b_ref_array[idx] = (fp*)oneapi::math::malloc_shared(64, sizeof(fp) * size_b, *dev, cxt);
             rand_trsm_matrix(a_array[idx], layout, trans[i], Arank, Arank, lda[i]);
-            rand_matrix(b_array[idx], layout, oneapi::mkl::transpose::nontrans, m[i], n[i], ldb[i]);
-            copy_matrix(b_array[idx], layout, oneapi::mkl::transpose::nontrans, m[i], n[i], ldb[i],
+            rand_matrix(b_array[idx], layout, oneapi::math::transpose::nontrans, m[i], n[i],
+                        ldb[i]);
+            copy_matrix(b_array[idx], layout, oneapi::math::transpose::nontrans, m[i], n[i], ldb[i],
                         b_ref_array[idx]);
             idx++;
         }
@@ -154,40 +155,40 @@ int test(device* dev, oneapi::mkl::layout layout, int64_t group_count) {
 
     // Call reference TRSM_BATCH.
     using fp_ref = typename ref_type_info<fp>::type;
-    int* m_ref = (int*)oneapi::mkl::aligned_alloc(64, sizeof(int) * group_count);
-    int* n_ref = (int*)oneapi::mkl::aligned_alloc(64, sizeof(int) * group_count);
-    int* lda_ref = (int*)oneapi::mkl::aligned_alloc(64, sizeof(int) * group_count);
-    int* ldb_ref = (int*)oneapi::mkl::aligned_alloc(64, sizeof(int) * group_count);
-    int* group_size_ref = (int*)oneapi::mkl::aligned_alloc(64, sizeof(int) * group_count);
+    int* m_ref = (int*)oneapi::math::aligned_alloc(64, sizeof(int) * group_count);
+    int* n_ref = (int*)oneapi::math::aligned_alloc(64, sizeof(int) * group_count);
+    int* lda_ref = (int*)oneapi::math::aligned_alloc(64, sizeof(int) * group_count);
+    int* ldb_ref = (int*)oneapi::math::aligned_alloc(64, sizeof(int) * group_count);
+    int* group_size_ref = (int*)oneapi::math::aligned_alloc(64, sizeof(int) * group_count);
 
     CBLAS_TRANSPOSE* trans_ref =
-        (CBLAS_TRANSPOSE*)oneapi::mkl::aligned_alloc(64, sizeof(CBLAS_TRANSPOSE) * group_count);
+        (CBLAS_TRANSPOSE*)oneapi::math::aligned_alloc(64, sizeof(CBLAS_TRANSPOSE) * group_count);
     CBLAS_SIDE* left_right_ref =
-        (CBLAS_SIDE*)oneapi::mkl::aligned_alloc(64, sizeof(CBLAS_SIDE) * group_count);
+        (CBLAS_SIDE*)oneapi::math::aligned_alloc(64, sizeof(CBLAS_SIDE) * group_count);
     CBLAS_UPLO* upper_lower_ref =
-        (CBLAS_UPLO*)oneapi::mkl::aligned_alloc(64, sizeof(CBLAS_UPLO) * group_count);
+        (CBLAS_UPLO*)oneapi::math::aligned_alloc(64, sizeof(CBLAS_UPLO) * group_count);
     CBLAS_DIAG* unit_nonunit_ref =
-        (CBLAS_DIAG*)oneapi::mkl::aligned_alloc(64, sizeof(CBLAS_DIAG) * group_count);
+        (CBLAS_DIAG*)oneapi::math::aligned_alloc(64, sizeof(CBLAS_DIAG) * group_count);
 
     if ((m_ref == NULL) || (n_ref == NULL) || (lda_ref == NULL) || (ldb_ref == NULL) ||
         (trans_ref == NULL) || (left_right_ref == NULL) || (upper_lower_ref == NULL) ||
         (unit_nonunit_ref == NULL) || (group_size_ref == NULL)) {
         std::cout << "Error cannot allocate input arrays\n";
-        oneapi::mkl::aligned_free(m_ref);
-        oneapi::mkl::aligned_free(n_ref);
-        oneapi::mkl::aligned_free(lda_ref);
-        oneapi::mkl::aligned_free(ldb_ref);
-        oneapi::mkl::aligned_free(trans_ref);
-        oneapi::mkl::aligned_free(left_right_ref);
-        oneapi::mkl::aligned_free(upper_lower_ref);
-        oneapi::mkl::aligned_free(unit_nonunit_ref);
-        oneapi::mkl::aligned_free(group_size_ref);
+        oneapi::math::aligned_free(m_ref);
+        oneapi::math::aligned_free(n_ref);
+        oneapi::math::aligned_free(lda_ref);
+        oneapi::math::aligned_free(ldb_ref);
+        oneapi::math::aligned_free(trans_ref);
+        oneapi::math::aligned_free(left_right_ref);
+        oneapi::math::aligned_free(upper_lower_ref);
+        oneapi::math::aligned_free(unit_nonunit_ref);
+        oneapi::math::aligned_free(group_size_ref);
         idx = 0;
         for (i = 0; i < group_count; i++) {
             for (j = 0; j < group_size[i]; j++) {
-                oneapi::mkl::free_shared(a_array[idx], cxt);
-                oneapi::mkl::free_shared(b_array[idx], cxt);
-                oneapi::mkl::free_shared(b_ref_array[idx], cxt);
+                oneapi::math::free_shared(a_array[idx], cxt);
+                oneapi::math::free_shared(b_array[idx], cxt);
+                oneapi::math::free_shared(b_ref_array[idx], cxt);
                 idx++;
             }
         }
@@ -218,14 +219,14 @@ int test(device* dev, oneapi::mkl::layout layout, int64_t group_count) {
     try {
 #ifdef CALL_RT_API
         switch (layout) {
-            case oneapi::mkl::layout::col_major:
-                done = oneapi::mkl::blas::column_major::trsm_batch(
+            case oneapi::math::layout::col_major:
+                done = oneapi::math::blas::column_major::trsm_batch(
                     main_queue, &left_right[0], &upper_lower[0], &trans[0], &unit_nonunit[0], &m[0],
                     &n[0], &alpha[0], (const fp**)&a_array[0], &lda[0], &b_array[0], &ldb[0],
                     group_count, &group_size[0], dependencies);
                 break;
-            case oneapi::mkl::layout::row_major:
-                done = oneapi::mkl::blas::row_major::trsm_batch(
+            case oneapi::math::layout::row_major:
+                done = oneapi::math::blas::row_major::trsm_batch(
                     main_queue, &left_right[0], &upper_lower[0], &trans[0], &unit_nonunit[0], &m[0],
                     &n[0], &alpha[0], (const fp**)&a_array[0], &lda[0], &b_array[0], &ldb[0],
                     group_count, &group_size[0], dependencies);
@@ -235,15 +236,15 @@ int test(device* dev, oneapi::mkl::layout layout, int64_t group_count) {
         done.wait();
 #else
         switch (layout) {
-            case oneapi::mkl::layout::col_major:
-                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::mkl::blas::column_major::trsm_batch,
+            case oneapi::math::layout::col_major:
+                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::math::blas::column_major::trsm_batch,
                                         &left_right[0], &upper_lower[0], &trans[0],
                                         &unit_nonunit[0], &m[0], &n[0], &alpha[0],
                                         (const fp**)&a_array[0], &lda[0], &b_array[0], &ldb[0],
                                         group_count, &group_size[0], dependencies);
                 break;
-            case oneapi::mkl::layout::row_major:
-                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::mkl::blas::row_major::trsm_batch,
+            case oneapi::math::layout::row_major:
+                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::math::blas::row_major::trsm_batch,
                                         &left_right[0], &upper_lower[0], &trans[0],
                                         &unit_nonunit[0], &m[0], &n[0], &alpha[0],
                                         (const fp**)&a_array[0], &lda[0], &b_array[0], &ldb[0],
@@ -260,22 +261,22 @@ int test(device* dev, oneapi::mkl::layout layout, int64_t group_count) {
         print_error_code(e);
     }
 
-    catch (const oneapi::mkl::unimplemented& e) {
-        oneapi::mkl::aligned_free(m_ref);
-        oneapi::mkl::aligned_free(n_ref);
-        oneapi::mkl::aligned_free(lda_ref);
-        oneapi::mkl::aligned_free(ldb_ref);
-        oneapi::mkl::aligned_free(trans_ref);
-        oneapi::mkl::aligned_free(left_right_ref);
-        oneapi::mkl::aligned_free(upper_lower_ref);
-        oneapi::mkl::aligned_free(unit_nonunit_ref);
-        oneapi::mkl::aligned_free(group_size_ref);
+    catch (const oneapi::math::unimplemented& e) {
+        oneapi::math::aligned_free(m_ref);
+        oneapi::math::aligned_free(n_ref);
+        oneapi::math::aligned_free(lda_ref);
+        oneapi::math::aligned_free(ldb_ref);
+        oneapi::math::aligned_free(trans_ref);
+        oneapi::math::aligned_free(left_right_ref);
+        oneapi::math::aligned_free(upper_lower_ref);
+        oneapi::math::aligned_free(unit_nonunit_ref);
+        oneapi::math::aligned_free(group_size_ref);
         idx = 0;
         for (i = 0; i < group_count; i++) {
             for (j = 0; j < group_size[i]; j++) {
-                oneapi::mkl::free_shared(a_array[idx], cxt);
-                oneapi::mkl::free_shared(b_array[idx], cxt);
-                oneapi::mkl::free_shared(b_ref_array[idx], cxt);
+                oneapi::math::free_shared(a_array[idx], cxt);
+                oneapi::math::free_shared(b_array[idx], cxt);
+                oneapi::math::free_shared(b_ref_array[idx], cxt);
                 idx++;
             }
         }
@@ -296,21 +297,21 @@ int test(device* dev, oneapi::mkl::layout layout, int64_t group_count) {
             idx++;
         }
     }
-    oneapi::mkl::aligned_free(m_ref);
-    oneapi::mkl::aligned_free(n_ref);
-    oneapi::mkl::aligned_free(lda_ref);
-    oneapi::mkl::aligned_free(ldb_ref);
-    oneapi::mkl::aligned_free(trans_ref);
-    oneapi::mkl::aligned_free(left_right_ref);
-    oneapi::mkl::aligned_free(upper_lower_ref);
-    oneapi::mkl::aligned_free(unit_nonunit_ref);
-    oneapi::mkl::aligned_free(group_size_ref);
+    oneapi::math::aligned_free(m_ref);
+    oneapi::math::aligned_free(n_ref);
+    oneapi::math::aligned_free(lda_ref);
+    oneapi::math::aligned_free(ldb_ref);
+    oneapi::math::aligned_free(trans_ref);
+    oneapi::math::aligned_free(left_right_ref);
+    oneapi::math::aligned_free(upper_lower_ref);
+    oneapi::math::aligned_free(unit_nonunit_ref);
+    oneapi::math::aligned_free(group_size_ref);
     idx = 0;
     for (i = 0; i < group_count; i++) {
         for (j = 0; j < group_size[i]; j++) {
-            oneapi::mkl::free_shared(a_array[idx], cxt);
-            oneapi::mkl::free_shared(b_array[idx], cxt);
-            oneapi::mkl::free_shared(b_ref_array[idx], cxt);
+            oneapi::math::free_shared(a_array[idx], cxt);
+            oneapi::math::free_shared(b_array[idx], cxt);
+            oneapi::math::free_shared(b_ref_array[idx], cxt);
             idx++;
         }
     }
@@ -319,7 +320,7 @@ int test(device* dev, oneapi::mkl::layout layout, int64_t group_count) {
 }
 
 class TrsmBatchUsmTests
-        : public ::testing::TestWithParam<std::tuple<sycl::device*, oneapi::mkl::layout>> {};
+        : public ::testing::TestWithParam<std::tuple<sycl::device*, oneapi::math::layout>> {};
 
 TEST_P(TrsmBatchUsmTests, RealSinglePrecision) {
     EXPECT_TRUEORSKIP(test<float>(std::get<0>(GetParam()), std::get<1>(GetParam()), 5));
@@ -345,8 +346,8 @@ TEST_P(TrsmBatchUsmTests, ComplexDoublePrecision) {
 
 INSTANTIATE_TEST_SUITE_P(TrsmBatchUsmTestSuite, TrsmBatchUsmTests,
                          ::testing::Combine(testing::ValuesIn(devices),
-                                            testing::Values(oneapi::mkl::layout::col_major,
-                                                            oneapi::mkl::layout::row_major)),
+                                            testing::Values(oneapi::math::layout::col_major,
+                                                            oneapi::math::layout::row_major)),
                          ::LayoutDeviceNamePrint());
 
 } // anonymous namespace

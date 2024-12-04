@@ -1,5 +1,5 @@
-#ifndef _MKL_RNG_CURAND_TASK_HPP_
-#define _MKL_RNG_CURAND_TASK_HPP_
+#ifndef ONEMATH_RNG_CURAND_TASK_HPP_
+#define ONEMATH_RNG_CURAND_TASK_HPP_
 
 #if __has_include(<sycl/sycl.hpp>)
 #include <sycl/sycl.hpp>
@@ -10,7 +10,7 @@
 #include "curand_helper.hpp"
 
 namespace oneapi {
-namespace mkl {
+namespace math {
 namespace rng {
 namespace curand {
 #ifdef __HIPSYCL__
@@ -73,18 +73,18 @@ static inline void host_task_internal(H& cgh, E e, F f) {
 }
 #endif
 template <typename H, typename A, typename E, typename F>
-static inline void onemkl_curand_host_task(H& cgh, A acc, E e, F f) {
+static inline void onemath_curand_host_task(H& cgh, A acc, E e, F f) {
     host_task_internal(cgh, acc, e, f);
 }
 
 template <typename H, typename Engine, typename F>
-static inline void onemkl_curand_host_task(H& cgh, Engine e, F f) {
+static inline void onemath_curand_host_task(H& cgh, Engine e, F f) {
     host_task_internal(cgh, e, f);
 }
 
 } // namespace curand
 } // namespace rng
-} // namespace mkl
+} // namespace math
 } // namespace oneapi
 
 #endif

@@ -23,12 +23,12 @@
 #include <CL/sycl.hpp>
 #endif
 
-#include "oneapi/mkl/blas/detail/mklcpu/onemkl_blas_mklcpu.hpp"
+#include "oneapi/math/blas/detail/mklcpu/onemath_blas_mklcpu.hpp"
 
 #include "../mkl_common/mkl_blas_backend.hpp"
 
 namespace oneapi {
-namespace mkl {
+namespace math {
 namespace blas {
 namespace mklcpu {
 namespace column_major {
@@ -45,5 +45,5 @@ namespace blas_major = ::oneapi::mkl::blas::row_major;
 } // namespace row_major
 } // namespace mklcpu
 } // namespace blas
-} // namespace mkl
+} // namespace math
 } // namespace oneapi

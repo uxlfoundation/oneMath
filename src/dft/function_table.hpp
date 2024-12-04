@@ -29,33 +29,35 @@
 #include <CL/sycl.hpp>
 #endif
 
-#include "oneapi/mkl/types.hpp"
-#include "oneapi/mkl/dft/types.hpp"
-#include "oneapi/mkl/dft/descriptor.hpp"
+#include "oneapi/math/types.hpp"
+#include "oneapi/math/dft/types.hpp"
+#include "oneapi/math/dft/descriptor.hpp"
 
 typedef struct {
     int version;
-    oneapi::mkl::dft::detail::commit_impl<oneapi::mkl::dft::precision::SINGLE,
-                                          oneapi::mkl::dft::domain::COMPLEX>* (
+    oneapi::math::dft::detail::commit_impl<oneapi::math::dft::precision::SINGLE,
+                                           oneapi::math::dft::domain::COMPLEX>* (
         *create_commit_sycl_fz)(
-        const oneapi::mkl::dft::descriptor<oneapi::mkl::dft::precision::SINGLE,
-                                           oneapi::mkl::dft::domain::COMPLEX>& desc,
+        const oneapi::math::dft::descriptor<oneapi::math::dft::precision::SINGLE,
+                                            oneapi::math::dft::domain::COMPLEX>& desc,
         sycl::queue& sycl_queue);
-    oneapi::mkl::dft::detail::commit_impl<oneapi::mkl::dft::precision::DOUBLE,
-                                          oneapi::mkl::dft::domain::COMPLEX>* (
+    oneapi::math::dft::detail::commit_impl<oneapi::math::dft::precision::DOUBLE,
+                                           oneapi::math::dft::domain::COMPLEX>* (
         *create_commit_sycl_dz)(
-        const oneapi::mkl::dft::descriptor<oneapi::mkl::dft::precision::DOUBLE,
-                                           oneapi::mkl::dft::domain::COMPLEX>& desc,
+        const oneapi::math::dft::descriptor<oneapi::math::dft::precision::DOUBLE,
+                                            oneapi::math::dft::domain::COMPLEX>& desc,
         sycl::queue& sycl_queue);
-    oneapi::mkl::dft::detail::commit_impl<oneapi::mkl::dft::precision::SINGLE,
-                                          oneapi::mkl::dft::domain::REAL>* (*create_commit_sycl_fr)(
-        const oneapi::mkl::dft::descriptor<oneapi::mkl::dft::precision::SINGLE,
-                                           oneapi::mkl::dft::domain::REAL>& desc,
+    oneapi::math::dft::detail::commit_impl<oneapi::math::dft::precision::SINGLE,
+                                           oneapi::math::dft::domain::REAL>* (
+        *create_commit_sycl_fr)(
+        const oneapi::math::dft::descriptor<oneapi::math::dft::precision::SINGLE,
+                                            oneapi::math::dft::domain::REAL>& desc,
         sycl::queue& sycl_queue);
-    oneapi::mkl::dft::detail::commit_impl<oneapi::mkl::dft::precision::DOUBLE,
-                                          oneapi::mkl::dft::domain::REAL>* (*create_commit_sycl_dr)(
-        const oneapi::mkl::dft::descriptor<oneapi::mkl::dft::precision::DOUBLE,
-                                           oneapi::mkl::dft::domain::REAL>& desc,
+    oneapi::math::dft::detail::commit_impl<oneapi::math::dft::precision::DOUBLE,
+                                           oneapi::math::dft::domain::REAL>* (
+        *create_commit_sycl_dr)(
+        const oneapi::math::dft::descriptor<oneapi::math::dft::precision::DOUBLE,
+                                            oneapi::math::dft::domain::REAL>& desc,
         sycl::queue& sycl_queue);
 } dft_function_table_t;
 

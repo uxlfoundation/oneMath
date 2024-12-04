@@ -19,7 +19,7 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'oneAPI Math Kernel Library Interfaces'
+project = 'oneMath'
 copyright = '2020-2022, Intel Corporation'
 author = 'Intel Corporation'
 
@@ -90,7 +90,7 @@ html_favicon = f'{static_dir}/favicons.png'
 
 # Theme options
 html_theme_options = {
-'repository_url': 'https://github.com/oneapi-src/oneMKL',
+'repository_url': 'https://github.com/uxlfoundation/oneMath',
 'path_to_docs': 'docs',
 'use_issues_button': True,
 'use_edit_page_button': True,

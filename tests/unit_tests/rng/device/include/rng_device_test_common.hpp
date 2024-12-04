@@ -170,10 +170,10 @@ template <typename Distribution>
 struct statistics_device {};
 
 template <typename Fp, typename Method>
-struct statistics_device<oneapi::mkl::rng::device::uniform<Fp, Method>> {
+struct statistics_device<oneapi::math::rng::device::uniform<Fp, Method>> {
     template <typename AllocType>
     bool check(const std::vector<Fp, AllocType>& r,
-               const oneapi::mkl::rng::device::uniform<Fp, Method>& distr) {
+               const oneapi::math::rng::device::uniform<Fp, Method>& distr) {
         double tM, tD, tQ;
         Fp a = distr.a();
         Fp b = distr.b();
@@ -188,10 +188,10 @@ struct statistics_device<oneapi::mkl::rng::device::uniform<Fp, Method>> {
 };
 
 template <typename Method>
-struct statistics_device<oneapi::mkl::rng::device::uniform<std::int32_t, Method>> {
+struct statistics_device<oneapi::math::rng::device::uniform<std::int32_t, Method>> {
     template <typename AllocType>
     bool check(const std::vector<std::int32_t, AllocType>& r,
-               const oneapi::mkl::rng::device::uniform<std::int32_t, Method>& distr) {
+               const oneapi::math::rng::device::uniform<std::int32_t, Method>& distr) {
         double tM, tD, tQ;
         double a = distr.a();
         double b = distr.b();
@@ -207,10 +207,10 @@ struct statistics_device<oneapi::mkl::rng::device::uniform<std::int32_t, Method>
 };
 
 template <typename Method>
-struct statistics_device<oneapi::mkl::rng::device::uniform<std::uint32_t, Method>> {
+struct statistics_device<oneapi::math::rng::device::uniform<std::uint32_t, Method>> {
     template <typename AllocType>
     bool check(const std::vector<std::uint32_t, AllocType>& r,
-               const oneapi::mkl::rng::device::uniform<std::uint32_t, Method>& distr) {
+               const oneapi::math::rng::device::uniform<std::uint32_t, Method>& distr) {
         double tM, tD, tQ;
         double a = distr.a();
         double b = distr.b();
@@ -226,10 +226,10 @@ struct statistics_device<oneapi::mkl::rng::device::uniform<std::uint32_t, Method
 };
 
 template <typename Method>
-struct statistics_device<oneapi::mkl::rng::device::uniform<std::int64_t, Method>> {
+struct statistics_device<oneapi::math::rng::device::uniform<std::int64_t, Method>> {
     template <typename AllocType>
     bool check(const std::vector<std::int64_t, AllocType>& r,
-               const oneapi::mkl::rng::device::uniform<std::int64_t, Method>& distr) {
+               const oneapi::math::rng::device::uniform<std::int64_t, Method>& distr) {
         double tM, tD, tQ;
         double a = distr.a();
         double b = distr.b();
@@ -245,10 +245,10 @@ struct statistics_device<oneapi::mkl::rng::device::uniform<std::int64_t, Method>
 };
 
 template <typename Method>
-struct statistics_device<oneapi::mkl::rng::device::uniform<std::uint64_t, Method>> {
+struct statistics_device<oneapi::math::rng::device::uniform<std::uint64_t, Method>> {
     template <typename AllocType>
     bool check(const std::vector<std::uint64_t, AllocType>& r,
-               const oneapi::mkl::rng::device::uniform<std::uint64_t, Method>& distr) {
+               const oneapi::math::rng::device::uniform<std::uint64_t, Method>& distr) {
         double tM, tD, tQ;
         double a = distr.a();
         double b = distr.b();
@@ -264,10 +264,10 @@ struct statistics_device<oneapi::mkl::rng::device::uniform<std::uint64_t, Method
 };
 
 template <typename Fp, typename Method>
-struct statistics_device<oneapi::mkl::rng::device::gaussian<Fp, Method>> {
+struct statistics_device<oneapi::math::rng::device::gaussian<Fp, Method>> {
     template <typename AllocType>
     bool check(const std::vector<Fp, AllocType>& r,
-               const oneapi::mkl::rng::device::gaussian<Fp, Method>& distr) {
+               const oneapi::math::rng::device::gaussian<Fp, Method>& distr) {
         double tM, tD, tQ;
         Fp a = distr.mean();
         Fp sigma = distr.stddev();
@@ -282,10 +282,10 @@ struct statistics_device<oneapi::mkl::rng::device::gaussian<Fp, Method>> {
 };
 
 template <typename Fp, typename Method>
-struct statistics_device<oneapi::mkl::rng::device::lognormal<Fp, Method>> {
+struct statistics_device<oneapi::math::rng::device::lognormal<Fp, Method>> {
     template <typename AllocType>
     bool check(const std::vector<Fp, AllocType>& r,
-               const oneapi::mkl::rng::device::lognormal<Fp, Method>& distr) {
+               const oneapi::math::rng::device::lognormal<Fp, Method>& distr) {
         double tM, tD, tQ;
         Fp a = distr.m();
         Fp b = distr.displ();
@@ -304,10 +304,10 @@ struct statistics_device<oneapi::mkl::rng::device::lognormal<Fp, Method>> {
 };
 
 template <typename Fp, typename Method>
-struct statistics_device<oneapi::mkl::rng::device::exponential<Fp, Method>> {
+struct statistics_device<oneapi::math::rng::device::exponential<Fp, Method>> {
     template <typename AllocType>
     bool check(const std::vector<Fp, AllocType>& r,
-               const oneapi::mkl::rng::device::exponential<Fp, Method>& distr) {
+               const oneapi::math::rng::device::exponential<Fp, Method>& distr) {
         double tM, tD, tQ;
         Fp a = distr.a();
         Fp beta = distr.beta();
@@ -321,10 +321,10 @@ struct statistics_device<oneapi::mkl::rng::device::exponential<Fp, Method>> {
 };
 
 template <typename Fp, typename Method>
-struct statistics_device<oneapi::mkl::rng::device::poisson<Fp, Method>> {
+struct statistics_device<oneapi::math::rng::device::poisson<Fp, Method>> {
     template <typename AllocType>
     bool check(const std::vector<Fp, AllocType>& r,
-               const oneapi::mkl::rng::device::poisson<Fp, Method>& distr) {
+               const oneapi::math::rng::device::poisson<Fp, Method>& distr) {
         double tM, tD, tQ;
         double lambda = distr.lambda();
 
@@ -337,10 +337,10 @@ struct statistics_device<oneapi::mkl::rng::device::poisson<Fp, Method>> {
 };
 
 template <typename Fp, typename Method>
-struct statistics_device<oneapi::mkl::rng::device::bernoulli<Fp, Method>> {
+struct statistics_device<oneapi::math::rng::device::bernoulli<Fp, Method>> {
     template <typename AllocType>
     bool check(const std::vector<Fp, AllocType>& r,
-               const oneapi::mkl::rng::device::bernoulli<Fp, Method>& distr) {
+               const oneapi::math::rng::device::bernoulli<Fp, Method>& distr) {
         double tM, tD, tQ;
         double p = static_cast<double>(distr.p());
 
@@ -353,10 +353,10 @@ struct statistics_device<oneapi::mkl::rng::device::bernoulli<Fp, Method>> {
 };
 
 template <typename Fp, typename Method>
-struct statistics_device<oneapi::mkl::rng::device::beta<Fp, Method>> {
+struct statistics_device<oneapi::math::rng::device::beta<Fp, Method>> {
     template <typename AllocType>
     bool check(const std::vector<Fp, AllocType>& r,
-               const oneapi::mkl::rng::device::beta<Fp, Method>& distr) {
+               const oneapi::math::rng::device::beta<Fp, Method>& distr) {
         double tM, tD, tQ;
         double b, c, d, e, e2, b2, sum_pq;
         Fp p = distr.p();
@@ -381,10 +381,10 @@ struct statistics_device<oneapi::mkl::rng::device::beta<Fp, Method>> {
 };
 
 template <typename Fp, typename Method>
-struct statistics_device<oneapi::mkl::rng::device::gamma<Fp, Method>> {
+struct statistics_device<oneapi::math::rng::device::gamma<Fp, Method>> {
     template <typename AllocType>
     bool check(const std::vector<Fp, AllocType>& r,
-               const oneapi::mkl::rng::device::gamma<Fp, Method>& distr) {
+               const oneapi::math::rng::device::gamma<Fp, Method>& distr) {
         double tM, tD, tQ;
         Fp a = distr.a();
         Fp alpha = distr.alpha();
@@ -399,19 +399,19 @@ struct statistics_device<oneapi::mkl::rng::device::gamma<Fp, Method>> {
 };
 
 template <typename Fp>
-struct statistics_device<oneapi::mkl::rng::device::bits<Fp>> {
+struct statistics_device<oneapi::math::rng::device::bits<Fp>> {
     template <typename AllocType>
     bool check(const std::vector<Fp, AllocType>& r,
-               const oneapi::mkl::rng::device::bits<Fp>& distr) {
+               const oneapi::math::rng::device::bits<Fp>& distr) {
         return true;
     }
 };
 
 template <typename Fp>
-struct statistics_device<oneapi::mkl::rng::device::uniform_bits<Fp>> {
+struct statistics_device<oneapi::math::rng::device::uniform_bits<Fp>> {
     template <typename AllocType>
     bool check(const std::vector<Fp, AllocType>& r,
-               const oneapi::mkl::rng::device::uniform_bits<Fp>& distr) {
+               const oneapi::math::rng::device::uniform_bits<Fp>& distr) {
         return true;
     }
 };
@@ -420,6 +420,6 @@ template <typename Engine>
 struct is_mcg59 : std::false_type {};
 
 template <std::int32_t VecSize>
-struct is_mcg59<oneapi::mkl::rng::device::mcg59<VecSize>> : std::true_type {};
+struct is_mcg59<oneapi::math::rng::device::mcg59<VecSize>> : std::true_type {};
 
 #endif // _RNG_DEVICE_TEST_COMMON_HPP__

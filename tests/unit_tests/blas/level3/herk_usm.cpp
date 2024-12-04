@@ -30,9 +30,9 @@
 #include <CL/sycl.hpp>
 #endif
 #include "cblas.h"
-#include "oneapi/mkl.hpp"
-#include "oneapi/mkl/detail/config.hpp"
-#include "onemkl_blas_helper.hpp"
+#include "oneapi/math.hpp"
+#include "oneapi/math/detail/config.hpp"
+#include "onemath_blas_helper.hpp"
 #include "reference_blas_templates.hpp"
 #include "test_common.hpp"
 #include "test_helper.hpp"
@@ -47,8 +47,8 @@ extern std::vector<sycl::device*> devices;
 namespace {
 
 template <typename fp, typename fp_scalar>
-int test(device* dev, oneapi::mkl::layout layout, oneapi::mkl::uplo upper_lower,
-         oneapi::mkl::transpose trans, int n, int k, int lda, int ldc, fp_scalar alpha,
+int test(device* dev, oneapi::math::layout layout, oneapi::math::uplo upper_lower,
+         oneapi::math::transpose trans, int n, int k, int lda, int ldc, fp_scalar alpha,
          fp_scalar beta) {
     // Catch asynchronous exceptions.
     auto exception_handler = [](exception_list exceptions) {
@@ -73,7 +73,7 @@ int test(device* dev, oneapi::mkl::layout layout, oneapi::mkl::uplo upper_lower,
     auto ua = usm_allocator<fp, usm::alloc::shared, 64>(cxt, *dev);
     vector<fp, decltype(ua)> A(ua), C(ua);
     rand_matrix(A, layout, trans, n, k, lda);
-    rand_matrix(C, layout, oneapi::mkl::transpose::nontrans, n, n, ldc);
+    rand_matrix(C, layout, oneapi::math::transpose::nontrans, n, n, ldc);
 
     auto C_ref = C;
 
@@ -92,30 +92,30 @@ int test(device* dev, oneapi::mkl::layout layout, oneapi::mkl::uplo upper_lower,
     try {
 #ifdef CALL_RT_API
         switch (layout) {
-            case oneapi::mkl::layout::col_major:
-                done = oneapi::mkl::blas::column_major::herk(main_queue, upper_lower, trans, n, k,
-                                                             alpha, A.data(), lda, beta, C.data(),
-                                                             ldc, dependencies);
+            case oneapi::math::layout::col_major:
+                done = oneapi::math::blas::column_major::herk(main_queue, upper_lower, trans, n, k,
+                                                              alpha, A.data(), lda, beta, C.data(),
+                                                              ldc, dependencies);
                 break;
-            case oneapi::mkl::layout::row_major:
-                done = oneapi::mkl::blas::row_major::herk(main_queue, upper_lower, trans, n, k,
-                                                          alpha, A.data(), lda, beta, C.data(), ldc,
-                                                          dependencies);
+            case oneapi::math::layout::row_major:
+                done = oneapi::math::blas::row_major::herk(main_queue, upper_lower, trans, n, k,
+                                                           alpha, A.data(), lda, beta, C.data(),
+                                                           ldc, dependencies);
                 break;
             default: break;
         }
         done.wait();
 #else
         switch (layout) {
-            case oneapi::mkl::layout::col_major:
-                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::mkl::blas::column_major::herk,
+            case oneapi::math::layout::col_major:
+                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::math::blas::column_major::herk,
                                         upper_lower, trans, n, k, alpha, A.data(), lda, beta,
                                         C.data(), ldc, dependencies);
                 break;
-            case oneapi::mkl::layout::row_major:
-                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::mkl::blas::row_major::herk, upper_lower,
-                                        trans, n, k, alpha, A.data(), lda, beta, C.data(), ldc,
-                                        dependencies);
+            case oneapi::math::layout::row_major:
+                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::math::blas::row_major::herk,
+                                        upper_lower, trans, n, k, alpha, A.data(), lda, beta,
+                                        C.data(), ldc, dependencies);
                 break;
             default: break;
         }
@@ -127,7 +127,7 @@ int test(device* dev, oneapi::mkl::layout layout, oneapi::mkl::uplo upper_lower,
         print_error_code(e);
     }
 
-    catch (const oneapi::mkl::unimplemented& e) {
+    catch (const oneapi::math::unimplemented& e) {
         return test_skipped;
     }
 
@@ -143,23 +143,23 @@ int test(device* dev, oneapi::mkl::layout layout, oneapi::mkl::uplo upper_lower,
 }
 
 class HerkUsmTests
-        : public ::testing::TestWithParam<std::tuple<sycl::device*, oneapi::mkl::layout>> {};
+        : public ::testing::TestWithParam<std::tuple<sycl::device*, oneapi::math::layout>> {};
 
 TEST_P(HerkUsmTests, ComplexSinglePrecision) {
     float alpha(2.0);
     float beta(3.0);
     EXPECT_TRUEORSKIP((test<std::complex<float>, float>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::uplo::lower,
-        oneapi::mkl::transpose::nontrans, 72, 27, 101, 103, alpha, beta)));
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::uplo::lower,
+        oneapi::math::transpose::nontrans, 72, 27, 101, 103, alpha, beta)));
     EXPECT_TRUEORSKIP((test<std::complex<float>, float>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::uplo::upper,
-        oneapi::mkl::transpose::nontrans, 72, 27, 101, 103, alpha, beta)));
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::uplo::upper,
+        oneapi::math::transpose::nontrans, 72, 27, 101, 103, alpha, beta)));
     EXPECT_TRUEORSKIP((test<std::complex<float>, float>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::uplo::lower,
-        oneapi::mkl::transpose::conjtrans, 72, 27, 101, 103, alpha, beta)));
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::uplo::lower,
+        oneapi::math::transpose::conjtrans, 72, 27, 101, 103, alpha, beta)));
     EXPECT_TRUEORSKIP((test<std::complex<float>, float>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::uplo::upper,
-        oneapi::mkl::transpose::conjtrans, 72, 27, 101, 103, alpha, beta)));
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::uplo::upper,
+        oneapi::math::transpose::conjtrans, 72, 27, 101, 103, alpha, beta)));
 }
 TEST_P(HerkUsmTests, ComplexDoublePrecision) {
     CHECK_DOUBLE_ON_DEVICE(std::get<0>(GetParam()));
@@ -167,23 +167,23 @@ TEST_P(HerkUsmTests, ComplexDoublePrecision) {
     double alpha(2.0);
     double beta(3.0);
     EXPECT_TRUEORSKIP((test<std::complex<double>, double>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::uplo::lower,
-        oneapi::mkl::transpose::nontrans, 72, 27, 101, 103, alpha, beta)));
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::uplo::lower,
+        oneapi::math::transpose::nontrans, 72, 27, 101, 103, alpha, beta)));
     EXPECT_TRUEORSKIP((test<std::complex<double>, double>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::uplo::upper,
-        oneapi::mkl::transpose::nontrans, 72, 27, 101, 103, alpha, beta)));
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::uplo::upper,
+        oneapi::math::transpose::nontrans, 72, 27, 101, 103, alpha, beta)));
     EXPECT_TRUEORSKIP((test<std::complex<double>, double>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::uplo::lower,
-        oneapi::mkl::transpose::conjtrans, 72, 27, 101, 103, alpha, beta)));
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::uplo::lower,
+        oneapi::math::transpose::conjtrans, 72, 27, 101, 103, alpha, beta)));
     EXPECT_TRUEORSKIP((test<std::complex<double>, double>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::uplo::upper,
-        oneapi::mkl::transpose::conjtrans, 72, 27, 101, 103, alpha, beta)));
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::uplo::upper,
+        oneapi::math::transpose::conjtrans, 72, 27, 101, 103, alpha, beta)));
 }
 
 INSTANTIATE_TEST_SUITE_P(HerkUsmTestSuite, HerkUsmTests,
                          ::testing::Combine(testing::ValuesIn(devices),
-                                            testing::Values(oneapi::mkl::layout::col_major,
-                                                            oneapi::mkl::layout::row_major)),
+                                            testing::Values(oneapi::math::layout::col_major,
+                                                            oneapi::math::layout::row_major)),
                          ::LayoutDeviceNamePrint());
 
 } // anonymous namespace

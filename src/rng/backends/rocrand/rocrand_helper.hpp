@@ -62,19 +62,19 @@
  * @file rocrand_helper.cpp : contains the implementation of all the routines
  * for HIP backend
  */
-#ifndef _MKL_RNG_ROCRAND_HELPER_HPP_
-#define _MKL_RNG_ROCRAND_HELPER_HPP_
+#ifndef ONEMATH_RNG_ROCRAND_HELPER_HPP_
+#define ONEMATH_RNG_ROCRAND_HELPER_HPP_
 
 #include <rocrand.h>
 #include <complex>
-#include "oneapi/mkl/types.hpp"
+#include "oneapi/math/types.hpp"
 
 namespace oneapi {
-namespace mkl {
+namespace math {
 namespace rng {
 namespace rocrand {
 
-// Static template functions oneapi::mkl::rng::rocrand::range_transform_fp for
+// Static template functions oneapi::math::rng::rocrand::range_transform_fp for
 // Buffer and USM APIs
 //
 // rocRAND has no built-in functionality to specify a custom range for sampling
@@ -138,7 +138,7 @@ static inline sycl::event range_transform_fp_accurate(sycl::queue& queue, T a, T
     });
 }
 
-// Static template functions oneapi::mkl::rng::rocrand::range_transform_int for
+// Static template functions oneapi::math::rng::rocrand::range_transform_int for
 // Buffer and USM APIs
 //
 // rocRAND has no built-in functionality to specify a custom range for sampling
@@ -173,7 +173,7 @@ inline sycl::event range_transform_int(sycl::queue& queue, T a, T b, std::int64_
     });
 }
 
-// Static template functions oneapi::mkl::rng::rocrand::sample_bernoulli for
+// Static template functions oneapi::math::rng::rocrand::sample_bernoulli for
 // Buffer and USM APIs
 //
 // rocRAND has no built-in functionality to sample from a Bernoulli distribution.
@@ -329,7 +329,7 @@ public:
 
 } // namespace rocrand
 } // namespace rng
-} // namespace mkl
+} // namespace math
 } // namespace oneapi
 
-#endif // _MKL_RNG_ROCRAND_HELPER_HPP_
+#endif // ONEMATH_RNG_ROCRAND_HELPER_HPP_

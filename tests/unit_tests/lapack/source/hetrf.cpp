@@ -26,7 +26,7 @@
 #include <CL/sycl.hpp>
 #endif
 
-#include "oneapi/mkl.hpp"
+#include "oneapi/math.hpp"
 #include "lapack_common.hpp"
 #include "lapack_test_controller.hpp"
 #include "lapack_accuracy_checks.hpp"
@@ -43,7 +43,7 @@ const char* accuracy_input = R"(
 )";
 
 template <typename data_T>
-bool accuracy(const sycl::device& dev, oneapi::mkl::uplo uplo, int64_t n, int64_t lda,
+bool accuracy(const sycl::device& dev, oneapi::math::uplo uplo, int64_t n, int64_t lda,
               uint64_t seed) {
     using fp = typename data_T_info<data_T>::value_type;
     using fp_real = typename complex_info<fp>::real_type;
@@ -63,11 +63,11 @@ bool accuracy(const sycl::device& dev, oneapi::mkl::uplo uplo, int64_t n, int64_
         auto ipiv_dev = device_alloc<data_T, int64_t>(queue, ipiv.size());
 #ifdef CALL_RT_API
         const auto scratchpad_size =
-            oneapi::mkl::lapack::hetrf_scratchpad_size<fp>(queue, uplo, n, lda);
+            oneapi::math::lapack::hetrf_scratchpad_size<fp>(queue, uplo, n, lda);
 #else
         int64_t scratchpad_size;
         TEST_RUN_LAPACK_CT_SELECT(
-            queue, scratchpad_size = oneapi::mkl::lapack::hetrf_scratchpad_size<fp>, uplo, n, lda);
+            queue, scratchpad_size = oneapi::math::lapack::hetrf_scratchpad_size<fp>, uplo, n, lda);
 #endif
         auto scratchpad_dev = device_alloc<data_T>(queue, scratchpad_size);
 
@@ -76,10 +76,10 @@ bool accuracy(const sycl::device& dev, oneapi::mkl::uplo uplo, int64_t n, int64_
         queue.wait_and_throw();
 
 #ifdef CALL_RT_API
-        oneapi::mkl::lapack::hetrf(queue, uplo, n, A_dev, lda, ipiv_dev, scratchpad_dev,
-                                   scratchpad_size);
+        oneapi::math::lapack::hetrf(queue, uplo, n, A_dev, lda, ipiv_dev, scratchpad_dev,
+                                    scratchpad_size);
 #else
-        TEST_RUN_LAPACK_CT_SELECT(queue, oneapi::mkl::lapack::hetrf, uplo, n, A_dev, lda, ipiv_dev,
+        TEST_RUN_LAPACK_CT_SELECT(queue, oneapi::math::lapack::hetrf, uplo, n, A_dev, lda, ipiv_dev,
                                   scratchpad_dev, scratchpad_size);
 #endif
         queue.wait_and_throw();
@@ -104,7 +104,7 @@ bool accuracy(const sycl::device& dev, oneapi::mkl::uplo uplo, int64_t n, int64_
     for (int64_t d = 0; d < n; d++)
         U[d + d * ldu] = 1.0;
 
-    if (uplo == oneapi::mkl::uplo::upper) {
+    if (uplo == oneapi::math::uplo::upper) {
         int64_t k = n - 1;
         while (k >= 0) {
             reference::laset('A', n, n, 0.0, 1.0, Uk.data(), ldu);
@@ -117,9 +117,9 @@ bool accuracy(const sycl::device& dev, oneapi::mkl::uplo uplo, int64_t n, int64_
                     reference::swap(n, Uk.data() + (k + 0 * ldu), ldu, Uk.data() + (piv + 0 * ldu),
                                     ldu);
                 auto U_temp = U;
-                reference::gemm(oneapi::mkl::transpose::nontrans, oneapi::mkl::transpose::nontrans,
-                                n, n, n, 1.0, U_temp.data(), ldu, Uk.data(), ldu, 0.0, U.data(),
-                                ldu);
+                reference::gemm(oneapi::math::transpose::nontrans,
+                                oneapi::math::transpose::nontrans, n, n, n, 1.0, U_temp.data(), ldu,
+                                Uk.data(), ldu, 0.0, U.data(), ldu);
 
                 D[k + k * ldd] = A[k + k * lda];
                 k -= 1;
@@ -135,9 +135,9 @@ bool accuracy(const sycl::device& dev, oneapi::mkl::uplo uplo, int64_t n, int64_
                     reference::swap(n, Uk.data() + (k - 1 + 0 * ldu), ldu,
                                     Uk.data() + (piv + 0 * ldu), ldu);
                 auto U_temp = U;
-                reference::gemm(oneapi::mkl::transpose::nontrans, oneapi::mkl::transpose::nontrans,
-                                n, n, n, 1.0, U_temp.data(), ldu, Uk.data(), ldu, 0.0, U.data(),
-                                ldu);
+                reference::gemm(oneapi::math::transpose::nontrans,
+                                oneapi::math::transpose::nontrans, n, n, n, 1.0, U_temp.data(), ldu,
+                                Uk.data(), ldu, 0.0, U.data(), ldu);
 
                 D[k + k * ldd] = A[k + k * lda];
                 D[k - 1 + (k - 1) * ldd] = A[k - 1 + (k - 1) * lda];
@@ -160,9 +160,9 @@ bool accuracy(const sycl::device& dev, oneapi::mkl::uplo uplo, int64_t n, int64_
                     reference::swap(n, Uk.data() + (k + 0 * lda), ldu, Uk.data() + (piv + 0 * ldu),
                                     ldu);
                 auto U_temp = U;
-                reference::gemm(oneapi::mkl::transpose::nontrans, oneapi::mkl::transpose::nontrans,
-                                n, n, n, 1.0, U_temp.data(), ldu, Uk.data(), ldu, 0.0, U.data(),
-                                ldu);
+                reference::gemm(oneapi::math::transpose::nontrans,
+                                oneapi::math::transpose::nontrans, n, n, n, 1.0, U_temp.data(), ldu,
+                                Uk.data(), ldu, 0.0, U.data(), ldu);
 
                 D[k + (k)*ldd] = A[k + (k)*lda];
                 k += 1;
@@ -178,9 +178,9 @@ bool accuracy(const sycl::device& dev, oneapi::mkl::uplo uplo, int64_t n, int64_
                     reference::swap(n, Uk.data() + (k + 1 + 0 * ldu), ldu,
                                     Uk.data() + (piv + 0 * ldu), ldu);
                 auto U_temp = U;
-                reference::gemm(oneapi::mkl::transpose::nontrans, oneapi::mkl::transpose::nontrans,
-                                n, n, n, 1.0, U_temp.data(), ldu, Uk.data(), ldu, 0.0, U.data(),
-                                ldu);
+                reference::gemm(oneapi::math::transpose::nontrans,
+                                oneapi::math::transpose::nontrans, n, n, n, 1.0, U_temp.data(), ldu,
+                                Uk.data(), ldu, 0.0, U.data(), ldu);
 
                 D[k + k * ldd] = A[k + k * lda];
                 D[k + 1 + (k + 1) * ldd] = A[k + 1 + (k + 1) * lda];
@@ -194,12 +194,12 @@ bool accuracy(const sycl::device& dev, oneapi::mkl::uplo uplo, int64_t n, int64_
     /* |A - UDU'| < |A| O(eps) */
     std::vector<fp> UD(n * n);
     int64_t ldud = n;
-    reference::gemm(oneapi::mkl::transpose::nontrans, oneapi::mkl::transpose::nontrans, n, n, n,
+    reference::gemm(oneapi::math::transpose::nontrans, oneapi::math::transpose::nontrans, n, n, n,
                     1.0, U.data(), ldu, D.data(), ldd, 0.0, UD.data(), ldud);
 
     std::vector<fp> UDU(n * n);
     int64_t ldudu = n;
-    reference::gemm(oneapi::mkl::transpose::nontrans, oneapi::mkl::transpose::conjtrans, n, n, n,
+    reference::gemm(oneapi::math::transpose::nontrans, oneapi::math::transpose::conjtrans, n, n, n,
                     1.0, UD.data(), ldud, U.data(), ldu, 0.0, UDU.data(), ldudu);
 
     if (!rel_mat_err_check(n, n, UDU, ldudu, A_initial, lda)) {
@@ -215,7 +215,7 @@ const char* dependency_input = R"(
 )";
 
 template <typename data_T>
-bool usm_dependency(const sycl::device& dev, oneapi::mkl::uplo uplo, int64_t n, int64_t lda,
+bool usm_dependency(const sycl::device& dev, oneapi::math::uplo uplo, int64_t n, int64_t lda,
                     uint64_t seed) {
     using fp = typename data_T_info<data_T>::value_type;
     using fp_real = typename complex_info<fp>::real_type;
@@ -236,11 +236,11 @@ bool usm_dependency(const sycl::device& dev, oneapi::mkl::uplo uplo, int64_t n, 
         auto ipiv_dev = device_alloc<data_T, int64_t>(queue, ipiv.size());
 #ifdef CALL_RT_API
         const auto scratchpad_size =
-            oneapi::mkl::lapack::hetrf_scratchpad_size<fp>(queue, uplo, n, lda);
+            oneapi::math::lapack::hetrf_scratchpad_size<fp>(queue, uplo, n, lda);
 #else
         int64_t scratchpad_size;
         TEST_RUN_LAPACK_CT_SELECT(
-            queue, scratchpad_size = oneapi::mkl::lapack::hetrf_scratchpad_size<fp>, uplo, n, lda);
+            queue, scratchpad_size = oneapi::math::lapack::hetrf_scratchpad_size<fp>, uplo, n, lda);
 #endif
         auto scratchpad_dev = device_alloc<data_T>(queue, scratchpad_size);
 
@@ -252,11 +252,11 @@ bool usm_dependency(const sycl::device& dev, oneapi::mkl::uplo uplo, int64_t n, 
         auto in_event = create_dependency(queue);
 #ifdef CALL_RT_API
         sycl::event func_event =
-            oneapi::mkl::lapack::hetrf(queue, uplo, n, A_dev, lda, ipiv_dev, scratchpad_dev,
-                                       scratchpad_size, std::vector<sycl::event>{ in_event });
+            oneapi::math::lapack::hetrf(queue, uplo, n, A_dev, lda, ipiv_dev, scratchpad_dev,
+                                        scratchpad_size, std::vector<sycl::event>{ in_event });
 #else
         sycl::event func_event;
-        TEST_RUN_LAPACK_CT_SELECT(queue, func_event = oneapi::mkl::lapack::hetrf, uplo, n, A_dev,
+        TEST_RUN_LAPACK_CT_SELECT(queue, func_event = oneapi::math::lapack::hetrf, uplo, n, A_dev,
                                   lda, ipiv_dev, scratchpad_dev, scratchpad_size,
                                   std::vector<sycl::event>{ in_event });
 #endif

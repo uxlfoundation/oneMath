@@ -16,8 +16,8 @@
 *  limitations under the License.
 *
 **************************************************************************/
-#ifndef _ONEMKL_SPARSE_BLAS_BACKENDS_CUSPARSE_SCOPE_HANDLE_HPP_
-#define _ONEMKL_SPARSE_BLAS_BACKENDS_CUSPARSE_SCOPE_HANDLE_HPP_
+#ifndef _ONEMATH_SPARSE_BLAS_BACKENDS_CUSPARSE_SCOPE_HANDLE_HPP_
+#define _ONEMATH_SPARSE_BLAS_BACKENDS_CUSPARSE_SCOPE_HANDLE_HPP_
 
 /**
  * @file Similar to cublas_scope_handle.hpp
@@ -30,8 +30,8 @@
 #endif
 
 // After Plugin Interface removal in DPC++ ur.hpp is the new include
-#if __has_include(<sycl/detail/ur.hpp>) && !defined(ONEAPI_ONEMKL_PI_INTERFACE_REMOVED)
-#define ONEAPI_ONEMKL_PI_INTERFACE_REMOVED
+#if __has_include(<sycl/detail/ur.hpp>) && !defined(ONEAPI_ONEMATH_PI_INTERFACE_REMOVED)
+#define ONEAPI_ONEMATH_PI_INTERFACE_REMOVED
 #endif
 
 #include <thread>
@@ -40,7 +40,7 @@
 #include "cusparse_global_handle.hpp"
 #include "cusparse_helper.hpp"
 
-namespace oneapi::mkl::sparse::cusparse::detail {
+namespace oneapi::math::sparse::cusparse::detail {
 
 class CusparseScopedContextHandler {
     CUcontext original_;
@@ -48,7 +48,7 @@ class CusparseScopedContextHandler {
     sycl::interop_handle& ih;
     bool needToRecover_;
 
-#ifdef ONEAPI_ONEMKL_PI_INTERFACE_REMOVED
+#ifdef ONEAPI_ONEMATH_PI_INTERFACE_REMOVED
     static thread_local cusparse_global_handle<ur_context_handle_t> handle_helper;
 #else
     static thread_local cusparse_global_handle<pi_context> handle_helper;
@@ -83,6 +83,6 @@ inline void* get_mem(sycl::interop_handle ih, AccT acc) {
     return reinterpret_cast<void*>(cudaPtr);
 }
 
-} // namespace oneapi::mkl::sparse::cusparse::detail
+} // namespace oneapi::math::sparse::cusparse::detail
 
-#endif //_ONEMKL_SPARSE_BLAS_BACKENDS_CUSPARSE_SCOPE_HANDLE_HPP_
+#endif //_ONEMATH_SPARSE_BLAS_BACKENDS_CUSPARSE_SCOPE_HANDLE_HPP_

@@ -17,16 +17,16 @@
 *
 **************************************************************************/
 
-#include "oneapi/mkl/sparse_blas/types.hpp"
+#include "oneapi/math/sparse_blas/types.hpp"
 
-#include "oneapi/mkl/sparse_blas/detail/mklcpu/onemkl_sparse_blas_mklcpu.hpp"
+#include "oneapi/math/sparse_blas/detail/mklcpu/onemath_sparse_blas_mklcpu.hpp"
 
 #include "sparse_blas/function_table.hpp"
 
 #define WRAPPER_VERSION 1
 #define BACKEND         mklcpu
 
-extern "C" sparse_blas_function_table_t mkl_sparse_blas_table = {
+extern "C" sparse_blas_function_table_t onemath_sparse_blas_table = {
     WRAPPER_VERSION,
 #include "sparse_blas/backends/backend_wrappers.cxx"
 };

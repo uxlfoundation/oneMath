@@ -31,7 +31,7 @@
 #endif
 
 #include "lapack_common.hpp"
-#include "oneapi/mkl/exceptions.hpp"
+#include "oneapi/math/exceptions.hpp"
 
 template <class T>
 std::istream& operator>>(std::istream& is, T& t) {
@@ -40,31 +40,31 @@ std::istream& operator>>(std::istream& is, T& t) {
     t = static_cast<T>(i);
     return is;
 }
-inline std::ostream& operator<<(std::ostream& os, const oneapi::mkl::job& t) {
+inline std::ostream& operator<<(std::ostream& os, const oneapi::math::job& t) {
     os << static_cast<int64_t>(t);
     return os;
 }
-inline std::ostream& operator<<(std::ostream& os, const oneapi::mkl::jobsvd& t) {
+inline std::ostream& operator<<(std::ostream& os, const oneapi::math::jobsvd& t) {
     os << static_cast<int64_t>(t);
     return os;
 }
-inline std::ostream& operator<<(std::ostream& os, const oneapi::mkl::transpose& t) {
+inline std::ostream& operator<<(std::ostream& os, const oneapi::math::transpose& t) {
     os << static_cast<int64_t>(t);
     return os;
 }
-inline std::ostream& operator<<(std::ostream& os, const oneapi::mkl::uplo& t) {
+inline std::ostream& operator<<(std::ostream& os, const oneapi::math::uplo& t) {
     os << static_cast<int64_t>(t);
     return os;
 }
-inline std::ostream& operator<<(std::ostream& os, const oneapi::mkl::side& t) {
+inline std::ostream& operator<<(std::ostream& os, const oneapi::math::side& t) {
     os << static_cast<int64_t>(t);
     return os;
 }
-inline std::ostream& operator<<(std::ostream& os, const oneapi::mkl::diag& t) {
+inline std::ostream& operator<<(std::ostream& os, const oneapi::math::diag& t) {
     os << static_cast<int64_t>(t);
     return os;
 }
-inline std::ostream& operator<<(std::ostream& os, const oneapi::mkl::generate& t) {
+inline std::ostream& operator<<(std::ostream& os, const oneapi::math::generate& t) {
     os << static_cast<int64_t>(t);
     return os;
 }
@@ -173,10 +173,10 @@ struct InputTestController {
         try {
             result = std::apply(tp, tp_args);
         }
-        catch (const oneapi::mkl::unsupported_device& e) {
+        catch (const oneapi::math::unsupported_device& e) {
             result = result_T{ e, result_T::result::pass };
         }
-        catch (const oneapi::mkl::unimplemented& e) {
+        catch (const oneapi::math::unimplemented& e) {
             result = result_T{ e, result_T::result::pass };
         }
         catch (const std::exception& e) {

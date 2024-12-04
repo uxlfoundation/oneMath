@@ -17,8 +17,8 @@
 *
 **************************************************************************/
 
-#ifndef ONEMKL_COMPUTE_TESTER_HPP
-#define ONEMKL_COMPUTE_TESTER_HPP
+#ifndef ONEMATH_COMPUTE_TESTER_HPP
+#define ONEMATH_COMPUTE_TESTER_HPP
 
 #include <algorithm>
 
@@ -27,25 +27,25 @@
 #else
 #include <CL/sycl.hpp>
 #endif
-#include "oneapi/mkl.hpp"
+#include "oneapi/math.hpp"
 #include "test_helper.hpp"
 #include "test_common.hpp"
 #include "reference_dft.hpp"
 
 #include <numeric>
 
-template <oneapi::mkl::dft::precision precision, oneapi::mkl::dft::domain domain>
+template <oneapi::math::dft::precision precision, oneapi::math::dft::domain domain>
 struct DFT_Test {
-    using descriptor_t = oneapi::mkl::dft::descriptor<precision, domain>;
+    using descriptor_t = oneapi::math::dft::descriptor<precision, domain>;
 
     template <typename ElemT>
     using usm_allocator_t = sycl::usm_allocator<ElemT, sycl::usm::alloc::shared, 64>;
 
     using PrecisionType =
-        typename std::conditional_t<precision == oneapi::mkl::dft::precision::SINGLE, float,
+        typename std::conditional_t<precision == oneapi::math::dft::precision::SINGLE, float,
                                     double>;
 
-    using FwdInputType = typename std::conditional_t<domain == oneapi::mkl::dft::domain::REAL,
+    using FwdInputType = typename std::conditional_t<domain == oneapi::math::dft::domain::REAL,
                                                      PrecisionType, std::complex<PrecisionType>>;
     using FwdOutputType = std::complex<PrecisionType>;
 
@@ -93,7 +93,7 @@ struct DFT_Test {
         out_host_ref = std::vector<FwdOutputType>(size_total);
 
         rand_vector(input, size_total);
-        if constexpr (domain == oneapi::mkl::dft::domain::REAL) {
+        if constexpr (domain == oneapi::math::dft::domain::REAL) {
             for (std::size_t i = 0; i < input.size(); ++i) {
                 input_re[i] = { input[i] };
                 input_im[i] = 0;
@@ -108,7 +108,7 @@ struct DFT_Test {
     }
 
     bool skip_test(MemoryAccessModel mem_acc) {
-        if constexpr (precision == oneapi::mkl::dft::precision::DOUBLE) {
+        if constexpr (precision == oneapi::math::dft::precision::DOUBLE) {
             if (!sycl_queue.get_device().has(sycl::aspect::fp64)) {
                 std::cout << "Device does not support double precision." << std::endl;
                 return true;
@@ -151,4 +151,4 @@ struct DFT_Test {
     int test_out_of_place_real_real_USM();
 };
 
-#endif //ONEMKL_COMPUTE_TESTER_HPP
+#endif //ONEMATH_COMPUTE_TESTER_HPP

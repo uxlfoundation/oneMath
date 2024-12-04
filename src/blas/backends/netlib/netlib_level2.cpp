@@ -24,10 +24,10 @@
 #endif
 
 #include "netlib_common.hpp"
-#include "oneapi/mkl/blas/detail/netlib/onemkl_blas_netlib.hpp"
+#include "oneapi/math/blas/detail/netlib/onemath_blas_netlib.hpp"
 
 namespace oneapi {
-namespace mkl {
+namespace math {
 namespace blas {
 namespace netlib {
 namespace column_major {
@@ -46,5 +46,5 @@ namespace row_major {
 } // namespace row_major
 } // namespace netlib
 } // namespace blas
-} // namespace mkl
+} // namespace math
 } // namespace oneapi

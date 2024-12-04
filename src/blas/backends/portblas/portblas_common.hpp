@@ -21,14 +21,14 @@
 #define _PORTBLAS_COMMON_HPP_
 
 #include "portblas.hpp"
-#include "oneapi/mkl/types.hpp"
-#include "oneapi/mkl/exceptions.hpp"
+#include "oneapi/math/types.hpp"
+#include "oneapi/math/exceptions.hpp"
 
 #include <tuple>
 #include <utility>
 
 namespace oneapi {
-namespace mkl {
+namespace math {
 namespace blas {
 namespace portblas {
 
@@ -44,19 +44,19 @@ using buffer_iterator_t = ::blas::BufferIterator<ElemT>;
 template <typename ElemT>
 using sycl_complex_t = sycl::ext::oneapi::experimental::complex<ElemT>;
 
-/** A trait for obtaining equivalent portBLAS API types from oneMKL API
+/** A trait for obtaining equivalent portBLAS API types from oneMath API
  *  types.
  * 
- *  @tparam InputT is the oneMKL type.
+ *  @tparam InputT is the oneMath type.
  *  portblas_type<InputT>::type should be the equivalent portBLAS type.
 **/
 template <typename InputT>
 struct portblas_type;
 
-#define DEF_PORTBLAS_TYPE(onemkl_t, portblas_t) \
-    template <>                                 \
-    struct portblas_type<onemkl_t> {            \
-        using type = portblas_t;                \
+#define DEF_PORTBLAS_TYPE(onemath_t, portblas_t) \
+    template <>                                  \
+    struct portblas_type<onemath_t> {            \
+        using type = portblas_t;                 \
     };
 
 DEF_PORTBLAS_TYPE(sycl::queue, handle_t)
@@ -64,10 +64,10 @@ DEF_PORTBLAS_TYPE(int64_t, int64_t)
 DEF_PORTBLAS_TYPE(sycl::half, sycl::half)
 DEF_PORTBLAS_TYPE(float, float)
 DEF_PORTBLAS_TYPE(double, double)
-DEF_PORTBLAS_TYPE(oneapi::mkl::transpose, char)
-DEF_PORTBLAS_TYPE(oneapi::mkl::uplo, char)
-DEF_PORTBLAS_TYPE(oneapi::mkl::side, char)
-DEF_PORTBLAS_TYPE(oneapi::mkl::diag, char)
+DEF_PORTBLAS_TYPE(oneapi::math::transpose, char)
+DEF_PORTBLAS_TYPE(oneapi::math::uplo, char)
+DEF_PORTBLAS_TYPE(oneapi::math::side, char)
+DEF_PORTBLAS_TYPE(oneapi::math::diag, char)
 DEF_PORTBLAS_TYPE(std::complex<float>, sycl_complex_t<float>)
 DEF_PORTBLAS_TYPE(std::complex<double>, sycl_complex_t<double>)
 // Passthrough of portBLAS arg types for more complex wrapping.
@@ -101,10 +101,10 @@ struct portblas_type<std::vector<sycl::event>> {
     using type = std::vector<sycl::event>;
 };
 
-/** Convert a OneMKL argument to the type required for portBLAS.
+/** Convert a oneMath argument to the type required for portBLAS.
  *  
- *  @tparam InputT The OneMKL type.
- *  @param input The value of the oneMKL type.
+ *  @tparam InputT The oneMath type.
+ *  @param input The value of the oneMath type.
  *  @return The portBLAS value with appropriate type.
 **/
 template <typename InputT>
@@ -113,21 +113,21 @@ inline typename portblas_type<InputT>::type convert_to_portblas_type(InputT& inp
 }
 
 template <>
-inline char convert_to_portblas_type<oneapi::mkl::transpose>(oneapi::mkl::transpose& trans) {
-    if (trans == oneapi::mkl::transpose::nontrans) {
+inline char convert_to_portblas_type<oneapi::math::transpose>(oneapi::math::transpose& trans) {
+    if (trans == oneapi::math::transpose::nontrans) {
         return 'n';
     }
-    else if (trans == oneapi::mkl::transpose::trans) {
+    else if (trans == oneapi::math::transpose::trans) {
         return 't';
     }
-    else { // trans == oneapi::mkl::transpose::conjtrans
+    else { // trans == oneapi::math::transpose::conjtrans
         return 'c';
     }
 }
 
 template <>
-inline char convert_to_portblas_type<oneapi::mkl::uplo>(oneapi::mkl::uplo& upper_lower) {
-    if (upper_lower == oneapi::mkl::uplo::upper) {
+inline char convert_to_portblas_type<oneapi::math::uplo>(oneapi::math::uplo& upper_lower) {
+    if (upper_lower == oneapi::math::uplo::upper) {
         return 'u';
     }
     else {
@@ -136,8 +136,8 @@ inline char convert_to_portblas_type<oneapi::mkl::uplo>(oneapi::mkl::uplo& upper
 }
 
 template <>
-inline char convert_to_portblas_type<oneapi::mkl::side>(oneapi::mkl::side& left_right) {
-    if (left_right == oneapi::mkl::side::left) {
+inline char convert_to_portblas_type<oneapi::math::side>(oneapi::math::side& left_right) {
+    if (left_right == oneapi::math::side::left) {
         return 'l';
     }
     else {
@@ -146,8 +146,8 @@ inline char convert_to_portblas_type<oneapi::mkl::side>(oneapi::mkl::side& left_
 }
 
 template <>
-inline char convert_to_portblas_type<oneapi::mkl::diag>(oneapi::mkl::diag& unit_diag) {
-    if (unit_diag == oneapi::mkl::diag::unit) {
+inline char convert_to_portblas_type<oneapi::math::diag>(oneapi::math::diag& unit_diag) {
+    if (unit_diag == oneapi::math::diag::unit) {
         return 'u';
     }
     else {
@@ -180,8 +180,8 @@ struct throw_if_unsupported_by_device {
         static constexpr bool checkTypeInPack = (std::is_same_v<CheckT, ArgTs> || ...);
         if (checkTypeInPack) {
             if (!q.get_info<sycl::info::queue::device>().has(AspectVal)) {
-                throw mkl::unsupported_device("blas", message,
-                                              q.get_info<sycl::info::queue::device>());
+                throw math::unsupported_device("blas", message,
+                                               q.get_info<sycl::info::queue::device>());
             }
         }
     }
@@ -233,7 +233,7 @@ struct throw_if_unsupported_by_device {
 
 } // namespace portblas
 } // namespace blas
-} // namespace mkl
+} // namespace math
 } // namespace oneapi
 
 #endif // _PORTBLAS_COMMON_HPP_

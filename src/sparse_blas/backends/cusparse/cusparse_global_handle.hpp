@@ -17,8 +17,8 @@
 *
 **************************************************************************/
 
-#ifndef _ONEMKL_SPARSE_BLAS_BACKENDS_CUSPARSE_GLOBAL_HANDLE_HPP_
-#define _ONEMKL_SPARSE_BLAS_BACKENDS_CUSPARSE_GLOBAL_HANDLE_HPP_
+#ifndef _ONEMATH_SPARSE_BLAS_BACKENDS_CUSPARSE_GLOBAL_HANDLE_HPP_
+#define _ONEMATH_SPARSE_BLAS_BACKENDS_CUSPARSE_GLOBAL_HANDLE_HPP_
 
 /**
  * @file Similar to blas_handle.hpp
@@ -29,7 +29,7 @@
 #include <atomic>
 #include <unordered_map>
 
-namespace oneapi::mkl::sparse::cusparse::detail {
+namespace oneapi::math::sparse::cusparse::detail {
 
 template <typename T>
 struct cusparse_global_handle {
@@ -58,6 +58,6 @@ struct cusparse_global_handle {
     }
 };
 
-} // namespace oneapi::mkl::sparse::cusparse::detail
+} // namespace oneapi::math::sparse::cusparse::detail
 
-#endif // _ONEMKL_SPARSE_BLAS_BACKENDS_CUSPARSE_GLOBAL_HANDLE_HPP_
+#endif // _ONEMATH_SPARSE_BLAS_BACKENDS_CUSPARSE_GLOBAL_HANDLE_HPP_

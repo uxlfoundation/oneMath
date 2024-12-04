@@ -32,18 +32,18 @@
 #include <hip/hip_runtime.h>
 #include <complex>
 
-#include "oneapi/mkl/types.hpp"
+#include "oneapi/math/types.hpp"
 #include "runtime_support_helper.hpp"
-#include "oneapi/mkl/exceptions.hpp"
-#include "oneapi/mkl/lapack/exceptions.hpp"
+#include "oneapi/math/exceptions.hpp"
+#include "oneapi/math/lapack/exceptions.hpp"
 
 namespace oneapi {
-namespace mkl {
+namespace math {
 namespace lapack {
 namespace rocsolver {
 
 // The static assert to make sure that all index types used in
-// oneMKL/include/oneapi/mkl/lapack.hpp interface are int64_t
+// oneMath/include/oneapi/math/lapack.hpp interface are int64_t
 template <typename... Next>
 struct is_int64 : std::false_type {};
 
@@ -75,7 +75,7 @@ struct Overflow<Index, T...> {
 
 template <typename Index, typename... Next>
 void overflow_check(Index index, Next... indices) {
-    static_assert(is_int64<Index, Next...>::value, "oneMKL index type must be 64 bit integer.");
+    static_assert(is_int64<Index, Next...>::value, "oneMath index type must be 64 bit integer.");
     Overflow<Index, Next...>::check(index, indices...);
 }
 
@@ -185,53 +185,53 @@ inline rocblas_eform get_rocsolver_itype(std::int64_t itype) {
     }
 }
 
-inline rocblas_evect get_rocsolver_job(oneapi::mkl::job jobz) {
+inline rocblas_evect get_rocsolver_job(oneapi::math::job jobz) {
     switch (jobz) {
-        case oneapi::mkl::job::V: return rocblas_evect_original;
-        case oneapi::mkl::job::N: return rocblas_evect_none;
+        case oneapi::math::job::V: return rocblas_evect_original;
+        case oneapi::math::job::N: return rocblas_evect_none;
         default: throw "Wrong jobz.";
     }
 }
 
-inline rocblas_svect get_rocsolver_jobsvd(oneapi::mkl::jobsvd job) {
+inline rocblas_svect get_rocsolver_jobsvd(oneapi::math::jobsvd job) {
     switch (job) {
-        case oneapi::mkl::jobsvd::N: return rocblas_svect_none;
-        case oneapi::mkl::jobsvd::A: return rocblas_svect_all;
-        case oneapi::mkl::jobsvd::O: return rocblas_svect_overwrite;
-        case oneapi::mkl::jobsvd::S: return rocblas_svect_singular;
+        case oneapi::math::jobsvd::N: return rocblas_svect_none;
+        case oneapi::math::jobsvd::A: return rocblas_svect_all;
+        case oneapi::math::jobsvd::O: return rocblas_svect_overwrite;
+        case oneapi::math::jobsvd::S: return rocblas_svect_singular;
         default: throw "Wrong jobsvd.";
     }
 }
 
-inline rocblas_operation get_rocblas_operation(oneapi::mkl::transpose trn) {
+inline rocblas_operation get_rocblas_operation(oneapi::math::transpose trn) {
     switch (trn) {
-        case oneapi::mkl::transpose::nontrans: return rocblas_operation_none;
-        case oneapi::mkl::transpose::trans: return rocblas_operation_transpose;
-        case oneapi::mkl::transpose::conjtrans: return rocblas_operation_conjugate_transpose;
+        case oneapi::math::transpose::nontrans: return rocblas_operation_none;
+        case oneapi::math::transpose::trans: return rocblas_operation_transpose;
+        case oneapi::math::transpose::conjtrans: return rocblas_operation_conjugate_transpose;
         default: throw "Wrong transpose Operation.";
     }
 }
 
-inline rocblas_fill get_rocblas_fill_mode(oneapi::mkl::uplo ul) {
+inline rocblas_fill get_rocblas_fill_mode(oneapi::math::uplo ul) {
     switch (ul) {
-        case oneapi::mkl::uplo::upper: return rocblas_fill_upper;
-        case oneapi::mkl::uplo::lower: return rocblas_fill_lower;
+        case oneapi::math::uplo::upper: return rocblas_fill_upper;
+        case oneapi::math::uplo::lower: return rocblas_fill_lower;
         default: throw "Wrong fill mode.";
     }
 }
 
-inline rocblas_side get_rocblas_side_mode(oneapi::mkl::side lr) {
+inline rocblas_side get_rocblas_side_mode(oneapi::math::side lr) {
     switch (lr) {
-        case oneapi::mkl::side::left: return rocblas_side_left;
-        case oneapi::mkl::side::right: return rocblas_side_right;
+        case oneapi::math::side::left: return rocblas_side_left;
+        case oneapi::math::side::right: return rocblas_side_right;
         default: throw "Wrong side mode.";
     }
 }
 
-inline rocblas_storev get_rocblas_generate(oneapi::mkl::generate qp) {
+inline rocblas_storev get_rocblas_generate(oneapi::math::generate qp) {
     switch (qp) {
-        case oneapi::mkl::generate::Q: return rocblas_column_wise;
-        case oneapi::mkl::generate::P: return rocblas_row_wise;
+        case oneapi::math::generate::Q: return rocblas_column_wise;
+        case oneapi::math::generate::P: return rocblas_row_wise;
         default: throw "Wrong generate.";
     }
 }
@@ -275,13 +275,13 @@ inline void lapack_info_check(sycl::queue& queue, DEVINFO_T devinfo, const char*
     queue.wait();
     const int devinfo_ = get_rocsolver_devinfo(queue, devinfo);
     if (devinfo_ > 0)
-        throw oneapi::mkl::lapack::computation_error(
+        throw oneapi::math::lapack::computation_error(
             func_name, std::string(cufunc_name) + " failed with info = " + std::to_string(devinfo_),
             devinfo_);
 }
 
 } // namespace rocsolver
 } // namespace lapack
-} // namespace mkl
+} // namespace math
 } // namespace oneapi
 #endif // _ROCSOLVER_HELPER_HPP_

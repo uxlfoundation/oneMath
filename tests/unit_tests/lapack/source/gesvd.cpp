@@ -26,7 +26,7 @@
 #include <CL/sycl.hpp>
 #endif
 
-#include "oneapi/mkl.hpp"
+#include "oneapi/math.hpp"
 #include "lapack_common.hpp"
 #include "lapack_test_controller.hpp"
 #include "lapack_accuracy_checks.hpp"
@@ -41,7 +41,7 @@ const char* accuracy_input = R"(
 )";
 
 template <typename data_T>
-bool accuracy(const sycl::device& dev, oneapi::mkl::jobsvd jobu, oneapi::mkl::jobsvd jobvt,
+bool accuracy(const sycl::device& dev, oneapi::math::jobsvd jobu, oneapi::math::jobsvd jobvt,
               int64_t m, int64_t n, int64_t lda, int64_t ldu, int64_t ldvt, uint64_t seed) {
     using fp = typename data_T_info<data_T>::value_type;
     using fp_real = typename complex_info<fp>::real_type;
@@ -49,10 +49,10 @@ bool accuracy(const sycl::device& dev, oneapi::mkl::jobsvd jobu, oneapi::mkl::jo
     /* Initialize */
     int64_t min_mn = std::min(m, n);
     int64_t ucols = min_mn;
-    if (jobu == oneapi::mkl::jobsvd::vectors)
+    if (jobu == oneapi::math::jobsvd::vectors)
         ucols = m;
     int64_t vtrows = min_mn;
-    if (jobvt == oneapi::mkl::jobsvd::vectors)
+    if (jobvt == oneapi::math::jobsvd::vectors)
         vtrows = n;
 
     std::vector<fp> A(lda * n);
@@ -60,7 +60,7 @@ bool accuracy(const sycl::device& dev, oneapi::mkl::jobsvd jobu, oneapi::mkl::jo
     std::vector<fp> Vt(ldvt * n);
     std::vector<fp_real> s(min_mn);
 
-    rand_matrix(seed, oneapi::mkl::transpose::nontrans, m, n, A, lda);
+    rand_matrix(seed, oneapi::math::transpose::nontrans, m, n, A, lda);
     std::vector<fp> A_initial = A;
 
     /* Compute on device */
@@ -71,12 +71,12 @@ bool accuracy(const sycl::device& dev, oneapi::mkl::jobsvd jobu, oneapi::mkl::jo
         auto Vt_dev = device_alloc<data_T>(queue, Vt.size());
         auto s_dev = device_alloc<data_T, fp_real>(queue, s.size());
 #ifdef CALL_RT_API
-        const auto scratchpad_size = oneapi::mkl::lapack::gesvd_scratchpad_size<fp>(
+        const auto scratchpad_size = oneapi::math::lapack::gesvd_scratchpad_size<fp>(
             queue, jobu, jobvt, m, n, lda, ldu, ldvt);
 #else
         int64_t scratchpad_size;
         TEST_RUN_LAPACK_CT_SELECT(queue,
-                                  scratchpad_size = oneapi::mkl::lapack::gesvd_scratchpad_size<fp>,
+                                  scratchpad_size = oneapi::math::lapack::gesvd_scratchpad_size<fp>,
                                   jobu, jobvt, m, n, lda, ldu, ldvt);
 #endif
         auto scratchpad_dev = device_alloc<data_T>(queue, scratchpad_size);
@@ -85,10 +85,10 @@ bool accuracy(const sycl::device& dev, oneapi::mkl::jobsvd jobu, oneapi::mkl::jo
         queue.wait_and_throw();
 
 #ifdef CALL_RT_API
-        oneapi::mkl::lapack::gesvd(queue, jobu, jobvt, m, n, A_dev, lda, s_dev, U_dev, ldu, Vt_dev,
-                                   ldvt, scratchpad_dev, scratchpad_size);
+        oneapi::math::lapack::gesvd(queue, jobu, jobvt, m, n, A_dev, lda, s_dev, U_dev, ldu, Vt_dev,
+                                    ldvt, scratchpad_dev, scratchpad_size);
 #else
-        TEST_RUN_LAPACK_CT_SELECT(queue, oneapi::mkl::lapack::gesvd, jobu, jobvt, m, n, A_dev, lda,
+        TEST_RUN_LAPACK_CT_SELECT(queue, oneapi::math::lapack::gesvd, jobu, jobvt, m, n, A_dev, lda,
                                   s_dev, U_dev, ldu, Vt_dev, ldvt, scratchpad_dev, scratchpad_size);
 #endif
         queue.wait_and_throw();
@@ -107,7 +107,7 @@ bool accuracy(const sycl::device& dev, oneapi::mkl::jobsvd jobu, oneapi::mkl::jo
     }
     bool result = true;
 
-    if (jobu == oneapi::mkl::jobsvd::vectors && jobvt == oneapi::mkl::jobsvd::vectors) {
+    if (jobu == oneapi::math::jobsvd::vectors && jobvt == oneapi::math::jobsvd::vectors) {
         /* |A - U S V'| < |A| O(eps) */
         std::vector<fp> US(m * n);
         int64_t ldus = m;
@@ -116,39 +116,40 @@ bool accuracy(const sycl::device& dev, oneapi::mkl::jobsvd jobu, oneapi::mkl::jo
                 US[row + col * ldus] = U[row + col * ldu] * s[col];
         std::vector<fp> USV(m * n);
         int64_t ldusv = m;
-        reference::gemm(oneapi::mkl::transpose::nontrans, oneapi::mkl::transpose::nontrans, m, n, n,
-                        1.0, US.data(), ldus, Vt.data(), ldvt, 0.0, USV.data(), ldusv);
+        reference::gemm(oneapi::math::transpose::nontrans, oneapi::math::transpose::nontrans, m, n,
+                        n, 1.0, US.data(), ldus, Vt.data(), ldvt, 0.0, USV.data(), ldusv);
         if (!rel_mat_err_check(m, n, A_initial, lda, USV, ldusv)) {
             test_log::lout << "Factorization check failed" << std::endl;
             result = false;
         }
     }
 
-    if (jobu == oneapi::mkl::jobsvd::vectorsina)
+    if (jobu == oneapi::math::jobsvd::vectorsina)
         reference::lacpy('A', m, ucols, A.data(), lda, U.data(), ldu);
-    if (jobvt == oneapi::mkl::jobsvd::vectorsina)
+    if (jobvt == oneapi::math::jobsvd::vectorsina)
         reference::lacpy('A', vtrows, n, A.data(), lda, Vt.data(), ldvt);
 
-    if (jobu == oneapi::mkl::jobsvd::vectors || jobu == oneapi::mkl::jobsvd::somevec ||
-        jobu == oneapi::mkl::jobsvd::vectorsina) {
+    if (jobu == oneapi::math::jobsvd::vectors || jobu == oneapi::math::jobsvd::somevec ||
+        jobu == oneapi::math::jobsvd::vectorsina) {
         /* |I - U' U| < n O(eps) */
         std::vector<fp> UU(ucols * ucols);
         int64_t lduu = ucols;
-        reference::gemm(oneapi::mkl::transpose::conjtrans, oneapi::mkl::transpose::nontrans, ucols,
-                        ucols, m, 1.0, U.data(), ldu, U.data(), ldu, 0.0, UU.data(), lduu);
+        reference::gemm(oneapi::math::transpose::conjtrans, oneapi::math::transpose::nontrans,
+                        ucols, ucols, m, 1.0, U.data(), ldu, U.data(), ldu, 0.0, UU.data(), lduu);
         if (!rel_id_err_check(ucols, UU, lduu)) {
             test_log::lout << "U Orthogonality check failed" << std::endl;
             result = false;
         }
     }
 
-    if (jobvt == oneapi::mkl::jobsvd::vectors || jobvt == oneapi::mkl::jobsvd::somevec ||
-        jobvt == oneapi::mkl::jobsvd::vectorsina) {
+    if (jobvt == oneapi::math::jobsvd::vectors || jobvt == oneapi::math::jobsvd::somevec ||
+        jobvt == oneapi::math::jobsvd::vectorsina) {
         /* |I - V' V| < n O(eps) */
         std::vector<fp> VV(vtrows * vtrows);
         int64_t ldvv = vtrows;
-        reference::gemm(oneapi::mkl::transpose::nontrans, oneapi::mkl::transpose::conjtrans, vtrows,
-                        vtrows, n, 1.0, Vt.data(), ldvt, Vt.data(), ldvt, 0.0, VV.data(), ldvv);
+        reference::gemm(oneapi::math::transpose::nontrans, oneapi::math::transpose::conjtrans,
+                        vtrows, vtrows, n, 1.0, Vt.data(), ldvt, Vt.data(), ldvt, 0.0, VV.data(),
+                        ldvv);
         if (!rel_id_err_check(vtrows, VV, ldvv)) {
             test_log::lout << "V Orthogonality check failed" << std::endl;
             result = false;
@@ -162,7 +163,7 @@ const char* dependency_input = R"(
 )";
 
 template <typename data_T>
-bool usm_dependency(const sycl::device& dev, oneapi::mkl::jobsvd jobu, oneapi::mkl::jobsvd jobvt,
+bool usm_dependency(const sycl::device& dev, oneapi::math::jobsvd jobu, oneapi::math::jobsvd jobvt,
                     int64_t m, int64_t n, int64_t lda, int64_t ldu, int64_t ldvt, uint64_t seed) {
     using fp = typename data_T_info<data_T>::value_type;
     using fp_real = typename complex_info<fp>::real_type;
@@ -170,10 +171,10 @@ bool usm_dependency(const sycl::device& dev, oneapi::mkl::jobsvd jobu, oneapi::m
     /* Initialize */
     int64_t min_mn = std::min(m, n);
     int64_t ucols = min_mn;
-    if (jobu == oneapi::mkl::jobsvd::vectors)
+    if (jobu == oneapi::math::jobsvd::vectors)
         ucols = m;
     int64_t vtrows = min_mn;
-    if (jobvt == oneapi::mkl::jobsvd::vectors)
+    if (jobvt == oneapi::math::jobsvd::vectors)
         vtrows = n;
 
     std::vector<fp> A(lda * n);
@@ -181,7 +182,7 @@ bool usm_dependency(const sycl::device& dev, oneapi::mkl::jobsvd jobu, oneapi::m
     std::vector<fp> Vt(ldvt * n);
     std::vector<fp_real> s(min_mn);
 
-    rand_matrix_diag_dom(seed, oneapi::mkl::transpose::nontrans, m, n, A, lda);
+    rand_matrix_diag_dom(seed, oneapi::math::transpose::nontrans, m, n, A, lda);
     std::vector<fp> A_initial = A;
 
     /* Compute on device */
@@ -193,12 +194,12 @@ bool usm_dependency(const sycl::device& dev, oneapi::mkl::jobsvd jobu, oneapi::m
         auto Vt_dev = device_alloc<data_T>(queue, Vt.size());
         auto s_dev = device_alloc<data_T, fp_real>(queue, s.size());
 #ifdef CALL_RT_API
-        const auto scratchpad_size = oneapi::mkl::lapack::gesvd_scratchpad_size<fp>(
+        const auto scratchpad_size = oneapi::math::lapack::gesvd_scratchpad_size<fp>(
             queue, jobu, jobvt, m, n, lda, ldu, ldvt);
 #else
         int64_t scratchpad_size;
         TEST_RUN_LAPACK_CT_SELECT(queue,
-                                  scratchpad_size = oneapi::mkl::lapack::gesvd_scratchpad_size<fp>,
+                                  scratchpad_size = oneapi::math::lapack::gesvd_scratchpad_size<fp>,
                                   jobu, jobvt, m, n, lda, ldu, ldvt);
 #endif
         auto scratchpad_dev = device_alloc<data_T>(queue, scratchpad_size);
@@ -209,13 +210,13 @@ bool usm_dependency(const sycl::device& dev, oneapi::mkl::jobsvd jobu, oneapi::m
         /* Check dependency handling */
         auto in_event = create_dependency(queue);
 #ifdef CALL_RT_API
-        sycl::event func_event = oneapi::mkl::lapack::gesvd(
+        sycl::event func_event = oneapi::math::lapack::gesvd(
             queue, jobu, jobvt, m, n, A_dev, lda, s_dev, U_dev, ldu, Vt_dev, ldvt, scratchpad_dev,
             scratchpad_size, std::vector<sycl::event>{ in_event });
 #else
         sycl::event func_event;
-        TEST_RUN_LAPACK_CT_SELECT(queue, func_event = oneapi::mkl::lapack::gesvd, jobu, jobvt, m, n,
-                                  A_dev, lda, s_dev, U_dev, ldu, Vt_dev, ldvt, scratchpad_dev,
+        TEST_RUN_LAPACK_CT_SELECT(queue, func_event = oneapi::math::lapack::gesvd, jobu, jobvt, m,
+                                  n, A_dev, lda, s_dev, U_dev, ldu, Vt_dev, ldvt, scratchpad_dev,
                                   scratchpad_size, std::vector<sycl::event>{ in_event });
 #endif
         result = check_dependency(queue, in_event, func_event);

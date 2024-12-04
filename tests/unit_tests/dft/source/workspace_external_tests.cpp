@@ -35,9 +35,9 @@ extern std::vector<sycl::device*> devices;
 
 class WorkspaceExternalTests : public ::testing::TestWithParam<sycl::device*> {};
 
-template <oneapi::mkl::dft::precision prec, oneapi::mkl::dft::domain dom>
+template <oneapi::math::dft::precision prec, oneapi::math::dft::domain dom>
 int test_workspace_external_usm_impl(std::size_t dft_size, sycl::device* dev) {
-    using namespace oneapi::mkl::dft;
+    using namespace oneapi::math::dft;
     using scalar_t = std::conditional_t<prec == precision::DOUBLE, double, float>;
     using forward_t = std::conditional_t<dom == domain::COMPLEX, std::complex<scalar_t>, scalar_t>;
     using backward_t = std::complex<scalar_t>;
@@ -54,7 +54,7 @@ int test_workspace_external_usm_impl(std::size_t dft_size, sycl::device* dev) {
     try {
         commit_descriptor(desc, sycl_queue);
     }
-    catch (oneapi::mkl::unimplemented&) {
+    catch (oneapi::math::unimplemented&) {
         std::cout << "Test configuration not implemented." << std::endl;
         return test_skipped;
     }
@@ -106,9 +106,9 @@ int test_workspace_external_usm_impl(std::size_t dft_size, sycl::device* dev) {
     return sanityCheckPasses ? !::testing::Test::HasFailure() : ::testing::Test::HasFailure();
 }
 
-template <oneapi::mkl::dft::precision prec, oneapi::mkl::dft::domain dom>
+template <oneapi::math::dft::precision prec, oneapi::math::dft::domain dom>
 int test_workspace_external_buffer_impl(std::size_t dft_size, sycl::device* dev) {
-    using namespace oneapi::mkl::dft;
+    using namespace oneapi::math::dft;
     using scalar_t = std::conditional_t<prec == precision::DOUBLE, double, float>;
     using forward_t = std::conditional_t<dom == domain::COMPLEX, std::complex<scalar_t>, scalar_t>;
     using backward_t = std::complex<scalar_t>;
@@ -125,7 +125,7 @@ int test_workspace_external_buffer_impl(std::size_t dft_size, sycl::device* dev)
     try {
         commit_descriptor(desc, sycl_queue);
     }
-    catch (oneapi::mkl::unimplemented&) {
+    catch (oneapi::math::unimplemented&) {
         std::cout << "Test configuration not implemented." << std::endl;
         return test_skipped;
     }
@@ -170,49 +170,49 @@ int test_workspace_external_buffer_impl(std::size_t dft_size, sycl::device* dev)
     return sanityCheckPasses ? !::testing::Test::HasFailure() : ::testing::Test::HasFailure();
 }
 
-template <oneapi::mkl::dft::precision prec, oneapi::mkl::dft::domain dom>
+template <oneapi::math::dft::precision prec, oneapi::math::dft::domain dom>
 void test_workspace_external_usm(sycl::device* dev) {
     EXPECT_TRUEORSKIP((test_workspace_external_usm_impl<prec, dom>(2, dev)));
     EXPECT_TRUEORSKIP((test_workspace_external_usm_impl<prec, dom>(1024 * 3 * 5 * 7 * 16, dev)));
 }
 
-template <oneapi::mkl::dft::precision prec, oneapi::mkl::dft::domain dom>
+template <oneapi::math::dft::precision prec, oneapi::math::dft::domain dom>
 void test_workspace_external_buffer(sycl::device* dev) {
     EXPECT_TRUEORSKIP((test_workspace_external_buffer_impl<prec, dom>(2, dev)));
     EXPECT_TRUEORSKIP((test_workspace_external_buffer_impl<prec, dom>(1024 * 3 * 5 * 7 * 16, dev)));
 }
 
 TEST_P(WorkspaceExternalTests, TestWorkspaceExternalSingleUsm) {
-    using precision = oneapi::mkl::dft::precision;
-    using domain = oneapi::mkl::dft::domain;
+    using precision = oneapi::math::dft::precision;
+    using domain = oneapi::math::dft::domain;
     test_workspace_external_usm<precision::SINGLE, domain::REAL>(GetParam());
     test_workspace_external_usm<precision::SINGLE, domain::COMPLEX>(GetParam());
 }
 
 TEST_P(WorkspaceExternalTests, TestWorkspaceExternalDoubleUsm) {
-    using precision = oneapi::mkl::dft::precision;
-    using domain = oneapi::mkl::dft::domain;
+    using precision = oneapi::math::dft::precision;
+    using domain = oneapi::math::dft::domain;
     test_workspace_external_usm<precision::DOUBLE, domain::REAL>(GetParam());
     test_workspace_external_usm<precision::DOUBLE, domain::COMPLEX>(GetParam());
 }
 
 TEST_P(WorkspaceExternalTests, TestWorkspaceExternalSingleBuffer) {
-    using precision = oneapi::mkl::dft::precision;
-    using domain = oneapi::mkl::dft::domain;
+    using precision = oneapi::math::dft::precision;
+    using domain = oneapi::math::dft::domain;
     test_workspace_external_buffer<precision::SINGLE, domain::REAL>(GetParam());
     test_workspace_external_buffer<precision::SINGLE, domain::COMPLEX>(GetParam());
 }
 
 TEST_P(WorkspaceExternalTests, TestWorkspaceExternalDoubleBuffer) {
-    using precision = oneapi::mkl::dft::precision;
-    using domain = oneapi::mkl::dft::domain;
+    using precision = oneapi::math::dft::precision;
+    using domain = oneapi::math::dft::domain;
     test_workspace_external_buffer<precision::DOUBLE, domain::REAL>(GetParam());
     test_workspace_external_buffer<precision::DOUBLE, domain::COMPLEX>(GetParam());
 }
 
 /// A test where set_workspace is called when an external workspace is not set.
 TEST_P(WorkspaceExternalTests, SetWorkspaceOnWorkspaceAutomatic) {
-    using namespace oneapi::mkl::dft;
+    using namespace oneapi::math::dft;
     sycl::queue sycl_queue(*GetParam());
     const int dft_len = 1024 * 3 * 5 * 7 * 16; // A size likely to require an external workspace.
     float* fft_data_usm = sycl::malloc_device<float>(dft_len * 2, sycl_queue);
@@ -223,7 +223,7 @@ TEST_P(WorkspaceExternalTests, SetWorkspaceOnWorkspaceAutomatic) {
         commit_descriptor(desc_usm, sycl_queue);
         commit_descriptor(desc_buf, sycl_queue);
     }
-    catch (oneapi::mkl::unimplemented&) {
+    catch (oneapi::math::unimplemented&) {
         // The DFT size may not be supported. Use a size that is likely to be supported, even if
         // that means no external workspace is actually used.
         descriptor<precision::SINGLE, domain::COMPLEX> desc_usm2(2), desc_buf2(2);
@@ -264,10 +264,10 @@ TEST_P(WorkspaceExternalTests, SetWorkspaceOnWorkspaceAutomatic) {
     sycl_queue.wait_and_throw();
 
     // Should not work:
-    EXPECT_THROW(compute_forward(desc_usm, fft_data_buf), oneapi::mkl::invalid_argument);
-    EXPECT_THROW(compute_forward(desc_buf, fft_data_usm), oneapi::mkl::invalid_argument);
-    EXPECT_THROW(compute_backward(desc_usm, fft_data_buf), oneapi::mkl::invalid_argument);
-    EXPECT_THROW(compute_backward(desc_buf, fft_data_usm), oneapi::mkl::invalid_argument);
+    EXPECT_THROW(compute_forward(desc_usm, fft_data_buf), oneapi::math::invalid_argument);
+    EXPECT_THROW(compute_forward(desc_buf, fft_data_usm), oneapi::math::invalid_argument);
+    EXPECT_THROW(compute_backward(desc_usm, fft_data_buf), oneapi::math::invalid_argument);
+    EXPECT_THROW(compute_backward(desc_buf, fft_data_usm), oneapi::math::invalid_argument);
     sycl_queue.wait_and_throw();
 
     // Free any allocations:
@@ -277,7 +277,7 @@ TEST_P(WorkspaceExternalTests, SetWorkspaceOnWorkspaceAutomatic) {
 
 /// Test that the implementation throws as expected.
 TEST_P(WorkspaceExternalTests, ThrowOnBadCalls) {
-    using namespace oneapi::mkl::dft;
+    using namespace oneapi::math::dft;
     sycl::queue sycl_queue(*GetParam());
     const int dft_len = 1024 * 3 * 5 * 7 * 16; // A size likely to require an external workspace.
     float* fft_data_usm = sycl::malloc_device<float>(dft_len * 2, sycl_queue);
@@ -289,13 +289,13 @@ TEST_P(WorkspaceExternalTests, ThrowOnBadCalls) {
     std::int64_t workspace_bytes = -10;
     float* usm_workspace = nullptr;
     EXPECT_THROW(desc_usm.get_value(config_param::WORKSPACE_EXTERNAL_BYTES, &workspace_bytes),
-                 oneapi::mkl::invalid_argument);
-    EXPECT_THROW(desc_usm.set_workspace(usm_workspace), oneapi::mkl::uninitialized);
+                 oneapi::math::invalid_argument);
+    EXPECT_THROW(desc_usm.set_workspace(usm_workspace), oneapi::math::uninitialized);
     try {
         commit_descriptor(desc_usm, sycl_queue);
         commit_descriptor(desc_buf, sycl_queue);
     }
-    catch (oneapi::mkl::unimplemented&) {
+    catch (oneapi::math::unimplemented&) {
         // DFT size may not be supported. Use a DFT size that probably will be, even if it
         // won't actually use an external workspace internally.
         descriptor<precision::SINGLE, domain::COMPLEX> desc_usm2(2), desc_buf2(2);
@@ -311,16 +311,16 @@ TEST_P(WorkspaceExternalTests, ThrowOnBadCalls) {
     EXPECT_GE(workspace_bytes, 0);
 
     // We haven't set a workspace, so the following should fail;
-    EXPECT_THROW(compute_forward(desc_usm, fft_data_usm), oneapi::mkl::invalid_argument);
+    EXPECT_THROW(compute_forward(desc_usm, fft_data_usm), oneapi::math::invalid_argument);
     sycl_queue.wait_and_throw();
-    EXPECT_THROW(compute_forward(desc_usm, fft_data_buf), oneapi::mkl::invalid_argument);
+    EXPECT_THROW(compute_forward(desc_usm, fft_data_buf), oneapi::math::invalid_argument);
     sycl_queue.wait_and_throw();
 
     if (workspace_bytes > 0) {
-        EXPECT_THROW(desc_usm.set_workspace(nullptr), oneapi::mkl::invalid_argument);
+        EXPECT_THROW(desc_usm.set_workspace(nullptr), oneapi::math::invalid_argument);
         sycl::buffer<float> undersize_workspace(
             static_cast<std::size_t>(workspace_bytes) / sizeof(float) - 1);
-        EXPECT_THROW(desc_buf.set_workspace(undersize_workspace), oneapi::mkl::invalid_argument);
+        EXPECT_THROW(desc_buf.set_workspace(undersize_workspace), oneapi::math::invalid_argument);
     }
 
     usm_workspace = sycl::malloc_device<float>(
@@ -341,10 +341,10 @@ TEST_P(WorkspaceExternalTests, ThrowOnBadCalls) {
     sycl_queue.wait_and_throw();
 
     // Should not work:
-    EXPECT_THROW(compute_forward(desc_usm, fft_data_buf), oneapi::mkl::invalid_argument);
-    EXPECT_THROW(compute_forward(desc_buf, fft_data_usm), oneapi::mkl::invalid_argument);
-    EXPECT_THROW(compute_backward(desc_usm, fft_data_buf), oneapi::mkl::invalid_argument);
-    EXPECT_THROW(compute_backward(desc_buf, fft_data_usm), oneapi::mkl::invalid_argument);
+    EXPECT_THROW(compute_forward(desc_usm, fft_data_buf), oneapi::math::invalid_argument);
+    EXPECT_THROW(compute_forward(desc_buf, fft_data_usm), oneapi::math::invalid_argument);
+    EXPECT_THROW(compute_backward(desc_usm, fft_data_buf), oneapi::math::invalid_argument);
+    EXPECT_THROW(compute_backward(desc_buf, fft_data_usm), oneapi::math::invalid_argument);
     sycl_queue.wait_and_throw();
 
     // Free any allocations:
@@ -353,7 +353,7 @@ TEST_P(WorkspaceExternalTests, ThrowOnBadCalls) {
 }
 
 TEST_P(WorkspaceExternalTests, RecommitBehaviour) {
-    using namespace oneapi::mkl::dft;
+    using namespace oneapi::math::dft;
     sycl::queue sycl_queue(*GetParam());
     const int dft_len = 1024 * 3 * 5 * 7 * 16; // A size likely to require an external workspace.
     float* fft_data_usm = sycl::malloc_device<float>(dft_len * 2, sycl_queue);
@@ -362,7 +362,7 @@ TEST_P(WorkspaceExternalTests, RecommitBehaviour) {
         // WORKSPACE_EXTERNAL is NOT set.
         commit_descriptor(desc_usm, sycl_queue);
     }
-    catch (oneapi::mkl::unimplemented&) {
+    catch (oneapi::math::unimplemented&) {
         // DFT size may not be supported. Use a DFT size that probably will be, even if it
         // won't actually use an external workspace internally.
         descriptor<precision::SINGLE, domain::COMPLEX> desc_usm2(2);
@@ -382,7 +382,7 @@ TEST_P(WorkspaceExternalTests, RecommitBehaviour) {
     commit_descriptor(desc_usm, sycl_queue);
 
     // No workspace, expect throw
-    EXPECT_THROW(compute_forward(desc_usm, fft_data_usm), oneapi::mkl::invalid_argument);
+    EXPECT_THROW(compute_forward(desc_usm, fft_data_usm), oneapi::math::invalid_argument);
 
     desc_usm.set_workspace(usm_workspace);
 
@@ -391,7 +391,7 @@ TEST_P(WorkspaceExternalTests, RecommitBehaviour) {
 
     // Recommitting should require workspace to be set again.
     commit_descriptor(desc_usm, sycl_queue);
-    EXPECT_THROW(compute_forward(desc_usm, fft_data_usm), oneapi::mkl::invalid_argument);
+    EXPECT_THROW(compute_forward(desc_usm, fft_data_usm), oneapi::math::invalid_argument);
     sycl_queue.wait_and_throw();
 
     // Free any allocations:

@@ -27,7 +27,7 @@
 #endif
 
 namespace oneapi {
-namespace mkl {
+namespace math {
 
 static inline void* aligned_alloc(size_t align, size_t size) {
 #ifdef _WIN64
@@ -44,7 +44,7 @@ static inline void aligned_free(void* p) {
     ::free(p);
 #endif
 }
-} // namespace mkl
+} // namespace math
 } // namespace oneapi
 
 #endif // __ALLOCATOR_HELPER_HPP

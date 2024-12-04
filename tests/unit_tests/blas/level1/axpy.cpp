@@ -29,9 +29,9 @@
 #include <CL/sycl.hpp>
 #endif
 #include "cblas.h"
-#include "oneapi/mkl/detail/config.hpp"
-#include "oneapi/mkl.hpp"
-#include "onemkl_blas_helper.hpp"
+#include "oneapi/math/detail/config.hpp"
+#include "oneapi/math.hpp"
+#include "onemath_blas_helper.hpp"
 #include "reference_blas_templates.hpp"
 #include "test_common.hpp"
 #include "test_helper.hpp"
@@ -46,7 +46,7 @@ extern std::vector<sycl::device*> devices;
 namespace {
 
 template <typename fp>
-int test(device* dev, oneapi::mkl::layout layout, int N, int incx, int incy, fp alpha) {
+int test(device* dev, oneapi::math::layout layout, int N, int incx, int incy, fp alpha) {
     // Prepare data.
     vector<fp> x, y, y_ref;
 
@@ -84,24 +84,24 @@ int test(device* dev, oneapi::mkl::layout layout, int N, int incx, int incy, fp 
     try {
 #ifdef CALL_RT_API
         switch (layout) {
-            case oneapi::mkl::layout::col_major:
-                oneapi::mkl::blas::column_major::axpy(main_queue, N, alpha, x_buffer, incx,
-                                                      y_buffer, incy);
+            case oneapi::math::layout::col_major:
+                oneapi::math::blas::column_major::axpy(main_queue, N, alpha, x_buffer, incx,
+                                                       y_buffer, incy);
                 break;
-            case oneapi::mkl::layout::row_major:
-                oneapi::mkl::blas::row_major::axpy(main_queue, N, alpha, x_buffer, incx, y_buffer,
-                                                   incy);
+            case oneapi::math::layout::row_major:
+                oneapi::math::blas::row_major::axpy(main_queue, N, alpha, x_buffer, incx, y_buffer,
+                                                    incy);
                 break;
             default: break;
         }
 #else
         switch (layout) {
-            case oneapi::mkl::layout::col_major:
-                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::mkl::blas::column_major::axpy, N, alpha,
-                                        x_buffer, incx, y_buffer, incy);
+            case oneapi::math::layout::col_major:
+                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::math::blas::column_major::axpy, N,
+                                        alpha, x_buffer, incx, y_buffer, incy);
                 break;
-            case oneapi::mkl::layout::row_major:
-                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::mkl::blas::row_major::axpy, N, alpha,
+            case oneapi::math::layout::row_major:
+                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::math::blas::row_major::axpy, N, alpha,
                                         x_buffer, incx, y_buffer, incy);
                 break;
             default: break;
@@ -113,7 +113,7 @@ int test(device* dev, oneapi::mkl::layout layout, int N, int incx, int incy, fp 
         print_error_code(e);
     }
 
-    catch (const oneapi::mkl::unimplemented& e) {
+    catch (const oneapi::math::unimplemented& e) {
         return test_skipped;
     }
 
@@ -129,7 +129,7 @@ int test(device* dev, oneapi::mkl::layout layout, int N, int incx, int incy, fp 
     return (int)good;
 }
 
-class AxpyTests : public ::testing::TestWithParam<std::tuple<sycl::device*, oneapi::mkl::layout>> {
+class AxpyTests : public ::testing::TestWithParam<std::tuple<sycl::device*, oneapi::math::layout>> {
 };
 
 TEST_P(AxpyTests, RealSinglePrecision) {
@@ -175,8 +175,8 @@ TEST_P(AxpyTests, ComplexDoublePrecision) {
 
 INSTANTIATE_TEST_SUITE_P(AxpyTestSuite, AxpyTests,
                          ::testing::Combine(testing::ValuesIn(devices),
-                                            testing::Values(oneapi::mkl::layout::col_major,
-                                                            oneapi::mkl::layout::row_major)),
+                                            testing::Values(oneapi::math::layout::col_major,
+                                                            oneapi::math::layout::row_major)),
                          ::LayoutDeviceNamePrint());
 
 } // anonymous namespace

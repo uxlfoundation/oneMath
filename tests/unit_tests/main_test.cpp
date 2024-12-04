@@ -25,8 +25,8 @@
 #endif
 #include <string>
 #include "test_helper.hpp"
-#include "oneapi/mkl/detail/config.hpp"
-#include "oneapi/mkl.hpp"
+#include "oneapi/math/detail/config.hpp"
+#include "oneapi/math.hpp"
 
 #define MAX_STR 128
 
@@ -112,29 +112,30 @@ int main(int argc, char** argv) {
                     if (unique_devices.find(dev.get_info<sycl::info::device::name>()) ==
                         unique_devices.end()) {
                         unique_devices.insert(dev.get_info<sycl::info::device::name>());
-#if !defined(ONEMKL_ENABLE_MKLCPU_BACKEND) &&             \
-    !defined(ONEMKL_ENABLE_PORTBLAS_BACKEND_INTEL_CPU) && \
-    !defined(ONEMKL_ENABLE_PORTFFT_BACKEND) && !defined(ONEMKL_ENABLE_NETLIB_BACKEND)
+#if !defined(ONEMATH_ENABLE_MKLCPU_BACKEND) &&             \
+    !defined(ONEMATH_ENABLE_PORTBLAS_BACKEND_INTEL_CPU) && \
+    !defined(ONEMATH_ENABLE_PORTFFT_BACKEND) && !defined(ONEMATH_ENABLE_NETLIB_BACKEND)
                         if (dev.is_cpu())
                             continue;
 #endif
-#if !defined(ONEMKL_ENABLE_MKLGPU_BACKEND) && \
-    !defined(ONEMKL_ENABLE_PORTBLAS_BACKEND_INTEL_GPU) && !defined(ONEMKL_ENABLE_PORTFFT_BACKEND)
+#if !defined(ONEMATH_ENABLE_MKLGPU_BACKEND) &&             \
+    !defined(ONEMATH_ENABLE_PORTBLAS_BACKEND_INTEL_GPU) && \
+    !defined(ONEMATH_ENABLE_PORTFFT_BACKEND)
                         if (dev.is_gpu() && vendor_id == INTEL_ID)
                             continue;
 #endif
-#if !defined(ONEMKL_ENABLE_CUBLAS_BACKEND) && !defined(ONEMKL_ENABLE_CURAND_BACKEND) && \
-    !defined(ONEMKL_ENABLE_CUSOLVER_BACKEND) &&                                         \
-    !defined(ONEMKL_ENABLE_PORTBLAS_BACKEND_NVIDIA_GPU) &&                              \
-    !defined(ONEMKL_ENABLE_CUFFT_BACKEND) && !defined(ONEMKL_ENABLE_PORTFFT_BACKEND) && \
-    !defined(ONEMKL_ENABLE_CUSPARSE_BACKEND)
+#if !defined(ONEMATH_ENABLE_CUBLAS_BACKEND) && !defined(ONEMATH_ENABLE_CURAND_BACKEND) && \
+    !defined(ONEMATH_ENABLE_CUSOLVER_BACKEND) &&                                          \
+    !defined(ONEMATH_ENABLE_PORTBLAS_BACKEND_NVIDIA_GPU) &&                               \
+    !defined(ONEMATH_ENABLE_CUFFT_BACKEND) && !defined(ONEMATH_ENABLE_PORTFFT_BACKEND) && \
+    !defined(ONEMATH_ENABLE_CUSPARSE_BACKEND)
                         if (dev.is_gpu() && vendor_id == NVIDIA_ID)
                             continue;
 #endif
-#if !defined(ONEMKL_ENABLE_ROCBLAS_BACKEND) && !defined(ONEMKL_ENABLE_ROCRAND_BACKEND) &&         \
-    !defined(ONEMKL_ENABLE_ROCSOLVER_BACKEND) &&                                                  \
-    !defined(ONEMKL_ENABLE_PORTBLAS_BACKEND_AMD_GPU) && !defined(ONEMKL_ENABLE_ROCFFT_BACKEND) && \
-    !defined(ONEMKL_ENABLE_PORTFFT_BACKEND) && !defined(ONEMKL_ENABLE_ROCSPARSE_BACKEND)
+#if !defined(ONEMATH_ENABLE_ROCBLAS_BACKEND) && !defined(ONEMATH_ENABLE_ROCRAND_BACKEND) && \
+    !defined(ONEMATH_ENABLE_ROCSOLVER_BACKEND) &&                                           \
+    !defined(ONEMATH_ENABLE_PORTBLAS_BACKEND_AMD_GPU) &&                                    \
+    !defined(ONEMATH_ENABLE_ROCFFT_BACKEND) && !defined(ONEMATH_ENABLE_PORTFFT_BACKEND) && !defined(ONEMATH_ENABLE_ROCSPARSE_BACKEND)
                         if (dev.is_gpu() && vendor_id == AMD_ID)
                             continue;
 #endif
@@ -143,9 +144,9 @@ int main(int argc, char** argv) {
                         if (dev.is_accelerator())
 #else
                         if (!dev.is_accelerator())
+// clang-format on
 #endif
                             local_devices.push_back(dev);
-                        // clang-format on
                     }
                 }
                 catch (std::exception const& e) {

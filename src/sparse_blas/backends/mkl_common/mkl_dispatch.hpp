@@ -17,11 +17,11 @@
 *
 **************************************************************************/
 
-#ifndef _ONEMKL_SRC_SPARSE_BLAS_BACKENDS_MKL_COMMON_MKL_DISPATCH_HPP_
-#define _ONEMKL_SRC_SPARSE_BLAS_BACKENDS_MKL_COMMON_MKL_DISPATCH_HPP_
+#ifndef _ONEMATH_SRC_SPARSE_BLAS_BACKENDS_MKL_COMMON_MKL_DISPATCH_HPP_
+#define _ONEMATH_SRC_SPARSE_BLAS_BACKENDS_MKL_COMMON_MKL_DISPATCH_HPP_
 
 /// Convert \p value_type to template type argument and use it to call \p op_functor.
-#define DISPATCH_MKL_OPERATION(function_name, value_type, op_functor, ...)                         \
+#define DISPATCH_ONEMATH_OPERATION(function_name, value_type, op_functor, ...)                     \
     switch (value_type) {                                                                          \
         case detail::data_type::real_fp32: return op_functor<float>(__VA_ARGS__);                  \
         case detail::data_type::real_fp64: return op_functor<double>(__VA_ARGS__);                 \
@@ -29,9 +29,9 @@
         case detail::data_type::complex_fp64:                                                      \
             return op_functor<std::complex<double>>(__VA_ARGS__);                                  \
         default:                                                                                   \
-            throw oneapi::mkl::exception(                                                          \
+            throw oneapi::math::exception(                                                         \
                 "sparse_blas", function_name,                                                      \
                 "Internal error: unsupported type " + data_type_to_str(value_type));               \
     }
 
-#endif // _ONEMKL_SRC_SPARSE_BLAS_BACKENDS_MKL_COMMON_MKL_DISPATCH_HPP_
+#endif // _ONEMATH_SRC_SPARSE_BLAS_BACKENDS_MKL_COMMON_MKL_DISPATCH_HPP_

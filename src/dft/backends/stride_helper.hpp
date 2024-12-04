@@ -20,7 +20,7 @@
 #ifndef _DFT_DETAIL_STRIDE_HELPER_HPP_
 #define _DFT_DETAIL_STRIDE_HELPER_HPP_
 
-namespace oneapi::mkl::dft::detail {
+namespace oneapi::math::dft::detail {
 
 enum class stride_api {
     INVALID, // Cannot choose: no valid choice
@@ -37,7 +37,7 @@ enum class stride_api {
 inline void throw_on_invalid_stride_api(const char* function,
                                         stride_api stride_choice = stride_api::INVALID) {
     if (stride_choice == stride_api::INVALID) {
-        throw mkl::invalid_argument(
+        throw math::invalid_argument(
             "DFT", function,
             "Invalid INPUT/OUTPUT or FWD/BACKWARD strides. API usage may have been mixed.");
     }
@@ -75,8 +75,8 @@ struct stride_vectors {
               bwd_in(stride_choice == stride_api::FB_STRIDES ? vec_b : vec_a),
               bwd_out(stride_choice == stride_api::FB_STRIDES ? vec_a : vec_b) {
         if (stride_choice == stride_api::INVALID) {
-            throw mkl::exception("DFT", "detail::stride_vector constructor",
-                                 "Internal error: invalid stride API");
+            throw math::exception("DFT", "detail::stride_vector constructor",
+                                  "Internal error: invalid stride API");
         }
         auto& v1 = stride_choice == stride_api::FB_STRIDES ? config_values.fwd_strides
                                                            : config_values.input_strides;
@@ -88,8 +88,8 @@ struct stride_vectors {
         for (std::size_t i{ 0 }; i < v1.size(); ++i) { // v1.size() == v2.size()
             if constexpr (std::is_unsigned_v<StrideElemT>) {
                 if (v1[i] < 0 || v2[i] < 0) {
-                    throw mkl::unimplemented("DFT", "commit",
-                                             "Backend does not support negative strides.");
+                    throw math::unimplemented("DFT", "commit",
+                                              "Backend does not support negative strides.");
                 }
             }
             vec_a[i] = static_cast<StrideElemT>(v1[i]);
@@ -146,6 +146,6 @@ inline stride_api get_stride_api(const ConfigT& config_values) {
     return stride_api::INVALID;
 }
 
-} // namespace oneapi::mkl::dft::detail
+} // namespace oneapi::math::dft::detail
 
 #endif //_DFT_DETAIL_STRIDE_HELPER_HPP_

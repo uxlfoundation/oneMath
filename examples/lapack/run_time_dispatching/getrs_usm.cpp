@@ -20,8 +20,8 @@
 /*
 *
 *  Content:
-*       This example demonstrates use of oneapi::mkl::lapack::getrf and
-*       oneapi::mkl::lapack::getrs to perform LU factorization and compute
+*       This example demonstrates use of oneapi::math::lapack::getrf and
+*       oneapi::math::lapack::getrs to perform LU factorization and compute
 *       the solution on a SYCL device (HOST, CPU, GPU) that is selected
 *       during runtime.
 *
@@ -36,13 +36,13 @@
 #include <iostream>
 #include <vector>
 
-// oneMKL/SYCL includes
+// oneMath/SYCL includes
 #if __has_include(<sycl/sycl.hpp>)
 #include <sycl/sycl.hpp>
 #else
 #include <CL/sycl.hpp>
 #endif
-#include "oneapi/mkl.hpp"
+#include "oneapi/math.hpp"
 
 // local includes
 #include "example_helper.hpp"
@@ -68,7 +68,7 @@ void run_getrs_example(const sycl::device& device) {
     std::int64_t A_size = n * lda;
     std::int64_t B_size = nrhs * ldb;
     std::int64_t ipiv_size = n;
-    oneapi::mkl::transpose trans = oneapi::mkl::transpose::nontrans;
+    oneapi::math::transpose trans = oneapi::math::transpose::nontrans;
 
     // Asynchronous error handler
     auto error_handler = [&](sycl::exception_list exceptions) {
@@ -76,7 +76,7 @@ void run_getrs_example(const sycl::device& device) {
             try {
                 std::rethrow_exception(e);
             }
-            catch (oneapi::mkl::lapack::exception const& e) {
+            catch (oneapi::math::lapack::exception const& e) {
                 // Handle LAPACK related exceptions that happened during asynchronous call
                 std::cerr << "Caught asynchronous LAPACK exception during GETRF or GETRS:"
                           << std::endl;
@@ -114,9 +114,9 @@ void run_getrs_example(const sycl::device& device) {
         sycl::malloc_device<std::int64_t>(ipiv_size * sizeof(std::int64_t), queue);
 
     std::int64_t getrf_scratchpad_size =
-        oneapi::mkl::lapack::getrf_scratchpad_size<float>(queue, m, n, lda);
+        oneapi::math::lapack::getrf_scratchpad_size<float>(queue, m, n, lda);
     std::int64_t getrs_scratchpad_size =
-        oneapi::mkl::lapack::getrs_scratchpad_size<float>(queue, trans, n, nrhs, lda, ldb);
+        oneapi::math::lapack::getrs_scratchpad_size<float>(queue, trans, n, nrhs, lda, ldb);
     float* getrf_scratchpad =
         sycl::malloc_shared<float>(getrf_scratchpad_size * sizeof(float), device, context);
     float* getrs_scratchpad =
@@ -145,11 +145,11 @@ void run_getrs_example(const sycl::device& device) {
     queue.memcpy(dev_B, B.data(), B_size * sizeof(float)).wait();
 
     // Execute on device
-    getrf_done = oneapi::mkl::lapack::getrf(queue, m, n, dev_A, lda, dev_ipiv, getrf_scratchpad,
-                                            getrf_scratchpad_size);
+    getrf_done = oneapi::math::lapack::getrf(queue, m, n, dev_A, lda, dev_ipiv, getrf_scratchpad,
+                                             getrf_scratchpad_size);
     getrs_done =
-        oneapi::mkl::lapack::getrs(queue, trans, n, nrhs, dev_A, lda, dev_ipiv, dev_B, ldb,
-                                   getrs_scratchpad, getrs_scratchpad_size, { getrf_done });
+        oneapi::math::lapack::getrs(queue, trans, n, nrhs, dev_A, lda, dev_ipiv, dev_B, ldb,
+                                    getrs_scratchpad, getrs_scratchpad_size, { getrf_done });
 
     // Wait until calculations are done
     queue.wait_and_throw();
@@ -160,9 +160,9 @@ void run_getrs_example(const sycl::device& device) {
     // Print results
     std::cout << "\n\t\tGETRF and GETRS parameters:" << std::endl;
     std::cout << "\t\t\ttrans = "
-              << (trans == oneapi::mkl::transpose::nontrans
+              << (trans == oneapi::math::transpose::nontrans
                       ? "nontrans"
-                      : (trans == oneapi::mkl::transpose::trans ? "trans" : "conjtrans"))
+                      : (trans == oneapi::math::transpose::trans ? "trans" : "conjtrans"))
               << std::endl;
     std::cout << "\t\t\tm = " << m << ", n = " << n << ", nrhs = " << nrhs << std::endl;
     std::cout << "\t\t\tlda = " << lda << ", ldb = " << ldb << std::endl;
@@ -235,7 +235,7 @@ int main(int argc, char** argv) {
         run_getrs_example(dev);
         std::cout << "LAPACK GETRS USM example ran OK" << std::endl;
     }
-    catch (oneapi::mkl::lapack::exception const& e) {
+    catch (oneapi::math::lapack::exception const& e) {
         // Handle LAPACK related exceptions that happened during synchronous call
         std::cerr << "Caught synchronous LAPACK exception:" << std::endl;
         std::cerr << "\t" << e.what() << std::endl;

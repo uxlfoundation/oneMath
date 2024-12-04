@@ -30,7 +30,7 @@
 #include <unordered_map>
 #include "rocblas_helper.hpp"
 namespace oneapi {
-namespace mkl {
+namespace math {
 namespace blas {
 namespace rocblas {
 
@@ -61,6 +61,6 @@ public:
 
 } // namespace rocblas
 } // namespace blas
-} // namespace mkl
+} // namespace math
 } // namespace oneapi
 #endif //_ROCBLAS_SCOPED_HANDLE_HPP_

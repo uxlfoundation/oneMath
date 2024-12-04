@@ -41,7 +41,7 @@ if(BUILD_SHARED_LIBS)
   if (USE_ADD_SYCL_TO_TARGET_INTEGRATION)
     add_sycl_to_target(TARGET blas_level3_rt SOURCES ${L3_SOURCES})
   else()
-    target_link_libraries(blas_level3_rt PUBLIC ONEMKL::SYCL::SYCL)
+    target_link_libraries(blas_level3_rt PUBLIC ONEMATH::SYCL::SYCL)
   endif()
 endif()
 
@@ -58,7 +58,7 @@ target_include_directories(blas_level3_ct
 if (USE_ADD_SYCL_TO_TARGET_INTEGRATION)
   add_sycl_to_target(TARGET blas_level3_ct SOURCES ${L3_SOURCES})
 else()
-  target_link_libraries(blas_level3_ct PUBLIC ONEMKL::SYCL::SYCL)
+  target_link_libraries(blas_level3_ct PUBLIC ONEMATH::SYCL::SYCL)
 endif()
 
 

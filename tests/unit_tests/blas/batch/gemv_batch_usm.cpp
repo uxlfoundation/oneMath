@@ -30,10 +30,10 @@
 #include <CL/sycl.hpp>
 #endif
 #include "cblas.h"
-#include "oneapi/mkl.hpp"
-#include "oneapi/mkl/detail/config.hpp"
+#include "oneapi/math.hpp"
+#include "oneapi/math/detail/config.hpp"
 #include "allocator_helper.hpp"
-#include "onemkl_blas_helper.hpp"
+#include "onemath_blas_helper.hpp"
 #include "reference_blas_templates.hpp"
 #include "test_common.hpp"
 #include "test_helper.hpp"
@@ -48,7 +48,7 @@ extern std::vector<sycl::device*> devices;
 namespace {
 
 template <typename fp>
-int test(device* dev, oneapi::mkl::layout layout, int64_t group_count) {
+int test(device* dev, oneapi::math::layout layout, int64_t group_count) {
     // Catch asynchronous exceptions.
     auto exception_handler = [](exception_list exceptions) {
         for (std::exception_ptr const& e : exceptions) {
@@ -73,8 +73,8 @@ int test(device* dev, oneapi::mkl::layout layout, int64_t group_count) {
     vector<int64_t, decltype(uaint)> m(uaint), n(uaint), lda(uaint), incx(uaint), incy(uaint),
         group_size(uaint);
 
-    auto uatranspose = usm_allocator<oneapi::mkl::transpose, usm::alloc::shared, 64>(cxt, *dev);
-    vector<oneapi::mkl::transpose, decltype(uatranspose)> transa(uatranspose);
+    auto uatranspose = usm_allocator<oneapi::math::transpose, usm::alloc::shared, 64>(cxt, *dev);
+    vector<oneapi::math::transpose, decltype(uatranspose)> transa(uatranspose);
 
     auto uafp = usm_allocator<fp, usm::alloc::shared, 64>(cxt, *dev);
     vector<fp, decltype(uafp)> alpha(uafp), beta(uafp);
@@ -107,14 +107,14 @@ int test(device* dev, oneapi::mkl::layout layout, int64_t group_count) {
         alpha[i] = rand_scalar<fp>();
         beta[i] = rand_scalar<fp>();
         if ((std::is_same<fp, float>::value) || (std::is_same<fp, double>::value)) {
-            transa[i] = (oneapi::mkl::transpose)(std::rand() % 2);
+            transa[i] = (oneapi::math::transpose)(std::rand() % 2);
         }
         else {
             tmp = std::rand() % 3;
             if (tmp == 2)
-                transa[i] = oneapi::mkl::transpose::conjtrans;
+                transa[i] = oneapi::math::transpose::conjtrans;
             else
-                transa[i] = (oneapi::mkl::transpose)tmp;
+                transa[i] = (oneapi::math::transpose)tmp;
         }
         total_batch_count += group_size[i];
     }
@@ -128,17 +128,18 @@ int test(device* dev, oneapi::mkl::layout layout, int64_t group_count) {
 
     idx = 0;
     for (i = 0; i < group_count; i++) {
-        size_a = (layout == oneapi::mkl::layout::col_major) ? lda[i] * n[i] : lda[i] * m[i];
-        x_len = (transa[i] == oneapi::mkl::transpose::nontrans) ? n[i] : m[i];
-        y_len = (transa[i] == oneapi::mkl::transpose::nontrans) ? m[i] : n[i];
+        size_a = (layout == oneapi::math::layout::col_major) ? lda[i] * n[i] : lda[i] * m[i];
+        x_len = (transa[i] == oneapi::math::transpose::nontrans) ? n[i] : m[i];
+        y_len = (transa[i] == oneapi::math::transpose::nontrans) ? m[i] : n[i];
         size_x = 1 + (x_len - 1) * std::abs(incx[i]);
         size_y = 1 + (y_len - 1) * std::abs(incy[i]);
         for (j = 0; j < group_size[i]; j++) {
-            a_array[idx] = (fp*)oneapi::mkl::malloc_shared(64, sizeof(fp) * size_a, *dev, cxt);
-            x_array[idx] = (fp*)oneapi::mkl::malloc_shared(64, sizeof(fp) * size_x, *dev, cxt);
-            y_array[idx] = (fp*)oneapi::mkl::malloc_shared(64, sizeof(fp) * size_y, *dev, cxt);
-            y_ref_array[idx] = (fp*)oneapi::mkl::malloc_shared(64, sizeof(fp) * size_y, *dev, cxt);
-            rand_matrix(a_array[idx], layout, oneapi::mkl::transpose::nontrans, m[i], n[i], lda[i]);
+            a_array[idx] = (fp*)oneapi::math::malloc_shared(64, sizeof(fp) * size_a, *dev, cxt);
+            x_array[idx] = (fp*)oneapi::math::malloc_shared(64, sizeof(fp) * size_x, *dev, cxt);
+            y_array[idx] = (fp*)oneapi::math::malloc_shared(64, sizeof(fp) * size_y, *dev, cxt);
+            y_ref_array[idx] = (fp*)oneapi::math::malloc_shared(64, sizeof(fp) * size_y, *dev, cxt);
+            rand_matrix(a_array[idx], layout, oneapi::math::transpose::nontrans, m[i], n[i],
+                        lda[i]);
             rand_vector(x_array[idx], x_len, incx[i]);
             rand_vector(y_array[idx], y_len, incy[i]);
             copy_vector(y_array[idx], y_len, incy[i], y_ref_array[idx]);
@@ -148,33 +149,33 @@ int test(device* dev, oneapi::mkl::layout layout, int64_t group_count) {
 
     // Call reference GEMV_BATCH.
     using fp_ref = typename ref_type_info<fp>::type;
-    int* m_ref = (int*)oneapi::mkl::aligned_alloc(64, sizeof(int) * group_count);
-    int* n_ref = (int*)oneapi::mkl::aligned_alloc(64, sizeof(int) * group_count);
-    int* lda_ref = (int*)oneapi::mkl::aligned_alloc(64, sizeof(int) * group_count);
-    int* incx_ref = (int*)oneapi::mkl::aligned_alloc(64, sizeof(int) * group_count);
-    int* incy_ref = (int*)oneapi::mkl::aligned_alloc(64, sizeof(int) * group_count);
-    int* group_size_ref = (int*)oneapi::mkl::aligned_alloc(64, sizeof(int) * group_count);
+    int* m_ref = (int*)oneapi::math::aligned_alloc(64, sizeof(int) * group_count);
+    int* n_ref = (int*)oneapi::math::aligned_alloc(64, sizeof(int) * group_count);
+    int* lda_ref = (int*)oneapi::math::aligned_alloc(64, sizeof(int) * group_count);
+    int* incx_ref = (int*)oneapi::math::aligned_alloc(64, sizeof(int) * group_count);
+    int* incy_ref = (int*)oneapi::math::aligned_alloc(64, sizeof(int) * group_count);
+    int* group_size_ref = (int*)oneapi::math::aligned_alloc(64, sizeof(int) * group_count);
 
     CBLAS_TRANSPOSE* transa_ref =
-        (CBLAS_TRANSPOSE*)oneapi::mkl::aligned_alloc(64, sizeof(CBLAS_TRANSPOSE) * group_count);
+        (CBLAS_TRANSPOSE*)oneapi::math::aligned_alloc(64, sizeof(CBLAS_TRANSPOSE) * group_count);
 
     if ((m_ref == NULL) || (n_ref == NULL) || (lda_ref == NULL) || (incx_ref == NULL) ||
         (incy_ref == NULL) || (transa_ref == NULL) || (group_size_ref == NULL)) {
         std::cout << "Error cannot allocate input arrays\n";
-        oneapi::mkl::aligned_free(m_ref);
-        oneapi::mkl::aligned_free(n_ref);
-        oneapi::mkl::aligned_free(lda_ref);
-        oneapi::mkl::aligned_free(incx_ref);
-        oneapi::mkl::aligned_free(incy_ref);
-        oneapi::mkl::aligned_free(transa_ref);
-        oneapi::mkl::aligned_free(group_size_ref);
+        oneapi::math::aligned_free(m_ref);
+        oneapi::math::aligned_free(n_ref);
+        oneapi::math::aligned_free(lda_ref);
+        oneapi::math::aligned_free(incx_ref);
+        oneapi::math::aligned_free(incy_ref);
+        oneapi::math::aligned_free(transa_ref);
+        oneapi::math::aligned_free(group_size_ref);
         idx = 0;
         for (i = 0; i < group_count; i++) {
             for (j = 0; j < group_size[i]; j++) {
-                oneapi::mkl::free_shared(a_array[idx], cxt);
-                oneapi::mkl::free_shared(x_array[idx], cxt);
-                oneapi::mkl::free_shared(y_array[idx], cxt);
-                oneapi::mkl::free_shared(y_ref_array[idx], cxt);
+                oneapi::math::free_shared(a_array[idx], cxt);
+                oneapi::math::free_shared(x_array[idx], cxt);
+                oneapi::math::free_shared(y_array[idx], cxt);
+                oneapi::math::free_shared(y_ref_array[idx], cxt);
                 idx++;
             }
         }
@@ -203,14 +204,14 @@ int test(device* dev, oneapi::mkl::layout layout, int64_t group_count) {
     try {
 #ifdef CALL_RT_API
         switch (layout) {
-            case oneapi::mkl::layout::col_major:
-                done = oneapi::mkl::blas::column_major::gemv_batch(
+            case oneapi::math::layout::col_major:
+                done = oneapi::math::blas::column_major::gemv_batch(
                     main_queue, &transa[0], &m[0], &n[0], &alpha[0], (const fp**)&a_array[0],
                     &lda[0], (const fp**)&x_array[0], &incx[0], &beta[0], &y_array[0], &incy[0],
                     group_count, &group_size[0], dependencies);
                 break;
-            case oneapi::mkl::layout::row_major:
-                done = oneapi::mkl::blas::row_major::gemv_batch(
+            case oneapi::math::layout::row_major:
+                done = oneapi::math::blas::row_major::gemv_batch(
                     main_queue, &transa[0], &m[0], &n[0], &alpha[0], (const fp**)&a_array[0],
                     &lda[0], (const fp**)&x_array[0], &incx[0], &beta[0], &y_array[0], &incy[0],
                     group_count, &group_size[0], dependencies);
@@ -220,16 +221,16 @@ int test(device* dev, oneapi::mkl::layout layout, int64_t group_count) {
         done.wait();
 #else
         switch (layout) {
-            case oneapi::mkl::layout::col_major:
-                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::mkl::blas::column_major::gemv_batch,
+            case oneapi::math::layout::col_major:
+                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::math::blas::column_major::gemv_batch,
                                         &transa[0], &m[0], &n[0], &alpha[0],
                                         (const fp**)&a_array[0], &lda[0], (const fp**)&x_array[0],
                                         &incx[0], &beta[0], &y_array[0], &incy[0], group_count,
                                         &group_size[0], dependencies);
                 break;
-            case oneapi::mkl::layout::row_major:
+            case oneapi::math::layout::row_major:
                 TEST_RUN_BLAS_CT_SELECT(
-                    main_queue, oneapi::mkl::blas::row_major::gemv_batch, &transa[0], &m[0], &n[0],
+                    main_queue, oneapi::math::blas::row_major::gemv_batch, &transa[0], &m[0], &n[0],
                     &alpha[0], (const fp**)&a_array[0], &lda[0], (const fp**)&x_array[0], &incx[0],
                     &beta[0], &y_array[0], &incy[0], group_count, &group_size[0], dependencies);
                 break;
@@ -244,21 +245,21 @@ int test(device* dev, oneapi::mkl::layout layout, int64_t group_count) {
         print_error_code(e);
     }
 
-    catch (const oneapi::mkl::unimplemented& e) {
-        oneapi::mkl::aligned_free(m_ref);
-        oneapi::mkl::aligned_free(n_ref);
-        oneapi::mkl::aligned_free(lda_ref);
-        oneapi::mkl::aligned_free(incx_ref);
-        oneapi::mkl::aligned_free(incy_ref);
-        oneapi::mkl::aligned_free(transa_ref);
-        oneapi::mkl::aligned_free(group_size_ref);
+    catch (const oneapi::math::unimplemented& e) {
+        oneapi::math::aligned_free(m_ref);
+        oneapi::math::aligned_free(n_ref);
+        oneapi::math::aligned_free(lda_ref);
+        oneapi::math::aligned_free(incx_ref);
+        oneapi::math::aligned_free(incy_ref);
+        oneapi::math::aligned_free(transa_ref);
+        oneapi::math::aligned_free(group_size_ref);
         idx = 0;
         for (i = 0; i < group_count; i++) {
             for (j = 0; j < group_size[i]; j++) {
-                oneapi::mkl::free_shared(a_array[idx], cxt);
-                oneapi::mkl::free_shared(x_array[idx], cxt);
-                oneapi::mkl::free_shared(y_array[idx], cxt);
-                oneapi::mkl::free_shared(y_ref_array[idx], cxt);
+                oneapi::math::free_shared(a_array[idx], cxt);
+                oneapi::math::free_shared(x_array[idx], cxt);
+                oneapi::math::free_shared(y_array[idx], cxt);
+                oneapi::math::free_shared(y_ref_array[idx], cxt);
                 idx++;
             }
         }
@@ -273,7 +274,7 @@ int test(device* dev, oneapi::mkl::layout layout, int64_t group_count) {
     // Compare the results of reference implementation and DPC++ implementation.
     idx = 0;
     for (i = 0; i < group_count; i++) {
-        y_len = (transa[i] == oneapi::mkl::transpose::nontrans) ? m[i] : n[i];
+        y_len = (transa[i] == oneapi::math::transpose::nontrans) ? m[i] : n[i];
         for (j = 0; j < group_size[i]; j++) {
             good = good && check_equal_vector(y_array[idx], y_ref_array[idx], y_len, incy[i],
                                               std::max<int>(m[i], n[i]), std::cout);
@@ -281,20 +282,20 @@ int test(device* dev, oneapi::mkl::layout layout, int64_t group_count) {
         }
     }
 
-    oneapi::mkl::aligned_free(m_ref);
-    oneapi::mkl::aligned_free(n_ref);
-    oneapi::mkl::aligned_free(lda_ref);
-    oneapi::mkl::aligned_free(incx_ref);
-    oneapi::mkl::aligned_free(incy_ref);
-    oneapi::mkl::aligned_free(transa_ref);
-    oneapi::mkl::aligned_free(group_size_ref);
+    oneapi::math::aligned_free(m_ref);
+    oneapi::math::aligned_free(n_ref);
+    oneapi::math::aligned_free(lda_ref);
+    oneapi::math::aligned_free(incx_ref);
+    oneapi::math::aligned_free(incy_ref);
+    oneapi::math::aligned_free(transa_ref);
+    oneapi::math::aligned_free(group_size_ref);
     idx = 0;
     for (i = 0; i < group_count; i++) {
         for (j = 0; j < group_size[i]; j++) {
-            oneapi::mkl::free_shared(a_array[idx], cxt);
-            oneapi::mkl::free_shared(x_array[idx], cxt);
-            oneapi::mkl::free_shared(y_array[idx], cxt);
-            oneapi::mkl::free_shared(y_ref_array[idx], cxt);
+            oneapi::math::free_shared(a_array[idx], cxt);
+            oneapi::math::free_shared(x_array[idx], cxt);
+            oneapi::math::free_shared(y_array[idx], cxt);
+            oneapi::math::free_shared(y_ref_array[idx], cxt);
             idx++;
         }
     }
@@ -303,7 +304,7 @@ int test(device* dev, oneapi::mkl::layout layout, int64_t group_count) {
 }
 
 class GemvBatchUsmTests
-        : public ::testing::TestWithParam<std::tuple<sycl::device*, oneapi::mkl::layout>> {};
+        : public ::testing::TestWithParam<std::tuple<sycl::device*, oneapi::math::layout>> {};
 
 TEST_P(GemvBatchUsmTests, RealSinglePrecision) {
     EXPECT_TRUEORSKIP(test<float>(std::get<0>(GetParam()), std::get<1>(GetParam()), 5));
@@ -329,8 +330,8 @@ TEST_P(GemvBatchUsmTests, ComplexDoublePrecision) {
 
 INSTANTIATE_TEST_SUITE_P(GemvBatchUsmTestSuite, GemvBatchUsmTests,
                          ::testing::Combine(testing::ValuesIn(devices),
-                                            testing::Values(oneapi::mkl::layout::col_major,
-                                                            oneapi::mkl::layout::row_major)),
+                                            testing::Values(oneapi::math::layout::col_major,
+                                                            oneapi::math::layout::row_major)),
                          ::LayoutDeviceNamePrint());
 
 } // anonymous namespace

@@ -64,15 +64,15 @@ foreach(blas_rt_source ${BLAS_RT_SOURCES})
       PUBLIC ${CMAKE_BINARY_DIR}/bin
   )
 
-  add_dependencies(example_${domain}_${blas_rt_source} onemkl)
+  add_dependencies(example_${domain}_${blas_rt_source} onemath)
 
   if (USE_ADD_SYCL_TO_TARGET_INTEGRATION)
     add_sycl_to_target(TARGET example_${domain}_${blas_rt_source} SOURCES ${BLAS_RT_SOURCES})
   endif()
 
   target_link_libraries(example_${domain}_${blas_rt_source} PUBLIC
-      onemkl
-      ONEMKL::SYCL::SYCL
+      onemath
+      ONEMATH::SYCL::SYCL
       ${CMAKE_DL_LIBS}
   )
 

@@ -42,8 +42,8 @@
 // After Plugin Interface removal in DPC++ ur.hpp is the new include
 #if __has_include(<sycl/detail/ur.hpp>)
 #include <sycl/detail/ur.hpp>
-#ifndef ONEMKL_PI_INTERFACE_REMOVED
-#define ONEMKL_PI_INTERFACE_REMOVED
+#ifndef ONEMATH_PI_INTERFACE_REMOVED
+#define ONEMATH_PI_INTERFACE_REMOVED
 #endif
 #elif __has_include(<sycl/detail/pi.hpp>)
 #include <sycl/detail/pi.hpp>
@@ -52,7 +52,7 @@
 #endif
 
 namespace oneapi {
-namespace mkl {
+namespace math {
 namespace lapack {
 namespace cusolver {
 
@@ -71,7 +71,7 @@ https://docs.nvidia.com/cuda/cusolver/index.html#thread-safety
  using the same host thread.
 
 The advice above is for using cublas with the cuda runtime API. Given that cusolver is based on cublas the advice is 
-transferable. The cusolver_scope_handle is based on the oneMKL cublas_scope_handle. The NVIDIA runtime API creates a 
+transferable. The cusolver_scope_handle is based on the oneMath cublas_scope_handle. The NVIDIA runtime API creates a 
 default context for users. The cusolverDnCreate function in uses the context located on top of the stack for each thread. 
 Then, the cuSolver routine uses this context for resource allocation/access. Calling a cuSolver function with a handle 
 created for context A and memories/queue created for context B results in a segmentation fault. Thus we need to create 
@@ -92,7 +92,7 @@ class CusolverScopedContextHandler {
     sycl::context* placedContext_;
     bool needToRecover_;
     sycl::interop_handle& ih;
-#ifdef ONEMKL_PI_INTERFACE_REMOVED
+#ifdef ONEMATH_PI_INTERFACE_REMOVED
     static thread_local cusolver_handle<ur_context_handle_t> handle_helper;
 #else
     static thread_local cusolver_handle<pi_context> handle_helper;
@@ -127,6 +127,6 @@ public:
 
 } // namespace cusolver
 } // namespace lapack
-} // namespace mkl
+} // namespace math
 } // namespace oneapi
 #endif //_CUSOLVER_SCOPED_HANDLE_HPP_

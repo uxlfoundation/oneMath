@@ -17,16 +17,16 @@
 * SPDX-License-Identifier: Apache-2.0
 *******************************************************************************/
 
-#ifndef _ONEMKL_DETAIL_DESCRIPTOR_CONFIG_HELPER_HPP_
-#define _ONEMKL_DETAIL_DESCRIPTOR_CONFIG_HELPER_HPP_
+#ifndef _ONEMATH_DETAIL_DESCRIPTOR_CONFIG_HELPER_HPP_
+#define _ONEMATH_DETAIL_DESCRIPTOR_CONFIG_HELPER_HPP_
 
 #include <cstdint>
 #include <type_traits>
 
-#include "oneapi/mkl/dft/descriptor.hpp"
+#include "oneapi/math/dft/descriptor.hpp"
 
 namespace oneapi {
-namespace mkl {
+namespace math {
 namespace dft {
 namespace detail {
 
@@ -113,18 +113,18 @@ void set_value(dft_values<prec, dom>& vals,
                param_type_helper_t<real_helper_t<prec>, Param>&& set_val) {
     if constexpr (Param == config_param::LENGTHS) {
         if (set_val == nullptr) {
-            throw mkl::invalid_argument("DFT", "set_value", "Given nullptr.");
+            throw math::invalid_argument("DFT", "set_value", "Given nullptr.");
         }
         for (std::size_t i{ 0 }; i < vals.dimensions.size(); ++i) {
             if (set_val[i] <= 0) {
-                throw mkl::invalid_argument("DFT", "set_value",
-                                            "Invalid length value (negative or 0).");
+                throw math::invalid_argument("DFT", "set_value",
+                                             "Invalid length value (negative or 0).");
             }
         }
         std::copy(set_val, set_val + vals.dimensions.size(), vals.dimensions.begin());
     }
     else if constexpr (Param == config_param::PRECISION) {
-        throw mkl::invalid_argument("DFT", "set_value", "Read-only parameter.");
+        throw math::invalid_argument("DFT", "set_value", "Read-only parameter.");
     }
     else if constexpr (Param == config_param::FORWARD_SCALE) {
         vals.fwd_scale = set_val;
@@ -134,8 +134,8 @@ void set_value(dft_values<prec, dom>& vals,
     }
     else if constexpr (Param == config_param::NUMBER_OF_TRANSFORMS) {
         if (set_val <= 0) {
-            throw mkl::invalid_argument("DFT", "set_value",
-                                        "Number of transforms must be positive.");
+            throw math::invalid_argument("DFT", "set_value",
+                                         "Number of transforms must be positive.");
         }
         vals.number_of_transforms = set_val;
     }
@@ -144,8 +144,8 @@ void set_value(dft_values<prec, dom>& vals,
             vals.complex_storage = set_val;
         }
         else {
-            throw mkl::invalid_argument("DFT", "set_value",
-                                        "Complex storage must be complex_complex or real_real.");
+            throw math::invalid_argument("DFT", "set_value",
+                                         "Complex storage must be complex_complex or real_real.");
         }
     }
     else if constexpr (Param == config_param::REAL_STORAGE) {
@@ -153,7 +153,7 @@ void set_value(dft_values<prec, dom>& vals,
             vals.real_storage = set_val;
         }
         else {
-            throw mkl::invalid_argument("DFT", "set_value", "Real storage must be real_real.");
+            throw math::invalid_argument("DFT", "set_value", "Real storage must be real_real.");
         }
     }
     else if constexpr (Param == config_param::CONJUGATE_EVEN_STORAGE) {
@@ -161,8 +161,8 @@ void set_value(dft_values<prec, dom>& vals,
             vals.conj_even_storage = set_val;
         }
         else {
-            throw mkl::invalid_argument("DFT", "set_value",
-                                        "Conjugate even storage must be complex_complex.");
+            throw math::invalid_argument("DFT", "set_value",
+                                         "Conjugate even storage must be complex_complex.");
         }
     }
     else if constexpr (Param == config_param::PLACEMENT) {
@@ -170,22 +170,22 @@ void set_value(dft_values<prec, dom>& vals,
             vals.placement = set_val;
         }
         else {
-            throw mkl::invalid_argument("DFT", "set_value",
-                                        "Placement must be inplace or not inplace.");
+            throw math::invalid_argument("DFT", "set_value",
+                                         "Placement must be inplace or not inplace.");
         }
     }
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
     else if constexpr (Param == config_param::INPUT_STRIDES) {
         if (set_val == nullptr) {
-            throw mkl::invalid_argument("DFT", "set_value", "Given nullptr.");
+            throw math::invalid_argument("DFT", "set_value", "Given nullptr.");
         }
         reset_strides_to_zero(vals.fwd_strides, vals.bwd_strides);
         std::copy(set_val, set_val + vals.dimensions.size() + 1, vals.input_strides.begin());
     }
     else if constexpr (Param == config_param::OUTPUT_STRIDES) {
         if (set_val == nullptr) {
-            throw mkl::invalid_argument("DFT", "set_value", "Given nullptr.");
+            throw math::invalid_argument("DFT", "set_value", "Given nullptr.");
         }
         reset_strides_to_zero(vals.fwd_strides, vals.bwd_strides);
         std::copy(set_val, set_val + vals.dimensions.size() + 1, vals.output_strides.begin());
@@ -202,7 +202,7 @@ void set_value(dft_values<prec, dom>& vals,
             vals.workspace = set_val;
         }
         else {
-            throw mkl::invalid_argument("DFT", "set_value", "Workspace must be allow or avoid.");
+            throw math::invalid_argument("DFT", "set_value", "Workspace must be allow or avoid.");
         }
     }
     else if constexpr (Param == config_param::WORKSPACE_PLACEMENT) {
@@ -211,20 +211,20 @@ void set_value(dft_values<prec, dom>& vals,
             vals.workspace_placement = set_val;
         }
         else {
-            throw mkl::invalid_argument(
+            throw math::invalid_argument(
                 "DFT", "set_value", "Workspace must be WORKSPACE_AUTOMATIC or WORKSPACE_EXTERNAL.");
         }
     }
     else if constexpr (Param == config_param::WORKSPACE_EXTERNAL_BYTES) {
-        throw mkl::invalid_argument("DFT", "set_value", "Read-only parameter.");
+        throw math::invalid_argument("DFT", "set_value", "Read-only parameter.");
     }
     else if constexpr (Param == config_param::ORDERING) {
         if (set_val == config_value::ORDERED || set_val == config_value::BACKWARD_SCRAMBLED) {
             vals.ordering = set_val;
         }
         else {
-            throw mkl::invalid_argument("DFT", "set_value",
-                                        "Ordering must be ordered or backwards scrambled.");
+            throw math::invalid_argument("DFT", "set_value",
+                                         "Ordering must be ordered or backwards scrambled.");
         }
     }
     else if constexpr (Param == config_param::TRANSPOSE) {
@@ -235,19 +235,19 @@ void set_value(dft_values<prec, dom>& vals,
             vals.packed_format = set_val;
         }
         else {
-            throw mkl::invalid_argument("DFT", "set_value", "Packed format must be CCE.");
+            throw math::invalid_argument("DFT", "set_value", "Packed format must be CCE.");
         }
     }
     else if constexpr (Param == config_param::FWD_STRIDES) {
         if (set_val == nullptr) {
-            throw mkl::invalid_argument("DFT", "set_value", "Given nullptr.");
+            throw math::invalid_argument("DFT", "set_value", "Given nullptr.");
         }
         reset_strides_to_zero(vals.input_strides, vals.output_strides);
         std::copy(set_val, set_val + vals.dimensions.size() + 1, vals.fwd_strides.begin());
     }
     else if constexpr (Param == config_param::BWD_STRIDES) {
         if (set_val == nullptr) {
-            throw mkl::invalid_argument("DFT", "set_value", "Given nullptr.");
+            throw math::invalid_argument("DFT", "set_value", "Given nullptr.");
         }
         reset_strides_to_zero(vals.input_strides, vals.output_strides);
         std::copy(set_val, set_val + vals.dimensions.size() + 1, vals.bwd_strides.begin());
@@ -256,7 +256,7 @@ void set_value(dft_values<prec, dom>& vals,
 
 } // namespace detail
 } // namespace dft
-} // namespace mkl
+} // namespace math
 } // namespace oneapi
 
-#endif //_ONEMKL_DETAIL_DESCRIPTOR_CONFIG_HELPER_HPP_
+#endif //_ONEMATH_DETAIL_DESCRIPTOR_CONFIG_HELPER_HPP_

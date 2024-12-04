@@ -50,17 +50,17 @@ foreach(sparse_blas_rt_sources ${SPARSE_BLAS_RT_SOURCES})
       PUBLIC ${CMAKE_BINARY_DIR}/bin
   )
 
-  add_dependencies(example_${sparse_blas_rt_sources} onemkl)
+  add_dependencies(example_${sparse_blas_rt_sources} onemath)
 
   if (USE_ADD_SYCL_TO_TARGET_INTEGRATION)
     add_sycl_to_target(TARGET example_${sparse_blas_rt_sources} SOURCES ${SPARSE_BLAS_RT_SOURCES})
   endif()
 
   target_link_libraries(example_${sparse_blas_rt_sources}
-      PUBLIC onemkl
-      PUBLIC ONEMKL::SYCL::SYCL
+      PUBLIC onemath
+      PUBLIC ONEMATH::SYCL::SYCL
       PUBLIC ${CMAKE_DL_LIBS}
-      PRIVATE onemkl_warnings
+      PRIVATE onemath_warnings
   )
 
   # Register example as ctest

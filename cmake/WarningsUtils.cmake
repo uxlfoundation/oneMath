@@ -19,15 +19,15 @@
 
 include_guard(GLOBAL)
 
-add_library(onemkl_warnings INTERFACE)
+add_library(onemath_warnings INTERFACE)
 
-set(ONEMKL_WARNINGS "")
+set(ONEMATH_WARNINGS "")
 
 include(CheckCXXCompilerFlag)
 macro(add_warning flag)
   check_cxx_compiler_flag(${flag} IS_SUPPORTED)
   if(${IS_SUPPORTED})
-    list(APPEND ONEMKL_WARNINGS ${flag})
+    list(APPEND ONEMATH_WARNINGS ${flag})
   else()
     message(WARNING "Compiler does not support ${flag}")
   endif()
@@ -39,10 +39,10 @@ add_warning("-Wshadow")
 add_warning("-Wconversion")
 add_warning("-Wpedantic")
 
-message(VERBOSE "Domains with warnings enabled use: ${ONEMKL_WARNINGS}")
+message(VERBOSE "Domains with warnings enabled use: ${ONEMATH_WARNINGS}")
 
-# The onemkl_warnings target can be linked to any other target to enable warnings.
-target_compile_options(onemkl_warnings INTERFACE ${ONEMKL_WARNINGS})
+# The onemath_warnings target can be linked to any other target to enable warnings.
+target_compile_options(onemath_warnings INTERFACE ${ONEMATH_WARNINGS})
 
 # Add the library to install package
-install(TARGETS onemkl_warnings EXPORT oneMKLTargets)
+install(TARGETS onemath_warnings EXPORT oneMathTargets)

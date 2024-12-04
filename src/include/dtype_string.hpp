@@ -17,8 +17,8 @@
 * SPDX-License-Identifier: Apache-2.0
 *******************************************************************************/
 
-#ifndef _ONEMKL_ERROR_HELPER_HPP_
-#define _ONEMKL_ERROR_HELPER_HPP_
+#ifndef _ONEMATH_ERROR_HELPER_HPP_
+#define _ONEMATH_ERROR_HELPER_HPP_
 
 #include <string>
 
@@ -53,4 +53,4 @@ inline const std::string dtype_string<std::int8_t>() {
     return "int8";
 }
 
-#endif //_ONEMKL_ERROR_HELPER_HPP_
+#endif //_ONEMATH_ERROR_HELPER_HPP_

@@ -26,7 +26,7 @@
 #include <CL/sycl.hpp>
 #endif
 
-#include "oneapi/mkl.hpp"
+#include "oneapi/math.hpp"
 #include "lapack_common.hpp"
 #include "lapack_test_controller.hpp"
 #include "lapack_accuracy_checks.hpp"
@@ -50,7 +50,7 @@ bool accuracy(const sycl::device& dev, int64_t m, int64_t n, int64_t k, int64_t 
     std::vector<fp> tau(stride_tau * batch_size);
 
     for (int64_t i = 0; i < batch_size; i++) {
-        rand_matrix(seed, oneapi::mkl::transpose::nontrans, m, n, A, lda, i * stride_a);
+        rand_matrix(seed, oneapi::math::transpose::nontrans, m, n, A, lda, i * stride_a);
         auto info =
             reference::geqrf(m, k, A.data() + i * stride_a, lda, tau.data() + i * stride_tau);
         if (0 != info) {
@@ -67,12 +67,12 @@ bool accuracy(const sycl::device& dev, int64_t m, int64_t n, int64_t k, int64_t 
         auto A_dev = device_alloc<data_T>(queue, A.size());
         auto tau_dev = device_alloc<data_T>(queue, tau.size());
 #ifdef CALL_RT_API
-        const auto scratchpad_size = oneapi::mkl::lapack::orgqr_batch_scratchpad_size<fp>(
+        const auto scratchpad_size = oneapi::math::lapack::orgqr_batch_scratchpad_size<fp>(
             queue, m, n, k, lda, stride_a, stride_tau, batch_size);
 #else
         int64_t scratchpad_size;
         TEST_RUN_LAPACK_CT_SELECT(
-            queue, scratchpad_size = oneapi::mkl::lapack::orgqr_batch_scratchpad_size<fp>, m, n, k,
+            queue, scratchpad_size = oneapi::math::lapack::orgqr_batch_scratchpad_size<fp>, m, n, k,
             lda, stride_a, stride_tau, batch_size);
 #endif
         auto scratchpad_dev = device_alloc<data_T>(queue, scratchpad_size);
@@ -82,10 +82,10 @@ bool accuracy(const sycl::device& dev, int64_t m, int64_t n, int64_t k, int64_t 
         queue.wait_and_throw();
 
 #ifdef CALL_RT_API
-        oneapi::mkl::lapack::orgqr_batch(queue, m, n, k, A_dev, lda, stride_a, tau_dev, stride_tau,
-                                         batch_size, scratchpad_dev, scratchpad_size);
+        oneapi::math::lapack::orgqr_batch(queue, m, n, k, A_dev, lda, stride_a, tau_dev, stride_tau,
+                                          batch_size, scratchpad_dev, scratchpad_size);
 #else
-        TEST_RUN_LAPACK_CT_SELECT(queue, oneapi::mkl::lapack::orgqr_batch, m, n, k, A_dev, lda,
+        TEST_RUN_LAPACK_CT_SELECT(queue, oneapi::math::lapack::orgqr_batch, m, n, k, A_dev, lda,
                                   stride_a, tau_dev, stride_tau, batch_size, scratchpad_dev,
                                   scratchpad_size);
 #endif
@@ -127,7 +127,7 @@ bool usm_dependency(const sycl::device& dev, int64_t m, int64_t n, int64_t k, in
     std::vector<fp> tau(stride_tau * batch_size);
 
     for (int64_t i = 0; i < batch_size; i++) {
-        rand_matrix(seed, oneapi::mkl::transpose::nontrans, m, n, A, lda, i * stride_a);
+        rand_matrix(seed, oneapi::math::transpose::nontrans, m, n, A, lda, i * stride_a);
         auto info =
             reference::geqrf(m, k, A.data() + i * stride_a, lda, tau.data() + i * stride_tau);
         if (0 != info) {
@@ -145,12 +145,12 @@ bool usm_dependency(const sycl::device& dev, int64_t m, int64_t n, int64_t k, in
         auto A_dev = device_alloc<data_T>(queue, A.size());
         auto tau_dev = device_alloc<data_T>(queue, tau.size());
 #ifdef CALL_RT_API
-        const auto scratchpad_size = oneapi::mkl::lapack::orgqr_batch_scratchpad_size<fp>(
+        const auto scratchpad_size = oneapi::math::lapack::orgqr_batch_scratchpad_size<fp>(
             queue, m, n, k, lda, stride_a, stride_tau, batch_size);
 #else
         int64_t scratchpad_size;
         TEST_RUN_LAPACK_CT_SELECT(
-            queue, scratchpad_size = oneapi::mkl::lapack::orgqr_batch_scratchpad_size<fp>, m, n, k,
+            queue, scratchpad_size = oneapi::math::lapack::orgqr_batch_scratchpad_size<fp>, m, n, k,
             lda, stride_a, stride_tau, batch_size);
 #endif
         auto scratchpad_dev = device_alloc<data_T>(queue, scratchpad_size);
@@ -162,12 +162,12 @@ bool usm_dependency(const sycl::device& dev, int64_t m, int64_t n, int64_t k, in
         /* Check dependency handling */
         auto in_event = create_dependency(queue);
 #ifdef CALL_RT_API
-        sycl::event func_event = oneapi::mkl::lapack::orgqr_batch(
+        sycl::event func_event = oneapi::math::lapack::orgqr_batch(
             queue, m, n, k, A_dev, lda, stride_a, tau_dev, stride_tau, batch_size, scratchpad_dev,
             scratchpad_size, std::vector<sycl::event>{ in_event });
 #else
         sycl::event func_event;
-        TEST_RUN_LAPACK_CT_SELECT(queue, func_event = oneapi::mkl::lapack::orgqr_batch, m, n, k,
+        TEST_RUN_LAPACK_CT_SELECT(queue, func_event = oneapi::math::lapack::orgqr_batch, m, n, k,
                                   A_dev, lda, stride_a, tau_dev, stride_tau, batch_size,
                                   scratchpad_dev, scratchpad_size,
                                   std::vector<sycl::event>{ in_event });

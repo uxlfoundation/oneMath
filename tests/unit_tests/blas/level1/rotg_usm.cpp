@@ -29,9 +29,9 @@
 #include <CL/sycl.hpp>
 #endif
 #include "cblas.h"
-#include "oneapi/mkl/detail/config.hpp"
-#include "oneapi/mkl.hpp"
-#include "onemkl_blas_helper.hpp"
+#include "oneapi/math/detail/config.hpp"
+#include "oneapi/math.hpp"
+#include "onemath_blas_helper.hpp"
 #include "reference_blas_templates.hpp"
 #include "test_common.hpp"
 #include "test_helper.hpp"
@@ -46,7 +46,7 @@ extern std::vector<sycl::device*> devices;
 namespace {
 
 template <typename fp, typename fp_scalar, usm::alloc alloc_type = usm::alloc::shared>
-int test(device* dev, oneapi::mkl::layout layout) {
+int test(device* dev, oneapi::math::layout layout) {
     // Catch asynchronous exceptions.
     auto exception_handler = [](exception_list exceptions) {
         for (std::exception_ptr const& e : exceptions) {
@@ -89,16 +89,16 @@ int test(device* dev, oneapi::mkl::layout layout) {
     fp *a_p, *b_p, *s_p;
     fp_scalar* c_p;
     if constexpr (alloc_type == usm::alloc::shared) {
-        a_p = (fp*)oneapi::mkl::malloc_shared(64, sizeof(fp), *dev, cxt);
-        b_p = (fp*)oneapi::mkl::malloc_shared(64, sizeof(fp), *dev, cxt);
-        s_p = (fp*)oneapi::mkl::malloc_shared(64, sizeof(fp), *dev, cxt);
-        c_p = (fp_scalar*)oneapi::mkl::malloc_shared(64, sizeof(fp_scalar), *dev, cxt);
+        a_p = (fp*)oneapi::math::malloc_shared(64, sizeof(fp), *dev, cxt);
+        b_p = (fp*)oneapi::math::malloc_shared(64, sizeof(fp), *dev, cxt);
+        s_p = (fp*)oneapi::math::malloc_shared(64, sizeof(fp), *dev, cxt);
+        c_p = (fp_scalar*)oneapi::math::malloc_shared(64, sizeof(fp_scalar), *dev, cxt);
     }
     else if constexpr (alloc_type == usm::alloc::device) {
-        a_p = (fp*)oneapi::mkl::malloc_device(64, sizeof(fp), *dev, cxt);
-        b_p = (fp*)oneapi::mkl::malloc_device(64, sizeof(fp), *dev, cxt);
-        s_p = (fp*)oneapi::mkl::malloc_device(64, sizeof(fp), *dev, cxt);
-        c_p = (fp_scalar*)oneapi::mkl::malloc_device(64, sizeof(fp_scalar), *dev, cxt);
+        a_p = (fp*)oneapi::math::malloc_device(64, sizeof(fp), *dev, cxt);
+        b_p = (fp*)oneapi::math::malloc_device(64, sizeof(fp), *dev, cxt);
+        s_p = (fp*)oneapi::math::malloc_device(64, sizeof(fp), *dev, cxt);
+        c_p = (fp_scalar*)oneapi::math::malloc_device(64, sizeof(fp_scalar), *dev, cxt);
     }
     else {
         throw std::runtime_error("Bad alloc_type");
@@ -113,25 +113,25 @@ int test(device* dev, oneapi::mkl::layout layout) {
     try {
 #ifdef CALL_RT_API
         switch (layout) {
-            case oneapi::mkl::layout::col_major:
-                done = oneapi::mkl::blas::column_major::rotg(main_queue, a_p, b_p, c_p, s_p,
-                                                             dependencies);
+            case oneapi::math::layout::col_major:
+                done = oneapi::math::blas::column_major::rotg(main_queue, a_p, b_p, c_p, s_p,
+                                                              dependencies);
                 break;
-            case oneapi::mkl::layout::row_major:
-                done = oneapi::mkl::blas::row_major::rotg(main_queue, a_p, b_p, c_p, s_p,
-                                                          dependencies);
+            case oneapi::math::layout::row_major:
+                done = oneapi::math::blas::row_major::rotg(main_queue, a_p, b_p, c_p, s_p,
+                                                           dependencies);
                 break;
             default: break;
         }
         done.wait();
 #else
         switch (layout) {
-            case oneapi::mkl::layout::col_major:
-                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::mkl::blas::column_major::rotg, a_p, b_p,
-                                        c_p, s_p, dependencies);
+            case oneapi::math::layout::col_major:
+                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::math::blas::column_major::rotg, a_p,
+                                        b_p, c_p, s_p, dependencies);
                 break;
-            case oneapi::mkl::layout::row_major:
-                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::mkl::blas::row_major::rotg, a_p, b_p,
+            case oneapi::math::layout::row_major:
+                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::math::blas::row_major::rotg, a_p, b_p,
                                         c_p, s_p, dependencies);
                 break;
             default: break;
@@ -144,7 +144,7 @@ int test(device* dev, oneapi::mkl::layout layout) {
         print_error_code(e);
     }
 
-    catch (const oneapi::mkl::unimplemented& e) {
+    catch (const oneapi::math::unimplemented& e) {
         return test_skipped;
     }
 
@@ -161,16 +161,16 @@ int test(device* dev, oneapi::mkl::layout layout) {
 
     bool good = good_a && good_b && good_c && good_s;
 
-    oneapi::mkl::free_usm(a_p, cxt);
-    oneapi::mkl::free_usm(b_p, cxt);
-    oneapi::mkl::free_usm(s_p, cxt);
-    oneapi::mkl::free_usm(c_p, cxt);
+    oneapi::math::free_usm(a_p, cxt);
+    oneapi::math::free_usm(b_p, cxt);
+    oneapi::math::free_usm(s_p, cxt);
+    oneapi::math::free_usm(c_p, cxt);
 
     return (int)good;
 }
 
 class RotgUsmTests
-        : public ::testing::TestWithParam<std::tuple<sycl::device*, oneapi::mkl::layout>> {};
+        : public ::testing::TestWithParam<std::tuple<sycl::device*, oneapi::math::layout>> {};
 
 TEST_P(RotgUsmTests, RealSinglePrecision) {
     EXPECT_TRUEORSKIP((test<float, float>(std::get<0>(GetParam()), std::get<1>(GetParam()))));
@@ -201,8 +201,8 @@ TEST_P(RotgUsmTests, ComplexDoublePrecision) {
 
 INSTANTIATE_TEST_SUITE_P(RotgUsmTestSuite, RotgUsmTests,
                          ::testing::Combine(testing::ValuesIn(devices),
-                                            testing::Values(oneapi::mkl::layout::col_major,
-                                                            oneapi::mkl::layout::row_major)),
+                                            testing::Values(oneapi::math::layout::col_major,
+                                                            oneapi::math::layout::row_major)),
                          ::LayoutDeviceNamePrint());
 
 } // anonymous namespace

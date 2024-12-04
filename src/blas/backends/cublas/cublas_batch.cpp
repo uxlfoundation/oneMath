@@ -18,11 +18,11 @@
 **************************************************************************/
 #include "cublas_helper.hpp"
 #include "cublas_task.hpp"
-#include "oneapi/mkl/exceptions.hpp"
-#include "oneapi/mkl/blas/detail/cublas/onemkl_blas_cublas.hpp"
+#include "oneapi/math/exceptions.hpp"
+#include "oneapi/math/blas/detail/cublas/onemath_blas_cublas.hpp"
 
 namespace oneapi {
-namespace mkl {
+namespace math {
 namespace blas {
 namespace cublas {
 namespace column_major {
@@ -155,13 +155,13 @@ inline void gemm_batch_impl(sycl::queue& queue, transpose transa, transpose tran
     cublasGemmAlgo_t cublas_gemm_algo = CUBLAS_GEMM_DEFAULT;
     queue.submit([&](sycl::handler& cgh) {
         if (!verify_support<sycl::half, Ta, Tb, Tc, Ts>(queue, sycl::aspect::fp16)) {
-            throw oneapi::mkl::unimplemented(
+            throw oneapi::math::unimplemented(
                 "blas", "sycl::half", "half is not supported by the device or the sycl compiler");
         }
         auto a_acc = a.template get_access<sycl::access::mode::read>(cgh);
         auto b_acc = b.template get_access<sycl::access::mode::read>(cgh);
         auto c_acc = c.template get_access<sycl::access::mode::read_write>(cgh);
-        onemkl_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
+        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             auto a_ = sc.get_mem<cuTypeA*>(a_acc);
             auto b_ = sc.get_mem<cuTypeB*>(b_acc);
@@ -514,7 +514,7 @@ inline sycl::event gemv_batch(const char* func_name, Func func, sycl::queue& que
     }
     auto done = queue.submit([&](sycl::handler& cgh) {
         cgh.depends_on(dependencies);
-        onemkl_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
+        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             int64_t offset = 0;
             cublasStatus_t err;
@@ -625,14 +625,14 @@ inline sycl::event gemm_batch_strided_usm_impl(sycl::queue& queue, transpose tra
     cublasGemmAlgo_t cublas_gemm_algo = CUBLAS_GEMM_DEFAULT;
     auto done = queue.submit([&](sycl::handler& cgh) {
         if (!verify_support<sycl::half, Ta, Tb, Tc, Ts>(queue, sycl::aspect::fp16)) {
-            throw oneapi::mkl::unimplemented(
+            throw oneapi::math::unimplemented(
                 "blas", "sycl::half", "half is not supported by the device or the sycl compiler");
         }
         int64_t num_events = dependencies.size();
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemkl_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
+        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             cublasStatus_t err;
 #ifdef SYCL_EXT_ONEAPI_ENQUEUE_NATIVE_COMMAND
@@ -711,14 +711,14 @@ inline sycl::event gemm_batch_usm_impl(sycl::queue& queue, transpose* transa, tr
     cublasGemmAlgo_t cublas_gemm_algo = CUBLAS_GEMM_DEFAULT;
     auto done = queue.submit([&](sycl::handler& cgh) {
         if (!verify_support<sycl::half, Ta, Tb, Tc, Ts>(queue, sycl::aspect::fp16)) {
-            throw oneapi::mkl::unimplemented(
+            throw oneapi::math::unimplemented(
                 "blas", "sycl::half", "half is not supported by the device or the sycl compiler");
         }
         int64_t num_events = dependencies.size();
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemkl_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
+        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             int64_t offset = 0;
             cublasStatus_t err;
@@ -832,7 +832,7 @@ inline sycl::event trsm_batch(const char* func_name, Func func, sycl::queue& que
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemkl_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
+        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             int64_t offset = 0;
             cublasStatus_t err;
@@ -1888,5 +1888,5 @@ sycl::event imatcopy_batch(sycl::queue& queue, transpose* trans, int64_t* m, int
 } // namespace row_major
 } // namespace cublas
 } // namespace blas
-} // namespace mkl
+} // namespace math
 } // namespace oneapi

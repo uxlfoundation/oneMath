@@ -38,7 +38,7 @@ Usage:
 
 Example:
 
-    {script}  include/oneapi/mkl/blas/detail/mklgpu mklgpu
+    {script}  include/oneapi/math/blas/detail/mklgpu mklgpu
 '''.format(script = argv[0]))
 
 if len(argv) <= 2:
@@ -72,7 +72,7 @@ out_file.write("""#
 # generated file
 #
 
-set(LIB_NAME onemkl_blas_{libname})
+set(LIB_NAME onemath_blas_{libname})
 set(LIB_OBJ ${{LIB_NAME}}_obj)
 
 # Add third-party library
@@ -84,7 +84,7 @@ add_library(${{LIB_OBJ}} OBJECT
 
 for f in file_list:
     if re.search('_dyn.c', f):
-        out_file.write("""  $<$<BOOL:${{ONEMKL_BUILD_SHARED_LIBS}}>: {filename}>
+        out_file.write("""  $<$<BOOL:${{ONEMATH_BUILD_SHARED_LIBS}}>: {filename}>
 """.format(filename=f))
     else:
         out_file.write("""  {filename}
@@ -99,7 +99,7 @@ target_include_directories(${{LIB_OBJ}}
 )
 
 target_link_libraries(${{LIB_OBJ}}
-    PUBLIC ONEMKL::SYCL::SYCL
+    PUBLIC ONEMATH::SYCL::SYCL
     # Add third party library to link with here
 )
 
@@ -118,8 +118,8 @@ set_target_properties(${{LIB_NAME}} PROPERTIES
 list(APPEND CMAKE_BUILD_RPATH $<TARGET_FILE_DIR:${{LIB_NAME}}>)
 
 # Add the library to install package
-install(TARGETS ${{LIB_OBJ}} EXPORT oneMKLTargets)
-install(TARGETS ${{LIB_NAME}} EXPORT oneMKLTargets
+install(TARGETS ${{LIB_OBJ}} EXPORT oneMathTargets)
+install(TARGETS ${{LIB_NAME}} EXPORT oneMathTargets
   RUNTIME DESTINATION bin
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib

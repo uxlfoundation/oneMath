@@ -26,7 +26,7 @@
 #endif
 
 namespace oneapi {
-namespace mkl {
+namespace math {
 namespace lapack {
 namespace rocsolver {
 
@@ -37,7 +37,7 @@ namespace rocsolver {
  * takes place if no other element in the container has a key equivalent to
  * the one being emplaced (keys in a map container are unique).
  */
-#ifdef ONEMKL_PI_INTERFACE_REMOVED
+#ifdef ONEMATH_PI_INTERFACE_REMOVED
 thread_local rocsolver_handle<ur_context_handle_t> RocsolverScopedContextHandler::handle_helper =
     rocsolver_handle<ur_context_handle_t>{};
 #else
@@ -100,7 +100,7 @@ rocblas_handle RocsolverScopedContextHandler::get_handle(const sycl::queue& queu
     hipError_t hipErr;
     hipCtx_t desired;
     HIP_ERROR_FUNC(hipDevicePrimaryCtxRetain, hipErr, &desired, hipDevice);
-#ifdef ONEMKL_PI_INTERFACE_REMOVED
+#ifdef ONEMATH_PI_INTERFACE_REMOVED
     auto piPlacedContext_ = reinterpret_cast<ur_context_handle_t>(desired);
 #else
     auto piPlacedContext_ = reinterpret_cast<pi_context>(desired);
@@ -151,5 +151,5 @@ sycl::context RocsolverScopedContextHandler::get_context(const sycl::queue& queu
 
 } // namespace rocsolver
 } // namespace lapack
-} // namespace mkl
+} // namespace math
 } // namespace oneapi

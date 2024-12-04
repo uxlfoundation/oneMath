@@ -17,7 +17,7 @@
 *
 **************************************************************************/
 
-#include "oneapi/mkl/sparse_blas/detail/cusparse/onemkl_sparse_blas_cusparse.hpp"
+#include "oneapi/math/sparse_blas/detail/cusparse/onemath_sparse_blas_cusparse.hpp"
 
 #include "sparse_blas/backends/cusparse/cusparse_error.hpp"
 #include "sparse_blas/backends/cusparse/cusparse_handles.hpp"
@@ -29,7 +29,7 @@
 #include "sparse_blas/matrix_view_comparison.hpp"
 #include "sparse_blas/sycl_helper.hpp"
 
-namespace oneapi::mkl::sparse {
+namespace oneapi::math::sparse {
 
 // Complete the definition of the incomplete type
 struct spmm_descr {
@@ -43,8 +43,8 @@ struct spmm_descr {
     std::size_t temp_buffer_size = 0;
     bool buffer_size_called = false;
     bool optimized_called = false;
-    oneapi::mkl::transpose last_optimized_opA;
-    oneapi::mkl::transpose last_optimized_opB;
+    transpose last_optimized_opA;
+    transpose last_optimized_opB;
     matrix_view last_optimized_A_view;
     matrix_handle_t last_optimized_A_handle;
     dense_matrix_handle_t last_optimized_B_handle;
@@ -52,9 +52,9 @@ struct spmm_descr {
     spmm_alg last_optimized_alg;
 };
 
-} // namespace oneapi::mkl::sparse
+} // namespace oneapi::math::sparse
 
-namespace oneapi::mkl::sparse::cusparse {
+namespace oneapi::math::sparse::cusparse {
 
 namespace detail {
 
@@ -71,42 +71,42 @@ inline auto get_cuda_spmm_alg(spmm_alg alg) {
     }
 }
 
-void check_valid_spmm(const std::string& function_name, oneapi::mkl::transpose opA,
-                      oneapi::mkl::transpose opB, matrix_view A_view, matrix_handle_t A_handle,
-                      dense_matrix_handle_t B_handle, dense_matrix_handle_t C_handle,
-                      bool is_alpha_host_accessible, bool is_beta_host_accessible, spmm_alg alg) {
+void check_valid_spmm(const std::string& function_name, transpose opA, transpose opB,
+                      matrix_view A_view, matrix_handle_t A_handle, dense_matrix_handle_t B_handle,
+                      dense_matrix_handle_t C_handle, bool is_alpha_host_accessible,
+                      bool is_beta_host_accessible, spmm_alg alg) {
     check_valid_spmm_common(function_name, A_view, A_handle, B_handle, C_handle,
                             is_alpha_host_accessible, is_beta_host_accessible);
     check_valid_matrix_properties(function_name, A_handle);
-    if (alg == spmm_alg::csr_alg3 && opA != oneapi::mkl::transpose::nontrans) {
-        throw mkl::unimplemented(
+    if (alg == spmm_alg::csr_alg3 && opA != transpose::nontrans) {
+        throw math::unimplemented(
             "sparse_blas", function_name,
             "The backend does not support spmm with the algorithm `spmm_alg::csr_alg3` if `opA` is not `transpose::nontrans`.");
     }
-    if (alg == spmm_alg::csr_alg3 && opB == oneapi::mkl::transpose::conjtrans) {
-        throw mkl::unimplemented(
+    if (alg == spmm_alg::csr_alg3 && opB == transpose::conjtrans) {
+        throw math::unimplemented(
             "sparse_blas", function_name,
             "The backend does not support spmm with the algorithm `spmm_alg::csr_alg3` if `opB` is `transpose::conjtrans`.");
     }
-    if (alg == spmm_alg::csr_alg3 && opB == oneapi::mkl::transpose::trans &&
+    if (alg == spmm_alg::csr_alg3 && opB == transpose::trans &&
         A_handle->get_value_type() == data_type::real_fp64) {
         // TODO: Remove once the issue is fixed: https://forums.developer.nvidia.com/t/cusparse-spmm-sample-failing-with-misaligned-address/311022
-        throw mkl::unimplemented(
+        throw math::unimplemented(
             "sparse_blas", function_name,
             "The backend does not support spmm with the algorithm `spmm_alg::csr_alg3` if `opB` is `transpose::trans` and the real fp64 precision is used.");
     }
 }
 
-inline void common_spmm_optimize(oneapi::mkl::transpose opA, oneapi::mkl::transpose opB,
-                                 bool is_alpha_host_accessible, matrix_view A_view,
-                                 matrix_handle_t A_handle, dense_matrix_handle_t B_handle,
-                                 bool is_beta_host_accessible, dense_matrix_handle_t C_handle,
-                                 spmm_alg alg, spmm_descr_t spmm_descr) {
+inline void common_spmm_optimize(transpose opA, transpose opB, bool is_alpha_host_accessible,
+                                 matrix_view A_view, matrix_handle_t A_handle,
+                                 dense_matrix_handle_t B_handle, bool is_beta_host_accessible,
+                                 dense_matrix_handle_t C_handle, spmm_alg alg,
+                                 spmm_descr_t spmm_descr) {
     check_valid_spmm("spmm_optimize", opA, opB, A_view, A_handle, B_handle, C_handle,
                      is_alpha_host_accessible, is_beta_host_accessible, alg);
     if (!spmm_descr->buffer_size_called) {
-        throw mkl::uninitialized("sparse_blas", "spmm_optimize",
-                                 "spmm_buffer_size must be called before spmm_optimize.");
+        throw math::uninitialized("sparse_blas", "spmm_optimize",
+                                  "spmm_buffer_size must be called before spmm_optimize.");
     }
     spmm_descr->optimized_called = true;
     spmm_descr->last_optimized_opA = opA;
@@ -118,9 +118,8 @@ inline void common_spmm_optimize(oneapi::mkl::transpose opA, oneapi::mkl::transp
     spmm_descr->last_optimized_alg = alg;
 }
 
-void spmm_optimize_impl(cusparseHandle_t cu_handle, oneapi::mkl::transpose opA,
-                        oneapi::mkl::transpose opB, const void* alpha, matrix_handle_t A_handle,
-                        dense_matrix_handle_t B_handle, const void* beta,
+void spmm_optimize_impl(cusparseHandle_t cu_handle, transpose opA, transpose opB, const void* alpha,
+                        matrix_handle_t A_handle, dense_matrix_handle_t B_handle, const void* beta,
                         dense_matrix_handle_t C_handle, spmm_alg alg, void* workspace_ptr,
                         bool is_alpha_host_accessible) {
     auto cu_a = A_handle->backend_handle;
@@ -180,11 +179,10 @@ sycl::event release_spmm_descr(sycl::queue& queue, spmm_descr_t spmm_descr,
     return event;
 }
 
-void spmm_buffer_size(sycl::queue& queue, oneapi::mkl::transpose opA, oneapi::mkl::transpose opB,
-                      const void* alpha, matrix_view A_view, matrix_handle_t A_handle,
-                      dense_matrix_handle_t B_handle, const void* beta,
-                      dense_matrix_handle_t C_handle, spmm_alg alg, spmm_descr_t spmm_descr,
-                      std::size_t& temp_buffer_size) {
+void spmm_buffer_size(sycl::queue& queue, transpose opA, transpose opB, const void* alpha,
+                      matrix_view A_view, matrix_handle_t A_handle, dense_matrix_handle_t B_handle,
+                      const void* beta, dense_matrix_handle_t C_handle, spmm_alg alg,
+                      spmm_descr_t spmm_descr, std::size_t& temp_buffer_size) {
     bool is_alpha_host_accessible = detail::is_ptr_accessible_on_host(queue, alpha);
     bool is_beta_host_accessible = detail::is_ptr_accessible_on_host(queue, beta);
     detail::check_valid_spmm(__func__, opA, opB, A_view, A_handle, B_handle, C_handle,
@@ -213,10 +211,10 @@ void spmm_buffer_size(sycl::queue& queue, oneapi::mkl::transpose opA, oneapi::mk
     spmm_descr->buffer_size_called = true;
 }
 
-void spmm_optimize(sycl::queue& queue, oneapi::mkl::transpose opA, oneapi::mkl::transpose opB,
-                   const void* alpha, matrix_view A_view, matrix_handle_t A_handle,
-                   dense_matrix_handle_t B_handle, const void* beta, dense_matrix_handle_t C_handle,
-                   spmm_alg alg, spmm_descr_t spmm_descr, sycl::buffer<std::uint8_t, 1> workspace) {
+void spmm_optimize(sycl::queue& queue, transpose opA, transpose opB, const void* alpha,
+                   matrix_view A_view, matrix_handle_t A_handle, dense_matrix_handle_t B_handle,
+                   const void* beta, dense_matrix_handle_t C_handle, spmm_alg alg,
+                   spmm_descr_t spmm_descr, sycl::buffer<std::uint8_t, 1> workspace) {
     bool is_alpha_host_accessible = detail::is_ptr_accessible_on_host(queue, alpha);
     bool is_beta_host_accessible = detail::is_ptr_accessible_on_host(queue, beta);
     if (!A_handle->all_use_buffer()) {
@@ -240,12 +238,11 @@ void spmm_optimize(sycl::queue& queue, oneapi::mkl::transpose opA, oneapi::mkl::
     detail::dispatch_submit(__func__, queue, functor, A_handle, workspace, B_handle, C_handle);
 }
 
-sycl::event spmm_optimize(sycl::queue& queue, oneapi::mkl::transpose opA,
-                          oneapi::mkl::transpose opB, const void* alpha, matrix_view A_view,
-                          matrix_handle_t A_handle, dense_matrix_handle_t B_handle,
-                          const void* beta, dense_matrix_handle_t C_handle, spmm_alg alg,
-                          spmm_descr_t spmm_descr, void* workspace,
-                          const std::vector<sycl::event>& dependencies) {
+sycl::event spmm_optimize(sycl::queue& queue, transpose opA, transpose opB, const void* alpha,
+                          matrix_view A_view, matrix_handle_t A_handle,
+                          dense_matrix_handle_t B_handle, const void* beta,
+                          dense_matrix_handle_t C_handle, spmm_alg alg, spmm_descr_t spmm_descr,
+                          void* workspace, const std::vector<sycl::event>& dependencies) {
     bool is_alpha_host_accessible = detail::is_ptr_accessible_on_host(queue, alpha);
     bool is_beta_host_accessible = detail::is_ptr_accessible_on_host(queue, beta);
     if (A_handle->all_use_buffer()) {
@@ -268,11 +265,10 @@ sycl::event spmm_optimize(sycl::queue& queue, oneapi::mkl::transpose opA,
                                    C_handle);
 }
 
-sycl::event spmm(sycl::queue& queue, oneapi::mkl::transpose opA, oneapi::mkl::transpose opB,
-                 const void* alpha, matrix_view A_view, matrix_handle_t A_handle,
-                 dense_matrix_handle_t B_handle, const void* beta, dense_matrix_handle_t C_handle,
-                 spmm_alg alg, spmm_descr_t spmm_descr,
-                 const std::vector<sycl::event>& dependencies) {
+sycl::event spmm(sycl::queue& queue, transpose opA, transpose opB, const void* alpha,
+                 matrix_view A_view, matrix_handle_t A_handle, dense_matrix_handle_t B_handle,
+                 const void* beta, dense_matrix_handle_t C_handle, spmm_alg alg,
+                 spmm_descr_t spmm_descr, const std::vector<sycl::event>& dependencies) {
     bool is_alpha_host_accessible = detail::is_ptr_accessible_on_host(queue, alpha);
     bool is_beta_host_accessible = detail::is_ptr_accessible_on_host(queue, beta);
     detail::check_valid_spmm(__func__, opA, opB, A_view, A_handle, B_handle, C_handle,
@@ -282,8 +278,8 @@ sycl::event spmm(sycl::queue& queue, oneapi::mkl::transpose opA, oneapi::mkl::tr
     }
 
     if (!spmm_descr->optimized_called) {
-        throw mkl::uninitialized("sparse_blas", __func__,
-                                 "spmm_optimize must be called before spmm.");
+        throw math::uninitialized("sparse_blas", __func__,
+                                  "spmm_optimize must be called before spmm.");
     }
     CHECK_DESCR_MATCH(spmm_descr, opA, "spmm_optimize");
     CHECK_DESCR_MATCH(spmm_descr, opB, "spmm_optimize");
@@ -334,4 +330,4 @@ sycl::event spmm(sycl::queue& queue, oneapi::mkl::transpose opA, oneapi::mkl::tr
     }
 }
 
-} // namespace oneapi::mkl::sparse::cusparse
+} // namespace oneapi::math::sparse::cusparse

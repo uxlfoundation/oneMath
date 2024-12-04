@@ -17,8 +17,8 @@
 *
 **************************************************************************/
 
-#ifndef _ONEMKL_SRC_SPARSE_BLAS_SYCL_HELPER_HPP_
-#define _ONEMKL_SRC_SPARSE_BLAS_SYCL_HELPER_HPP_
+#ifndef _ONEMATH_SRC_SPARSE_BLAS_SYCL_HELPER_HPP_
+#define _ONEMATH_SRC_SPARSE_BLAS_SYCL_HELPER_HPP_
 
 #if __has_include(<sycl/sycl.hpp>)
 #include <sycl/sycl.hpp>
@@ -26,7 +26,7 @@
 #include <CL/sycl.hpp>
 #endif
 
-namespace oneapi::mkl::sparse::detail {
+namespace oneapi::math::sparse::detail {
 
 /// Return whether a pointer is accessible on the host
 template <typename T>
@@ -75,6 +75,6 @@ inline sycl::event collapse_dependencies(sycl::queue& queue,
     });
 }
 
-} // namespace oneapi::mkl::sparse::detail
+} // namespace oneapi::math::sparse::detail
 
-#endif // _ONEMKL_SRC_SPARSE_BLAS_SYCL_HELPER_HPP_
+#endif // _ONEMATH_SRC_SPARSE_BLAS_SYCL_HELPER_HPP_

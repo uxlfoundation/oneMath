@@ -29,9 +29,9 @@
 #include <CL/sycl.hpp>
 #endif
 #include "cblas.h"
-#include "oneapi/mkl/detail/config.hpp"
-#include "oneapi/mkl.hpp"
-#include "onemkl_blas_helper.hpp"
+#include "oneapi/math/detail/config.hpp"
+#include "oneapi/math.hpp"
+#include "onemath_blas_helper.hpp"
 #include "reference_blas_templates.hpp"
 #include "test_common.hpp"
 #include "test_helper.hpp"
@@ -46,7 +46,7 @@ extern std::vector<sycl::device*> devices;
 namespace {
 
 template <typename fp, usm::alloc alloc_type = usm::alloc::shared>
-int test(device* dev, oneapi::mkl::layout layout) {
+int test(device* dev, oneapi::math::layout layout) {
     // Catch asynchronous exceptions.
     auto exception_handler = [](exception_list exceptions) {
         for (std::exception_ptr const& e : exceptions) {
@@ -82,14 +82,14 @@ int test(device* dev, oneapi::mkl::layout layout) {
 
     fp *d1_p, *d2_p, *x1_p;
     if constexpr (alloc_type == usm::alloc::device) {
-        d1_p = (fp*)oneapi::mkl::malloc_device(64, sizeof(fp), *dev, cxt);
-        d2_p = (fp*)oneapi::mkl::malloc_device(64, sizeof(fp), *dev, cxt);
-        x1_p = (fp*)oneapi::mkl::malloc_device(64, sizeof(fp), *dev, cxt);
+        d1_p = (fp*)oneapi::math::malloc_device(64, sizeof(fp), *dev, cxt);
+        d2_p = (fp*)oneapi::math::malloc_device(64, sizeof(fp), *dev, cxt);
+        x1_p = (fp*)oneapi::math::malloc_device(64, sizeof(fp), *dev, cxt);
     }
     else if constexpr (alloc_type == usm::alloc::shared) {
-        d1_p = (fp*)oneapi::mkl::malloc_shared(64, sizeof(fp), *dev, cxt);
-        d2_p = (fp*)oneapi::mkl::malloc_shared(64, sizeof(fp), *dev, cxt);
-        x1_p = (fp*)oneapi::mkl::malloc_shared(64, sizeof(fp), *dev, cxt);
+        d1_p = (fp*)oneapi::math::malloc_shared(64, sizeof(fp), *dev, cxt);
+        d2_p = (fp*)oneapi::math::malloc_shared(64, sizeof(fp), *dev, cxt);
+        x1_p = (fp*)oneapi::math::malloc_shared(64, sizeof(fp), *dev, cxt);
     }
     else {
         throw std::runtime_error("Bad alloc_type");
@@ -108,26 +108,26 @@ int test(device* dev, oneapi::mkl::layout layout) {
     try {
 #ifdef CALL_RT_API
         switch (layout) {
-            case oneapi::mkl::layout::col_major:
-                done = oneapi::mkl::blas::column_major::rotmg(main_queue, d1_p, d2_p, x1_p, y1,
-                                                              param.data(), dependencies);
+            case oneapi::math::layout::col_major:
+                done = oneapi::math::blas::column_major::rotmg(main_queue, d1_p, d2_p, x1_p, y1,
+                                                               param.data(), dependencies);
                 break;
-            case oneapi::mkl::layout::row_major:
-                done = oneapi::mkl::blas::row_major::rotmg(main_queue, d1_p, d2_p, x1_p, y1,
-                                                           param.data(), dependencies);
+            case oneapi::math::layout::row_major:
+                done = oneapi::math::blas::row_major::rotmg(main_queue, d1_p, d2_p, x1_p, y1,
+                                                            param.data(), dependencies);
                 break;
             default: break;
         }
         done.wait();
 #else
         switch (layout) {
-            case oneapi::mkl::layout::col_major:
-                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::mkl::blas::column_major::rotmg, d1_p,
+            case oneapi::math::layout::col_major:
+                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::math::blas::column_major::rotmg, d1_p,
                                         d2_p, x1_p, y1, param.data(), dependencies);
                 break;
-            case oneapi::mkl::layout::row_major:
-                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::mkl::blas::row_major::rotmg, d1_p, d2_p,
-                                        x1_p, y1, param.data(), dependencies);
+            case oneapi::math::layout::row_major:
+                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::math::blas::row_major::rotmg, d1_p,
+                                        d2_p, x1_p, y1, param.data(), dependencies);
                 break;
             default: break;
         }
@@ -139,7 +139,7 @@ int test(device* dev, oneapi::mkl::layout layout) {
         print_error_code(e);
     }
 
-    catch (const oneapi::mkl::unimplemented& e) {
+    catch (const oneapi::math::unimplemented& e) {
         return test_skipped;
     }
 
@@ -205,15 +205,15 @@ int test(device* dev, oneapi::mkl::layout layout) {
     bool good =
         good_d1 && good_d2 && good_x1 && flag_good && h11_good && h12_good && h21_good && h22_good;
 
-    oneapi::mkl::free_usm(d1_p, cxt);
-    oneapi::mkl::free_usm(d2_p, cxt);
-    oneapi::mkl::free_usm(x1_p, cxt);
+    oneapi::math::free_usm(d1_p, cxt);
+    oneapi::math::free_usm(d2_p, cxt);
+    oneapi::math::free_usm(x1_p, cxt);
 
     return (int)good;
 }
 
 class RotmgUsmTests
-        : public ::testing::TestWithParam<std::tuple<sycl::device*, oneapi::mkl::layout>> {};
+        : public ::testing::TestWithParam<std::tuple<sycl::device*, oneapi::math::layout>> {};
 
 TEST_P(RotmgUsmTests, RealSinglePrecision) {
     EXPECT_TRUEORSKIP(test<float>(std::get<0>(GetParam()), std::get<1>(GetParam())));
@@ -230,8 +230,8 @@ TEST_P(RotmgUsmTests, RealDoublePrecision) {
 
 INSTANTIATE_TEST_SUITE_P(RotmgUsmTestSuite, RotmgUsmTests,
                          ::testing::Combine(testing::ValuesIn(devices),
-                                            testing::Values(oneapi::mkl::layout::col_major,
-                                                            oneapi::mkl::layout::row_major)),
+                                            testing::Values(oneapi::math::layout::col_major,
+                                                            oneapi::math::layout::row_major)),
                          ::LayoutDeviceNamePrint());
 
 } // anonymous namespace

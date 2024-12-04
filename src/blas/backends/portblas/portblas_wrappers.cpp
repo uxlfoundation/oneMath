@@ -4,11 +4,11 @@
 
 #include "blas/function_table.hpp"
 
-#include "oneapi/mkl/blas/detail/portblas/onemkl_blas_portblas.hpp"
+#include "oneapi/math/blas/detail/portblas/onemath_blas_portblas.hpp"
 
 #define WRAPPER_VERSION 1
 
-extern "C" ONEMKL_EXPORT blas_function_table_t mkl_blas_table = {
+extern "C" ONEMATH_EXPORT blas_function_table_t onemath_blas_table = {
     WRAPPER_VERSION,
 #define BACKEND portblas
 #define MAJOR   column_major

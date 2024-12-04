@@ -1,5 +1,5 @@
 /*******************************************************************************
-* Copyright 2023 Intel Corporation
+* Copyright 2024 Intel Corporation
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -17,23 +17,15 @@
 * SPDX-License-Identifier: Apache-2.0
 *******************************************************************************/
 
-#ifndef _ONEMKL_DFT_HPP_
-#define _ONEMKL_DFT_HPP_
+#ifndef ONEMATH_MKL_DFT_HPP
+#define ONEMATH_MKL_DFT_HPP
 
-#if __has_include(<sycl/sycl.hpp>)
-#include <sycl/sycl.hpp>
-#else
-#include <CL/sycl.hpp>
-#endif
-#include <complex>
-#include <cstdint>
+// Deprecated header is planned to be removed late 2025.
+#pragma message( \
+    "Header `oneapi/mkl/dft.hpp` is deprecated, please use `oneapi/math/dft.hpp` instead")
 
-#include "oneapi/mkl/detail/config.hpp"
-#include "oneapi/mkl/detail/get_device_id.hpp"
-#include "oneapi/mkl/dft/detail/dft_loader.hpp"
+#include "oneapi/math/dft.hpp"
 
-#include "oneapi/mkl/dft/descriptor.hpp"
-#include "oneapi/mkl/dft/forward.hpp"
-#include "oneapi/mkl/dft/backward.hpp"
+#include "namespace_alias.hpp"
 
-#endif // _ONEMKL_DFT_HPP_
+#endif // ONEMATH_MKL_DFT_HPP

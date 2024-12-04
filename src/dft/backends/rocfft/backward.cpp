@@ -23,10 +23,10 @@
 #include <CL/sycl.hpp>
 #endif
 
-#include "oneapi/mkl/exceptions.hpp"
+#include "oneapi/math/exceptions.hpp"
 
-#include "oneapi/mkl/dft/detail/rocfft/onemkl_dft_rocfft.hpp"
-#include "oneapi/mkl/dft/descriptor.hpp"
+#include "oneapi/math/dft/detail/rocfft/onemath_dft_rocfft.hpp"
+#include "oneapi/math/dft/descriptor.hpp"
 
 #include "execute_helper.hpp"
 #include "../../execute_helper_generic.hpp"
@@ -35,7 +35,7 @@
 #include <rocfft.h>
 #include <hip/hip_runtime_api.h>
 
-namespace oneapi::mkl::dft::rocfft {
+namespace oneapi::math::dft::rocfft {
 namespace detail {
 //forward declaration
 template <dft::precision prec, dft::domain dom>
@@ -55,8 +55,8 @@ rocfft_execution_info get_bwd_info(dft::detail::commit_impl<prec, dom>* commit) 
 
 //In-place transform
 template <typename descriptor_type>
-ONEMKL_EXPORT void compute_backward(descriptor_type& desc,
-                                    sycl::buffer<fwd<descriptor_type>, 1>& inout) {
+ONEMATH_EXPORT void compute_backward(descriptor_type& desc,
+                                     sycl::buffer<fwd<descriptor_type>, 1>& inout) {
     const std::string func_name = "compute_backward(desc, inout)";
     detail::expect_config<dft::config_param::PLACEMENT, dft::config_value::INPLACE>(
         desc, "Unexpected value for placement");
@@ -70,7 +70,7 @@ ONEMKL_EXPORT void compute_backward(descriptor_type& desc,
         offsets[0] *= 2; // offset is supplied in complex but we offset scalar pointer
     }
     if (offsets[0] != offsets[1]) {
-        throw oneapi::mkl::unimplemented(
+        throw oneapi::math::unimplemented(
             "DFT", func_name,
             "rocFFT requires input and output offsets (first value in strides) to be equal for in-place transforms!");
     }
@@ -92,9 +92,9 @@ ONEMKL_EXPORT void compute_backward(descriptor_type& desc,
 
 //In-place transform, using config_param::COMPLEX_STORAGE=config_value::REAL_REAL data format
 template <typename descriptor_type>
-ONEMKL_EXPORT void compute_backward(descriptor_type& desc,
-                                    sycl::buffer<scalar<descriptor_type>, 1>& inout_re,
-                                    sycl::buffer<scalar<descriptor_type>, 1>& inout_im) {
+ONEMATH_EXPORT void compute_backward(descriptor_type& desc,
+                                     sycl::buffer<scalar<descriptor_type>, 1>& inout_re,
+                                     sycl::buffer<scalar<descriptor_type>, 1>& inout_im) {
     const std::string func_name = "compute_backward(desc, inout_re, inout_im)";
     auto commit = detail::checked_get_commit(desc);
     auto queue = commit->get_queue();
@@ -103,7 +103,7 @@ ONEMKL_EXPORT void compute_backward(descriptor_type& desc,
     auto offsets = detail::get_offsets_bwd(commit);
 
     if (offsets[0] != offsets[1]) {
-        throw oneapi::mkl::unimplemented(
+        throw oneapi::math::unimplemented(
             "DFT", func_name,
             "rocFFT requires input and output offsets (first value in strides) to be equal for in-place transforms!");
     }
@@ -131,9 +131,9 @@ ONEMKL_EXPORT void compute_backward(descriptor_type& desc,
 
 //Out-of-place transform
 template <typename descriptor_type>
-ONEMKL_EXPORT void compute_backward(descriptor_type& desc,
-                                    sycl::buffer<bwd<descriptor_type>, 1>& in,
-                                    sycl::buffer<fwd<descriptor_type>, 1>& out) {
+ONEMATH_EXPORT void compute_backward(descriptor_type& desc,
+                                     sycl::buffer<bwd<descriptor_type>, 1>& in,
+                                     sycl::buffer<fwd<descriptor_type>, 1>& out) {
     detail::expect_config<dft::config_param::PLACEMENT, dft::config_value::NOT_INPLACE>(
         desc, "Unexpected value for placement");
     auto commit = detail::checked_get_commit(desc);
@@ -164,11 +164,11 @@ ONEMKL_EXPORT void compute_backward(descriptor_type& desc,
 
 //Out-of-place transform, using config_param::COMPLEX_STORAGE=config_value::REAL_REAL data format
 template <typename descriptor_type>
-ONEMKL_EXPORT void compute_backward(descriptor_type& desc,
-                                    sycl::buffer<scalar<descriptor_type>, 1>& in_re,
-                                    sycl::buffer<scalar<descriptor_type>, 1>& in_im,
-                                    sycl::buffer<scalar<descriptor_type>, 1>& out_re,
-                                    sycl::buffer<scalar<descriptor_type>, 1>& out_im) {
+ONEMATH_EXPORT void compute_backward(descriptor_type& desc,
+                                     sycl::buffer<scalar<descriptor_type>, 1>& in_re,
+                                     sycl::buffer<scalar<descriptor_type>, 1>& in_im,
+                                     sycl::buffer<scalar<descriptor_type>, 1>& out_re,
+                                     sycl::buffer<scalar<descriptor_type>, 1>& out_im) {
     auto commit = detail::checked_get_commit(desc);
     auto queue = commit->get_queue();
     auto plan = detail::get_bwd_plan(commit);
@@ -212,8 +212,8 @@ ONEMKL_EXPORT void compute_backward(descriptor_type& desc,
 
 //In-place transform
 template <typename descriptor_type>
-ONEMKL_EXPORT sycl::event compute_backward(descriptor_type& desc, fwd<descriptor_type>* inout,
-                                           const std::vector<sycl::event>& deps) {
+ONEMATH_EXPORT sycl::event compute_backward(descriptor_type& desc, fwd<descriptor_type>* inout,
+                                            const std::vector<sycl::event>& deps) {
     const std::string func_name = "compute_backward(desc, inout, deps)";
     detail::expect_config<dft::config_param::PLACEMENT, dft::config_value::INPLACE>(
         desc, "Unexpected value for placement");
@@ -227,7 +227,7 @@ ONEMKL_EXPORT sycl::event compute_backward(descriptor_type& desc, fwd<descriptor
         offsets[0] *= 2; // offset is supplied in complex but we offset scalar pointer
     }
     if (offsets[0] != offsets[1]) {
-        throw oneapi::mkl::unimplemented(
+        throw oneapi::math::unimplemented(
             "DFT", func_name,
             "rocFFT requires input and output offsets (first value in strides) to be equal for in-place transforms!");
     }
@@ -250,9 +250,10 @@ ONEMKL_EXPORT sycl::event compute_backward(descriptor_type& desc, fwd<descriptor
 
 //In-place transform, using config_param::COMPLEX_STORAGE=config_value::REAL_REAL data format
 template <typename descriptor_type>
-ONEMKL_EXPORT sycl::event compute_backward(descriptor_type& desc, scalar<descriptor_type>* inout_re,
-                                           scalar<descriptor_type>* inout_im,
-                                           const std::vector<sycl::event>& deps) {
+ONEMATH_EXPORT sycl::event compute_backward(descriptor_type& desc,
+                                            scalar<descriptor_type>* inout_re,
+                                            scalar<descriptor_type>* inout_im,
+                                            const std::vector<sycl::event>& deps) {
     const std::string func_name = "compute_backward(desc, inout_re, inout_im, deps)";
     auto commit = detail::checked_get_commit(desc);
     auto queue = commit->get_queue();
@@ -261,7 +262,7 @@ ONEMKL_EXPORT sycl::event compute_backward(descriptor_type& desc, scalar<descrip
     auto offsets = detail::get_offsets_bwd(commit);
 
     if (offsets[0] != offsets[1]) {
-        throw oneapi::mkl::unimplemented(
+        throw oneapi::math::unimplemented(
             "DFT", func_name,
             "rocFFT requires input and output offsets (first value in strides) to be equal for in-place transforms!");
     }
@@ -283,9 +284,9 @@ ONEMKL_EXPORT sycl::event compute_backward(descriptor_type& desc, scalar<descrip
 
 //Out-of-place transform
 template <typename descriptor_type>
-ONEMKL_EXPORT sycl::event compute_backward(descriptor_type& desc, bwd<descriptor_type>* in,
-                                           fwd<descriptor_type>* out,
-                                           const std::vector<sycl::event>& deps) {
+ONEMATH_EXPORT sycl::event compute_backward(descriptor_type& desc, bwd<descriptor_type>* in,
+                                            fwd<descriptor_type>* out,
+                                            const std::vector<sycl::event>& deps) {
     detail::expect_config<dft::config_param::PLACEMENT, dft::config_value::NOT_INPLACE>(
         desc, "Unexpected value for placement");
     auto commit = detail::checked_get_commit(desc);
@@ -316,11 +317,11 @@ ONEMKL_EXPORT sycl::event compute_backward(descriptor_type& desc, bwd<descriptor
 
 //Out-of-place transform, using config_param::COMPLEX_STORAGE=config_value::REAL_REAL data format
 template <typename descriptor_type>
-ONEMKL_EXPORT sycl::event compute_backward(descriptor_type& desc, scalar<descriptor_type>* in_re,
-                                           scalar<descriptor_type>* in_im,
-                                           scalar<descriptor_type>* out_re,
-                                           scalar<descriptor_type>* out_im,
-                                           const std::vector<sycl::event>& deps) {
+ONEMATH_EXPORT sycl::event compute_backward(descriptor_type& desc, scalar<descriptor_type>* in_re,
+                                            scalar<descriptor_type>* in_im,
+                                            scalar<descriptor_type>* out_re,
+                                            scalar<descriptor_type>* out_im,
+                                            const std::vector<sycl::event>& deps) {
     auto commit = detail::checked_get_commit(desc);
     auto queue = commit->get_queue();
     auto plan = detail::get_bwd_plan(commit);
@@ -349,4 +350,4 @@ ONEMKL_EXPORT sycl::event compute_backward(descriptor_type& desc, scalar<descrip
 // Template function instantiations
 #include "dft/backends/backend_backward_instantiations.cxx"
 
-} // namespace oneapi::mkl::dft::rocfft
+} // namespace oneapi::math::dft::rocfft

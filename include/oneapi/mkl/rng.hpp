@@ -1,5 +1,5 @@
 /*******************************************************************************
-* Copyright 2020-2021 Intel Corporation
+* Copyright 2024 Intel Corporation
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -17,25 +17,15 @@
 * SPDX-License-Identifier: Apache-2.0
 *******************************************************************************/
 
-#ifndef _ONEMKL_RNG_HPP_
-#define _ONEMKL_RNG_HPP_
+#ifndef ONEMATH_MKL_RNG_HPP
+#define ONEMATH_MKL_RNG_HPP
 
-#if __has_include(<sycl/sycl.hpp>)
-#include <sycl/sycl.hpp>
-#else
-#include <CL/sycl.hpp>
-#endif
-#include <complex>
-#include <cstdint>
+// Deprecated header is planned to be removed late 2025.
+#pragma message( \
+    "Header `oneapi/mkl/rng.hpp` is deprecated, please use `oneapi/math/rng.hpp` instead")
 
-#include "oneapi/mkl/detail/config.hpp"
-#include "oneapi/mkl/detail/get_device_id.hpp"
+#include "oneapi/math/rng.hpp"
 
-#include "oneapi/mkl/rng/predicates.hpp"
-#include "oneapi/mkl/rng/detail/rng_loader.hpp"
+#include "namespace_alias.hpp"
 
-#include "oneapi/mkl/rng/functions.hpp"
-#include "oneapi/mkl/rng/distributions.hpp"
-#include "oneapi/mkl/rng/engines.hpp"
-
-#endif // _ONEMKL_RNG_HPP_
+#endif // ONEMATH_MKL_RNG_HPP

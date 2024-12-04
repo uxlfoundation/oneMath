@@ -22,7 +22,7 @@
 #include "rocblas_scope_handle_hipsycl.hpp"
 
 namespace oneapi {
-namespace mkl {
+namespace math {
 namespace blas {
 namespace rocblas {
 
@@ -90,5 +90,5 @@ hipStream_t RocblasScopedContextHandler::get_stream(const sycl::queue& queue) {
 
 } // namespace rocblas
 } // namespace blas
-} // namespace mkl
+} // namespace math
 } // namespace oneapi

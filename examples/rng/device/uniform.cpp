@@ -20,7 +20,7 @@
 /*
 *
 *  Content:
-*       This example demonstrates usage of oneapi::mkl::rng::device::mcg59
+*       This example demonstrates usage of oneapi::math::rng::device::mcg59
 *       random number generator to produce random
 *       numbers using unifrom distribution on a SYCL device (CPU, GPU).
 *
@@ -30,14 +30,14 @@
 #include <iostream>
 #include <vector>
 
-// oneMKL/SYCL includes
+// oneMath/SYCL includes
 #if __has_include(<sycl/sycl.hpp>)
 #include <sycl/sycl.hpp>
 #else
 #include <CL/sycl.hpp>
 #endif
 
-#include "oneapi/mkl/rng/device.hpp"
+#include "oneapi/math/rng/device.hpp"
 
 #include "rng_example_helper.hpp"
 
@@ -74,10 +74,10 @@ int run_example(sycl::queue& queue) {
                 sycl::accessor r_acc(r_buf, cgh, sycl::write_only);
                 cgh.parallel_for(sycl::range<1>(n / VecSize), [=](sycl::item<1> item) {
                     size_t item_id = item.get_id(0);
-                    oneapi::mkl::rng::device::mcg59<VecSize> engine(seed, item_id * VecSize);
-                    oneapi::mkl::rng::device::uniform<Type> distr;
+                    oneapi::math::rng::device::mcg59<VecSize> engine(seed, item_id * VecSize);
+                    oneapi::math::rng::device::uniform<Type> distr;
 
-                    auto res = oneapi::mkl::rng::device::generate(distr, engine);
+                    auto res = oneapi::math::rng::device::generate(distr, engine);
                     if constexpr (VecSize == 1) {
                         r_acc[item_id] = res;
                     }
@@ -104,13 +104,13 @@ int run_example(sycl::queue& queue) {
     } // buffer life-time ends
 
     // compare results with host-side generation
-    oneapi::mkl::rng::device::mcg59<1> engine(seed);
-    oneapi::mkl::rng::device::uniform<Type> distr;
+    oneapi::math::rng::device::mcg59<1> engine(seed);
+    oneapi::math::rng::device::uniform<Type> distr;
 
     int err = 0;
     Type res_host;
-    for (int i = 0; i < n; i++) {
-        res_host = oneapi::mkl::rng::device::generate(distr, engine);
+    for (std::size_t i = 0; i < n; i++) {
+        res_host = oneapi::math::rng::device::generate(distr, engine);
         if (res_host != r_dev[i]) {
             std::cout << "error in " << i << " element " << res_host << " " << r_dev[i]
                       << std::endl;

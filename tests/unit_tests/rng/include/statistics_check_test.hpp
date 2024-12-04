@@ -30,7 +30,7 @@
 #include <CL/sycl.hpp>
 #endif
 
-#include "oneapi/mkl.hpp"
+#include "oneapi/math.hpp"
 
 #include "statistics_check.hpp"
 
@@ -62,7 +62,7 @@ public:
 
             Engine engine(queue, SEED);
             Distr distr(args...);
-            oneapi::mkl::rng::generate(distr, engine, n_gen, r_buffer);
+            oneapi::math::rng::generate(distr, engine, n_gen, r_buffer);
             QUEUE_WAIT(queue);
         }
         catch (sycl::exception const& e) {
@@ -70,7 +70,7 @@ public:
                       << e.what() << std::endl;
             print_error_code(e);
         }
-        catch (const oneapi::mkl::unimplemented& e) {
+        catch (const oneapi::math::unimplemented& e) {
             status = test_skipped;
             return;
         }
@@ -101,7 +101,7 @@ public:
         try {
             Engine engine(queue, SEED);
             Distr distr(args...);
-            auto event = oneapi::mkl::rng::generate(distr, engine, n_gen, r.data());
+            auto event = oneapi::math::rng::generate(distr, engine, n_gen, r.data());
             event.wait_and_throw();
         }
         catch (sycl::exception const& e) {
@@ -109,7 +109,7 @@ public:
                       << e.what() << std::endl;
             print_error_code(e);
         }
-        catch (const oneapi::mkl::unimplemented& e) {
+        catch (const oneapi::math::unimplemented& e) {
             status = test_skipped;
             return;
         }

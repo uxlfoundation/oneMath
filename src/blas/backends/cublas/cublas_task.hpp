@@ -19,8 +19,8 @@
 *
 **************************************************************************/
 
-#ifndef _MKL_BLAS_CUBLAS_TASK_HPP_
-#define _MKL_BLAS_CUBLAS_TASK_HPP_
+#ifndef ONEMATH_BLAS_CUBLAS_TASK_HPP_
+#define ONEMATH_BLAS_CUBLAS_TASK_HPP_
 #include <cublas_v2.h>
 #include <cuda.h>
 #include <complex>
@@ -29,30 +29,18 @@
 #else
 #include <CL/sycl.hpp>
 #endif
-#include "oneapi/mkl/types.hpp"
+#include "oneapi/math/types.hpp"
 #ifndef __HIPSYCL__
 #include "cublas_scope_handle.hpp"
 #else
 #include "cublas_scope_handle_hipsycl.hpp"
-
-// After Plugin Interface removal in DPC++ ur.hpp is the new include
-#if __has_include(<sycl/detail/ur.hpp>)
-#include <sycl/detail/ur.hpp>
-#ifndef ONEMKL_PI_INTERFACE_REMOVED
-#define ONEMKL_PI_INTERFACE_REMOVED
-#endif
-#elif __has_include(<sycl/detail/pi.hpp>)
-#include <sycl/detail/pi.hpp>
-#else
-#include <CL/sycl/detail/pi.hpp>
-#endif
 
 namespace sycl {
 using interop_handler = sycl::interop_handle;
 }
 #endif
 namespace oneapi {
-namespace mkl {
+namespace math {
 namespace blas {
 namespace cublas {
 
@@ -72,18 +60,18 @@ static inline void host_task_internal(H& cgh, sycl::queue queue, F f) {
 #else
     cgh.host_task([f, queue](sycl::interop_handle ih) {
 #endif
-        auto sc = CublasScopedContextHandler(queue, ih);
+        auto sc = CublasScopedContextHandler(ih);
         f(sc);
     });
 }
 #endif
 template <typename H, typename F>
-static inline void onemkl_cublas_host_task(H& cgh, sycl::queue queue, F f) {
+static inline void onemath_cublas_host_task(H& cgh, sycl::queue queue, F f) {
     (void)host_task_internal(cgh, queue, f);
 }
 
 } // namespace cublas
 } // namespace blas
-} // namespace mkl
+} // namespace math
 } // namespace oneapi
-#endif // _MKL_BLAS_CUBLAS_TASK_HPP_
+#endif // ONEMATH_BLAS_CUBLAS_TASK_HPP_

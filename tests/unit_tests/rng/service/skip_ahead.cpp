@@ -30,12 +30,12 @@ class Philox4x32x10SkipAheadTests : public ::testing::TestWithParam<sycl::device
 class Philox4x32x10SkipAheadExTests : public ::testing::TestWithParam<sycl::device*> {};
 
 TEST_P(Philox4x32x10SkipAheadTests, BinaryPrecision) {
-    rng_test<skip_ahead_test<oneapi::mkl::rng::philox4x32x10>> test;
+    rng_test<skip_ahead_test<oneapi::math::rng::philox4x32x10>> test;
     EXPECT_TRUEORSKIP((test(GetParam())));
 }
 
 TEST_P(Philox4x32x10SkipAheadExTests, BinaryPrecision) {
-    rng_test<skip_ahead_ex_test<oneapi::mkl::rng::philox4x32x10>> test;
+    rng_test<skip_ahead_ex_test<oneapi::math::rng::philox4x32x10>> test;
     EXPECT_TRUEORSKIP((test(GetParam())));
 }
 
@@ -50,12 +50,12 @@ class Mrg32k3aSkipAheadTests : public ::testing::TestWithParam<sycl::device*> {}
 class Mrg32k3aSkipAheadExTests : public ::testing::TestWithParam<sycl::device*> {};
 
 TEST_P(Mrg32k3aSkipAheadTests, BinaryPrecision) {
-    rng_test<skip_ahead_test<oneapi::mkl::rng::mrg32k3a>> test;
+    rng_test<skip_ahead_test<oneapi::math::rng::mrg32k3a>> test;
     EXPECT_TRUEORSKIP((test(GetParam())));
 }
 
 TEST_P(Mrg32k3aSkipAheadExTests, BinaryPrecision) {
-    rng_test<skip_ahead_ex_test<oneapi::mkl::rng::mrg32k3a>> test;
+    rng_test<skip_ahead_ex_test<oneapi::math::rng::mrg32k3a>> test;
     EXPECT_TRUEORSKIP((test(GetParam())));
 }
 

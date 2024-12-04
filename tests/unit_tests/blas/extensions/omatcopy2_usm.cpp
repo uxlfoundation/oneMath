@@ -32,9 +32,9 @@
 #endif
 #include "allocator_helper.hpp"
 #include "cblas.h"
-#include "oneapi/mkl/detail/config.hpp"
-#include "oneapi/mkl.hpp"
-#include "onemkl_blas_helper.hpp"
+#include "oneapi/math/detail/config.hpp"
+#include "oneapi/math.hpp"
+#include "onemath_blas_helper.hpp"
 #include "reference_blas_templates.hpp"
 #include "test_common.hpp"
 #include "test_helper.hpp"
@@ -49,7 +49,7 @@ extern std::vector<sycl::device*> devices;
 namespace {
 
 template <typename fp>
-int test(device* dev, oneapi::mkl::layout layout) {
+int test(device* dev, oneapi::math::layout layout) {
     // Catch asynchronous exceptions.
     auto exception_handler = [](exception_list exceptions) {
         for (std::exception_ptr const& e : exceptions) {
@@ -73,7 +73,7 @@ int test(device* dev, oneapi::mkl::layout layout) {
     int64_t m, n;
     int64_t lda, ldb;
     int64_t stride_a, stride_b;
-    oneapi::mkl::transpose trans;
+    oneapi::math::transpose trans;
     fp alpha;
 
     stride_a = 1 + std::rand() % 50;
@@ -88,13 +88,13 @@ int test(device* dev, oneapi::mkl::layout layout) {
     int64_t size_a, size_b;
 
     switch (layout) {
-        case oneapi::mkl::layout::col_major:
+        case oneapi::math::layout::col_major:
             size_a = lda * n;
-            size_b = (trans == oneapi::mkl::transpose::nontrans) ? ldb * n : ldb * m;
+            size_b = (trans == oneapi::math::transpose::nontrans) ? ldb * n : ldb * m;
             break;
-        case oneapi::mkl::layout::row_major:
+        case oneapi::math::layout::row_major:
             size_a = lda * m;
-            size_b = (trans == oneapi::mkl::transpose::nontrans) ? ldb * m : ldb * n;
+            size_b = (trans == oneapi::math::transpose::nontrans) ? ldb * m : ldb * n;
             break;
         default: break;
     }
@@ -106,11 +106,11 @@ int test(device* dev, oneapi::mkl::layout layout) {
     B.resize(size_b);
     B_ref.resize(size_b);
 
-    rand_matrix(A, oneapi::mkl::layout::col_major, oneapi::mkl::transpose::nontrans, size_a, 1,
+    rand_matrix(A, oneapi::math::layout::col_major, oneapi::math::transpose::nontrans, size_a, 1,
                 size_a);
-    rand_matrix(B, oneapi::mkl::layout::col_major, oneapi::mkl::transpose::nontrans, size_b, 1,
+    rand_matrix(B, oneapi::math::layout::col_major, oneapi::math::transpose::nontrans, size_b, 1,
                 size_b);
-    copy_matrix(B, oneapi::mkl::layout::col_major, oneapi::mkl::transpose::nontrans, size_b, 1,
+    copy_matrix(B, oneapi::math::layout::col_major, oneapi::math::transpose::nontrans, size_b, 1,
                 size_b, B_ref);
 
     // Call reference OMATCOPY2.
@@ -127,28 +127,28 @@ int test(device* dev, oneapi::mkl::layout layout) {
     try {
 #ifdef CALL_RT_API
         switch (layout) {
-            case oneapi::mkl::layout::col_major:
-                done = oneapi::mkl::blas::column_major::omatcopy2(main_queue, trans, m, n, alpha,
-                                                                  &A[0], lda, stride_a, &B[0], ldb,
-                                                                  stride_b, dependencies);
+            case oneapi::math::layout::col_major:
+                done = oneapi::math::blas::column_major::omatcopy2(main_queue, trans, m, n, alpha,
+                                                                   &A[0], lda, stride_a, &B[0], ldb,
+                                                                   stride_b, dependencies);
                 break;
-            case oneapi::mkl::layout::row_major:
-                done = oneapi::mkl::blas::row_major::omatcopy2(main_queue, trans, m, n, alpha,
-                                                               &A[0], lda, stride_a, &B[0], ldb,
-                                                               stride_b, dependencies);
+            case oneapi::math::layout::row_major:
+                done = oneapi::math::blas::row_major::omatcopy2(main_queue, trans, m, n, alpha,
+                                                                &A[0], lda, stride_a, &B[0], ldb,
+                                                                stride_b, dependencies);
                 break;
             default: break;
         }
         done.wait();
 #else
         switch (layout) {
-            case oneapi::mkl::layout::col_major:
-                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::mkl::blas::column_major::omatcopy2,
+            case oneapi::math::layout::col_major:
+                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::math::blas::column_major::omatcopy2,
                                         trans, m, n, alpha, &A[0], lda, stride_a, &B[0], ldb,
                                         stride_b, dependencies);
                 break;
-            case oneapi::mkl::layout::row_major:
-                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::mkl::blas::row_major::omatcopy2, trans,
+            case oneapi::math::layout::row_major:
+                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::math::blas::row_major::omatcopy2, trans,
                                         m, n, alpha, &A[0], lda, stride_a, &B[0], ldb, stride_b,
                                         dependencies);
                 break;
@@ -163,7 +163,7 @@ int test(device* dev, oneapi::mkl::layout layout) {
         print_error_code(e);
     }
 
-    catch (const oneapi::mkl::unimplemented& e) {
+    catch (const oneapi::math::unimplemented& e) {
         return test_skipped;
     }
 
@@ -172,14 +172,14 @@ int test(device* dev, oneapi::mkl::layout layout) {
     }
 
     // Compare the results of reference implementation and DPC++ implementation.
-    bool good = check_equal_matrix(B, B_ref, oneapi::mkl::layout::col_major, size_b, 1, size_b, 10,
+    bool good = check_equal_matrix(B, B_ref, oneapi::math::layout::col_major, size_b, 1, size_b, 10,
                                    std::cout);
 
     return (int)good;
 }
 
 class Omatcopy2UsmTests
-        : public ::testing::TestWithParam<std::tuple<sycl::device*, oneapi::mkl::layout>> {};
+        : public ::testing::TestWithParam<std::tuple<sycl::device*, oneapi::math::layout>> {};
 
 TEST_P(Omatcopy2UsmTests, RealSinglePrecision) {
     EXPECT_TRUEORSKIP(test<float>(std::get<0>(GetParam()), std::get<1>(GetParam())));
@@ -203,8 +203,8 @@ TEST_P(Omatcopy2UsmTests, ComplexDoublePrecision) {
 
 INSTANTIATE_TEST_SUITE_P(Omatcopy2UsmTestSuite, Omatcopy2UsmTests,
                          ::testing::Combine(testing::ValuesIn(devices),
-                                            testing::Values(oneapi::mkl::layout::col_major,
-                                                            oneapi::mkl::layout::row_major)),
+                                            testing::Values(oneapi::math::layout::col_major,
+                                                            oneapi::math::layout::row_major)),
                          ::LayoutDeviceNamePrint());
 
 } // anonymous namespace

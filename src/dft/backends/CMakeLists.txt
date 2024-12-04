@@ -17,8 +17,8 @@
 # SPDX-License-Identifier: Apache-2.0
 #===============================================================================
 
-add_custom_target(onemkl_backend_libs_dft)
-add_dependencies(onemkl_backend_libs onemkl_backend_libs_dft)
+add_custom_target(onemath_backend_libs_dft)
+add_dependencies(onemath_backend_libs onemath_backend_libs_dft)
 
 if(ENABLE_MKLGPU_BACKEND)
   add_subdirectory(mklgpu)

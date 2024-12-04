@@ -31,9 +31,9 @@
 #endif
 #include "allocator_helper.hpp"
 #include "cblas.h"
-#include "oneapi/mkl/detail/config.hpp"
-#include "oneapi/mkl.hpp"
-#include "onemkl_blas_helper.hpp"
+#include "oneapi/math/detail/config.hpp"
+#include "oneapi/math.hpp"
+#include "onemath_blas_helper.hpp"
 #include "reference_blas_templates.hpp"
 #include "test_common.hpp"
 #include "test_helper.hpp"
@@ -48,7 +48,7 @@ extern std::vector<sycl::device*> devices;
 namespace {
 
 template <typename Ta, typename Tb, typename Tc, typename Ts>
-int test(device* dev, oneapi::mkl::layout layout, int64_t batch_size) {
+int test(device* dev, oneapi::math::layout layout, int64_t batch_size) {
     // Catch asynchronous exceptions.
     auto exception_handler = [](exception_list exceptions) {
         for (std::exception_ptr const& e : exceptions) {
@@ -71,7 +71,7 @@ int test(device* dev, oneapi::mkl::layout layout, int64_t batch_size) {
     // Prepare data.
     int64_t m, n, k;
     int64_t lda, ldb, ldc;
-    oneapi::mkl::transpose transa, transb;
+    oneapi::math::transpose transa, transb;
     Ts alpha, beta;
 
     int64_t i, tmp;
@@ -89,31 +89,31 @@ int test(device* dev, oneapi::mkl::layout layout, int64_t batch_size) {
         (std::is_same<Ts, std::complex<double>>::value)) {
         tmp = std::rand() % 3;
         if (tmp == 2)
-            transa = oneapi::mkl::transpose::conjtrans;
+            transa = oneapi::math::transpose::conjtrans;
         else
-            transa = (oneapi::mkl::transpose)tmp;
+            transa = (oneapi::math::transpose)tmp;
         tmp = std::rand() % 3;
         if (tmp == 2)
-            transb = oneapi::mkl::transpose::conjtrans;
+            transb = oneapi::math::transpose::conjtrans;
         else
-            transb = (oneapi::mkl::transpose)tmp;
+            transb = (oneapi::math::transpose)tmp;
     }
     else {
-        transa = (oneapi::mkl::transpose)(std::rand() % 2);
-        transb = (oneapi::mkl::transpose)(std::rand() % 2);
+        transa = (oneapi::math::transpose)(std::rand() % 2);
+        transb = (oneapi::math::transpose)(std::rand() % 2);
     }
 
     int64_t stride_a, stride_b, stride_c;
 
     switch (layout) {
-        case oneapi::mkl::layout::col_major:
-            stride_a = (transa == oneapi::mkl::transpose::nontrans) ? lda * k : lda * m;
-            stride_b = (transb == oneapi::mkl::transpose::nontrans) ? ldb * n : ldb * k;
+        case oneapi::math::layout::col_major:
+            stride_a = (transa == oneapi::math::transpose::nontrans) ? lda * k : lda * m;
+            stride_b = (transb == oneapi::math::transpose::nontrans) ? ldb * n : ldb * k;
             stride_c = ldc * n;
             break;
-        case oneapi::mkl::layout::row_major:
-            stride_a = (transa == oneapi::mkl::transpose::nontrans) ? lda * m : lda * k;
-            stride_b = (transb == oneapi::mkl::transpose::nontrans) ? ldb * k : ldb * n;
+        case oneapi::math::layout::row_major:
+            stride_a = (transa == oneapi::math::transpose::nontrans) ? lda * m : lda * k;
+            stride_b = (transb == oneapi::math::transpose::nontrans) ? ldb * k : ldb * n;
             stride_c = ldc * m;
             break;
         default: break;
@@ -136,17 +136,17 @@ int test(device* dev, oneapi::mkl::layout layout, int64_t batch_size) {
     C_ref.resize(stride_c * batch_size);
     C_cast_ref.resize(stride_c * batch_size);
 
-    Ta** a_array = (Ta**)oneapi::mkl::malloc_shared(64, sizeof(Ta*) * batch_size, *dev, cxt);
-    Tb** b_array = (Tb**)oneapi::mkl::malloc_shared(64, sizeof(Tb*) * batch_size, *dev, cxt);
-    Tc** c_array = (Tc**)oneapi::mkl::malloc_shared(64, sizeof(Tc*) * batch_size, *dev, cxt);
-    Ts** c_ref_array = (Ts**)oneapi::mkl::malloc_shared(64, sizeof(Ts*) * batch_size, *dev, cxt);
+    Ta** a_array = (Ta**)oneapi::math::malloc_shared(64, sizeof(Ta*) * batch_size, *dev, cxt);
+    Tb** b_array = (Tb**)oneapi::math::malloc_shared(64, sizeof(Tb*) * batch_size, *dev, cxt);
+    Tc** c_array = (Tc**)oneapi::math::malloc_shared(64, sizeof(Tc*) * batch_size, *dev, cxt);
+    Ts** c_ref_array = (Ts**)oneapi::math::malloc_shared(64, sizeof(Ts*) * batch_size, *dev, cxt);
 
     if ((a_array == NULL) || (b_array == NULL) || (c_array == NULL) || (c_ref_array == NULL)) {
         std::cout << "Error cannot allocate arrays of pointers\n";
-        oneapi::mkl::free_shared(a_array, cxt);
-        oneapi::mkl::free_shared(b_array, cxt);
-        oneapi::mkl::free_shared(c_array, cxt);
-        oneapi::mkl::free_shared(c_ref_array, cxt);
+        oneapi::math::free_shared(a_array, cxt);
+        oneapi::math::free_shared(b_array, cxt);
+        oneapi::math::free_shared(c_array, cxt);
+        oneapi::math::free_shared(c_ref_array, cxt);
         return false;
     }
 
@@ -157,17 +157,17 @@ int test(device* dev, oneapi::mkl::layout layout, int64_t batch_size) {
         c_ref_array[i] = &C_ref[i * stride_c];
     }
 
-    rand_matrix(A, oneapi::mkl::layout::col_major, oneapi::mkl::transpose::nontrans,
+    rand_matrix(A, oneapi::math::layout::col_major, oneapi::math::transpose::nontrans,
                 stride_a * batch_size, 1, stride_a * batch_size);
-    rand_matrix(B, oneapi::mkl::layout::col_major, oneapi::mkl::transpose::nontrans,
+    rand_matrix(B, oneapi::math::layout::col_major, oneapi::math::transpose::nontrans,
                 stride_b * batch_size, 1, stride_b * batch_size);
-    rand_matrix(C, oneapi::mkl::layout::col_major, oneapi::mkl::transpose::nontrans,
+    rand_matrix(C, oneapi::math::layout::col_major, oneapi::math::transpose::nontrans,
                 stride_c * batch_size, 1, stride_c * batch_size);
-    copy_matrix(A, oneapi::mkl::layout::col_major, oneapi::mkl::transpose::nontrans,
+    copy_matrix(A, oneapi::math::layout::col_major, oneapi::math::transpose::nontrans,
                 stride_a * batch_size, 1, stride_a * batch_size, A_ref);
-    copy_matrix(B, oneapi::mkl::layout::col_major, oneapi::mkl::transpose::nontrans,
+    copy_matrix(B, oneapi::math::layout::col_major, oneapi::math::transpose::nontrans,
                 stride_b * batch_size, 1, stride_b * batch_size, B_ref);
-    copy_matrix(C, oneapi::mkl::layout::col_major, oneapi::mkl::transpose::nontrans,
+    copy_matrix(C, oneapi::math::layout::col_major, oneapi::math::transpose::nontrans,
                 stride_c * batch_size, 1, stride_c * batch_size, C_ref);
 
     // Call reference GEMM_BATCH_STRIDE.
@@ -193,13 +193,13 @@ int test(device* dev, oneapi::mkl::layout layout, int64_t batch_size) {
     try {
 #ifdef CALL_RT_API
         switch (layout) {
-            case oneapi::mkl::layout::col_major:
-                done = oneapi::mkl::blas::column_major::gemm_batch(
+            case oneapi::math::layout::col_major:
+                done = oneapi::math::blas::column_major::gemm_batch(
                     main_queue, transa, transb, m, n, k, alpha, &A[0], lda, stride_a, &B[0], ldb,
                     stride_b, beta, &C[0], ldc, stride_c, batch_size, dependencies);
                 break;
-            case oneapi::mkl::layout::row_major:
-                done = oneapi::mkl::blas::row_major::gemm_batch(
+            case oneapi::math::layout::row_major:
+                done = oneapi::math::blas::row_major::gemm_batch(
                     main_queue, transa, transb, m, n, k, alpha, &A[0], lda, stride_a, &B[0], ldb,
                     stride_b, beta, &C[0], ldc, stride_c, batch_size, dependencies);
                 break;
@@ -208,14 +208,14 @@ int test(device* dev, oneapi::mkl::layout layout, int64_t batch_size) {
         done.wait_and_throw();
 #else
         switch (layout) {
-            case oneapi::mkl::layout::col_major:
-                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::mkl::blas::column_major::gemm_batch,
+            case oneapi::math::layout::col_major:
+                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::math::blas::column_major::gemm_batch,
                                         transa, transb, m, n, k, alpha, &A[0], lda, stride_a, &B[0],
                                         ldb, stride_b, beta, &C[0], ldc, stride_c, batch_size,
                                         dependencies);
                 break;
-            case oneapi::mkl::layout::row_major:
-                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::mkl::blas::row_major::gemm_batch,
+            case oneapi::math::layout::row_major:
+                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::math::blas::row_major::gemm_batch,
                                         transa, transb, m, n, k, alpha, &A[0], lda, stride_a, &B[0],
                                         ldb, stride_b, beta, &C[0], ldc, stride_c, batch_size,
                                         dependencies);
@@ -231,11 +231,11 @@ int test(device* dev, oneapi::mkl::layout layout, int64_t batch_size) {
         print_error_code(e);
     }
 
-    catch (const oneapi::mkl::unimplemented& e) {
-        oneapi::mkl::free_shared(a_array, cxt);
-        oneapi::mkl::free_shared(b_array, cxt);
-        oneapi::mkl::free_shared(c_array, cxt);
-        oneapi::mkl::free_shared(c_ref_array, cxt);
+    catch (const oneapi::math::unimplemented& e) {
+        oneapi::math::free_shared(a_array, cxt);
+        oneapi::math::free_shared(b_array, cxt);
+        oneapi::math::free_shared(c_array, cxt);
+        oneapi::math::free_shared(c_ref_array, cxt);
         return test_skipped;
     }
 
@@ -253,20 +253,20 @@ int test(device* dev, oneapi::mkl::layout layout, int64_t batch_size) {
     for (size_t i = 0; i < C_ref.size(); ++i) {
         C_cast_ref[i] = C_ref[i];
     }
-    bool good = check_almost_equal_matrix(C, C_cast_ref, oneapi::mkl::layout::col_major,
+    bool good = check_almost_equal_matrix(C, C_cast_ref, oneapi::math::layout::col_major,
                                           stride_c * batch_size, 1, stride_c * batch_size,
                                           error_mag, std::cout);
 
-    oneapi::mkl::free_shared(a_array, cxt);
-    oneapi::mkl::free_shared(b_array, cxt);
-    oneapi::mkl::free_shared(c_array, cxt);
-    oneapi::mkl::free_shared(c_ref_array, cxt);
+    oneapi::math::free_shared(a_array, cxt);
+    oneapi::math::free_shared(b_array, cxt);
+    oneapi::math::free_shared(c_array, cxt);
+    oneapi::math::free_shared(c_ref_array, cxt);
 
     return (int)good;
 }
 
 class GemmBatchStrideUsmTests
-        : public ::testing::TestWithParam<std::tuple<sycl::device*, oneapi::mkl::layout>> {};
+        : public ::testing::TestWithParam<std::tuple<sycl::device*, oneapi::math::layout>> {};
 
 TEST_P(GemmBatchStrideUsmTests, RealHalfPrecision) {
     EXPECT_TRUEORSKIP((test<sycl::half, sycl::half, sycl::half, sycl::half>(
@@ -316,8 +316,8 @@ TEST_P(GemmBatchStrideUsmTests, ComplexDoublePrecision) {
 
 INSTANTIATE_TEST_SUITE_P(GemmBatchStrideUsmTestSuite, GemmBatchStrideUsmTests,
                          ::testing::Combine(testing::ValuesIn(devices),
-                                            testing::Values(oneapi::mkl::layout::col_major,
-                                                            oneapi::mkl::layout::row_major)),
+                                            testing::Values(oneapi::math::layout::col_major,
+                                                            oneapi::math::layout::row_major)),
                          ::LayoutDeviceNamePrint());
 
 } // anonymous namespace

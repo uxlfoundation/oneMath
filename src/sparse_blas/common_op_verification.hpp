@@ -17,8 +17,8 @@
 *
 **************************************************************************/
 
-#ifndef _ONEMKL_SRC_SPARSE_BLAS_COMMON_OP_VERIFICATION_HPP_
-#define _ONEMKL_SRC_SPARSE_BLAS_COMMON_OP_VERIFICATION_HPP_
+#ifndef _ONEMATH_SRC_SPARSE_BLAS_COMMON_OP_VERIFICATION_HPP_
+#define _ONEMATH_SRC_SPARSE_BLAS_COMMON_OP_VERIFICATION_HPP_
 
 #include <string>
 
@@ -28,17 +28,17 @@
 #include <CL/sycl.hpp>
 #endif
 
-#include "oneapi/mkl/sparse_blas/types.hpp"
+#include "oneapi/math/sparse_blas/types.hpp"
 #include "macros.hpp"
 
-namespace oneapi::mkl::sparse::detail {
+namespace oneapi::math::sparse::detail {
 
 /// Throw an exception if the scalar is not accessible in the host
 inline void check_ptr_is_host_accessible(const std::string& function_name,
                                          const std::string& scalar_name,
                                          bool is_ptr_accessible_on_host) {
     if (!is_ptr_accessible_on_host) {
-        throw mkl::invalid_argument(
+        throw math::invalid_argument(
             "sparse_blas", function_name,
             "Scalar " + scalar_name + " must be accessible on the host for buffer functions.");
     }
@@ -59,28 +59,28 @@ void check_valid_spmm_common(const std::string& function_name, matrix_view A_vie
         check_ptr_is_host_accessible("spmm", "beta", is_beta_host_accessible);
     }
     if (is_alpha_host_accessible != is_beta_host_accessible) {
-        throw mkl::invalid_argument(
+        throw math::invalid_argument(
             "sparse_blas", function_name,
             "Alpha and beta must both be placed on host memory or device memory.");
     }
     if (B_handle->dense_layout != C_handle->dense_layout) {
-        throw mkl::invalid_argument("sparse_blas", function_name,
-                                    "B and C matrices must use the same layout.");
+        throw math::invalid_argument("sparse_blas", function_name,
+                                     "B and C matrices must use the same layout.");
     }
 
     if (A_view.type_view != matrix_descr::general) {
-        throw mkl::invalid_argument("sparse_blas", function_name,
-                                    "Matrix view's `type_view` must be `matrix_descr::general`.");
+        throw math::invalid_argument("sparse_blas", function_name,
+                                     "Matrix view's `type_view` must be `matrix_descr::general`.");
     }
 
-    if (A_view.diag_view != oneapi::mkl::diag::nonunit) {
-        throw mkl::invalid_argument("sparse_blas", function_name,
-                                    "Matrix's diag_view must be `nonunit`.");
+    if (A_view.diag_view != oneapi::math::diag::nonunit) {
+        throw math::invalid_argument("sparse_blas", function_name,
+                                     "Matrix's diag_view must be `nonunit`.");
     }
 }
 
 template <typename InternalSparseMatHandleT>
-void check_valid_spmv_common(const std::string& function_name, oneapi::mkl::transpose /*opA*/,
+void check_valid_spmv_common(const std::string& function_name, oneapi::math::transpose /*opA*/,
                              matrix_view A_view, InternalSparseMatHandleT internal_A_handle,
                              dense_vector_handle_t x_handle, dense_vector_handle_t y_handle,
                              bool is_alpha_host_accessible, bool is_beta_host_accessible) {
@@ -94,18 +94,18 @@ void check_valid_spmv_common(const std::string& function_name, oneapi::mkl::tran
         check_ptr_is_host_accessible("spmv", "beta", is_beta_host_accessible);
     }
     if (is_alpha_host_accessible != is_beta_host_accessible) {
-        throw mkl::invalid_argument(
+        throw math::invalid_argument(
             "sparse_blas", function_name,
             "Alpha and beta must both be placed on host memory or device memory.");
     }
     if (A_view.type_view == matrix_descr::diagonal) {
-        throw mkl::invalid_argument("sparse_blas", function_name,
-                                    "Matrix view's `type_view` cannot be diagonal.");
+        throw math::invalid_argument("sparse_blas", function_name,
+                                     "Matrix view's `type_view` cannot be diagonal.");
     }
 
     if (A_view.type_view != matrix_descr::triangular &&
-        A_view.diag_view == oneapi::mkl::diag::unit) {
-        throw mkl::invalid_argument(
+        A_view.diag_view == oneapi::math::diag::unit) {
+        throw math::invalid_argument(
             "sparse_blas", function_name,
             "`diag_view::unit` can only be used with `type_view::triangular`.");
     }
@@ -122,7 +122,7 @@ void check_valid_spsv_common(const std::string& function_name, matrix_view A_vie
 
     check_all_containers_compatible(function_name, internal_A_handle, x_handle, y_handle);
     if (A_view.type_view != matrix_descr::triangular) {
-        throw mkl::invalid_argument(
+        throw math::invalid_argument(
             "sparse_blas", function_name,
             "Matrix view's `type_view` must be `matrix_descr::triangular`.");
     }
@@ -132,6 +132,6 @@ void check_valid_spsv_common(const std::string& function_name, matrix_view A_vie
     }
 }
 
-} // namespace oneapi::mkl::sparse::detail
+} // namespace oneapi::math::sparse::detail
 
-#endif // _ONEMKL_SRC_SPARSE_BLAS_COMMON_OP_VERIFICATION_HPP_
+#endif // _ONEMATH_SRC_SPARSE_BLAS_COMMON_OP_VERIFICATION_HPP_

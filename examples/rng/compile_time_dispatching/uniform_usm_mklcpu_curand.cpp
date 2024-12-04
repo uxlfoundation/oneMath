@@ -20,8 +20,8 @@
 /*
 *
 *  Content:
-*       This example demonstrates use of DPC++ API oneapi::mkl::rng::uniform distribution
-*       with oneapi::mkl::rng::philox4x32x10 random number generator to produce
+*       This example demonstrates use of DPC++ API oneapi::math::rng::uniform distribution
+*       with oneapi::math::rng::philox4x32x10 random number generator to produce
 *       random numbers on a INTEL CPU SYCL device and an NVIDIA GPU SYCL device
 *       with Unified Shared Memory(USM) API.
 *
@@ -36,13 +36,13 @@
 #include <iostream>
 #include <vector>
 
-// oneMKL/SYCL includes
+// oneMath/SYCL includes
 #if __has_include(<sycl/sycl.hpp>)
 #include <sycl/sycl.hpp>
 #else
 #include <CL/sycl.hpp>
 #endif
-#include "oneapi/mkl.hpp"
+#include "oneapi/math.hpp"
 
 // local includes
 #include "example_helper.hpp"
@@ -98,12 +98,12 @@ void run_uniform_example(const sycl::device& cpu_dev, const sycl::device& gpu_de
     // preparation on CPU device and GPU device
     sycl::queue cpu_queue(cpu_dev, cpu_exception_handler);
     sycl::queue gpu_queue(gpu_dev, gpu_exception_handler);
-    oneapi::mkl::rng::default_engine cpu_engine(
-        oneapi::mkl::backend_selector<oneapi::mkl::backend::mklcpu>{ cpu_queue }, seed);
-    oneapi::mkl::rng::default_engine gpu_engine(
-        oneapi::mkl::backend_selector<oneapi::mkl::backend::curand>{ gpu_queue }, seed);
+    oneapi::math::rng::default_engine cpu_engine(
+        oneapi::math::backend_selector<oneapi::math::backend::mklcpu>{ cpu_queue }, seed);
+    oneapi::math::rng::default_engine gpu_engine(
+        oneapi::math::backend_selector<oneapi::math::backend::curand>{ gpu_queue }, seed);
 
-    oneapi::mkl::rng::uniform<float> distribution(a, b);
+    oneapi::math::rng::uniform<float> distribution(a, b);
 
     //
     // Data preparation on host: prepare array for random numbers
@@ -127,8 +127,8 @@ void run_uniform_example(const sycl::device& cpu_dev, const sycl::device& gpu_de
     //
     sycl::event event_out_cpu;
     sycl::event event_out_gpu;
-    event_out_cpu = oneapi::mkl::rng::generate(distribution, cpu_engine, n, dev_cpu);
-    event_out_gpu = oneapi::mkl::rng::generate(distribution, gpu_engine, n, dev_gpu);
+    event_out_cpu = oneapi::math::rng::generate(distribution, cpu_engine, n, dev_cpu);
+    event_out_gpu = oneapi::math::rng::generate(distribution, gpu_engine, n, dev_gpu);
     event_out_cpu.wait_and_throw();
     event_out_gpu.wait_and_throw();
 

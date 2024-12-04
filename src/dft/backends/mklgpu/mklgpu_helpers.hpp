@@ -17,50 +17,50 @@
 * SPDX-License-Identifier: Apache-2.0
 *******************************************************************************/
 
-#ifndef _ONEMKL_DFT_SRC_MKLGPU_HELPERS_HPP_
-#define _ONEMKL_DFT_SRC_MKLGPU_HELPERS_HPP_
+#ifndef _ONEMATH_DFT_SRC_MKLGPU_HELPERS_HPP_
+#define _ONEMATH_DFT_SRC_MKLGPU_HELPERS_HPP_
 
-#include "oneapi/mkl/detail/exceptions.hpp"
-#include "oneapi/mkl/dft/detail/types_impl.hpp"
+#include "oneapi/math/detail/exceptions.hpp"
+#include "oneapi/math/dft/detail/types_impl.hpp"
 
-#include "mkl_version.h"
-// MKLGPU header
+// Intel(R) oneMKL headers
+#include <mkl_version.h>
 #if INTEL_MKL_VERSION < 20250000
-#include <oneapi/mkl/dfti.hpp>
+#include <mkl/dfti.hpp>
 #else
-#include <oneapi/mkl/dft.hpp>
+#include <mkl/dft.hpp>
 #endif
 
 namespace oneapi {
-namespace mkl {
+namespace math {
 namespace dft {
 namespace mklgpu {
 namespace detail {
 
 /// Convert domain to equivalent backend native value.
-inline constexpr dft::domain to_mklgpu(dft::detail::domain dom) {
+inline constexpr oneapi::mkl::dft::domain to_mklgpu(dft::detail::domain dom) {
     if (dom == dft::detail::domain::REAL) {
-        return dft::domain::REAL;
+        return oneapi::mkl::dft::domain::REAL;
     }
     else {
-        return dft::domain::COMPLEX;
+        return oneapi::mkl::dft::domain::COMPLEX;
     }
 }
 
 /// Convert precision to equivalent backend native value.
-inline constexpr dft::precision to_mklgpu(dft::detail::precision dom) {
+inline constexpr oneapi::mkl::dft::precision to_mklgpu(dft::detail::precision dom) {
     if (dom == dft::detail::precision::SINGLE) {
-        return dft::precision::SINGLE;
+        return oneapi::mkl::dft::precision::SINGLE;
     }
     else {
-        return dft::precision::DOUBLE;
+        return oneapi::mkl::dft::precision::DOUBLE;
     }
 }
 
 /// Convert a config_param to equivalent backend native value.
-inline constexpr dft::config_param to_mklgpu(dft::detail::config_param param) {
+inline constexpr oneapi::mkl::dft::config_param to_mklgpu(dft::detail::config_param param) {
     using iparam = dft::detail::config_param;
-    using oparam = dft::config_param;
+    using oparam = oneapi::mkl::dft::config_param;
     switch (param) {
         case iparam::FORWARD_DOMAIN: return oparam::FORWARD_DOMAIN;
         case iparam::DIMENSION: return oparam::DIMENSION;
@@ -78,8 +78,8 @@ inline constexpr dft::config_param to_mklgpu(dft::detail::config_param param) {
         case iparam::WORKSPACE_EXTERNAL_BYTES: return oparam::WORKSPACE_BYTES;
         case iparam::COMMIT_STATUS: return oparam::COMMIT_STATUS;
         default:
-            throw mkl::invalid_argument("dft", "MKLGPU descriptor set_value()",
-                                        "Invalid config param.");
+            throw math::invalid_argument("dft", "MKLGPU descriptor set_value()",
+                                         "Invalid config param.");
             return static_cast<oparam>(0);
     }
 }
@@ -98,8 +98,8 @@ inline constexpr int to_mklgpu<dft::detail::config_param::COMPLEX_STORAGE>(
         return DFTI_COMPLEX_COMPLEX;
     }
     else {
-        throw mkl::unimplemented("dft", "MKLGPU descriptor set_value()",
-                                 "MKLGPU only supports complex-complex for complex storage.");
+        throw math::unimplemented("dft", "MKLGPU descriptor set_value()",
+                                  "MKLGPU only supports complex-complex for complex storage.");
         return 0;
     }
 }
@@ -111,8 +111,8 @@ inline constexpr int to_mklgpu<dft::detail::config_param::CONJUGATE_EVEN_STORAGE
         return DFTI_COMPLEX_COMPLEX;
     }
     else {
-        throw mkl::invalid_argument("dft", "MKLGPU descriptor set_value()",
-                                    "Invalid config value for conjugate even storage.");
+        throw math::invalid_argument("dft", "MKLGPU descriptor set_value()",
+                                     "Invalid config value for conjugate even storage.");
         return 0;
     }
 }
@@ -127,8 +127,8 @@ inline constexpr int to_mklgpu<dft::detail::config_param::PLACEMENT>(
         return DFTI_NOT_INPLACE;
     }
     else {
-        throw mkl::invalid_argument("dft", "MKLGPU descriptor set_value()",
-                                    "Invalid config value for inplace.");
+        throw math::invalid_argument("dft", "MKLGPU descriptor set_value()",
+                                     "Invalid config value for inplace.");
         return 0;
     }
 }
@@ -140,8 +140,8 @@ inline constexpr int to_mklgpu<dft::detail::config_param::PACKED_FORMAT>(
         return DFTI_CCE_FORMAT;
     }
     else {
-        throw mkl::invalid_argument("dft", "MKLGPU descriptor set_value()",
-                                    "Invalid config value for packed format.");
+        throw math::invalid_argument("dft", "MKLGPU descriptor set_value()",
+                                     "Invalid config value for packed format.");
         return 0;
     }
 }
@@ -151,29 +151,30 @@ inline constexpr int to_mklgpu<dft::detail::config_param::PACKED_FORMAT>(
  * @param value The config value to convert.
 **/
 template <dft::detail::config_param Param>
-inline constexpr dft::config_value to_mklgpu_config_value(dft::detail::config_value value);
+inline constexpr oneapi::mkl::dft::config_value to_mklgpu_config_value(
+    dft::detail::config_value value);
 
 template <>
-inline constexpr dft::config_value
+inline constexpr oneapi::mkl::dft::config_value
 to_mklgpu_config_value<dft::detail::config_param::WORKSPACE_PLACEMENT>(
     dft::detail::config_value value) {
     if (value == dft::detail::config_value::WORKSPACE_AUTOMATIC) {
-        // NB: dft::config_value != dft::detail::config_value
-        return dft::config_value::WORKSPACE_INTERNAL;
+        // NB: oneapi::mkl::dft::config_value != dft::detail::config_value
+        return oneapi::mkl::dft::config_value::WORKSPACE_INTERNAL;
     }
     else if (value == dft::detail::config_value::WORKSPACE_EXTERNAL) {
-        return dft::config_value::WORKSPACE_EXTERNAL;
+        return oneapi::mkl::dft::config_value::WORKSPACE_EXTERNAL;
     }
     else {
-        throw mkl::invalid_argument("dft", "MKLGPU descriptor set_value()",
-                                    "Invalid config value for workspace placement.");
-        return dft::config_value::WORKSPACE_INTERNAL;
+        throw math::invalid_argument("dft", "MKLGPU descriptor set_value()",
+                                     "Invalid config value for workspace placement.");
+        return oneapi::mkl::dft::config_value::WORKSPACE_INTERNAL;
     }
 }
 } // namespace detail
 } // namespace mklgpu
 } // namespace dft
-} // namespace mkl
+} // namespace math
 } // namespace oneapi
 
-#endif // _ONEMKL_DFT_SRC_MKLGPU_HELPERS_HPP_
+#endif // _ONEMATH_DFT_SRC_MKLGPU_HELPERS_HPP_

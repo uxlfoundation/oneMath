@@ -19,8 +19,8 @@
 
 # Add compile definitions for the reference libraries
 add_compile_definitions(
-  ONEMKL_REF_BLAS_LIBNAME="${ONEMKL_REF_BLAS_LIBNAME}"
-  ONEMKL_REF_CBLAS_LIBNAME="${ONEMKL_REF_CBLAS_LIBNAME}")
+  ONEMATH_REF_BLAS_LIBNAME="${ONEMATH_REF_BLAS_LIBNAME}"
+  ONEMATH_REF_CBLAS_LIBNAME="${ONEMATH_REF_CBLAS_LIBNAME}")
 
 add_subdirectory(level1)
 add_subdirectory(level2)

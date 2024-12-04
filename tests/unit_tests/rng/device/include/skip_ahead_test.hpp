@@ -20,7 +20,7 @@
 /*
 *
 *  Content:
-*       oneapi::mkl::rng::device:: engines skip_ahead and skip_ahead_ex tests
+*       oneapi::math::rng::device:: engines skip_ahead and skip_ahead_ex tests
 *       (SYCL interface)
 *
 *******************************************************************************/
@@ -38,7 +38,7 @@
 #include <CL/sycl.hpp>
 #endif
 
-#include "oneapi/mkl/rng/device.hpp"
+#include "oneapi/math/rng/device.hpp"
 
 #include "rng_device_test_common.hpp"
 
@@ -61,9 +61,9 @@ public:
                 cgh.parallel_for(range, [=](sycl::item<1> item) {
                     size_t id = item.get_id(0);
                     Engine engine(SEED);
-                    oneapi::mkl::rng::device::skip_ahead(engine, id * Engine::vec_size);
-                    oneapi::mkl::rng::device::bits<UIntType> distr;
-                    auto res = oneapi::mkl::rng::device::generate(distr, engine);
+                    oneapi::math::rng::device::skip_ahead(engine, id * Engine::vec_size);
+                    oneapi::math::rng::device::bits<UIntType> distr;
+                    auto res = oneapi::math::rng::device::generate(distr, engine);
                     if constexpr (Engine::vec_size == 1) {
                         acc[id] = res;
                     }
@@ -74,7 +74,7 @@ public:
             });
             event.wait_and_throw();
         }
-        catch (const oneapi::mkl::unimplemented& e) {
+        catch (const oneapi::math::unimplemented& e) {
             status = test_skipped;
             return;
         }
@@ -88,9 +88,9 @@ public:
 
         // validation
         Engine engine(SEED);
-        oneapi::mkl::rng::device::bits<UIntType> distr;
+        oneapi::math::rng::device::bits<UIntType> distr;
         for (int i = 0; i < N_GEN; i += Engine::vec_size) {
-            auto res = oneapi::mkl::rng::device::generate(distr, engine);
+            auto res = oneapi::math::rng::device::generate(distr, engine);
             if constexpr (Engine::vec_size == 1) {
                 r_ref[i] = res;
             }
@@ -125,10 +125,10 @@ public:
                 cgh.parallel_for(range, [=](sycl::item<1> item) {
                     size_t id = item.get_id(0);
                     Engine engine(SEED);
-                    oneapi::mkl::rng::device::skip_ahead(engine,
-                                                         { id * Engine::vec_size, skip_num });
-                    oneapi::mkl::rng::device::bits<> distr;
-                    auto res = oneapi::mkl::rng::device::generate(distr, engine);
+                    oneapi::math::rng::device::skip_ahead(engine,
+                                                          { id * Engine::vec_size, skip_num });
+                    oneapi::math::rng::device::bits<> distr;
+                    auto res = oneapi::math::rng::device::generate(distr, engine);
                     if constexpr (Engine::vec_size == 1) {
                         acc[id] = res;
                     }
@@ -139,7 +139,7 @@ public:
             });
             event.wait_and_throw();
         }
-        catch (const oneapi::mkl::unimplemented& e) {
+        catch (const oneapi::math::unimplemented& e) {
             status = test_skipped;
             return;
         }
@@ -154,11 +154,11 @@ public:
         // validation
         Engine engine(SEED);
         for (int j = 0; j < SKIP_TIMES; j++) {
-            oneapi::mkl::rng::device::skip_ahead(engine, N_SKIP);
+            oneapi::math::rng::device::skip_ahead(engine, N_SKIP);
         }
-        oneapi::mkl::rng::device::bits<> distr;
+        oneapi::math::rng::device::bits<> distr;
         for (int i = 0; i < N_GEN; i += Engine::vec_size) {
-            auto res = oneapi::mkl::rng::device::generate(distr, engine);
+            auto res = oneapi::math::rng::device::generate(distr, engine);
             if constexpr (Engine::vec_size == 1) {
                 r_ref[i] = res;
             }

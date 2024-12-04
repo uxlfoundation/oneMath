@@ -24,37 +24,38 @@
 #include <CL/sycl.hpp>
 #endif
 
-#include "mkl_vsl.h"
+// Intel(R) oneMKL header
+#include <mkl_vsl.h>
 
-#include "oneapi/mkl/exceptions.hpp"
-#include "oneapi/mkl/rng/detail/engine_impl.hpp"
-#include "oneapi/mkl/rng/detail/mklcpu/onemkl_rng_mklcpu.hpp"
+#include "oneapi/math/exceptions.hpp"
+#include "oneapi/math/rng/detail/engine_impl.hpp"
+#include "oneapi/math/rng/detail/mklcpu/onemath_rng_mklcpu.hpp"
 
 #include "cpu_common.hpp"
 
 namespace oneapi {
-namespace mkl {
+namespace math {
 namespace rng {
 namespace mklcpu {
 
-class philox4x32x10_impl : public oneapi::mkl::rng::detail::engine_impl {
+class philox4x32x10_impl : public oneapi::math::rng::detail::engine_impl {
 public:
     philox4x32x10_impl(sycl::queue queue, std::uint64_t seed)
-            : oneapi::mkl::rng::detail::engine_impl(queue) {
+            : oneapi::math::rng::detail::engine_impl(queue) {
         vslNewStreamEx(&stream_, VSL_BRNG_PHILOX4X32X10, 2,
                        reinterpret_cast<std::uint32_t*>(&seed));
         state_size_ = vslGetStreamSize(stream_);
     }
 
     philox4x32x10_impl(sycl::queue queue, std::initializer_list<std::uint64_t> seed)
-            : oneapi::mkl::rng::detail::engine_impl(queue) {
+            : oneapi::math::rng::detail::engine_impl(queue) {
         vslNewStreamEx(&stream_, VSL_BRNG_PHILOX4X32X10, 2 * seed.size(),
                        reinterpret_cast<const std::uint32_t*>(seed.begin()));
         state_size_ = vslGetStreamSize(stream_);
     }
 
     philox4x32x10_impl(const philox4x32x10_impl* other)
-            : oneapi::mkl::rng::detail::engine_impl(*other) {
+            : oneapi::math::rng::detail::engine_impl(*other) {
         vslCopyStream(&stream_, other->stream_);
         state_size_ = vslGetStreamSize(stream_);
     }
@@ -547,7 +548,7 @@ public:
         });
     }
 
-    virtual oneapi::mkl::rng::detail::engine_impl* copy_state() override {
+    virtual oneapi::math::rng::detail::engine_impl* copy_state() override {
         return new philox4x32x10_impl(this);
     }
 
@@ -560,7 +561,7 @@ public:
     }
 
     virtual void leapfrog(std::uint64_t idx, std::uint64_t stride) override {
-        throw oneapi::mkl::unimplemented("rng", "leapfrog");
+        throw oneapi::math::unimplemented("rng", "leapfrog");
     }
 
     virtual ~philox4x32x10_impl() override {
@@ -572,16 +573,17 @@ private:
     std::int32_t state_size_;
 };
 
-oneapi::mkl::rng::detail::engine_impl* create_philox4x32x10(sycl::queue queue, std::uint64_t seed) {
+oneapi::math::rng::detail::engine_impl* create_philox4x32x10(sycl::queue queue,
+                                                             std::uint64_t seed) {
     return new philox4x32x10_impl(queue, seed);
 }
 
-oneapi::mkl::rng::detail::engine_impl* create_philox4x32x10(
+oneapi::math::rng::detail::engine_impl* create_philox4x32x10(
     sycl::queue queue, std::initializer_list<std::uint64_t> seed) {
     return new philox4x32x10_impl(queue, seed);
 }
 
 } // namespace mklcpu
 } // namespace rng
-} // namespace mkl
+} // namespace math
 } // namespace oneapi

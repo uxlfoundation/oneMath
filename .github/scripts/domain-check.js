@@ -14,7 +14,7 @@ function matchesPattern(domain, filePaths) {
       !filePath.startsWith("third-party-programs/"),
   );
   // These directories contain domain specific code
-  const dirs = "(tests/unit_tests|examples|src|include/oneapi/mkl)";
+  const dirs = "(tests/unit_tests|examples|src|include/oneapi/math)";
   const domains = "(blas|lapack|rng|dft)";
   // matches changes to the domain of interest or non domain-specific code
   const re = new RegExp(`^(${dirs}/${domain}|(?!${dirs}/${domains}))`);
@@ -92,7 +92,7 @@ test_patterns = [
   },
   {
     domain: "lapack",
-    files: ["include/oneapi/mkl/lapack/lapack.hpp"],
+    files: ["include/oneapi/math/lapack/lapack.hpp"],
     expected: true,
   },
   {
@@ -117,7 +117,7 @@ test_patterns = [
   },
   {
     domain: "lapack",
-    files: ["include/oneapi/mkl/rng/lapack.hpp"],
+    files: ["include/oneapi/math/rng/lapack.hpp"],
     expected: false,
   },
   {

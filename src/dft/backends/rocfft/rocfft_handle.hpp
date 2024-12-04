@@ -17,8 +17,8 @@
 * SPDX-License-Identifier: Apache-2.0
 *******************************************************************************/
 
-#ifndef _ONEMKL_DFT_SRC_ROCFFT_ROCFFT_HANDLE_HPP_
-#define _ONEMKL_DFT_SRC_ROCFFT_ROCFFT_HANDLE_HPP_
+#ifndef _ONEMATH_DFT_SRC_ROCFFT_ROCFFT_HANDLE_HPP_
+#define _ONEMATH_DFT_SRC_ROCFFT_ROCFFT_HANDLE_HPP_
 
 #include <optional>
 

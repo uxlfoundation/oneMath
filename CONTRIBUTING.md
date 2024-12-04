@@ -1,5 +1,5 @@
 # Contributing Guidelines
-If you have improvements, new libraries integrated under oneAPI Math Kernel Library (oneMKL) Interfaces, or new interfaces to contribute to the oneMKL Specification, please send us your pull requests! For getting started, see GitHub [howto](https://help.github.com/en/articles/about-pull-requests).
+If you have improvements, new libraries integrated under oneAPI Math Library (oneMath), or new interfaces to contribute to the oneMath Specification, please send us your pull requests! For getting started, see GitHub [howto](https://help.github.com/en/articles/about-pull-requests).
 
 For how to enable a new third-party library, see the [guidelines](docs/create_new_backend.rst).
 
@@ -15,11 +15,11 @@ Before sending your pull requests, ensure that you follow this checklist:
 
 * Ensure that [unit tests](CONTRIBUTING.md#unit-tests) pass. Include logs from tests as attachments to the pull request.
 
-* Ensure that corresponding [maintainer GitHub team](#onemkl-interfaces-maintainers) is assigned to the PR review.
+* Ensure that corresponding [maintainer GitHub team](#onemath-maintainers) is assigned to the PR review.
 
 ## Library Functionality Guidelines
 
-oneMKL focuses on the following criteria:
+oneMath focuses on the following criteria:
 
 1. *Performance*: Functionality that has highly optimized and extensively parallelized routines for applications that require maximum performance.
 
@@ -31,13 +31,13 @@ oneMKL focuses on the following criteria:
 
 3. *Complexity*: Functionality that is not trivial to implement directly or by combining existing primitives.
 
-For the new API to become a part of the open source project, it should be accepted as part of [oneMKL spec](https://oneapi-spec.uxlfoundation.org/specifications/oneapi/latest/elements/onemkl/source/).
+For the new API to become a part of the open source project, it should be accepted as part of [oneMath spec](https://oneapi-spec.uxlfoundation.org/specifications/oneapi/latest/elements/onemath/source/).
 
 
 ### Request for Comments Process
 
 For changes impacting the public API or any significant changes in the library, such as adding new backend or changes to the architecture,
-please follow the [RFC process](https://github.com/oneapi-src/oneMKL/tree/rfcs).
+please follow the [RFC process](https://github.com/uxlfoundation/oneMath/tree/rfcs).
 
 Please also provide the following details as part of the RFC:
 
@@ -45,33 +45,33 @@ Please also provide the following details as part of the RFC:
 
 * The definition of the function including the interface and semantics, and how this interface will be extendable for different HW implementations.
 
-* What existing libraries have implementations of this function and can be used under the oneMKL interface.
+* What existing libraries have implementations of this function and can be used under oneMath.
 
-* Ensure that corresponding [maintainer GitHub team](#onemkl-interfaces-maintainers) is assigned to the RFC review.
+* Ensure that corresponding [maintainer GitHub team](#onemath-maintainers) is assigned to the RFC review.
 
 ## Bug Reporting
 
-If you find a bug or problem, please open a request under [Issues](https://github.com/oneapi-src/oneMKL/issues).
+If you find a bug or problem, please open a request under [Issues](https://github.com/uxlfoundation/oneMath/issues).
 
 
 ## Security Issues
 
 Report security issues to onemkl.maintainers@intel.com.
 
-## oneMKL Interfaces Maintainers
+## oneMath Maintainers
 
 For GitHub questions, issues, RFCs, or PRs you can contact maintainers via one of the following GitHub teams based on the topic:
 
 | GitHub team name | Description |
 :-----------|:------------|
-| @oneapi-src/onemkl-maintain  | All oneMKL Interfaces maintainers |
-| @oneapi-src/onemkl-arch-write | oneMKL Interfaces Architecture maintainers |
-| @oneapi-src/onemkl-blas-write | oneMKL Interfaces BLAS maintainers |
-| @oneapi-src/onemkl-dft-write | oneMKL Interfaces DFT maintainers |
-| @oneapi-src/onemkl-lapack-write | oneMKL Interfaces LAPACK maintainers |
-| @oneapi-src/onemkl-rng-write | oneMKL Interfaces RNG maintainers |
-| @oneapi-src/onemkl-sparse-write | oneMKL Interfaces Sparse Algebra maintainers |
-| @oneapi-src/onemkl-vm-write | oneMKL Interfaces Vector Math maintainers |
+| @uxlfoundation/onemath-maintain  | All oneMath maintainers |
+| @uxlfoundation/onemath-arch-write | oneMath Architecture maintainers |
+| @uxlfoundation/onemath-blas-write | oneMath BLAS maintainers |
+| @uxlfoundation/onemath-dft-write | oneMath DFT maintainers |
+| @uxlfoundation/onemath-lapack-write | oneMath LAPACK maintainers |
+| @uxlfoundation/onemath-rng-write | oneMath RNG maintainers |
+| @uxlfoundation/onemath-sparse-write | oneMath Sparse Algebra maintainers |
+| @uxlfoundation/onemath-vm-write | oneMath Vector Math maintainers |
 
 Please read [MAINTAINERS page](MAINTAINERS.md) for more information about maintainer roles, responsibilities, and how to become one of them.
 
@@ -81,12 +81,12 @@ The general principle is to follow the style of existing/surrounding code. If yo
 ```sh
 clang-format -style=file -i foo.cpp
 ```
-This formats code using the `_clang_format` file found in the oneMKL top-level directory. The version of `clang-format` is specified in [`.pre-commit-config.yaml`](https://github.com/oneapi-src/oneMKL/blob/develop/.pre-commit-config.yaml). Alternatively, you can install and run `pre-commit`, which will install the specified `clang-format` version automatically:
+This formats code using the `_clang_format` file found in the oneMath top-level directory. The version of `clang-format` is specified in [`.pre-commit-config.yaml`](https://github.com/uxlfoundation/oneMath/blob/develop/.pre-commit-config.yaml). Alternatively, you can install and run `pre-commit`, which will install the specified `clang-format` version automatically:
 ```sh
 python3 -m venv <venv-name>
 source <venv-name>/bin/activate
 pip install pre-commit
-cd <path-to-onemkl>
+cd <path-to-onemath>
 pre-commit run --all-files
 deactivate
 ```
@@ -177,43 +177,43 @@ files in the following order:
 ### NS: Namespaces
 * **NS1:** Use snake_case: all lowercase, with underscores "_" between words for all namespaces.
 
-* **NS2:** The name of a top-level namespace must be the name of the project (oneMKL).
+* **NS2:** The name of a top-level namespace must be the name of the project (oneMath).
 
 * **NS3:** Do not indent content inside a namespace scope.
 
 ```c
 // Wrong! Do not indent
 namespace oneapi {
-namespace mkl {
+namespace math {
 
    class table { };
 
-} // namespace mkl
+} // namespace math
 } // namespace oneapi
 
 // Right
 namespace oneapi {
-namespace mkl {
+namespace math {
 
 class table { };
 
-} // namespace mkl
+} // namespace math
 } // namespace oneapi
 ```
 
 *  **NS4:** Put each namespace on its own line when declaring nested namespaces.
 
 ```c
-#include "oneapi/mkl/blas/path_to_some_header.hpp"
+#include "oneapi/math/blas/path_to_some_header.hpp"
 
 namespace oneapi {
-namespace mkl {
+namespace math {
 namespace blas {
 
 /* ... */
 
 } // namespace blas
-} // namespace mkl
+} // namespace math
 } // namespace oneapi
 ```
 
@@ -351,6 +351,6 @@ for (int i = 0; i < loop_size; i++) ...;
 
 ## Unit Tests
 
-oneMKL uses GoogleTest for functional testing. For more information about how to build and run Unit Tests please see [Building and Running Tests](https://oneapi-src.github.io/oneMKL/building_and_running_tests.html).
+oneMath uses GoogleTest for functional testing. For more information about how to build and run Unit Tests please see [Building and Running Tests](https://uxlfoundation.github.io/oneMath/building_and_running_tests.html).
 
 Be sure to extend the existing tests when fixing an issue, adding a new interface or new implementation under existing interfaces.

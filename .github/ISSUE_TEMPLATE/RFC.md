@@ -9,7 +9,7 @@ assignees: ''
 # Summary
 Include a short summary of the request. Sections below provide guidance on
 what factors are considered important. Describe how new interface will meet
-[library functionality guidelines](https://github.com/oneapi-src/oneMKL/blob/master/CONTRIBUTING.md#library-functionality-guidelines).
+[library functionality guidelines](https://github.com/uxlfoundation/oneMath/blob/master/CONTRIBUTING.md#library-functionality-guidelines).
 
 # Problem statement
 Describe the problem you are trying to solve with reasonable level of details.
@@ -18,4 +18,4 @@ Describe the problem you are trying to solve with reasonable level of details.
 * The definition of the function including interface and semantics. How this
 interface will be extendable for different HW implementations.
 * What existing libraries have implementation of this function and can be used
-under oneMKL interface.
+under oneMath.

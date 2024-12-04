@@ -127,9 +127,9 @@ bool check_geqrf_accuracy(int64_t m, int64_t n, const std::vector<fp>& A, int64_
     /* |A - Q R| < |A| O(eps) */
     std::vector<fp> R(m * n);
     int64_t ldr = m;
-    reference::laset(oneapi::mkl::uplo::lower, m, n, 0.0, 0.0, R.data(), ldr);
-    reference::lacpy(oneapi::mkl::uplo::upper, m, n, A.data(), lda, R.data(), ldr);
-    auto info = reference::or_un_mqr(oneapi::mkl::side::left, oneapi::mkl::transpose::nontrans, m,
+    reference::laset(oneapi::math::uplo::lower, m, n, 0.0, 0.0, R.data(), ldr);
+    reference::lacpy(oneapi::math::uplo::upper, m, n, A.data(), lda, R.data(), ldr);
+    auto info = reference::or_un_mqr(oneapi::math::side::left, oneapi::math::transpose::nontrans, m,
                                      n, std::min(m, n), A.data(), lda, tau.data(), R.data(), ldr);
     if (0 != info) {
         test_log::lout << "reference ormqr/unmqr failed with info = " << info << std::endl;
@@ -153,7 +153,7 @@ bool check_geqrf_accuracy(int64_t m, int64_t n, const std::vector<fp>& A, int64_
     }
     std::vector<fp> QQ(m * m);
     int64_t ldqq = m;
-    reference::gemm(oneapi::mkl::transpose::nontrans, oneapi::mkl::transpose::conjtrans, m, m, m,
+    reference::gemm(oneapi::math::transpose::nontrans, oneapi::math::transpose::conjtrans, m, m, m,
                     1.0, Q.data(), ldq, Q.data(), ldq, 0.0, QQ.data(), ldqq);
     if (!rel_id_err_check(m, QQ, ldqq)) {
         test_log::lout << "Orthogonality check failed" << std::endl;
@@ -173,7 +173,7 @@ bool check_gerqf_accuracy(const std::vector<fp>& A, const std::vector<fp>& A_ini
         std::vector<fp> R(m * n);
         int64_t ldr = m;
         reference::lacpy('A', m, n, A.data(), lda, R.data(), ldr);
-        reference::laset(oneapi::mkl::uplo::lower, n - 1, n - 1, 0.0, 0.0,
+        reference::laset(oneapi::math::uplo::lower, n - 1, n - 1, 0.0, 0.0,
                          R.data() + ((m - n + 1) + 0 * ldr), ldr);
 
         std::vector<fp> Q(lda * n);
@@ -181,7 +181,7 @@ bool check_gerqf_accuracy(const std::vector<fp>& A, const std::vector<fp>& A_ini
         reference::lacpy('A', n, n, A.data() + ((m - n) + 0 * lda), lda, Q.data(), ldq);
 
         auto info =
-            reference::or_un_mrq(oneapi::mkl::side::right, oneapi::mkl::transpose::nontrans, m, n,
+            reference::or_un_mrq(oneapi::math::side::right, oneapi::math::transpose::nontrans, m, n,
                                  std::min(m, n), Q.data(), ldq, tau.data(), R.data(), ldr);
         if (0 != info) {
             test_log::lout << "reference ormqr/unmqr failed with info = " << info << std::endl;
@@ -195,8 +195,8 @@ bool check_gerqf_accuracy(const std::vector<fp>& A, const std::vector<fp>& A_ini
     else {
         std::vector<fp> R(m * n);
         int64_t ldr = m;
-        reference::laset(oneapi::mkl::uplo::lower, m, m, 0.0, 0.0, R.data(), ldr);
-        reference::lacpy(oneapi::mkl::uplo::upper, m, m, A.data() + (0 + (n - m) * lda), lda,
+        reference::laset(oneapi::math::uplo::lower, m, m, 0.0, 0.0, R.data(), ldr);
+        reference::lacpy(oneapi::math::uplo::upper, m, m, A.data() + (0 + (n - m) * lda), lda,
                          R.data() + (0 + (n - m) * ldr), ldr);
 
         std::vector<fp> Q(n * n);
@@ -206,8 +206,9 @@ bool check_gerqf_accuracy(const std::vector<fp>& A, const std::vector<fp>& A_ini
         std::vector<fp> tau2(n);
         for (int64_t i = 0; i < std::min(m, n); i++)
             tau2[n - m + i] = tau[i];
-        auto info = reference::or_un_mrq(oneapi::mkl::side::right, oneapi::mkl::transpose::nontrans,
-                                         m, n, n, Q.data(), ldq, tau2.data(), R.data(), ldr);
+        auto info =
+            reference::or_un_mrq(oneapi::math::side::right, oneapi::math::transpose::nontrans, m, n,
+                                 n, Q.data(), ldq, tau2.data(), R.data(), ldr);
         if (0 != info) {
             test_log::lout << "reference ormqr/unmqr failed with info = " << info << std::endl;
             return false;
@@ -233,7 +234,7 @@ bool check_gerqf_accuracy(const std::vector<fp>& A, const std::vector<fp>& A_ini
 
     std::vector<fp> QQ(std::min(m, n) * std::min(m, n));
     int64_t ldqq = std::min(m, n);
-    reference::gemm(oneapi::mkl::transpose::nontrans, oneapi::mkl::transpose::conjtrans,
+    reference::gemm(oneapi::math::transpose::nontrans, oneapi::math::transpose::conjtrans,
                     std::min(m, n), std::min(m, n), n, 1.0, Q.data(), ldq, Q.data(), ldq, 0.0,
                     QQ.data(), ldqq);
 
@@ -255,17 +256,17 @@ bool check_getrf_accuracy(int64_t m, int64_t n, const std::vector<fp>& A, int64_
     /* Compute P L U */
     reference::laset('A', m, n, 0.0, 0.0, residual.data(), m);
     if (m < n) {
-        reference::lacpy(oneapi::mkl::uplo::upper, m, n, A.data(), lda, residual.data(), m);
-        reference::trmm(oneapi::mkl::side::left, oneapi::mkl::uplo::lower,
-                        oneapi::mkl::transpose::nontrans, oneapi::mkl::diag::unit, m, n, 1.0,
+        reference::lacpy(oneapi::math::uplo::upper, m, n, A.data(), lda, residual.data(), m);
+        reference::trmm(oneapi::math::side::left, oneapi::math::uplo::lower,
+                        oneapi::math::transpose::nontrans, oneapi::math::diag::unit, m, n, 1.0,
                         A.data(), lda, residual.data(), m);
     }
     else {
-        reference::lacpy(oneapi::mkl::uplo::lower, m, n, A.data(), lda, residual.data(), m);
+        reference::lacpy(oneapi::math::uplo::lower, m, n, A.data(), lda, residual.data(), m);
         for (int64_t diag = 0; diag < n; diag++)
             residual[diag + diag * m] = 1.0;
-        reference::trmm(oneapi::mkl::side::right, oneapi::mkl::uplo::upper,
-                        oneapi::mkl::transpose::nontrans, oneapi::mkl::diag::nonunit, m, n, 1.0,
+        reference::trmm(oneapi::math::side::right, oneapi::math::uplo::upper,
+                        oneapi::math::transpose::nontrans, oneapi::math::diag::nonunit, m, n, 1.0,
                         A.data(), lda, residual.data(), m);
     }
     reference::laswp(n, residual.data(), m, 1, std::min(m, n), ipiv.data(), -1);
@@ -314,7 +315,7 @@ bool check_getri_accuracy(int64_t n, std::vector<fp> A, int64_t lda, std::vector
 
     /* Compute | I - inv(A)*A |. Store in residual array */
     reference::laset('A', n, n, 0.0, 1.0, residual.data(), n);
-    reference::gemm(oneapi::mkl::transpose::nontrans, oneapi::mkl::transpose::nontrans, n, n, n,
+    reference::gemm(oneapi::math::transpose::nontrans, oneapi::math::transpose::nontrans, n, n, n,
                     -1.0, A.data(), lda, A_initial.data(), lda, 1.0, residual.data(), n);
 
     /* | I - inv(A)*A | / ( |A| * |inv(A)| * n * ulp ) */
@@ -331,7 +332,7 @@ bool check_getri_accuracy(int64_t n, std::vector<fp> A, int64_t lda, std::vector
 
     /* Compute | I - A*inv(A) |. Store in residual */
     reference::laset('A', n, n, 0.0, 1.0, residual.data(), n);
-    reference::gemm(oneapi::mkl::transpose::nontrans, oneapi::mkl::transpose::nontrans, n, n, n,
+    reference::gemm(oneapi::math::transpose::nontrans, oneapi::math::transpose::nontrans, n, n, n,
                     -1.0, A_initial.data(), lda, A.data(), lda, 1.0, residual.data(), n);
 
     /* | I - A*inv(A) | / ( |A| * |inv(A)| * n * ulp ) */
@@ -350,13 +351,13 @@ bool check_getri_accuracy(int64_t n, std::vector<fp> A, int64_t lda, std::vector
 }
 
 template <typename fp>
-bool check_getrs_accuracy(oneapi::mkl::transpose transa, int64_t n, int64_t nrhs,
+bool check_getrs_accuracy(oneapi::math::transpose transa, int64_t n, int64_t nrhs,
                           const std::vector<fp>& B, int64_t ldb, const std::vector<fp>& A_initial,
                           int64_t lda, std::vector<fp> B_initial) {
     using fp_real = typename complex_info<fp>::real_type;
 
     // Compute A*X - B. Store result in B_initial
-    reference::gemm(transa, oneapi::mkl::transpose::nontrans, n, nrhs, n, -1.0, A_initial.data(),
+    reference::gemm(transa, oneapi::math::transpose::nontrans, n, nrhs, n, -1.0, A_initial.data(),
                     lda, B.data(), ldb, 1.0, B_initial.data(), ldb);
 
     // Compute norm residual |A*X - B|
@@ -384,25 +385,26 @@ bool check_getrs_accuracy(oneapi::mkl::transpose transa, int64_t n, int64_t nrhs
 }
 
 template <typename fp>
-bool check_or_un_gbr_accuracy(oneapi::mkl::generate vect, int64_t m, int64_t n, int64_t k,
+bool check_or_un_gbr_accuracy(oneapi::math::generate vect, int64_t m, int64_t n, int64_t k,
                               const std::vector<fp>& Q, int64_t ldq) {
     bool result = true;
 
-    if (vect == oneapi::mkl::generate::Q) {
+    if (vect == oneapi::math::generate::Q) {
         int64_t rows_Q = m;
         int64_t cols_Q = (m >= k) ? n : m;
 
         /* | I - Q'Q | < m O(eps) */
         std::vector<fp> QQ(cols_Q * cols_Q);
         int64_t ldqq = cols_Q;
-        reference::gemm(oneapi::mkl::transpose::conjtrans, oneapi::mkl::transpose::nontrans, cols_Q,
-                        cols_Q, rows_Q, 1.0, Q.data(), ldq, Q.data(), ldq, 0.0, QQ.data(), ldqq);
+        reference::gemm(oneapi::math::transpose::conjtrans, oneapi::math::transpose::nontrans,
+                        cols_Q, cols_Q, rows_Q, 1.0, Q.data(), ldq, Q.data(), ldq, 0.0, QQ.data(),
+                        ldqq);
         if (!rel_id_err_check(cols_Q, QQ, ldqq)) {
             test_log::lout << "Q Orthogonality check failed" << std::endl;
             result = false;
         }
     }
-    else { /* vect == oneapi::mkl::generate::P */
+    else { /* vect == oneapi::math::generate::P */
         auto& P = Q;
         auto& ldp = ldq;
         int64_t rows_P = (k < n) ? m : n;
@@ -411,8 +413,9 @@ bool check_or_un_gbr_accuracy(oneapi::mkl::generate vect, int64_t m, int64_t n, 
         /* | I - (P')(P')' | < m O(eps) */
         std::vector<fp> PP(rows_P * rows_P);
         int64_t ldpp = rows_P;
-        reference::gemm(oneapi::mkl::transpose::nontrans, oneapi::mkl::transpose::conjtrans, rows_P,
-                        rows_P, cols_P, 1.0, P.data(), ldp, P.data(), ldp, 0.0, PP.data(), ldpp);
+        reference::gemm(oneapi::math::transpose::nontrans, oneapi::math::transpose::conjtrans,
+                        rows_P, rows_P, cols_P, 1.0, P.data(), ldp, P.data(), ldp, 0.0, PP.data(),
+                        ldpp);
         if (!rel_id_err_check(rows_P, PP, ldpp)) {
             test_log::lout << "P^t Orthogonality check failed" << std::endl;
             result = false;
@@ -428,7 +431,7 @@ bool check_or_un_gqr_accuracy(int64_t m, int64_t n, const std::vector<fp>& Q, in
     /* | I - Q'Q | < m O(eps) */
     std::vector<fp> QQ(n * n);
     int64_t ldqq = n;
-    reference::gemm(oneapi::mkl::transpose::conjtrans, oneapi::mkl::transpose::nontrans, n, n, m,
+    reference::gemm(oneapi::math::transpose::conjtrans, oneapi::math::transpose::nontrans, n, n, m,
                     1.0, Q.data(), ldq, Q.data(), ldq, 0.0, QQ.data(), ldqq);
     if (!rel_id_err_check(n, QQ, n)) {
         test_log::lout << "Orthogonality check failed" << std::endl;
@@ -444,7 +447,7 @@ bool check_or_un_gtr_accuracy(int64_t n, const std::vector<fp>& Q, int64_t ldq) 
     /* | I - Q'Q | < m O(eps) */
     std::vector<fp> QQ(n * n);
     int64_t ldqq = n;
-    reference::gemm(oneapi::mkl::transpose::conjtrans, oneapi::mkl::transpose::nontrans, n, n, n,
+    reference::gemm(oneapi::math::transpose::conjtrans, oneapi::math::transpose::nontrans, n, n, n,
                     1.0, Q.data(), ldq, Q.data(), ldq, 0.0, QQ.data(), ldqq);
     if (!rel_id_err_check(n, QQ, n)) {
         test_log::lout << "Orthogonality check failed" << std::endl;
@@ -455,7 +458,7 @@ bool check_or_un_gtr_accuracy(int64_t n, const std::vector<fp>& Q, int64_t ldq) 
 
 template <typename fp>
 bool check_potrf_accuracy(const std::vector<fp>& init, const std::vector<fp>& sol,
-                          oneapi::mkl::uplo uplo, int64_t n, int64_t lda) {
+                          oneapi::math::uplo uplo, int64_t n, int64_t lda) {
     using fp_real = typename complex_info<fp>::real_type;
 
     std::vector<fp> ref(init);
@@ -464,7 +467,7 @@ bool check_potrf_accuracy(const std::vector<fp>& init, const std::vector<fp>& so
     fp_real eps = reference::lamch<fp_real>('e');
     fp_real error, max_error = 0;
     bool lower =
-        (uplo == oneapi::mkl::uplo::
+        (uplo == oneapi::math::uplo::
                      upper); // lower for row-major (which is this source) is upper for column major
     bool result = true;
     // Check solution values are inside allowed error bounds derived in:
@@ -490,15 +493,15 @@ bool check_potrf_accuracy(const std::vector<fp>& init, const std::vector<fp>& so
 }
 
 template <typename fp>
-bool check_potrs_accuracy(oneapi::mkl::uplo uplo, int64_t n, int64_t nrhs, const std::vector<fp>& B,
-                          int64_t ldb, std::vector<fp> A_initial, int64_t lda,
-                          std::vector<fp> B_initial) {
+bool check_potrs_accuracy(oneapi::math::uplo uplo, int64_t n, int64_t nrhs,
+                          const std::vector<fp>& B, int64_t ldb, std::vector<fp> A_initial,
+                          int64_t lda, std::vector<fp> B_initial) {
     using fp_real = typename complex_info<fp>::real_type;
 
     hermitian_to_full(uplo, n, A_initial, lda);
     // Compute A*X - B. Store result in B_initial
-    reference::gemm(oneapi::mkl::transpose::nontrans, oneapi::mkl::transpose::nontrans, n, nrhs, n,
-                    -1.0, A_initial.data(), lda, B.data(), ldb, 1.0, B_initial.data(), ldb);
+    reference::gemm(oneapi::math::transpose::nontrans, oneapi::math::transpose::nontrans, n, nrhs,
+                    n, -1.0, A_initial.data(), lda, B.data(), ldb, 1.0, B_initial.data(), ldb);
 
     // Compute norm residual |A*X - B|
     fp_real norm_residual = reference::lange('1', n, nrhs, B_initial.data(), ldb);
@@ -525,7 +528,7 @@ bool check_potrs_accuracy(oneapi::mkl::uplo uplo, int64_t n, int64_t nrhs, const
 }
 
 template <typename fp>
-bool check_sy_he_evd_accuracy(oneapi::mkl::job jobz, oneapi::mkl::uplo uplo, int64_t n,
+bool check_sy_he_evd_accuracy(oneapi::math::job jobz, oneapi::math::uplo uplo, int64_t n,
                               const std::vector<fp>& A, int64_t lda,
                               const std::vector<typename complex_info<fp>::real_type>& w,
                               std::vector<fp> A_initial) {
@@ -540,10 +543,10 @@ bool check_sy_he_evd_accuracy(oneapi::mkl::job jobz, oneapi::mkl::uplo uplo, int
     std::vector<fp_real> D_ref(n);
 
     if constexpr (complex_info<fp>::is_complex)
-        reference::heevd(oneapi::mkl::job::novec, uplo, n, std::vector<fp>(A_initial).data(), lda,
+        reference::heevd(oneapi::math::job::novec, uplo, n, std::vector<fp>(A_initial).data(), lda,
                          D_ref.data());
     else
-        reference::syevd(oneapi::mkl::job::novec, uplo, n, std::vector<fp>(A_initial).data(), lda,
+        reference::syevd(oneapi::math::job::novec, uplo, n, std::vector<fp>(A_initial).data(), lda,
                          D_ref.data());
 
     if (!rel_vec_err_check(n, D_ref, D, 10.0)) {
@@ -551,7 +554,7 @@ bool check_sy_he_evd_accuracy(oneapi::mkl::job jobz, oneapi::mkl::uplo uplo, int
         result = false;
     }
 
-    if (oneapi::mkl::job::vec == jobz) {
+    if (oneapi::math::job::vec == jobz) {
         /* |A - Z D Z'| < |A| O(eps) */
         std::vector<fp> ZD(n * n);
         int64_t ldzd = n;
@@ -560,7 +563,7 @@ bool check_sy_he_evd_accuracy(oneapi::mkl::job jobz, oneapi::mkl::uplo uplo, int
         for (int64_t col = 0; col < n; col++)
             for (int64_t row = 0; row < n; row++)
                 ZD[row + col * ldzd] = Z[row + col * ldz] * D[col];
-        reference::gemm(oneapi::mkl::transpose::nontrans, oneapi::mkl::transpose::conjtrans, n, n,
+        reference::gemm(oneapi::math::transpose::nontrans, oneapi::math::transpose::conjtrans, n, n,
                         n, 1.0, ZD.data(), ldzd, Z.data(), ldz, 0.0, ZDZ.data(), ldzdz);
 
         if (!rel_mat_err_check(n, n, A_initial, lda, ZDZ, ldzdz)) {
@@ -571,9 +574,9 @@ bool check_sy_he_evd_accuracy(oneapi::mkl::job jobz, oneapi::mkl::uplo uplo, int
         /* |I - Z Z'| < n O(eps) */
         std::vector<fp> ZZ(n * n);
         int64_t ldzz = n;
-        reference::sy_he_rk(oneapi::mkl::uplo::upper, oneapi::mkl::transpose::nontrans, n, n, 1.0,
+        reference::sy_he_rk(oneapi::math::uplo::upper, oneapi::math::transpose::nontrans, n, n, 1.0,
                             Z.data(), ldz, 0.0, ZZ.data(), ldzz);
-        hermitian_to_full(oneapi::mkl::uplo::upper, n, ZZ, ldzz);
+        hermitian_to_full(oneapi::math::uplo::upper, n, ZZ, ldzz);
         if (!rel_id_err_check(n, ZZ, ldzz)) {
             test_log::lout << "Orthogonality check failed" << std::endl;
             result = false;
@@ -583,18 +586,18 @@ bool check_sy_he_evd_accuracy(oneapi::mkl::job jobz, oneapi::mkl::uplo uplo, int
 }
 
 template <typename fp>
-bool check_trtrs_accuracy(oneapi::mkl::uplo uplo, oneapi::mkl::transpose trans,
-                          oneapi::mkl::diag diag, int64_t n, int64_t nrhs, std::vector<fp> A,
+bool check_trtrs_accuracy(oneapi::math::uplo uplo, oneapi::math::transpose trans,
+                          oneapi::math::diag diag, int64_t n, int64_t nrhs, std::vector<fp> A,
                           int64_t lda, const std::vector<fp>& B, int64_t ldb,
                           const std::vector<fp>& B_initial) {
     using fp_real = typename complex_info<fp>::real_type;
     fp_real threshold = 10.0;
 
     /* |A x - b| = |A (x-x_0)| < |A| |x-x0| < |A| |x| cond(A) O(eps) */
-    if (diag == oneapi::mkl::diag::unit)
+    if (diag == oneapi::math::diag::unit)
         for (int64_t d = 0; d < n; d++)
             A[d + d * lda] = 1.0;
-    if (uplo == oneapi::mkl::uplo::upper)
+    if (uplo == oneapi::math::uplo::upper)
         for (int64_t col = 0; col < n; col++)
             for (int64_t row = col + 1; row < n; row++)
                 A[row + col * lda] = 0.0;
@@ -607,7 +610,7 @@ bool check_trtrs_accuracy(oneapi::mkl::uplo uplo, oneapi::mkl::transpose trans,
     auto norm_x = reference::lange('I', n, nrhs, B.data(), ldb);
 
     fp_real cond_A;
-    if (diag == oneapi::mkl::diag::unit)
+    if (diag == oneapi::math::diag::unit)
         cond_A = 1.0;
     else {
         fp_real min = std::abs(A[0]);
@@ -626,7 +629,7 @@ bool check_trtrs_accuracy(oneapi::mkl::uplo uplo, oneapi::mkl::transpose trans,
 
     std::vector<fp> residual(n * nrhs);
     int64_t ldr = n;
-    reference::gemm(trans, oneapi::mkl::transpose::nontrans, n, nrhs, n, 1.0, A.data(), lda,
+    reference::gemm(trans, oneapi::math::transpose::nontrans, n, nrhs, n, 1.0, A.data(), lda,
                     B.data(), ldb, 0.0, residual.data(), ldr);
     for (int64_t col = 0; col < nrhs; col++)
         for (int64_t row = 0; row < n; row++)

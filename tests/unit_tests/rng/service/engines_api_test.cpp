@@ -30,13 +30,13 @@ class Philox4x32x10ConstructorsTests : public ::testing::TestWithParam<sycl::dev
 class Philox4x32x10CopyTests : public ::testing::TestWithParam<sycl::device*> {};
 
 TEST_P(Philox4x32x10ConstructorsTests, BinaryPrecision) {
-    rng_test<engines_constructors_test<oneapi::mkl::rng::philox4x32x10>> test;
+    rng_test<engines_constructors_test<oneapi::math::rng::philox4x32x10>> test;
     std::initializer_list<std::uint64_t> seed_ex = { SEED, 0, 0 };
     EXPECT_TRUEORSKIP((test(GetParam(), seed_ex)));
 }
 
 TEST_P(Philox4x32x10CopyTests, BinaryPrecision) {
-    rng_test<engines_copy_test<oneapi::mkl::rng::philox4x32x10>> test;
+    rng_test<engines_copy_test<oneapi::math::rng::philox4x32x10>> test;
     EXPECT_TRUEORSKIP((test(GetParam())));
 }
 
@@ -51,13 +51,13 @@ class Mrg32k3aConstructorsTests : public ::testing::TestWithParam<sycl::device*>
 class Mrg32k3aCopyTests : public ::testing::TestWithParam<sycl::device*> {};
 
 TEST_P(Mrg32k3aConstructorsTests, BinaryPrecision) {
-    rng_test<engines_constructors_test<oneapi::mkl::rng::mrg32k3a>> test;
+    rng_test<engines_constructors_test<oneapi::math::rng::mrg32k3a>> test;
     std::initializer_list<std::uint32_t> seed_ex = { SEED, 1, 1, 1, 1, 1 };
     EXPECT_TRUEORSKIP((test(GetParam(), seed_ex)));
 }
 
 TEST_P(Mrg32k3aCopyTests, BinaryPrecision) {
-    rng_test<engines_copy_test<oneapi::mkl::rng::mrg32k3a>> test;
+    rng_test<engines_copy_test<oneapi::math::rng::mrg32k3a>> test;
     EXPECT_TRUEORSKIP((test(GetParam())));
 }
 

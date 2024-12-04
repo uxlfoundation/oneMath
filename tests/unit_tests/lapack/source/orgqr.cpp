@@ -26,7 +26,7 @@
 #include <CL/sycl.hpp>
 #endif
 
-#include "oneapi/mkl.hpp"
+#include "oneapi/math.hpp"
 #include "lapack_common.hpp"
 #include "lapack_test_controller.hpp"
 #include "lapack_accuracy_checks.hpp"
@@ -54,7 +54,7 @@ bool accuracy(const sycl::device& dev, int64_t m, int64_t n, int64_t k, int64_t 
     std::vector<fp> A(lda * n);
     std::vector<fp> tau(k);
 
-    rand_matrix(seed, oneapi::mkl::transpose::nontrans, m, n, A, lda);
+    rand_matrix(seed, oneapi::math::transpose::nontrans, m, n, A, lda);
     auto info = reference::geqrf(m, k, A.data(), lda, tau.data());
     if (0 != info) {
         test_log::lout << "reference geqrf failed with info: " << info << std::endl;
@@ -68,11 +68,11 @@ bool accuracy(const sycl::device& dev, int64_t m, int64_t n, int64_t k, int64_t 
         auto tau_dev = device_alloc<data_T>(queue, tau.size());
 #ifdef CALL_RT_API
         const auto scratchpad_size =
-            oneapi::mkl::lapack::orgqr_scratchpad_size<fp>(queue, m, n, k, lda);
+            oneapi::math::lapack::orgqr_scratchpad_size<fp>(queue, m, n, k, lda);
 #else
         int64_t scratchpad_size;
         TEST_RUN_LAPACK_CT_SELECT(
-            queue, scratchpad_size = oneapi::mkl::lapack::orgqr_scratchpad_size<fp>, m, n, k, lda);
+            queue, scratchpad_size = oneapi::math::lapack::orgqr_scratchpad_size<fp>, m, n, k, lda);
 #endif
         auto scratchpad_dev = device_alloc<data_T>(queue, scratchpad_size);
 
@@ -81,10 +81,10 @@ bool accuracy(const sycl::device& dev, int64_t m, int64_t n, int64_t k, int64_t 
         queue.wait_and_throw();
 
 #ifdef CALL_RT_API
-        oneapi::mkl::lapack::orgqr(queue, m, n, k, A_dev, lda, tau_dev, scratchpad_dev,
-                                   scratchpad_size);
+        oneapi::math::lapack::orgqr(queue, m, n, k, A_dev, lda, tau_dev, scratchpad_dev,
+                                    scratchpad_size);
 #else
-        TEST_RUN_LAPACK_CT_SELECT(queue, oneapi::mkl::lapack::orgqr, m, n, k, A_dev, lda, tau_dev,
+        TEST_RUN_LAPACK_CT_SELECT(queue, oneapi::math::lapack::orgqr, m, n, k, A_dev, lda, tau_dev,
                                   scratchpad_dev, scratchpad_size);
 #endif
         queue.wait_and_throw();
@@ -112,7 +112,7 @@ bool usm_dependency(const sycl::device& dev, int64_t m, int64_t n, int64_t k, in
 
     /* Initialize */
     std::vector<fp> A(lda * n);
-    rand_matrix(seed, oneapi::mkl::transpose::nontrans, m, n, A, lda);
+    rand_matrix(seed, oneapi::math::transpose::nontrans, m, n, A, lda);
     std::vector<fp> tau(k);
 
     auto info = reference::geqrf(m, k, A.data(), lda, tau.data());
@@ -129,11 +129,11 @@ bool usm_dependency(const sycl::device& dev, int64_t m, int64_t n, int64_t k, in
         auto tau_dev = device_alloc<data_T>(queue, tau.size());
 #ifdef CALL_RT_API
         const auto scratchpad_size =
-            oneapi::mkl::lapack::orgqr_scratchpad_size<fp>(queue, m, n, k, lda);
+            oneapi::math::lapack::orgqr_scratchpad_size<fp>(queue, m, n, k, lda);
 #else
         int64_t scratchpad_size;
         TEST_RUN_LAPACK_CT_SELECT(
-            queue, scratchpad_size = oneapi::mkl::lapack::orgqr_scratchpad_size<fp>, m, n, k, lda);
+            queue, scratchpad_size = oneapi::math::lapack::orgqr_scratchpad_size<fp>, m, n, k, lda);
 #endif
         auto scratchpad_dev = device_alloc<data_T>(queue, scratchpad_size);
 
@@ -145,11 +145,11 @@ bool usm_dependency(const sycl::device& dev, int64_t m, int64_t n, int64_t k, in
         auto in_event = create_dependency(queue);
 #ifdef CALL_RT_API
         sycl::event func_event =
-            oneapi::mkl::lapack::orgqr(queue, m, n, k, A_dev, lda, tau_dev, scratchpad_dev,
-                                       scratchpad_size, std::vector<sycl::event>{ in_event });
+            oneapi::math::lapack::orgqr(queue, m, n, k, A_dev, lda, tau_dev, scratchpad_dev,
+                                        scratchpad_size, std::vector<sycl::event>{ in_event });
 #else
         sycl::event func_event;
-        TEST_RUN_LAPACK_CT_SELECT(queue, func_event = oneapi::mkl::lapack::orgqr, m, n, k, A_dev,
+        TEST_RUN_LAPACK_CT_SELECT(queue, func_event = oneapi::math::lapack::orgqr, m, n, k, A_dev,
                                   lda, tau_dev, scratchpad_dev, scratchpad_size,
                                   std::vector<sycl::event>{ in_event });
 #endif

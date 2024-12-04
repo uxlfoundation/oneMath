@@ -48,7 +48,7 @@ struct allocator_helper {
     allocator_helper(allocator_helper<U, align2>&& other) noexcept {}
 
     T* allocate(size_t n) {
-        void* mem = oneapi::mkl::aligned_alloc(align, n * sizeof(T));
+        void* mem = oneapi::math::aligned_alloc(align, n * sizeof(T));
         if (!mem)
             throw std::bad_alloc();
 
@@ -56,7 +56,7 @@ struct allocator_helper {
     }
 
     void deallocate(T* p, size_t n) noexcept {
-        oneapi::mkl::aligned_free(p);
+        oneapi::math::aligned_free(p);
     }
 
     constexpr size_t max_size() const noexcept {

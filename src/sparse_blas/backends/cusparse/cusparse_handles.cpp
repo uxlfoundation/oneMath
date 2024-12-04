@@ -17,7 +17,7 @@
 *
 **************************************************************************/
 
-#include "oneapi/mkl/sparse_blas/detail/cusparse/onemkl_sparse_blas_cusparse.hpp"
+#include "oneapi/math/sparse_blas/detail/cusparse/onemath_sparse_blas_cusparse.hpp"
 
 #include "cusparse_error.hpp"
 #include "cusparse_helper.hpp"
@@ -26,7 +26,7 @@
 #include "cusparse_task.hpp"
 #include "sparse_blas/macros.hpp"
 
-namespace oneapi::mkl::sparse::cusparse {
+namespace oneapi::math::sparse::cusparse {
 
 /**
  * In this file CusparseScopedContextHandler are used to ensure that a cusparseHandle_t is created before any other cuSPARSE call, as required by the specification.
@@ -164,7 +164,7 @@ void init_dense_matrix(sycl::queue& queue, dense_matrix_handle_t* p_dmhandle, st
 template <typename fpType>
 void set_dense_matrix_data(sycl::queue& queue, dense_matrix_handle_t dmhandle,
                            std::int64_t num_rows, std::int64_t num_cols, std::int64_t ld,
-                           oneapi::mkl::layout dense_layout, sycl::buffer<fpType, 1> val) {
+                           oneapi::math::layout dense_layout, sycl::buffer<fpType, 1> val) {
     detail::check_can_reset_value_handle<fpType>(__func__, dmhandle, true);
     auto event = queue.submit([&](sycl::handler& cgh) {
         auto acc = val.template get_access<sycl::access::mode::read_write>(cgh);
@@ -194,8 +194,8 @@ void set_dense_matrix_data(sycl::queue& queue, dense_matrix_handle_t dmhandle,
 
 template <typename fpType>
 void set_dense_matrix_data(sycl::queue&, dense_matrix_handle_t dmhandle, std::int64_t num_rows,
-                           std::int64_t num_cols, std::int64_t ld, oneapi::mkl::layout dense_layout,
-                           fpType* val) {
+                           std::int64_t num_cols, std::int64_t ld,
+                           oneapi::math::layout dense_layout, fpType* val) {
     detail::check_can_reset_value_handle<fpType>(__func__, dmhandle, false);
     if (dmhandle->num_rows != num_rows || dmhandle->num_cols != num_cols || dmhandle->ld != ld ||
         dmhandle->dense_layout != dense_layout) {
@@ -230,7 +230,7 @@ sycl::event release_dense_matrix(sycl::queue& queue, dense_matrix_handle_t dmhan
 // COO matrix
 template <typename fpType, typename intType>
 void init_coo_matrix(sycl::queue& queue, matrix_handle_t* p_smhandle, std::int64_t num_rows,
-                     std::int64_t num_cols, std::int64_t nnz, oneapi::mkl::index_base index,
+                     std::int64_t num_cols, std::int64_t nnz, oneapi::math::index_base index,
                      sycl::buffer<intType, 1> row_ind, sycl::buffer<intType, 1> col_ind,
                      sycl::buffer<fpType, 1> val) {
     auto event = queue.submit([&](sycl::handler& cgh) {
@@ -258,7 +258,7 @@ void init_coo_matrix(sycl::queue& queue, matrix_handle_t* p_smhandle, std::int64
 
 template <typename fpType, typename intType>
 void init_coo_matrix(sycl::queue& queue, matrix_handle_t* p_smhandle, std::int64_t num_rows,
-                     std::int64_t num_cols, std::int64_t nnz, oneapi::mkl::index_base index,
+                     std::int64_t num_cols, std::int64_t nnz, oneapi::math::index_base index,
                      intType* row_ind, intType* col_ind, fpType* val) {
     auto event = queue.submit([&](sycl::handler& cgh) {
         detail::submit_host_task(cgh, queue, [=](sycl::interop_handle ih) {
@@ -280,7 +280,7 @@ void init_coo_matrix(sycl::queue& queue, matrix_handle_t* p_smhandle, std::int64
 
 template <typename fpType, typename intType>
 void set_coo_matrix_data(sycl::queue& queue, matrix_handle_t smhandle, std::int64_t num_rows,
-                         std::int64_t num_cols, std::int64_t nnz, oneapi::mkl::index_base index,
+                         std::int64_t num_cols, std::int64_t nnz, oneapi::math::index_base index,
                          sycl::buffer<intType, 1> row_ind, sycl::buffer<intType, 1> col_ind,
                          sycl::buffer<fpType, 1> val) {
     detail::check_can_reset_sparse_handle<fpType, intType>(__func__, smhandle, true);
@@ -319,7 +319,7 @@ void set_coo_matrix_data(sycl::queue& queue, matrix_handle_t smhandle, std::int6
 
 template <typename fpType, typename intType>
 void set_coo_matrix_data(sycl::queue&, matrix_handle_t smhandle, std::int64_t num_rows,
-                         std::int64_t num_cols, std::int64_t nnz, oneapi::mkl::index_base index,
+                         std::int64_t num_cols, std::int64_t nnz, oneapi::math::index_base index,
                          intType* row_ind, intType* col_ind, fpType* val) {
     detail::check_can_reset_sparse_handle<fpType, intType>(__func__, smhandle, false);
     if (smhandle->num_rows != num_rows || smhandle->num_cols != num_cols || smhandle->nnz != nnz ||
@@ -348,7 +348,7 @@ FOR_EACH_FP_AND_INT_TYPE(INSTANTIATE_COO_MATRIX_FUNCS);
 // CSR matrix
 template <typename fpType, typename intType>
 void init_csr_matrix(sycl::queue& queue, matrix_handle_t* p_smhandle, std::int64_t num_rows,
-                     std::int64_t num_cols, std::int64_t nnz, oneapi::mkl::index_base index,
+                     std::int64_t num_cols, std::int64_t nnz, oneapi::math::index_base index,
                      sycl::buffer<intType, 1> row_ptr, sycl::buffer<intType, 1> col_ind,
                      sycl::buffer<fpType, 1> val) {
     auto event = queue.submit([&](sycl::handler& cgh) {
@@ -376,7 +376,7 @@ void init_csr_matrix(sycl::queue& queue, matrix_handle_t* p_smhandle, std::int64
 
 template <typename fpType, typename intType>
 void init_csr_matrix(sycl::queue& queue, matrix_handle_t* p_smhandle, std::int64_t num_rows,
-                     std::int64_t num_cols, std::int64_t nnz, oneapi::mkl::index_base index,
+                     std::int64_t num_cols, std::int64_t nnz, oneapi::math::index_base index,
                      intType* row_ptr, intType* col_ind, fpType* val) {
     auto event = queue.submit([&](sycl::handler& cgh) {
         detail::submit_host_task(cgh, queue, [=](sycl::interop_handle ih) {
@@ -399,7 +399,7 @@ void init_csr_matrix(sycl::queue& queue, matrix_handle_t* p_smhandle, std::int64
 
 template <typename fpType, typename intType>
 void set_csr_matrix_data(sycl::queue& queue, matrix_handle_t smhandle, std::int64_t num_rows,
-                         std::int64_t num_cols, std::int64_t nnz, oneapi::mkl::index_base index,
+                         std::int64_t num_cols, std::int64_t nnz, oneapi::math::index_base index,
                          sycl::buffer<intType, 1> row_ptr, sycl::buffer<intType, 1> col_ind,
                          sycl::buffer<fpType, 1> val) {
     detail::check_can_reset_sparse_handle<fpType, intType>(__func__, smhandle, true);
@@ -438,7 +438,7 @@ void set_csr_matrix_data(sycl::queue& queue, matrix_handle_t smhandle, std::int6
 
 template <typename fpType, typename intType>
 void set_csr_matrix_data(sycl::queue&, matrix_handle_t smhandle, std::int64_t num_rows,
-                         std::int64_t num_cols, std::int64_t nnz, oneapi::mkl::index_base index,
+                         std::int64_t num_cols, std::int64_t nnz, oneapi::math::index_base index,
                          intType* row_ptr, intType* col_ind, fpType* val) {
     detail::check_can_reset_sparse_handle<fpType, intType>(__func__, smhandle, false);
     if (smhandle->num_rows != num_rows || smhandle->num_cols != num_cols || smhandle->nnz != nnz ||
@@ -483,4 +483,4 @@ bool set_matrix_property(sycl::queue&, matrix_handle_t smhandle, matrix_property
     return false;
 }
 
-} // namespace oneapi::mkl::sparse::cusparse
+} // namespace oneapi::math::sparse::cusparse

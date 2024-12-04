@@ -24,11 +24,11 @@
 #endif
 
 #include "portblas_common.hpp"
-#include "oneapi/mkl/exceptions.hpp"
-#include "oneapi/mkl/blas/detail/portblas/onemkl_blas_portblas.hpp"
+#include "oneapi/math/exceptions.hpp"
+#include "oneapi/math/blas/detail/portblas/onemath_blas_portblas.hpp"
 
 namespace oneapi {
-namespace mkl {
+namespace math {
 namespace blas {
 namespace portblas {
 
@@ -58,5 +58,5 @@ constexpr bool is_column_major() {
 } // namespace row_major
 } // namespace portblas
 } // namespace blas
-} // namespace mkl
+} // namespace math
 } // namespace oneapi

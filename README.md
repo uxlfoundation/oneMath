@@ -1,25 +1,25 @@
 <img src="https://github.com/uxlfoundation/artwork/blob/main/foundation/uxl-foundation-logo-horizontal-color.png" alt="UXL Foundation Logo" width="250"/>
 
-# oneAPI Math Kernel Library (oneMKL) Interfaces
+# oneAPI Math Library (oneMath)
 
-oneMKL Interfaces is an open-source implementation of the oneMKL Data Parallel C++ (DPC++) interface according to the [oneMKL specification](https://oneapi-spec.uxlfoundation.org/specifications/oneapi/latest/elements/onemkl/source/). It works with multiple devices (backends) using device-specific libraries underneath.
+oneMath is an open-source implementation of the [oneMath specification](https://oneapi-spec.uxlfoundation.org/specifications/oneapi/latest/elements/onemath/source/). It can work with multiple devices using multiple libraries (backends) underneath. The oneMath project was previously referred to as oneMKL Interfaces.
 
-oneMKL is part of the [UXL Foundation](http://www.uxlfoundation.org).
+oneMath is part of the [UXL Foundation](http://www.uxlfoundation.org).
 <br/><br/>
 
 <table>
     <thead>
         <tr align="center" >
             <th>User Application</th>
-            <th>oneMKL Layer</th>
+            <th>oneMath Layer</th>
             <th>Third-Party Library</th>
             <th>Hardware Backend</th>
         </tr>
     </thead>
     <tbody>
         <tr>
-            <td rowspan=14 align="center">oneMKL interface</td>
-            <td rowspan=14 align="center">oneMKL selector</td>
+            <td rowspan=14 align="center">oneMath</td>
+            <td rowspan=14 align="center">oneMath selector</td>
             <td align="center"><a href="https://software.intel.com/en-us/oneapi/onemkl">Intel(R) oneAPI Math Kernel Library (oneMKL)</a></td>
             <td align="center">x86 CPU, Intel GPU</td>
         </tr>
@@ -95,14 +95,14 @@ oneMKL is part of the [UXL Foundation](http://www.uxlfoundation.org).
 
 #### Host API
 
-There are two oneMKL selector layer implementations:
+There are two oneMath selector layer implementations:
 
-- **Run-time dispatching**: The application is linked with the oneMKL library and the required backend is loaded at run-time based on device vendor (all libraries should be dynamic).
+- **Run-time dispatching**: The application is linked with the oneMath library and the required backend is loaded at run-time based on device vendor (all libraries should be dynamic).
 
   Example of app.cpp with run-time dispatching:
   
   ```cpp
-  #include "oneapi/mkl.hpp"
+  #include "oneapi/math.hpp"
   
   ...
   cpu_dev = sycl::device(sycl::cpu_selector());
@@ -111,24 +111,24 @@ There are two oneMKL selector layer implementations:
   sycl::queue cpu_queue(cpu_dev);
   sycl::queue gpu_queue(gpu_dev);
   
-  oneapi::mkl::blas::column_major::gemm(cpu_queue, transA, transB, m, ...);
-  oneapi::mkl::blas::column_major::gemm(gpu_queue, transA, transB, m, ...);
+  oneapi::math::blas::column_major::gemm(cpu_queue, transA, transB, m, ...);
+  oneapi::math::blas::column_major::gemm(gpu_queue, transA, transB, m, ...);
   ```
   How to build an application with run-time dispatching:
   
   if OS is Linux, use icpx compiler. If OS is Windows, use icx compiler.
   Linux example:
   ```cmd
-  $> icpx -fsycl –I$ONEMKL/include app.cpp
-  $> icpx -fsycl app.o –L$ONEMKL/lib –lonemkl
+  $> icpx -fsycl –I$ONEMATH/include app.cpp
+  $> icpx -fsycl app.o –L$ONEMATH/lib –lonemath
   ```
 
-- **Compile-time dispatching**: The application uses a templated backend selector API where the template parameters specify the required backends and third-party libraries and the application is linked with the required oneMKL backend wrapper libraries (libraries can be static or dynamic).
+- **Compile-time dispatching**: The application uses a templated backend selector API where the template parameters specify the required backends and third-party libraries and the application is linked with the required oneMath backend wrapper libraries (libraries can be static or dynamic).
 
   Example of app.cpp with compile-time dispatching:
   
   ```cpp
-  #include "oneapi/mkl.hpp"
+  #include "oneapi/math.hpp"
   
   ...
   cpu_dev = sycl::device(sycl::cpu_selector());
@@ -137,25 +137,25 @@ There are two oneMKL selector layer implementations:
   sycl::queue cpu_queue(cpu_dev);
   sycl::queue gpu_queue(gpu_dev);
   
-  oneapi::mkl::backend_selector<oneapi::mkl::backend::mklcpu> cpu_selector(cpu_queue);
+  oneapi::math::backend_selector<oneapi::math::backend::mklcpu> cpu_selector(cpu_queue);
   
-  oneapi::mkl::blas::column_major::gemm(cpu_selector, transA, transB, m, ...);
-  oneapi::mkl::blas::column_major::gemm(oneapi::mkl::backend_selector<oneapi::mkl::backend::cublas> {gpu_queue}, transA, transB, m, ...);
+  oneapi::math::blas::column_major::gemm(cpu_selector, transA, transB, m, ...);
+  oneapi::math::blas::column_major::gemm(oneapi::math::backend_selector<oneapi::math::backend::cublas> {gpu_queue}, transA, transB, m, ...);
   ```
   How to build an application with compile-time dispatching:
   
   ```cmd
-  $> clang++ -fsycl –I$ONEMKL/include app.cpp
-  $> clang++ -fsycl app.o –L$ONEMKL/lib –lonemkl_blas_mklcpu –lonemkl_blas_cublas
+  $> clang++ -fsycl –I$ONEMATH/include app.cpp
+  $> clang++ -fsycl app.o –L$ONEMATH/lib –lonemath_blas_mklcpu –lonemath_blas_cublas
   ```
   
-*Refer to [Selecting a Compiler](https://oneapi-src.github.io/oneMKL/selecting_a_compiler.html) for the choice between `icpx/icx` and `clang++` compilers.*
+*Refer to [Selecting a Compiler](https://uxlfoundation.github.io/oneMath/selecting_a_compiler.html) for the choice between `icpx/icx` and `clang++` compilers.*
 
 #### Device API
 
-Header-based and backend-independent Device API can be called within ```sycl kernel``` or work from Host code ([device-rng-usage-model-example](https://spec.oneapi.io/versions/latest/elements/oneMKL/source/domains/rng/device_api/device-rng-usage-model.html#id2)). Currently, the following domains support the Device API:
+Header-based and backend-independent Device API can be called within ```sycl kernel``` or work from Host code ([device-rng-usage-model-example](https://spec.oneapi.io/versions/latest/elements/oneMath/source/domains/rng/device_api/device-rng-usage-model.html#id2)). Currently, the following domains support the Device API:
 
-- **RNG**. To use RNG Device API functionality it's required to include ```oneapi/mkl/rng/device.hpp``` header file.
+- **RNG**. To use RNG Device API functionality it's required to include ```oneapi/math/rng/device.hpp``` header file.
 
 ### Supported Configurations:
 
@@ -447,7 +447,7 @@ Supported compilers include:
 Backend | Supported Operating System
 :--- | :---
 x86 CPU    | Red Hat Enterprise Linux* 9 (RHEL* 9)
-Intel GPU  | Ubuntu 22.04 LTS
+Intel GPU  | Ubuntu 24.04 LTS
 NVIDIA GPU | Ubuntu 22.04 LTS
 
 #### Windows*
@@ -555,22 +555,22 @@ Product | Supported Version | License
 ---
 
 ## Documentation
-- [Contents](https://oneapi-src.github.io/oneMKL/)
-- [About](https://oneapi-src.github.io/oneMKL/introduction.html)
+- [Contents](https://uxlfoundation.github.io/oneMath/)
+- [About](https://uxlfoundation.github.io/oneMath/introduction.html)
 - Get Started
-  - [Selecting a Compiler](https://oneapi-src.github.io/oneMKL/selecting_a_compiler.html)
-  - [Building the Project with DPC++](https://oneapi-src.github.io/oneMKL/building_the_project_with_dpcpp.html)
-  - [Building the Project with AdaptiveCpp](https://oneapi-src.github.io/oneMKL/building_the_project_with_adaptivecpp.html)
+  - [Selecting a Compiler](https://uxlfoundation.github.io/oneMath/selecting_a_compiler.html)
+  - [Building the Project with DPC++](https://uxlfoundation.github.io/oneMath/building_the_project_with_dpcpp.html)
+  - [Building the Project with AdaptiveCpp](https://uxlfoundation.github.io/oneMath/building_the_project_with_adaptivecpp.html)
 - Developer Reference
-  - [oneMKL Defined Datatypes](https://oneapi-src.github.io/oneMKL/onemkl-datatypes.html)
-  - [Dense Linear Algebra](https://oneapi-src.github.io/oneMKL/domains/dense_linear_algebra.html)
-- [Integrating a Third-Party Library](https://oneapi-src.github.io/oneMKL/create_new_backend.html)
+  - [oneMath Defined Datatypes](https://uxlfoundation.github.io/oneMath/onemath-datatypes.html)
+  - [Dense Linear Algebra](https://uxlfoundation.github.io/oneMath/domains/dense_linear_algebra.html)
+- [Integrating a Third-Party Library](https://uxlfoundation.github.io/oneMath/create_new_backend.html)
 
 ---
 
 ## Governance
 
-The oneMKL Interfaces project is governed by the UXL Foundation and you can get involved in this project in multiple ways. It is possible to join the [Math Special Interest Group (SIG)](https://github.com/uxlfoundation/foundation/tree/main/math) meetings where the group discusses and demonstrates work using this project. Members can also join the Open Source and Specification Working Group meetings.
+The oneMath project is governed by the UXL Foundation and you can get involved in this project in multiple ways. It is possible to join the [Math Special Interest Group (SIG)](https://github.com/uxlfoundation/foundation/tree/main/math) meetings where the group discusses and demonstrates work using this project. Members can also join the Open Source and Specification Working Group meetings.
 
 You can also join the mailing lists for the [UXL Foundation](https://lists.uxlfoundation.org/g/main/subgroups) to be informed of when meetings are happening and receive the latest information and discussions.
 
@@ -578,7 +578,7 @@ You can also join the mailing lists for the [UXL Foundation](https://lists.uxlfo
 
 ## Contributing
 
-You can contribute to this project and also contribute to [the specification for this project](https://oneapi-spec.uxlfoundation.org/specifications/oneapi/latest/elements/onemkl/source/). Please read the [CONTRIBUTING](CONTRIBUTING.md) page for more information. You can also contact oneMKL developers and maintainers via [UXL Foundation Slack](https://slack-invite.uxlfoundation.org/) using [#onemkl](https://uxlfoundation.slack.com/archives/onemkl) channel.
+You can contribute to this project and also contribute to [the specification for this project](https://oneapi-spec.uxlfoundation.org/specifications/oneapi/latest/elements/onemath/source/). Please read the [CONTRIBUTING](CONTRIBUTING.md) page for more information. You can also contact oneMath developers and maintainers via [UXL Foundation Slack](https://slack-invite.uxlfoundation.org/) using [#onemath](https://uxlfoundation.slack.com/archives/onemath) channel.
 
 ---
 
@@ -590,31 +590,31 @@ Distributed under the Apache license 2.0. See [LICENSE](LICENSE) for more inform
 
 ## FAQs
 
-### oneMKL
+### oneMath
 
-**Q: What is the difference between the following oneMKL items?**
-   - The [oneAPI Specification for oneMKL](https://oneapi-spec.uxlfoundation.org/specifications/oneapi/latest/elements/onemkl/source/)
-   - The [oneAPI Math Kernel Library (oneMKL) Interfaces](https://github.com/oneapi-src/oneMKL) Project
+**Q: What is the difference between the following items?**
+   - The [oneAPI Specification for oneMath](https://oneapi-spec.uxlfoundation.org/specifications/oneapi/latest/elements/onemath/source/)
+   - The [oneAPI Math Library (oneMath)](https://github.com/uxlfoundation/oneMath) project
    - The [Intel(R) oneAPI Math Kernel Library (oneMKL)](https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onemkl.html) Product
 
 **A:**
-- The [oneAPI Specification for oneMKL](https://oneapi-spec.uxlfoundation.org/specifications/oneapi/latest/elements/onemkl/source/) defines the DPC++ interfaces for performance math library functions. The oneMKL specification can evolve faster and more frequently than implementations of the specification.
+- The [oneAPI Specification for oneMath](https://oneapi-spec.uxlfoundation.org/specifications/oneapi/latest/elements/onemath/source/) defines the SYCL interfaces for performance math library functions. The oneMath specification can evolve faster and more frequently than implementations of the specification.
 
-- The [oneAPI Math Kernel Library (oneMKL) Interfaces](https://github.com/oneapi-src/oneMKL) Project is an open source implementation of the specification. The project goal is to demonstrate how the DPC++ interfaces documented in the oneMKL specification can be implemented for any math library and work for any target hardware. While the implementation provided here may not yet be the full implementation of the specification, the goal is to build it out over time. We encourage the community to contribute to this project and help to extend support to multiple hardware targets and other math libraries.
+- The [oneAPI Math Library (oneMath)](https://github.com/uxlfoundation/oneMath) project is an open source implementation of the specification. The project goal is to demonstrate how the SYCL interfaces documented in the oneMath specification can be implemented for any math library and work for any target hardware. While the implementation provided here may not yet be the full implementation of the specification, the goal is to build it out over time. We encourage the community to contribute to this project and help to extend support to multiple hardware targets and other math libraries.
 
-- The [Intel(R) oneAPI Math Kernel Library (oneMKL)](https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onemkl.html) product is the Intel product implementation of the specification (with DPC++ interfaces) as well as similar functionality with C and Fortran interfaces, and is provided as part of Intel® oneAPI Base Toolkit. It is highly optimized for Intel CPU and Intel GPU hardware.
+- The [Intel(R) oneAPI Math Kernel Library (oneMKL)](https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onemkl.html) project is an Intel product provided as part of the Intel(R) oneAPI Base Toolkit. It is used for the Intel backends of oneMath. Its C++ API is very similar to the oneMath specification. It is highly optimized for Intel CPU and Intel GPU hardware.
 
-**Q: I'm trying to use oneMKL Interfaces in my project using `FetchContent`**, but I keep running into `ONEMKL::SYCL::SYCL target was not found` problem when I try to build the project. What should I do?
+**Q: I'm trying to use oneMath in my project using `FetchContent`**, but I keep running into `ONEMATH::SYCL::SYCL target was not found` problem when I try to build the project. What should I do?
 
 **A:**
 Make sure you set the compiler when you configure your project.
 E.g. `cmake -Bbuild . -DCMAKE_CXX_COMPILER=icpx`.
 
-**Q: I'm trying to use oneMKL Interfaces in my project using `find_package(oneMKL)`.** I set oneMKL/oneTBB and Compiler environment first, then I built and installed oneMKL Interfaces, and finally I tried to build my project using installed oneMKL Interfaces (e.g. like this `cmake -Bbuild -GNinja -DCMAKE_CXX_COMPILER=icpx -DoneMKL_ROOT=<path_to_installed_oneMKL_interfaces> .`) and I noticed that cmake includes installed oneMKL Interfaces headers as a system include which ends up as a lower priority than the installed oneMKL package includes which I set before for building oneMKL Interfaces. As a result, I get conflicts between oneMKL and installed oneMKL Interfaces headers. What should I do?
+**Q: I'm trying to use oneMath in my project using `find_package(oneMath)`.** I set oneMath/oneTBB and Compiler environment first, then I built and installed oneMath, and finally I tried to build my project using installed oneMath (e.g. like this `cmake -Bbuild -GNinja -DCMAKE_CXX_COMPILER=icpx -DoneMath_ROOT=<path_to_installed_oneMath> .`) and I noticed that cmake includes installed oneMath headers as a system include which ends up as a lower priority than the installed Intel(R) oneAPI Math Kernel Library package includes which I set before for building oneMath. As a result, I get conflicts between Intel(R) oneAPI Math Kernel Library and installed oneMath headers. What should I do?
 
 **A:**
-Having installed oneMKL Interfaces headers as `-I` instead on system includes (as `-isystem`) helps to resolve this problem. We use `INTERFACE_INCLUDE_DIRECTORIES` to add paths to installed oneMKL Interfaces headers (check `oneMKLTargets.cmake` in `lib/cmake` to find it). It's a known limitation that `INTERFACE_INCLUDE_DIRECTORIES` puts headers paths as system headers. To avoid that:
-- Option 1: Use CMake >=3.25. In this case oneMKL Interfaces will be built with `EXPORT_NO_SYSTEM` property set to `true` and you won't see the issue.
+Having installed oneMath headers as `-I` instead on system includes (as `-isystem`) helps to resolve this problem. We use `INTERFACE_INCLUDE_DIRECTORIES` to add paths to installed oneMath headers (check `oneMathTargets.cmake` in `lib/cmake` to find it). It's a known limitation that `INTERFACE_INCLUDE_DIRECTORIES` puts headers paths as system headers. To avoid that:
+- Option 1: Use CMake >=3.25. In this case oneMath will be built with `EXPORT_NO_SYSTEM` property set to `true` and you won't see the issue.
 - Option 2: If you use CMake < 3.25, set `PROPERTIES NO_SYSTEM_FROM_IMPORTED true` for your target. E.g: `set_target_properties(test PROPERTIES NO_SYSTEM_FROM_IMPORTED true)`.
 
 ---

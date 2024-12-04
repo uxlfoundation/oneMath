@@ -24,7 +24,7 @@
 #include <string>
 #include <tuple>
 
-#include "oneapi/mkl.hpp"
+#include "oneapi/math.hpp"
 
 #include "test_common.hpp"
 
@@ -55,10 +55,10 @@ inline T opVal(const T t, const bool isConj) {
 };
 
 template <typename fpType, typename intType, typename accIntType, typename accFpType>
-void do_csr_transpose(const oneapi::mkl::transpose opA, intType* ia_t, intType* ja_t, fpType* a_t,
+void do_csr_transpose(const oneapi::math::transpose opA, intType* ia_t, intType* ja_t, fpType* a_t,
                       intType a_nrows, intType a_ncols, intType indexing, accIntType& ia,
                       accIntType& ja, accFpType& a, const bool structOnlyFlag = false) {
-    const bool isConj = (opA == oneapi::mkl::transpose::conjtrans);
+    const bool isConj = (opA == oneapi::math::transpose::conjtrans);
 
     // initialize ia_t to zero
     for (intType i = 0; i < a_ncols + 1; ++i) {
@@ -107,17 +107,17 @@ void do_csr_transpose(const oneapi::mkl::transpose opA, intType* ia_t, intType* 
 template <typename fpType, typename intType>
 auto sparse_transpose_if_needed(const intType* ia, const intType* ja, const fpType* a,
                                 intType a_nrows, intType a_ncols, std::size_t nnz, intType indexing,
-                                oneapi::mkl::transpose transpose_val) {
+                                oneapi::math::transpose transpose_val) {
     std::vector<intType> iopa;
     std::vector<intType> jopa;
     std::vector<fpType> opa;
-    if (transpose_val == oneapi::mkl::transpose::nontrans) {
+    if (transpose_val == oneapi::math::transpose::nontrans) {
         iopa.assign(ia, ia + a_nrows + 1);
         jopa.assign(ja, ja + nnz);
         opa.assign(a, a + nnz);
     }
-    else if (transpose_val == oneapi::mkl::transpose::trans ||
-             transpose_val == oneapi::mkl::transpose::conjtrans) {
+    else if (transpose_val == oneapi::math::transpose::trans ||
+             transpose_val == oneapi::math::transpose::conjtrans) {
         iopa.resize(static_cast<std::size_t>(a_ncols + 1));
         jopa.resize(nnz);
         opa.resize(nnz);
@@ -135,11 +135,11 @@ auto sparse_transpose_if_needed(const intType* ia, const intType* ja, const fpTy
 /// The outputted matrix always uses row major layout
 template <typename fpType>
 auto extract_dense_matrix(const fpType* x, std::size_t nrows, std::size_t ncols, std::size_t ld,
-                          oneapi::mkl::transpose transpose_val,
-                          oneapi::mkl::layout dense_matrix_layout) {
-    const bool is_row_major = dense_matrix_layout == oneapi::mkl::layout::row_major;
-    const bool is_transposed = transpose_val != oneapi::mkl::transpose::nontrans;
-    const bool apply_conjugate = transpose_val == oneapi::mkl::transpose::conjtrans;
+                          oneapi::math::transpose transpose_val,
+                          oneapi::math::layout dense_matrix_layout) {
+    const bool is_row_major = dense_matrix_layout == oneapi::math::layout::row_major;
+    const bool is_transposed = transpose_val != oneapi::math::transpose::nontrans;
+    const bool apply_conjugate = transpose_val == oneapi::math::transpose::conjtrans;
     const bool swap_ld = is_row_major != is_transposed;
     if (swap_ld && ncols > ld) {
         throw std::runtime_error("Expected ncols <= ld");
@@ -164,31 +164,31 @@ template <typename fpType, typename intType>
 std::vector<fpType> sparse_to_dense(sparse_matrix_format_t format, const intType* ia,
                                     const intType* ja, const fpType* a, std::size_t a_nrows,
                                     std::size_t a_ncols, std::size_t nnz, intType indexing,
-                                    oneapi::mkl::transpose transpose_val,
-                                    oneapi::mkl::sparse::matrix_view A_view) {
-    oneapi::mkl::sparse::matrix_descr type_view = A_view.type_view;
-    oneapi::mkl::uplo uplo_val = A_view.uplo_view;
+                                    oneapi::math::transpose transpose_val,
+                                    oneapi::math::sparse::matrix_view A_view) {
+    oneapi::math::sparse::matrix_descr type_view = A_view.type_view;
+    oneapi::math::uplo uplo_val = A_view.uplo_view;
     const bool is_symmetric_or_hermitian_view =
-        type_view == oneapi::mkl::sparse::matrix_descr::symmetric ||
-        type_view == oneapi::mkl::sparse::matrix_descr::hermitian;
-    const bool apply_conjugate = transpose_val == oneapi::mkl::transpose::conjtrans;
+        type_view == oneapi::math::sparse::matrix_descr::symmetric ||
+        type_view == oneapi::math::sparse::matrix_descr::hermitian;
+    const bool apply_conjugate = transpose_val == oneapi::math::transpose::conjtrans;
     std::vector<fpType> dense_a(a_nrows * a_ncols, fpType(0));
 
     auto write_to_dense_if_needed = [&](std::size_t a_idx, std::size_t row, std::size_t col) {
-        if ((type_view == oneapi::mkl::sparse::matrix_descr::triangular ||
+        if ((type_view == oneapi::math::sparse::matrix_descr::triangular ||
              is_symmetric_or_hermitian_view) &&
-            ((uplo_val == oneapi::mkl::uplo::lower && col > row) ||
-             (uplo_val == oneapi::mkl::uplo::upper && col < row))) {
+            ((uplo_val == oneapi::math::uplo::lower && col > row) ||
+             (uplo_val == oneapi::math::uplo::upper && col < row))) {
             // Read only the upper or lower part of the sparse matrix
             return;
         }
-        if (type_view == oneapi::mkl::sparse::matrix_descr::diagonal && col != row) {
+        if (type_view == oneapi::math::sparse::matrix_descr::diagonal && col != row) {
             // Read only the diagonal
             return;
         }
         // Do not transpose symmetric matrices to simplify the propagation of the symmetric values
         std::size_t dense_a_idx =
-            (!is_symmetric_or_hermitian_view && transpose_val != oneapi::mkl::transpose::nontrans)
+            (!is_symmetric_or_hermitian_view && transpose_val != oneapi::math::transpose::nontrans)
                 ? col * a_nrows + row
                 : row * a_ncols + col;
         fpType val = opVal(a[a_idx], apply_conjugate);
@@ -213,7 +213,7 @@ std::vector<fpType> sparse_to_dense(sparse_matrix_format_t format, const intType
     }
 
     // Write unit diagonal
-    if (A_view.diag_view == oneapi::mkl::diag::unit && a_nrows == a_ncols) {
+    if (A_view.diag_view == oneapi::math::diag::unit && a_nrows == a_ncols) {
         for (std::size_t i = 0; i < a_nrows; i++) {
             dense_a[i * a_nrows + i] = fpType(1);
         }
@@ -223,7 +223,7 @@ std::vector<fpType> sparse_to_dense(sparse_matrix_format_t format, const intType
     if (is_symmetric_or_hermitian_view) {
         for (std::size_t i = 0; i < a_nrows; ++i) {
             for (std::size_t j = i + 1; j < a_ncols; ++j) {
-                if (uplo_val == oneapi::mkl::uplo::lower) {
+                if (uplo_val == oneapi::math::uplo::lower) {
                     dense_a[i * a_ncols + j] = dense_a[j * a_nrows + i];
                 }
                 else {

@@ -88,10 +88,10 @@ fp rand_scalar() {
 }
 
 template <typename vec>
-void rand_matrix(vec& M, oneapi::mkl::transpose trans, int m, int n, int ld) {
+void rand_matrix(vec& M, oneapi::math::transpose trans, int m, int n, int ld) {
     using fp = typename vec::value_type;
 
-    if (trans == oneapi::mkl::transpose::nontrans) {
+    if (trans == oneapi::math::transpose::nontrans) {
         for (int j = 0; j < n; j++)
             for (int i = 0; i < m; i++)
                 M.at(i + j * ld) = rand_scalar<fp>();

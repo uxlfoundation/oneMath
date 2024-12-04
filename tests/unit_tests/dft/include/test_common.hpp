@@ -17,8 +17,8 @@
 *
 **************************************************************************/
 
-#ifndef ONEMKL_TEST_COMMON_HPP
-#define ONEMKL_TEST_COMMON_HPP
+#ifndef ONEMATH_TEST_COMMON_HPP
+#define ONEMATH_TEST_COMMON_HPP
 
 #include <cstdint>
 #include <cstdlib>
@@ -152,8 +152,8 @@ auto exception_handler = [](sycl::exception_list exceptions) {
     }
 };
 
-template <oneapi::mkl::dft::precision precision, oneapi::mkl::dft::domain domain>
-void commit_descriptor(oneapi::mkl::dft::descriptor<precision, domain>& descriptor,
+template <oneapi::math::dft::precision precision, oneapi::math::dft::domain domain>
+void commit_descriptor(oneapi::math::dft::descriptor<precision, domain>& descriptor,
                        sycl::queue queue) {
 #ifdef CALL_RT_API
     descriptor.commit(queue);
@@ -170,7 +170,7 @@ inline std::array<std::int64_t, 4> get_conjugate_even_complex_strides(
         case 2: return { 0, sizes[1] / 2 + 1, 1 };
         case 3: return { 0, sizes[1] * (sizes[2] / 2 + 1), (sizes[2] / 2 + 1), 1 };
         default:
-            throw oneapi::mkl::unimplemented(
+            throw oneapi::math::unimplemented(
                 "dft/test_common", __FUNCTION__,
                 "not implemented for " + std::to_string(sizes.size()) + " dimensions");
             return {};
@@ -180,7 +180,7 @@ inline std::array<std::int64_t, 4> get_conjugate_even_complex_strides(
 // is it assumed that the unused elements of the array are ignored
 inline std::array<std::int64_t, 4> get_default_strides(const std::vector<std::int64_t>& sizes) {
     if (sizes.size() > 3) {
-        throw oneapi::mkl::unimplemented(
+        throw oneapi::math::unimplemented(
             "dft/test_common", __FUNCTION__,
             "not implemented for " + std::to_string(sizes.size()) + " dimensions");
     }
@@ -190,7 +190,7 @@ inline std::array<std::int64_t, 4> get_default_strides(const std::vector<std::in
         case 2: return { 0, sizes[1], 1 };
         case 3: return { 0, sizes[1] * sizes[2], sizes[2], 1 };
         default:
-            throw oneapi::mkl::unimplemented(
+            throw oneapi::math::unimplemented(
                 "dft/test_common", __FUNCTION__,
                 "not implemented for " + std::to_string(sizes.size()) + " dimensions");
             return {};
@@ -205,7 +205,7 @@ T get_default(const std::vector<T> vec, std::size_t idx, T default_) {
     return vec[idx];
 }
 
-template <oneapi::mkl::dft::domain domain, bool in_place = false>
+template <oneapi::math::dft::domain domain, bool in_place = false>
 std::pair<std::int64_t, std::int64_t> get_default_distances(
     const std::vector<std::int64_t>& sizes, const std::vector<std::int64_t>& strides_fwd,
     const std::vector<std::int64_t>& strides_bwd) {
@@ -213,11 +213,11 @@ std::pair<std::int64_t, std::int64_t> get_default_distances(
     std::int64_t size1 = get_default(sizes, 1, 1l);
     std::int64_t size2 = get_default(sizes, 2, 1l);
     std::int64_t size0_real =
-        domain == oneapi::mkl::dft::domain::REAL && sizes.size() == 1 ? size0 / 2 + 1 : size0;
+        domain == oneapi::math::dft::domain::REAL && sizes.size() == 1 ? size0 / 2 + 1 : size0;
     std::int64_t size1_real =
-        domain == oneapi::mkl::dft::domain::REAL && sizes.size() == 2 ? size1 / 2 + 1 : size1;
+        domain == oneapi::math::dft::domain::REAL && sizes.size() == 2 ? size1 / 2 + 1 : size1;
     std::int64_t size2_real =
-        domain == oneapi::mkl::dft::domain::REAL && sizes.size() == 3 ? size2 / 2 + 1 : size2;
+        domain == oneapi::math::dft::domain::REAL && sizes.size() == 3 ? size2 / 2 + 1 : size2;
     std::int64_t backward_distance = size0_real * size1_real * size2_real;
     std::int64_t forward_distance = size0 * size1 * size2;
     if (strides_fwd.size() > 1) {
@@ -233,7 +233,7 @@ std::pair<std::int64_t, std::int64_t> get_default_distances(
     if (in_place) {
         forward_distance =
             std::max(forward_distance,
-                     backward_distance * (domain == oneapi::mkl::dft::domain::REAL ? 2L : 1L));
+                     backward_distance * (domain == oneapi::math::dft::domain::REAL ? 2L : 1L));
     }
     return { forward_distance, backward_distance };
 }
@@ -387,4 +387,4 @@ public:
     }
 };
 
-#endif //ONEMKL_TEST_COMMON_HPP
+#endif //ONEMATH_TEST_COMMON_HPP

@@ -19,11 +19,11 @@
 #include "cusolver_helper.hpp"
 #include "cusolver_task.hpp"
 
-#include "oneapi/mkl/exceptions.hpp"
-#include "oneapi/mkl/lapack/detail/cusolver/onemkl_lapack_cusolver.hpp"
+#include "oneapi/math/exceptions.hpp"
+#include "oneapi/math/lapack/detail/cusolver/onemath_lapack_cusolver.hpp"
 
 namespace oneapi {
-namespace mkl {
+namespace math {
 namespace lapack {
 namespace cusolver {
 
@@ -48,7 +48,7 @@ inline void gebrd(const char* func_name, Func func, sycl::queue& queue, std::int
         auto tauq_acc = tauq.template get_access<sycl::access::mode::write>(cgh);
         auto taup_acc = taup.template get_access<sycl::access::mode::write>(cgh);
         auto scratch_acc = scratchpad.template get_access<sycl::access::mode::read_write>(cgh);
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+        onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             auto a_ = sc.get_mem<cuDataType_A*>(a_acc);
             auto d_ = sc.get_mem<cuDataType_B*>(d_acc);
@@ -111,7 +111,7 @@ inline void geqrf(const char* func_name, Func func, sycl::queue& queue, std::int
         auto a_acc = a.template get_access<sycl::access::mode::read_write>(cgh);
         auto tau_acc = tau.template get_access<sycl::access::mode::write>(cgh);
         auto scratch_acc = scratchpad.template get_access<sycl::access::mode::read_write>(cgh);
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+        onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             auto a_ = sc.get_mem<cuDataType*>(a_acc);
             auto tau_ = sc.get_mem<cuDataType*>(tau_acc);
@@ -157,7 +157,7 @@ void getrf(const char* func_name, Func func, sycl::queue& queue, std::int64_t m,
         auto ipiv32_acc = ipiv32.template get_access<sycl::access::mode::write>(cgh);
         auto devInfo_acc = devInfo.template get_access<sycl::access::mode::write>(cgh);
         auto scratch_acc = scratchpad.template get_access<sycl::access::mode::write>(cgh);
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+        onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             auto a_ = sc.get_mem<cuDataType*>(a_acc);
             auto ipiv32_ = sc.get_mem<int*>(ipiv32_acc);
@@ -212,7 +212,7 @@ GETRI_LAUNCHER(std::complex<double>)
 // cusolverDnXgetrs does not use scratchpad memory
 template <typename Func, typename T>
 inline void getrs(const char* func_name, Func func, sycl::queue& queue,
-                  oneapi::mkl::transpose trans, std::int64_t n, std::int64_t nrhs,
+                  oneapi::math::transpose trans, std::int64_t n, std::int64_t nrhs,
                   sycl::buffer<T>& a, std::int64_t lda, sycl::buffer<std::int64_t>& ipiv,
                   sycl::buffer<T>& b, std::int64_t ldb, sycl::buffer<T>& scratchpad,
                   std::int64_t scratchpad_size) {
@@ -237,7 +237,7 @@ inline void getrs(const char* func_name, Func func, sycl::queue& queue,
         auto a_acc = a.template get_access<sycl::access::mode::read>(cgh);
         auto ipiv_acc = ipiv32.template get_access<sycl::access::mode::read>(cgh);
         auto b_acc = b.template get_access<sycl::access::mode::write>(cgh);
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+        onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             auto a_ = sc.get_mem<cuDataType*>(a_acc);
             auto ipiv_ = sc.get_mem<std::int32_t*>(ipiv_acc);
@@ -250,7 +250,7 @@ inline void getrs(const char* func_name, Func func, sycl::queue& queue,
 }
 
 #define GETRS_LAUNCHER(TYPE, CUSOLVER_ROUTINE)                                                  \
-    void getrs(sycl::queue& queue, oneapi::mkl::transpose trans, std::int64_t n,                \
+    void getrs(sycl::queue& queue, oneapi::math::transpose trans, std::int64_t n,               \
                std::int64_t nrhs, sycl::buffer<TYPE>& a, std::int64_t lda,                      \
                sycl::buffer<std::int64_t>& ipiv, sycl::buffer<TYPE>& b, std::int64_t ldb,       \
                sycl::buffer<TYPE>& scratchpad, std::int64_t scratchpad_size) {                  \
@@ -266,8 +266,8 @@ GETRS_LAUNCHER(std::complex<double>, cusolverDnZgetrs)
 #undef GETRS_LAUNCHER
 
 template <typename Func, typename T_A, typename T_B>
-inline void gesvd(const char* func_name, Func func, sycl::queue& queue, oneapi::mkl::jobsvd jobu,
-                  oneapi::mkl::jobsvd jobvt, std::int64_t m, std::int64_t n, sycl::buffer<T_A>& a,
+inline void gesvd(const char* func_name, Func func, sycl::queue& queue, oneapi::math::jobsvd jobu,
+                  oneapi::math::jobsvd jobvt, std::int64_t m, std::int64_t n, sycl::buffer<T_A>& a,
                   std::int64_t lda, sycl::buffer<T_B>& s, sycl::buffer<T_A>& u, std::int64_t ldu,
                   sycl::buffer<T_A>& vt, std::int64_t ldvt, sycl::buffer<T_A>& scratchpad,
                   std::int64_t scratchpad_size) {
@@ -282,7 +282,7 @@ inline void gesvd(const char* func_name, Func func, sycl::queue& queue, oneapi::
         auto vt_acc = vt.template get_access<sycl::access::mode::write>(cgh);
         auto devInfo_acc = devInfo.template get_access<sycl::access::mode::write>(cgh);
         auto scratch_acc = scratchpad.template get_access<sycl::access::mode::read_write>(cgh);
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+        onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             auto a_ = sc.get_mem<cuDataType_A*>(a_acc);
             auto s_ = sc.get_mem<cuDataType_B*>(s_acc);
@@ -301,7 +301,7 @@ inline void gesvd(const char* func_name, Func func, sycl::queue& queue, oneapi::
 }
 
 #define GESVD_LAUNCHER(TYPE_A, TYPE_B, CUSOLVER_ROUTINE)                                        \
-    void gesvd(sycl::queue& queue, oneapi::mkl::jobsvd jobu, oneapi::mkl::jobsvd jobvt,         \
+    void gesvd(sycl::queue& queue, oneapi::math::jobsvd jobu, oneapi::math::jobsvd jobvt,       \
                std::int64_t m, std::int64_t n, sycl::buffer<TYPE_A>& a, std::int64_t lda,       \
                sycl::buffer<TYPE_B>& s, sycl::buffer<TYPE_A>& u, std::int64_t ldu,              \
                sycl::buffer<TYPE_A>& vt, std::int64_t ldvt, sycl::buffer<TYPE_A>& scratchpad,   \
@@ -318,8 +318,8 @@ GESVD_LAUNCHER(std::complex<double>, double, cusolverDnZgesvd)
 #undef GESVD_LAUNCHER
 
 template <typename Func, typename T_A, typename T_B>
-inline void heevd(const char* func_name, Func func, sycl::queue& queue, oneapi::mkl::job jobz,
-                  oneapi::mkl::uplo uplo, std::int64_t n, sycl::buffer<T_A>& a, std::int64_t lda,
+inline void heevd(const char* func_name, Func func, sycl::queue& queue, oneapi::math::job jobz,
+                  oneapi::math::uplo uplo, std::int64_t n, sycl::buffer<T_A>& a, std::int64_t lda,
                   sycl::buffer<T_B>& w, sycl::buffer<T_A>& scratchpad,
                   std::int64_t scratchpad_size) {
     using cuDataType_A = typename CudaEquivalentType<T_A>::Type;
@@ -331,7 +331,7 @@ inline void heevd(const char* func_name, Func func, sycl::queue& queue, oneapi::
         auto w_acc = w.template get_access<sycl::access::mode::write>(cgh);
         auto devInfo_acc = devInfo.template get_access<sycl::access::mode::write>(cgh);
         auto scratch_acc = scratchpad.template get_access<sycl::access::mode::read_write>(cgh);
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+        onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             auto a_ = sc.get_mem<cuDataType_A*>(a_acc);
             auto w_ = sc.get_mem<cuDataType_B*>(w_acc);
@@ -346,12 +346,12 @@ inline void heevd(const char* func_name, Func func, sycl::queue& queue, oneapi::
     lapack_info_check(queue, devInfo, __func__, func_name);
 }
 
-#define HEEVD_LAUNCHER(TYPE_A, TYPE_B, CUSOLVER_ROUTINE)                                          \
-    void heevd(sycl::queue& queue, oneapi::mkl::job jobz, oneapi::mkl::uplo uplo, std::int64_t n, \
-               sycl::buffer<TYPE_A>& a, std::int64_t lda, sycl::buffer<TYPE_B>& w,                \
-               sycl::buffer<TYPE_A>& scratchpad, std::int64_t scratchpad_size) {                  \
-        heevd(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, jobz, uplo, n, a, lda, w, scratchpad,   \
-              scratchpad_size);                                                                   \
+#define HEEVD_LAUNCHER(TYPE_A, TYPE_B, CUSOLVER_ROUTINE)                                           \
+    void heevd(sycl::queue& queue, oneapi::math::job jobz, oneapi::math::uplo uplo,                \
+               std::int64_t n, sycl::buffer<TYPE_A>& a, std::int64_t lda, sycl::buffer<TYPE_B>& w, \
+               sycl::buffer<TYPE_A>& scratchpad, std::int64_t scratchpad_size) {                   \
+        heevd(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, jobz, uplo, n, a, lda, w, scratchpad,    \
+              scratchpad_size);                                                                    \
     }
 
 HEEVD_LAUNCHER(std::complex<float>, float, cusolverDnCheevd)
@@ -361,7 +361,7 @@ HEEVD_LAUNCHER(std::complex<double>, double, cusolverDnZheevd)
 
 template <typename Func, typename T_A, typename T_B>
 inline void hegvd(const char* func_name, Func func, sycl::queue& queue, std::int64_t itype,
-                  oneapi::mkl::job jobz, oneapi::mkl::uplo uplo, std::int64_t n,
+                  oneapi::math::job jobz, oneapi::math::uplo uplo, std::int64_t n,
                   sycl::buffer<T_A>& a, std::int64_t lda, sycl::buffer<T_A>& b, std::int64_t ldb,
                   sycl::buffer<T_B>& w, sycl::buffer<T_A>& scratchpad,
                   std::int64_t scratchpad_size) {
@@ -375,7 +375,7 @@ inline void hegvd(const char* func_name, Func func, sycl::queue& queue, std::int
         auto w_acc = w.template get_access<sycl::access::mode::write>(cgh);
         auto devInfo_acc = devInfo.template get_access<sycl::access::mode::write>(cgh);
         auto scratch_acc = scratchpad.template get_access<sycl::access::mode::read_write>(cgh);
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+        onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             auto a_ = sc.get_mem<cuDataType_A*>(a_acc);
             auto b_ = sc.get_mem<cuDataType_A*>(b_acc);
@@ -392,8 +392,8 @@ inline void hegvd(const char* func_name, Func func, sycl::queue& queue, std::int
 }
 
 #define HEGVD_LAUNCHER(TYPE_A, TYPE_B, CUSOLVER_ROUTINE)                                           \
-    void hegvd(sycl::queue& queue, std::int64_t itype, oneapi::mkl::job jobz,                      \
-               oneapi::mkl::uplo uplo, std::int64_t n, sycl::buffer<TYPE_A>& a, std::int64_t lda,  \
+    void hegvd(sycl::queue& queue, std::int64_t itype, oneapi::math::job jobz,                     \
+               oneapi::math::uplo uplo, std::int64_t n, sycl::buffer<TYPE_A>& a, std::int64_t lda, \
                sycl::buffer<TYPE_A>& b, std::int64_t ldb, sycl::buffer<TYPE_B>& w,                 \
                sycl::buffer<TYPE_A>& scratchpad, std::int64_t scratchpad_size) {                   \
         hegvd(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, itype, jobz, uplo, n, a, lda, b, ldb, w, \
@@ -406,7 +406,7 @@ HEGVD_LAUNCHER(std::complex<double>, double, cusolverDnZhegvd)
 #undef HEGVD_LAUNCHER
 
 template <typename Func, typename T_A, typename T_B>
-inline void hetrd(const char* func_name, Func func, sycl::queue& queue, oneapi::mkl::uplo uplo,
+inline void hetrd(const char* func_name, Func func, sycl::queue& queue, oneapi::math::uplo uplo,
                   std::int64_t n, sycl::buffer<T_A>& a, std::int64_t lda, sycl::buffer<T_B>& d,
                   sycl::buffer<T_B>& e, sycl::buffer<T_A>& tau, sycl::buffer<T_A>& scratchpad,
                   std::int64_t scratchpad_size) {
@@ -421,7 +421,7 @@ inline void hetrd(const char* func_name, Func func, sycl::queue& queue, oneapi::
         auto tau_acc = tau.template get_access<sycl::access::mode::write>(cgh);
         auto devInfo_acc = devInfo.template get_access<sycl::access::mode::write>(cgh);
         auto scratch_acc = scratchpad.template get_access<sycl::access::mode::read_write>(cgh);
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+        onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             auto a_ = sc.get_mem<cuDataType_A*>(a_acc);
             auto d_ = sc.get_mem<cuDataType_B*>(d_acc);
@@ -438,7 +438,7 @@ inline void hetrd(const char* func_name, Func func, sycl::queue& queue, oneapi::
 }
 
 #define HETRD_LAUNCHER(TYPE_A, TYPE_B, CUSOLVER_ROUTINE)                                          \
-    void hetrd(sycl::queue& queue, oneapi::mkl::uplo uplo, std::int64_t n,                        \
+    void hetrd(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n,                       \
                sycl::buffer<TYPE_A>& a, std::int64_t lda, sycl::buffer<TYPE_B>& d,                \
                sycl::buffer<TYPE_B>& e, sycl::buffer<TYPE_A>& tau,                                \
                sycl::buffer<TYPE_A>& scratchpad, std::int64_t scratchpad_size) {                  \
@@ -451,12 +451,12 @@ HETRD_LAUNCHER(std::complex<double>, double, cusolverDnZhetrd)
 
 #undef HETRD_LAUNCHER
 
-void hetrf(sycl::queue& queue, oneapi::mkl::uplo uplo, std::int64_t n,
+void hetrf(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n,
            sycl::buffer<std::complex<float>>& a, std::int64_t lda, sycl::buffer<std::int64_t>& ipiv,
            sycl::buffer<std::complex<float>>& scratchpad, std::int64_t scratchpad_size) {
     throw unimplemented("lapack", "hetrf");
 }
-void hetrf(sycl::queue& queue, oneapi::mkl::uplo uplo, std::int64_t n,
+void hetrf(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n,
            sycl::buffer<std::complex<double>>& a, std::int64_t lda,
            sycl::buffer<std::int64_t>& ipiv, sycl::buffer<std::complex<double>>& scratchpad,
            std::int64_t scratchpad_size) {
@@ -464,7 +464,7 @@ void hetrf(sycl::queue& queue, oneapi::mkl::uplo uplo, std::int64_t n,
 }
 
 template <typename Func, typename T>
-inline void orgbr(const char* func_name, Func func, sycl::queue& queue, oneapi::mkl::generate vec,
+inline void orgbr(const char* func_name, Func func, sycl::queue& queue, oneapi::math::generate vec,
                   std::int64_t m, std::int64_t n, std::int64_t k, sycl::buffer<T>& a,
                   std::int64_t lda, sycl::buffer<T>& tau, sycl::buffer<T>& scratchpad,
                   std::int64_t scratchpad_size) {
@@ -474,7 +474,7 @@ inline void orgbr(const char* func_name, Func func, sycl::queue& queue, oneapi::
         auto a_acc = a.template get_access<sycl::access::mode::read_write>(cgh);
         auto tau_acc = tau.template get_access<sycl::access::mode::read>(cgh);
         auto scratch_acc = scratchpad.template get_access<sycl::access::mode::read_write>(cgh);
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+        onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             auto a_ = sc.get_mem<cuDataType*>(a_acc);
             auto tau_ = sc.get_mem<cuDataType*>(tau_acc);
@@ -487,7 +487,7 @@ inline void orgbr(const char* func_name, Func func, sycl::queue& queue, oneapi::
 }
 
 #define ORGBR_LAUNCHER(TYPE, CUSOLVER_ROUTINE)                                                   \
-    void orgbr(sycl::queue& queue, oneapi::mkl::generate vec, std::int64_t m, std::int64_t n,    \
+    void orgbr(sycl::queue& queue, oneapi::math::generate vec, std::int64_t m, std::int64_t n,   \
                std::int64_t k, sycl::buffer<TYPE>& a, std::int64_t lda, sycl::buffer<TYPE>& tau, \
                sycl::buffer<TYPE>& scratchpad, std::int64_t scratchpad_size) {                   \
         orgbr(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, vec, m, n, k, a, lda, tau, scratchpad, \
@@ -509,7 +509,7 @@ inline void orgqr(const char* func_name, Func func, sycl::queue& queue, std::int
         auto a_acc = a.template get_access<sycl::access::mode::read_write>(cgh);
         auto tau_acc = tau.template get_access<sycl::access::mode::read>(cgh);
         auto scratch_acc = scratchpad.template get_access<sycl::access::mode::read_write>(cgh);
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+        onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             auto a_ = sc.get_mem<cuDataType*>(a_acc);
             auto tau_ = sc.get_mem<cuDataType*>(tau_acc);
@@ -535,7 +535,7 @@ ORGQR_LAUNCHER(double, cusolverDnDorgqr)
 #undef ORGQR_LAUNCHER
 
 template <typename Func, typename T>
-inline void orgtr(const char* func_name, Func func, sycl::queue& queue, oneapi::mkl::uplo uplo,
+inline void orgtr(const char* func_name, Func func, sycl::queue& queue, oneapi::math::uplo uplo,
                   std::int64_t n, sycl::buffer<T>& a, std::int64_t lda, sycl::buffer<T>& tau,
                   sycl::buffer<T>& scratchpad, std::int64_t scratchpad_size) {
     using cuDataType = typename CudaEquivalentType<T>::Type;
@@ -544,7 +544,7 @@ inline void orgtr(const char* func_name, Func func, sycl::queue& queue, oneapi::
         auto a_acc = a.template get_access<sycl::access::mode::read_write>(cgh);
         auto tau_acc = tau.template get_access<sycl::access::mode::read>(cgh);
         auto scratch_acc = scratchpad.template get_access<sycl::access::mode::read_write>(cgh);
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+        onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             auto a_ = sc.get_mem<cuDataType*>(a_acc);
             auto tau_ = sc.get_mem<cuDataType*>(tau_acc);
@@ -556,12 +556,12 @@ inline void orgtr(const char* func_name, Func func, sycl::queue& queue, oneapi::
     });
 }
 
-#define ORGTR_LAUNCHER(TYPE, CUSOLVER_ROUTINE)                                                    \
-    void orgtr(sycl::queue& queue, oneapi::mkl::uplo uplo, std::int64_t n, sycl::buffer<TYPE>& a, \
-               std::int64_t lda, sycl::buffer<TYPE>& tau, sycl::buffer<TYPE>& scratchpad,         \
-               std::int64_t scratchpad_size) {                                                    \
-        orgtr(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, uplo, n, a, lda, tau, scratchpad,       \
-              scratchpad_size);                                                                   \
+#define ORGTR_LAUNCHER(TYPE, CUSOLVER_ROUTINE)                                                     \
+    void orgtr(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n, sycl::buffer<TYPE>& a, \
+               std::int64_t lda, sycl::buffer<TYPE>& tau, sycl::buffer<TYPE>& scratchpad,          \
+               std::int64_t scratchpad_size) {                                                     \
+        orgtr(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, uplo, n, a, lda, tau, scratchpad,        \
+              scratchpad_size);                                                                    \
     }
 
 ORGTR_LAUNCHER(float, cusolverDnSorgtr)
@@ -570,8 +570,8 @@ ORGTR_LAUNCHER(double, cusolverDnDorgtr)
 #undef ORGTR_LAUNCHER
 
 template <typename Func, typename T>
-inline void ormtr(const char* func_name, Func func, sycl::queue& queue, oneapi::mkl::side side,
-                  oneapi::mkl::uplo uplo, oneapi::mkl::transpose trans, std::int64_t m,
+inline void ormtr(const char* func_name, Func func, sycl::queue& queue, oneapi::math::side side,
+                  oneapi::math::uplo uplo, oneapi::math::transpose trans, std::int64_t m,
                   std::int64_t n, sycl::buffer<T>& a, std::int64_t lda, sycl::buffer<T>& tau,
                   sycl::buffer<T>& c, std::int64_t ldc, sycl::buffer<T>& scratchpad,
                   std::int64_t scratchpad_size) {
@@ -582,7 +582,7 @@ inline void ormtr(const char* func_name, Func func, sycl::queue& queue, oneapi::
         auto tau_acc = tau.template get_access<sycl::access::mode::read_write>(cgh);
         auto c_acc = c.template get_access<sycl::access::mode::read_write>(cgh);
         auto scratch_acc = scratchpad.template get_access<sycl::access::mode::read_write>(cgh);
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+        onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             auto a_ = sc.get_mem<cuDataType*>(a_acc);
             auto tau_ = sc.get_mem<cuDataType*>(tau_acc);
@@ -598,8 +598,8 @@ inline void ormtr(const char* func_name, Func func, sycl::queue& queue, oneapi::
 }
 
 #define ORMTR_LAUNCHER(TYPE, CUSOLVER_ROUTINE)                                                     \
-    void ormtr(sycl::queue& queue, oneapi::mkl::side side, oneapi::mkl::uplo uplo,                 \
-               oneapi::mkl::transpose trans, std::int64_t m, std::int64_t n,                       \
+    void ormtr(sycl::queue& queue, oneapi::math::side side, oneapi::math::uplo uplo,               \
+               oneapi::math::transpose trans, std::int64_t m, std::int64_t n,                      \
                sycl::buffer<TYPE>& a, std::int64_t lda, sycl::buffer<TYPE>& tau,                   \
                sycl::buffer<TYPE>& c, std::int64_t ldc, sycl::buffer<TYPE>& scratchpad,            \
                std::int64_t scratchpad_size) {                                                     \
@@ -612,22 +612,22 @@ ORMTR_LAUNCHER(double, cusolverDnDormtr)
 
 #undef ORMTR_LAUNCHER
 
-void ormrq(sycl::queue& queue, oneapi::mkl::side side, oneapi::mkl::transpose trans, std::int64_t m,
-           std::int64_t n, std::int64_t k, sycl::buffer<float>& a, std::int64_t lda,
+void ormrq(sycl::queue& queue, oneapi::math::side side, oneapi::math::transpose trans,
+           std::int64_t m, std::int64_t n, std::int64_t k, sycl::buffer<float>& a, std::int64_t lda,
            sycl::buffer<float>& tau, sycl::buffer<float>& c, std::int64_t ldc,
            sycl::buffer<float>& scratchpad, std::int64_t scratchpad_size) {
     throw unimplemented("lapack", "ormrq");
 }
-void ormrq(sycl::queue& queue, oneapi::mkl::side side, oneapi::mkl::transpose trans, std::int64_t m,
-           std::int64_t n, std::int64_t k, sycl::buffer<double>& a, std::int64_t lda,
-           sycl::buffer<double>& tau, sycl::buffer<double>& c, std::int64_t ldc,
+void ormrq(sycl::queue& queue, oneapi::math::side side, oneapi::math::transpose trans,
+           std::int64_t m, std::int64_t n, std::int64_t k, sycl::buffer<double>& a,
+           std::int64_t lda, sycl::buffer<double>& tau, sycl::buffer<double>& c, std::int64_t ldc,
            sycl::buffer<double>& scratchpad, std::int64_t scratchpad_size) {
     throw unimplemented("lapack", "ormrq");
 }
 
 template <typename Func, typename T>
-inline void ormqr(const char* func_name, Func func, sycl::queue& queue, oneapi::mkl::side side,
-                  oneapi::mkl::transpose trans, std::int64_t m, std::int64_t n, std::int64_t k,
+inline void ormqr(const char* func_name, Func func, sycl::queue& queue, oneapi::math::side side,
+                  oneapi::math::transpose trans, std::int64_t m, std::int64_t n, std::int64_t k,
                   sycl::buffer<T>& a, std::int64_t lda, sycl::buffer<T>& tau, sycl::buffer<T>& c,
                   std::int64_t ldc, sycl::buffer<T>& scratchpad, std::int64_t scratchpad_size) {
     using cuDataType = typename CudaEquivalentType<T>::Type;
@@ -637,7 +637,7 @@ inline void ormqr(const char* func_name, Func func, sycl::queue& queue, oneapi::
         auto tau_acc = tau.template get_access<sycl::access::mode::read>(cgh);
         auto c_acc = c.template get_access<sycl::access::mode::read_write>(cgh);
         auto scratch_acc = scratchpad.template get_access<sycl::access::mode::read_write>(cgh);
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+        onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             auto a_ = sc.get_mem<cuDataType*>(a_acc);
             auto tau_ = sc.get_mem<cuDataType*>(tau_acc);
@@ -652,7 +652,7 @@ inline void ormqr(const char* func_name, Func func, sycl::queue& queue, oneapi::
 }
 
 #define ORMQR_LAUNCHER(TYPE, CUSOLVER_ROUTINE)                                                     \
-    void ormqr(sycl::queue& queue, oneapi::mkl::side side, oneapi::mkl::transpose trans,           \
+    void ormqr(sycl::queue& queue, oneapi::math::side side, oneapi::math::transpose trans,         \
                std::int64_t m, std::int64_t n, std::int64_t k, sycl::buffer<TYPE>& a,              \
                std::int64_t lda, sycl::buffer<TYPE>& tau, sycl::buffer<TYPE>& c, std::int64_t ldc, \
                sycl::buffer<TYPE>& scratchpad, std::int64_t scratchpad_size) {                     \
@@ -666,7 +666,7 @@ ORMQR_LAUNCHER(double, cusolverDnDormqr)
 #undef ORMQR_LAUNCHER
 
 template <typename Func, typename T>
-inline void potrf(const char* func_name, Func func, sycl::queue& queue, oneapi::mkl::uplo uplo,
+inline void potrf(const char* func_name, Func func, sycl::queue& queue, oneapi::math::uplo uplo,
                   std::int64_t n, sycl::buffer<T>& a, std::int64_t lda, sycl::buffer<T>& scratchpad,
                   std::int64_t scratchpad_size) {
     using cuDataType = typename CudaEquivalentType<T>::Type;
@@ -676,7 +676,7 @@ inline void potrf(const char* func_name, Func func, sycl::queue& queue, oneapi::
         auto a_acc = a.template get_access<sycl::access::mode::read_write>(cgh);
         auto devInfo_acc = devInfo.template get_access<sycl::access::mode::write>(cgh);
         auto scratch_acc = scratchpad.template get_access<sycl::access::mode::read_write>(cgh);
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+        onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             auto a_ = sc.get_mem<cuDataType*>(a_acc);
             auto devInfo_ = sc.get_mem<int*>(devInfo_acc);
@@ -689,11 +689,11 @@ inline void potrf(const char* func_name, Func func, sycl::queue& queue, oneapi::
     lapack_info_check(queue, devInfo, __func__, func_name);
 }
 
-#define POTRF_LAUNCHER(TYPE, CUSOLVER_ROUTINE)                                                    \
-    void potrf(sycl::queue& queue, oneapi::mkl::uplo uplo, std::int64_t n, sycl::buffer<TYPE>& a, \
-               std::int64_t lda, sycl::buffer<TYPE>& scratchpad, std::int64_t scratchpad_size) {  \
-        potrf(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, uplo, n, a, lda, scratchpad,            \
-              scratchpad_size);                                                                   \
+#define POTRF_LAUNCHER(TYPE, CUSOLVER_ROUTINE)                                                     \
+    void potrf(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n, sycl::buffer<TYPE>& a, \
+               std::int64_t lda, sycl::buffer<TYPE>& scratchpad, std::int64_t scratchpad_size) {   \
+        potrf(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, uplo, n, a, lda, scratchpad,             \
+              scratchpad_size);                                                                    \
     }
 
 POTRF_LAUNCHER(float, cusolverDnSpotrf)
@@ -704,7 +704,7 @@ POTRF_LAUNCHER(std::complex<double>, cusolverDnZpotrf)
 #undef POTRF_LAUNCHER
 
 template <typename Func, typename T>
-inline void potri(const char* func_name, Func func, sycl::queue& queue, oneapi::mkl::uplo uplo,
+inline void potri(const char* func_name, Func func, sycl::queue& queue, oneapi::math::uplo uplo,
                   std::int64_t n, sycl::buffer<T>& a, std::int64_t lda, sycl::buffer<T>& scratchpad,
                   std::int64_t scratchpad_size) {
     using cuDataType = typename CudaEquivalentType<T>::Type;
@@ -714,7 +714,7 @@ inline void potri(const char* func_name, Func func, sycl::queue& queue, oneapi::
         auto a_acc = a.template get_access<sycl::access::mode::read_write>(cgh);
         auto devInfo_acc = devInfo.template get_access<sycl::access::mode::write>(cgh);
         auto scratch_acc = scratchpad.template get_access<sycl::access::mode::read_write>(cgh);
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+        onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             auto a_ = sc.get_mem<cuDataType*>(a_acc);
             auto devInfo_ = sc.get_mem<int*>(devInfo_acc);
@@ -727,11 +727,11 @@ inline void potri(const char* func_name, Func func, sycl::queue& queue, oneapi::
     lapack_info_check(queue, devInfo, __func__, func_name);
 }
 
-#define POTRI_LAUNCHER(TYPE, CUSOLVER_ROUTINE)                                                    \
-    void potri(sycl::queue& queue, oneapi::mkl::uplo uplo, std::int64_t n, sycl::buffer<TYPE>& a, \
-               std::int64_t lda, sycl::buffer<TYPE>& scratchpad, std::int64_t scratchpad_size) {  \
-        potri(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, uplo, n, a, lda, scratchpad,            \
-              scratchpad_size);                                                                   \
+#define POTRI_LAUNCHER(TYPE, CUSOLVER_ROUTINE)                                                     \
+    void potri(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n, sycl::buffer<TYPE>& a, \
+               std::int64_t lda, sycl::buffer<TYPE>& scratchpad, std::int64_t scratchpad_size) {   \
+        potri(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, uplo, n, a, lda, scratchpad,             \
+              scratchpad_size);                                                                    \
     }
 
 POTRI_LAUNCHER(float, cusolverDnSpotri)
@@ -743,7 +743,7 @@ POTRI_LAUNCHER(std::complex<double>, cusolverDnZpotri)
 
 // cusolverDnXpotrs does not use scratchpad memory
 template <typename Func, typename T>
-inline void potrs(const char* func_name, Func func, sycl::queue& queue, oneapi::mkl::uplo uplo,
+inline void potrs(const char* func_name, Func func, sycl::queue& queue, oneapi::math::uplo uplo,
                   std::int64_t n, std::int64_t nrhs, sycl::buffer<T>& a, std::int64_t lda,
                   sycl::buffer<T>& b, std::int64_t ldb, sycl::buffer<T>& scratchpad,
                   std::int64_t scratchpad_size) {
@@ -752,7 +752,7 @@ inline void potrs(const char* func_name, Func func, sycl::queue& queue, oneapi::
     queue.submit([&](sycl::handler& cgh) {
         auto a_acc = a.template get_access<sycl::access::mode::read>(cgh);
         auto b_acc = b.template get_access<sycl::access::mode::read_write>(cgh);
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+        onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             auto a_ = sc.get_mem<cuDataType*>(a_acc);
             auto b_ = sc.get_mem<cuDataType*>(b_acc);
@@ -764,7 +764,7 @@ inline void potrs(const char* func_name, Func func, sycl::queue& queue, oneapi::
 }
 
 #define POTRS_LAUNCHER(TYPE, CUSOLVER_ROUTINE)                                                   \
-    void potrs(sycl::queue& queue, oneapi::mkl::uplo uplo, std::int64_t n, std::int64_t nrhs,    \
+    void potrs(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n, std::int64_t nrhs,   \
                sycl::buffer<TYPE>& a, std::int64_t lda, sycl::buffer<TYPE>& b, std::int64_t ldb, \
                sycl::buffer<TYPE>& scratchpad, std::int64_t scratchpad_size) {                   \
         potrs(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, uplo, n, nrhs, a, lda, b, ldb,         \
@@ -779,8 +779,8 @@ POTRS_LAUNCHER(std::complex<double>, cusolverDnZpotrs)
 #undef POTRS_LAUNCHER
 
 template <typename Func, typename T>
-inline void syevd(const char* func_name, Func func, sycl::queue& queue, oneapi::mkl::job jobz,
-                  oneapi::mkl::uplo uplo, std::int64_t n, sycl::buffer<T>& a, std::int64_t lda,
+inline void syevd(const char* func_name, Func func, sycl::queue& queue, oneapi::math::job jobz,
+                  oneapi::math::uplo uplo, std::int64_t n, sycl::buffer<T>& a, std::int64_t lda,
                   sycl::buffer<T>& w, sycl::buffer<T>& scratchpad, std::int64_t scratchpad_size) {
     using cuDataType = typename CudaEquivalentType<T>::Type;
     overflow_check(n, lda, scratchpad_size);
@@ -790,7 +790,7 @@ inline void syevd(const char* func_name, Func func, sycl::queue& queue, oneapi::
         auto w_acc = w.template get_access<sycl::access::mode::write>(cgh);
         auto devInfo_acc = devInfo.template get_access<sycl::access::mode::write>(cgh);
         auto scratch_acc = scratchpad.template get_access<sycl::access::mode::read_write>(cgh);
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+        onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             auto a_ = sc.get_mem<cuDataType*>(a_acc);
             auto w_ = sc.get_mem<cuDataType*>(w_acc);
@@ -805,12 +805,12 @@ inline void syevd(const char* func_name, Func func, sycl::queue& queue, oneapi::
     lapack_info_check(queue, devInfo, __func__, func_name);
 }
 
-#define SYEVD_LAUNCHER(TYPE, CUSOLVER_ROUTINE)                                                    \
-    void syevd(sycl::queue& queue, oneapi::mkl::job jobz, oneapi::mkl::uplo uplo, std::int64_t n, \
-               sycl::buffer<TYPE>& a, std::int64_t lda, sycl::buffer<TYPE>& w,                    \
-               sycl::buffer<TYPE>& scratchpad, std::int64_t scratchpad_size) {                    \
-        syevd(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, jobz, uplo, n, a, lda, w, scratchpad,   \
-              scratchpad_size);                                                                   \
+#define SYEVD_LAUNCHER(TYPE, CUSOLVER_ROUTINE)                                                  \
+    void syevd(sycl::queue& queue, oneapi::math::job jobz, oneapi::math::uplo uplo,             \
+               std::int64_t n, sycl::buffer<TYPE>& a, std::int64_t lda, sycl::buffer<TYPE>& w,  \
+               sycl::buffer<TYPE>& scratchpad, std::int64_t scratchpad_size) {                  \
+        syevd(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, jobz, uplo, n, a, lda, w, scratchpad, \
+              scratchpad_size);                                                                 \
     }
 
 SYEVD_LAUNCHER(float, cusolverDnSsyevd)
@@ -820,9 +820,9 @@ SYEVD_LAUNCHER(double, cusolverDnDsyevd)
 
 template <typename Func, typename T>
 inline void sygvd(const char* func_name, Func func, sycl::queue& queue, std::int64_t itype,
-                  oneapi::mkl::job jobz, oneapi::mkl::uplo uplo, std::int64_t n, sycl::buffer<T>& a,
-                  std::int64_t lda, sycl::buffer<T>& b, std::int64_t ldb, sycl::buffer<T>& w,
-                  sycl::buffer<T>& scratchpad, std::int64_t scratchpad_size) {
+                  oneapi::math::job jobz, oneapi::math::uplo uplo, std::int64_t n,
+                  sycl::buffer<T>& a, std::int64_t lda, sycl::buffer<T>& b, std::int64_t ldb,
+                  sycl::buffer<T>& w, sycl::buffer<T>& scratchpad, std::int64_t scratchpad_size) {
     using cuDataType = typename CudaEquivalentType<T>::Type;
     overflow_check(n, lda, ldb, scratchpad_size);
     sycl::buffer<int> devInfo{ 1 };
@@ -832,7 +832,7 @@ inline void sygvd(const char* func_name, Func func, sycl::queue& queue, std::int
         auto w_acc = w.template get_access<sycl::access::mode::write>(cgh);
         auto devInfo_acc = devInfo.template get_access<sycl::access::mode::write>(cgh);
         auto scratch_acc = scratchpad.template get_access<sycl::access::mode::read_write>(cgh);
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+        onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             auto a_ = sc.get_mem<cuDataType*>(a_acc);
             auto b_ = sc.get_mem<cuDataType*>(b_acc);
@@ -849,8 +849,8 @@ inline void sygvd(const char* func_name, Func func, sycl::queue& queue, std::int
 }
 
 #define SYGVD_LAUNCHER(TYPE, CUSOLVER_ROUTINE)                                                     \
-    void sygvd(sycl::queue& queue, std::int64_t itype, oneapi::mkl::job jobz,                      \
-               oneapi::mkl::uplo uplo, std::int64_t n, sycl::buffer<TYPE>& a, std::int64_t lda,    \
+    void sygvd(sycl::queue& queue, std::int64_t itype, oneapi::math::job jobz,                     \
+               oneapi::math::uplo uplo, std::int64_t n, sycl::buffer<TYPE>& a, std::int64_t lda,   \
                sycl::buffer<TYPE>& b, std::int64_t ldb, sycl::buffer<TYPE>& w,                     \
                sycl::buffer<TYPE>& scratchpad, std::int64_t scratchpad_size) {                     \
         sygvd(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, itype, jobz, uplo, n, a, lda, b, ldb, w, \
@@ -863,7 +863,7 @@ SYGVD_LAUNCHER(double, cusolverDnDsygvd)
 #undef SYGVD_LAUNCH
 
 template <typename Func, typename T>
-inline void sytrd(const char* func_name, Func func, sycl::queue& queue, oneapi::mkl::uplo uplo,
+inline void sytrd(const char* func_name, Func func, sycl::queue& queue, oneapi::math::uplo uplo,
                   std::int64_t n, sycl::buffer<T>& a, std::int64_t lda, sycl::buffer<T>& d,
                   sycl::buffer<T>& e, sycl::buffer<T>& tau, sycl::buffer<T>& scratchpad,
                   std::int64_t scratchpad_size) {
@@ -877,7 +877,7 @@ inline void sytrd(const char* func_name, Func func, sycl::queue& queue, oneapi::
         auto tau_acc = tau.template get_access<sycl::access::mode::write>(cgh);
         auto devInfo_acc = devInfo.template get_access<sycl::access::mode::write>(cgh);
         auto scratch_acc = scratchpad.template get_access<sycl::access::mode::read_write>(cgh);
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+        onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             auto a_ = sc.get_mem<cuDataType*>(a_acc);
             auto d_ = sc.get_mem<cuDataType*>(d_acc);
@@ -893,13 +893,13 @@ inline void sytrd(const char* func_name, Func func, sycl::queue& queue, oneapi::
     lapack_info_check(queue, devInfo, __func__, func_name);
 }
 
-#define SYTRD_LAUNCHER(TYPE, CUSOLVER_ROUTINE)                                                    \
-    void sytrd(sycl::queue& queue, oneapi::mkl::uplo uplo, std::int64_t n, sycl::buffer<TYPE>& a, \
-               std::int64_t lda, sycl::buffer<TYPE>& d, sycl::buffer<TYPE>& e,                    \
-               sycl::buffer<TYPE>& tau, sycl::buffer<TYPE>& scratchpad,                           \
-               std::int64_t scratchpad_size) {                                                    \
-        sytrd(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, uplo, n, a, lda, d, e, tau, scratchpad, \
-              scratchpad_size);                                                                   \
+#define SYTRD_LAUNCHER(TYPE, CUSOLVER_ROUTINE)                                                     \
+    void sytrd(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n, sycl::buffer<TYPE>& a, \
+               std::int64_t lda, sycl::buffer<TYPE>& d, sycl::buffer<TYPE>& e,                     \
+               sycl::buffer<TYPE>& tau, sycl::buffer<TYPE>& scratchpad,                            \
+               std::int64_t scratchpad_size) {                                                     \
+        sytrd(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, uplo, n, a, lda, d, e, tau, scratchpad,  \
+              scratchpad_size);                                                                    \
     }
 
 SYTRD_LAUNCHER(float, cusolverDnSsytrd)
@@ -908,7 +908,7 @@ SYTRD_LAUNCHER(double, cusolverDnDsytrd)
 #undef SYTRD_LAUNCHER
 
 template <typename Func, typename T>
-inline void sytrf(const char* func_name, Func func, sycl::queue& queue, oneapi::mkl::uplo uplo,
+inline void sytrf(const char* func_name, Func func, sycl::queue& queue, oneapi::math::uplo uplo,
                   std::int64_t n, sycl::buffer<T>& a, std::int64_t lda,
                   sycl::buffer<std::int64_t>& ipiv, sycl::buffer<T>& scratchpad,
                   std::int64_t scratchpad_size) {
@@ -927,7 +927,7 @@ inline void sytrf(const char* func_name, Func func, sycl::queue& queue, oneapi::
         auto ipiv32_acc = ipiv32.template get_access<sycl::access::mode::write>(cgh);
         auto devInfo_acc = devInfo.template get_access<sycl::access::mode::write>(cgh);
         auto scratch_acc = scratchpad.template get_access<sycl::access::mode::read_write>(cgh);
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+        onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             auto a_ = sc.get_mem<cuDataType*>(a_acc);
             auto ipiv32_ = sc.get_mem<int*>(ipiv32_acc);
@@ -951,7 +951,7 @@ inline void sytrf(const char* func_name, Func func, sycl::queue& queue, oneapi::
 }
 
 #define SYTRF_LAUNCHER(TYPE, CUSOLVER_ROUTINE)                                                     \
-    void sytrf(sycl::queue& queue, oneapi::mkl::uplo uplo, std::int64_t n, sycl::buffer<TYPE>& a,  \
+    void sytrf(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n, sycl::buffer<TYPE>& a, \
                std::int64_t lda, sycl::buffer<std::int64_t>& ipiv, sycl::buffer<TYPE>& scratchpad, \
                std::int64_t scratchpad_size) {                                                     \
         sytrf(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, uplo, n, a, lda, ipiv, scratchpad,       \
@@ -965,27 +965,27 @@ SYTRF_LAUNCHER(std::complex<double>, cusolverDnZsytrf)
 
 #undef SYTRF_LAUNCHER
 
-void trtrs(sycl::queue& queue, oneapi::mkl::uplo uplo, oneapi::mkl::transpose trans,
-           oneapi::mkl::diag diag, std::int64_t n, std::int64_t nrhs,
+void trtrs(sycl::queue& queue, oneapi::math::uplo uplo, oneapi::math::transpose trans,
+           oneapi::math::diag diag, std::int64_t n, std::int64_t nrhs,
            sycl::buffer<std::complex<float>>& a, std::int64_t lda,
            sycl::buffer<std::complex<float>>& b, std::int64_t ldb,
            sycl::buffer<std::complex<float>>& scratchpad, std::int64_t scratchpad_size) {
     throw unimplemented("lapack", "trtrs");
 }
-void trtrs(sycl::queue& queue, oneapi::mkl::uplo uplo, oneapi::mkl::transpose trans,
-           oneapi::mkl::diag diag, std::int64_t n, std::int64_t nrhs, sycl::buffer<double>& a,
+void trtrs(sycl::queue& queue, oneapi::math::uplo uplo, oneapi::math::transpose trans,
+           oneapi::math::diag diag, std::int64_t n, std::int64_t nrhs, sycl::buffer<double>& a,
            std::int64_t lda, sycl::buffer<double>& b, std::int64_t ldb,
            sycl::buffer<double>& scratchpad, std::int64_t scratchpad_size) {
     throw unimplemented("lapack", "trtrs");
 }
-void trtrs(sycl::queue& queue, oneapi::mkl::uplo uplo, oneapi::mkl::transpose trans,
-           oneapi::mkl::diag diag, std::int64_t n, std::int64_t nrhs, sycl::buffer<float>& a,
+void trtrs(sycl::queue& queue, oneapi::math::uplo uplo, oneapi::math::transpose trans,
+           oneapi::math::diag diag, std::int64_t n, std::int64_t nrhs, sycl::buffer<float>& a,
            std::int64_t lda, sycl::buffer<float>& b, std::int64_t ldb,
            sycl::buffer<float>& scratchpad, std::int64_t scratchpad_size) {
     throw unimplemented("lapack", "trtrs");
 }
-void trtrs(sycl::queue& queue, oneapi::mkl::uplo uplo, oneapi::mkl::transpose trans,
-           oneapi::mkl::diag diag, std::int64_t n, std::int64_t nrhs,
+void trtrs(sycl::queue& queue, oneapi::math::uplo uplo, oneapi::math::transpose trans,
+           oneapi::math::diag diag, std::int64_t n, std::int64_t nrhs,
            sycl::buffer<std::complex<double>>& a, std::int64_t lda,
            sycl::buffer<std::complex<double>>& b, std::int64_t ldb,
            sycl::buffer<std::complex<double>>& scratchpad, std::int64_t scratchpad_size) {
@@ -993,7 +993,7 @@ void trtrs(sycl::queue& queue, oneapi::mkl::uplo uplo, oneapi::mkl::transpose tr
 }
 
 template <typename Func, typename T>
-inline void ungbr(const char* func_name, Func func, sycl::queue& queue, oneapi::mkl::generate vec,
+inline void ungbr(const char* func_name, Func func, sycl::queue& queue, oneapi::math::generate vec,
                   std::int64_t m, std::int64_t n, std::int64_t k, sycl::buffer<T>& a,
                   std::int64_t lda, sycl::buffer<T>& tau, sycl::buffer<T>& scratchpad,
                   std::int64_t scratchpad_size) {
@@ -1003,7 +1003,7 @@ inline void ungbr(const char* func_name, Func func, sycl::queue& queue, oneapi::
         auto a_acc = a.template get_access<sycl::access::mode::read_write>(cgh);
         auto tau_acc = tau.template get_access<sycl::access::mode::write>(cgh);
         auto scratch_acc = scratchpad.template get_access<sycl::access::mode::read_write>(cgh);
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+        onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             auto a_ = sc.get_mem<cuDataType*>(a_acc);
             auto tau_ = sc.get_mem<cuDataType*>(tau_acc);
@@ -1016,7 +1016,7 @@ inline void ungbr(const char* func_name, Func func, sycl::queue& queue, oneapi::
 }
 
 #define UNGBR_LAUNCHER(TYPE, CUSOLVER_ROUTINE)                                                   \
-    void ungbr(sycl::queue& queue, oneapi::mkl::generate vec, std::int64_t m, std::int64_t n,    \
+    void ungbr(sycl::queue& queue, oneapi::math::generate vec, std::int64_t m, std::int64_t n,   \
                std::int64_t k, sycl::buffer<TYPE>& a, std::int64_t lda, sycl::buffer<TYPE>& tau, \
                sycl::buffer<TYPE>& scratchpad, std::int64_t scratchpad_size) {                   \
         ungbr(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, vec, m, n, k, a, lda, tau, scratchpad, \
@@ -1038,7 +1038,7 @@ inline void ungqr(const char* func_name, Func func, sycl::queue& queue, std::int
         auto a_acc = a.template get_access<sycl::access::mode::read_write>(cgh);
         auto tau_acc = tau.template get_access<sycl::access::mode::write>(cgh);
         auto scratch_acc = scratchpad.template get_access<sycl::access::mode::read_write>(cgh);
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+        onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             auto a_ = sc.get_mem<cuDataType*>(a_acc);
             auto tau_ = sc.get_mem<cuDataType*>(tau_acc);
@@ -1064,7 +1064,7 @@ UNGQR_LAUNCHER(std::complex<double>, cusolverDnZungqr)
 #undef UNGQR_LAUNCHER
 
 template <typename Func, typename T>
-inline void ungtr(const char* func_name, Func func, sycl::queue& queue, oneapi::mkl::uplo uplo,
+inline void ungtr(const char* func_name, Func func, sycl::queue& queue, oneapi::math::uplo uplo,
                   std::int64_t n, sycl::buffer<T>& a, std::int64_t lda, sycl::buffer<T>& tau,
                   sycl::buffer<T>& scratchpad, std::int64_t scratchpad_size) {
     using cuDataType = typename CudaEquivalentType<T>::Type;
@@ -1073,7 +1073,7 @@ inline void ungtr(const char* func_name, Func func, sycl::queue& queue, oneapi::
         auto a_acc = a.template get_access<sycl::access::mode::read_write>(cgh);
         auto tau_acc = tau.template get_access<sycl::access::mode::write>(cgh);
         auto scratch_acc = scratchpad.template get_access<sycl::access::mode::read_write>(cgh);
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+        onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             auto a_ = sc.get_mem<cuDataType*>(a_acc);
             auto tau_ = sc.get_mem<cuDataType*>(tau_acc);
@@ -1085,12 +1085,12 @@ inline void ungtr(const char* func_name, Func func, sycl::queue& queue, oneapi::
     });
 }
 
-#define UNGTR_LAUNCHER(TYPE, CUSOLVER_ROUTINE)                                                    \
-    void ungtr(sycl::queue& queue, oneapi::mkl::uplo uplo, std::int64_t n, sycl::buffer<TYPE>& a, \
-               std::int64_t lda, sycl::buffer<TYPE>& tau, sycl::buffer<TYPE>& scratchpad,         \
-               std::int64_t scratchpad_size) {                                                    \
-        ungtr(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, uplo, n, a, lda, tau, scratchpad,       \
-              scratchpad_size);                                                                   \
+#define UNGTR_LAUNCHER(TYPE, CUSOLVER_ROUTINE)                                                     \
+    void ungtr(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n, sycl::buffer<TYPE>& a, \
+               std::int64_t lda, sycl::buffer<TYPE>& tau, sycl::buffer<TYPE>& scratchpad,          \
+               std::int64_t scratchpad_size) {                                                     \
+        ungtr(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, uplo, n, a, lda, tau, scratchpad,        \
+              scratchpad_size);                                                                    \
     }
 
 UNGTR_LAUNCHER(std::complex<float>, cusolverDnCungtr)
@@ -1098,24 +1098,24 @@ UNGTR_LAUNCHER(std::complex<double>, cusolverDnZungtr)
 
 #undef UNGTR_LAUNCHER
 
-void unmrq(sycl::queue& queue, oneapi::mkl::side side, oneapi::mkl::transpose trans, std::int64_t m,
-           std::int64_t n, std::int64_t k, sycl::buffer<std::complex<float>>& a, std::int64_t lda,
-           sycl::buffer<std::complex<float>>& tau, sycl::buffer<std::complex<float>>& c,
-           std::int64_t ldc, sycl::buffer<std::complex<float>>& scratchpad,
-           std::int64_t scratchpad_size) {
+void unmrq(sycl::queue& queue, oneapi::math::side side, oneapi::math::transpose trans,
+           std::int64_t m, std::int64_t n, std::int64_t k, sycl::buffer<std::complex<float>>& a,
+           std::int64_t lda, sycl::buffer<std::complex<float>>& tau,
+           sycl::buffer<std::complex<float>>& c, std::int64_t ldc,
+           sycl::buffer<std::complex<float>>& scratchpad, std::int64_t scratchpad_size) {
     throw unimplemented("lapack", "unmrq");
 }
-void unmrq(sycl::queue& queue, oneapi::mkl::side side, oneapi::mkl::transpose trans, std::int64_t m,
-           std::int64_t n, std::int64_t k, sycl::buffer<std::complex<double>>& a, std::int64_t lda,
-           sycl::buffer<std::complex<double>>& tau, sycl::buffer<std::complex<double>>& c,
-           std::int64_t ldc, sycl::buffer<std::complex<double>>& scratchpad,
-           std::int64_t scratchpad_size) {
+void unmrq(sycl::queue& queue, oneapi::math::side side, oneapi::math::transpose trans,
+           std::int64_t m, std::int64_t n, std::int64_t k, sycl::buffer<std::complex<double>>& a,
+           std::int64_t lda, sycl::buffer<std::complex<double>>& tau,
+           sycl::buffer<std::complex<double>>& c, std::int64_t ldc,
+           sycl::buffer<std::complex<double>>& scratchpad, std::int64_t scratchpad_size) {
     throw unimplemented("lapack", "unmrq");
 }
 
 template <typename Func, typename T>
-inline void unmqr(const char* func_name, Func func, sycl::queue& queue, oneapi::mkl::side side,
-                  oneapi::mkl::transpose trans, std::int64_t m, std::int64_t n, std::int64_t k,
+inline void unmqr(const char* func_name, Func func, sycl::queue& queue, oneapi::math::side side,
+                  oneapi::math::transpose trans, std::int64_t m, std::int64_t n, std::int64_t k,
                   sycl::buffer<T>& a, std::int64_t lda, sycl::buffer<T>& tau, sycl::buffer<T>& c,
                   std::int64_t ldc, sycl::buffer<T>& scratchpad, std::int64_t scratchpad_size) {
     using cuDataType = typename CudaEquivalentType<T>::Type;
@@ -1125,7 +1125,7 @@ inline void unmqr(const char* func_name, Func func, sycl::queue& queue, oneapi::
         auto tau_acc = tau.template get_access<sycl::access::mode::write>(cgh);
         auto c_acc = c.template get_access<sycl::access::mode::read_write>(cgh);
         auto scratch_acc = scratchpad.template get_access<sycl::access::mode::read_write>(cgh);
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+        onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             auto a_ = sc.get_mem<cuDataType*>(a_acc);
             auto tau_ = sc.get_mem<cuDataType*>(tau_acc);
@@ -1140,7 +1140,7 @@ inline void unmqr(const char* func_name, Func func, sycl::queue& queue, oneapi::
 }
 
 #define UNMQR_LAUNCHER(TYPE, CUSOLVER_ROUTINE)                                                     \
-    void unmqr(sycl::queue& queue, oneapi::mkl::side side, oneapi::mkl::transpose trans,           \
+    void unmqr(sycl::queue& queue, oneapi::math::side side, oneapi::math::transpose trans,         \
                std::int64_t m, std::int64_t n, std::int64_t k, sycl::buffer<TYPE>& a,              \
                std::int64_t lda, sycl::buffer<TYPE>& tau, sycl::buffer<TYPE>& c, std::int64_t ldc, \
                sycl::buffer<TYPE>& scratchpad, std::int64_t scratchpad_size) {                     \
@@ -1154,8 +1154,8 @@ UNMQR_LAUNCHER(std::complex<double>, cusolverDnZunmqr)
 #undef UNMQR_LAUNCHER
 
 template <typename Func, typename T>
-inline void unmtr(const char* func_name, Func func, sycl::queue& queue, oneapi::mkl::side side,
-                  oneapi::mkl::uplo uplo, oneapi::mkl::transpose trans, std::int64_t m,
+inline void unmtr(const char* func_name, Func func, sycl::queue& queue, oneapi::math::side side,
+                  oneapi::math::uplo uplo, oneapi::math::transpose trans, std::int64_t m,
                   std::int64_t n, sycl::buffer<T>& a, std::int64_t lda, sycl::buffer<T>& tau,
                   sycl::buffer<T>& c, std::int64_t ldc, sycl::buffer<T>& scratchpad,
                   std::int64_t scratchpad_size) {
@@ -1166,7 +1166,7 @@ inline void unmtr(const char* func_name, Func func, sycl::queue& queue, oneapi::
         auto tau_acc = tau.template get_access<sycl::access::mode::write>(cgh);
         auto c_acc = c.template get_access<sycl::access::mode::read_write>(cgh);
         auto scratch_acc = scratchpad.template get_access<sycl::access::mode::read_write>(cgh);
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+        onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             auto a_ = sc.get_mem<cuDataType*>(a_acc);
             auto tau_ = sc.get_mem<cuDataType*>(tau_acc);
@@ -1182,8 +1182,8 @@ inline void unmtr(const char* func_name, Func func, sycl::queue& queue, oneapi::
 }
 
 #define UNMTR_LAUNCHER(TYPE, CUSOLVER_ROUTINE)                                                     \
-    void unmtr(sycl::queue& queue, oneapi::mkl::side side, oneapi::mkl::uplo uplo,                 \
-               oneapi::mkl::transpose trans, std::int64_t m, std::int64_t n,                       \
+    void unmtr(sycl::queue& queue, oneapi::math::side side, oneapi::math::uplo uplo,               \
+               oneapi::math::transpose trans, std::int64_t m, std::int64_t n,                      \
                sycl::buffer<TYPE>& a, std::int64_t lda, sycl::buffer<TYPE>& tau,                   \
                sycl::buffer<TYPE>& c, std::int64_t ldc, sycl::buffer<TYPE>& scratchpad,            \
                std::int64_t scratchpad_size) {                                                     \
@@ -1215,7 +1215,7 @@ inline sycl::event gebrd(const char* func_name, Func func, sycl::queue& queue, s
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+        onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             auto a_ = reinterpret_cast<cuDataType_A*>(a);
             auto d_ = reinterpret_cast<cuDataType_B*>(d);
@@ -1280,7 +1280,7 @@ inline sycl::event geqrf(const char* func_name, Func func, sycl::queue& queue, s
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+        onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             auto a_ = reinterpret_cast<cuDataType*>(a);
             auto tau_ = reinterpret_cast<cuDataType*>(tau);
@@ -1328,7 +1328,7 @@ inline sycl::event getrf(const char* func_name, Func func, sycl::queue& queue, s
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+        onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             auto a_ = reinterpret_cast<cuDataType*>(a);
             auto devInfo_ = reinterpret_cast<int*>(devInfo);
@@ -1391,7 +1391,7 @@ GETRI_LAUNCHER_USM(std::complex<double>)
 // cusolverDnXgetrs does not use scratchpad memory
 template <typename Func, typename T>
 inline sycl::event getrs(const char* func_name, Func func, sycl::queue& queue,
-                         oneapi::mkl::transpose trans, std::int64_t n, std::int64_t nrhs, T* a,
+                         oneapi::math::transpose trans, std::int64_t n, std::int64_t nrhs, T* a,
                          std::int64_t lda, std::int64_t* ipiv, T* b, std::int64_t ldb,
                          T* scratchpad, std::int64_t scratchpad_size,
                          const std::vector<sycl::event>& dependencies) {
@@ -1416,7 +1416,7 @@ inline sycl::event getrs(const char* func_name, Func func, sycl::queue& queue,
             cgh.depends_on(dependencies[i]);
         }
         cgh.depends_on(done_casting);
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+        onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             auto a_ = reinterpret_cast<cuDataType*>(a);
             auto ipiv_ = reinterpret_cast<int*>(ipiv32);
@@ -1435,7 +1435,7 @@ inline sycl::event getrs(const char* func_name, Func func, sycl::queue& queue,
 }
 
 #define GETRS_LAUNCHER_USM(TYPE, CUSOLVER_ROUTINE)                                                \
-    sycl::event getrs(sycl::queue& queue, oneapi::mkl::transpose trans, std::int64_t n,           \
+    sycl::event getrs(sycl::queue& queue, oneapi::math::transpose trans, std::int64_t n,          \
                       std::int64_t nrhs, TYPE* a, std::int64_t lda, std::int64_t* ipiv, TYPE* b,  \
                       std::int64_t ldb, TYPE* scratchpad, std::int64_t scratchpad_size,           \
                       const std::vector<sycl::event>& dependencies) {                             \
@@ -1452,7 +1452,7 @@ GETRS_LAUNCHER_USM(std::complex<double>, cusolverDnZgetrs)
 
 template <typename Func, typename T_A, typename T_B>
 inline sycl::event gesvd(const char* func_name, Func func, sycl::queue& queue,
-                         oneapi::mkl::jobsvd jobu, oneapi::mkl::jobsvd jobvt, std::int64_t m,
+                         oneapi::math::jobsvd jobu, oneapi::math::jobsvd jobvt, std::int64_t m,
                          std::int64_t n, T_A* a, std::int64_t lda, T_B* s, T_A* u, std::int64_t ldu,
                          T_A* vt, std::int64_t ldvt, T_A* scratchpad, std::int64_t scratchpad_size,
                          const std::vector<sycl::event>& dependencies) {
@@ -1465,7 +1465,7 @@ inline sycl::event gesvd(const char* func_name, Func func, sycl::queue& queue,
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+        onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             auto a_ = reinterpret_cast<cuDataType_A*>(a);
             auto s_ = reinterpret_cast<cuDataType_B*>(s);
@@ -1486,7 +1486,7 @@ inline sycl::event gesvd(const char* func_name, Func func, sycl::queue& queue,
 }
 
 #define GESVD_LAUNCHER_USM(TYPE_A, TYPE_B, CUSOLVER_ROUTINE)                                      \
-    sycl::event gesvd(sycl::queue& queue, oneapi::mkl::jobsvd jobu, oneapi::mkl::jobsvd jobvt,    \
+    sycl::event gesvd(sycl::queue& queue, oneapi::math::jobsvd jobu, oneapi::math::jobsvd jobvt,  \
                       std::int64_t m, std::int64_t n, TYPE_A* a, std::int64_t lda, TYPE_B* s,     \
                       TYPE_A* u, std::int64_t ldu, TYPE_A* vt, std::int64_t ldvt,                 \
                       TYPE_A* scratchpad, std::int64_t scratchpad_size,                           \
@@ -1504,7 +1504,7 @@ GESVD_LAUNCHER_USM(std::complex<double>, double, cusolverDnZgesvd)
 
 template <typename Func, typename T_A, typename T_B>
 inline sycl::event heevd(const char* func_name, Func func, sycl::queue& queue,
-                         oneapi::mkl::job jobz, oneapi::mkl::uplo uplo, std::int64_t n, T_A*& a,
+                         oneapi::math::job jobz, oneapi::math::uplo uplo, std::int64_t n, T_A*& a,
                          std::int64_t lda, T_B*& w, T_A*& scratchpad, std::int64_t scratchpad_size,
                          const std::vector<sycl::event>& dependencies) {
     using cuDataType_A = typename CudaEquivalentType<T_A>::Type;
@@ -1516,7 +1516,7 @@ inline sycl::event heevd(const char* func_name, Func func, sycl::queue& queue,
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+        onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             auto a_ = reinterpret_cast<cuDataType_A*>(a);
             auto w_ = reinterpret_cast<cuDataType_B*>(w);
@@ -1534,7 +1534,7 @@ inline sycl::event heevd(const char* func_name, Func func, sycl::queue& queue,
 }
 
 #define HEEVD_LAUNCHER_USM(TYPE_A, TYPE_B, CUSOLVER_ROUTINE)                                      \
-    sycl::event heevd(sycl::queue& queue, oneapi::mkl::job jobz, oneapi::mkl::uplo uplo,          \
+    sycl::event heevd(sycl::queue& queue, oneapi::math::job jobz, oneapi::math::uplo uplo,        \
                       std::int64_t n, TYPE_A* a, std::int64_t lda, TYPE_B* w, TYPE_A* scratchpad, \
                       std::int64_t scratchpad_size,                                               \
                       const std::vector<sycl::event>& dependencies) {                             \
@@ -1549,7 +1549,7 @@ HEEVD_LAUNCHER_USM(std::complex<double>, double, cusolverDnZheevd)
 
 template <typename Func, typename T_A, typename T_B>
 inline sycl::event hegvd(const char* func_name, Func func, sycl::queue& queue, std::int64_t itype,
-                         oneapi::mkl::job jobz, oneapi::mkl::uplo uplo, std::int64_t n, T_A*& a,
+                         oneapi::math::job jobz, oneapi::math::uplo uplo, std::int64_t n, T_A*& a,
                          std::int64_t lda, T_A*& b, std::int64_t ldb, T_B*& w, T_A*& scratchpad,
                          std::int64_t scratchpad_size,
                          const std::vector<sycl::event>& dependencies) {
@@ -1562,7 +1562,7 @@ inline sycl::event hegvd(const char* func_name, Func func, sycl::queue& queue, s
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+        onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             auto a_ = reinterpret_cast<cuDataType_A*>(a);
             auto b_ = reinterpret_cast<cuDataType_A*>(b);
@@ -1581,8 +1581,8 @@ inline sycl::event hegvd(const char* func_name, Func func, sycl::queue& queue, s
 }
 
 #define HEGVD_LAUNCHER_USM(TYPE_A, TYPE_B, CUSOLVER_ROUTINE)                                      \
-    sycl::event hegvd(sycl::queue& queue, std::int64_t itype, oneapi::mkl::job jobz,              \
-                      oneapi::mkl::uplo uplo, std::int64_t n, TYPE_A* a, std::int64_t lda,        \
+    sycl::event hegvd(sycl::queue& queue, std::int64_t itype, oneapi::math::job jobz,             \
+                      oneapi::math::uplo uplo, std::int64_t n, TYPE_A* a, std::int64_t lda,       \
                       TYPE_A* b, std::int64_t ldb, TYPE_B* w, TYPE_A* scratchpad,                 \
                       std::int64_t scratchpad_size,                                               \
                       const std::vector<sycl::event>& dependencies) {                             \
@@ -1597,7 +1597,7 @@ HEGVD_LAUNCHER_USM(std::complex<double>, double, cusolverDnZhegvd)
 
 template <typename Func, typename T_A, typename T_B>
 inline sycl::event hetrd(const char* func_name, Func func, sycl::queue& queue,
-                         oneapi::mkl::uplo uplo, std::int64_t n, T_A* a, std::int64_t lda, T_B* d,
+                         oneapi::math::uplo uplo, std::int64_t n, T_A* a, std::int64_t lda, T_B* d,
                          T_B* e, T_A* tau, T_A* scratchpad, std::int64_t scratchpad_size,
                          const std::vector<sycl::event>& dependencies) {
     using cuDataType_A = typename CudaEquivalentType<T_A>::Type;
@@ -1609,7 +1609,7 @@ inline sycl::event hetrd(const char* func_name, Func func, sycl::queue& queue,
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+        onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             auto a_ = reinterpret_cast<cuDataType_A*>(a);
             auto d_ = reinterpret_cast<cuDataType_B*>(d);
@@ -1628,7 +1628,7 @@ inline sycl::event hetrd(const char* func_name, Func func, sycl::queue& queue,
 }
 
 #define HETRD_LAUNCHER_USM(TYPE_A, TYPE_B, CUSOLVER_ROUTINE)                                   \
-    sycl::event hetrd(sycl::queue& queue, oneapi::mkl::uplo uplo, std::int64_t n, TYPE_A* a,   \
+    sycl::event hetrd(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n, TYPE_A* a,  \
                       std::int64_t lda, TYPE_B* d, TYPE_B* e, TYPE_A* tau, TYPE_A* scratchpad, \
                       std::int64_t scratchpad_size,                                            \
                       const std::vector<sycl::event>& dependencies) {                          \
@@ -1641,13 +1641,13 @@ HETRD_LAUNCHER_USM(std::complex<double>, double, cusolverDnZhetrd)
 
 #undef HETRD_LAUNCHER_USM
 
-sycl::event hetrf(sycl::queue& queue, oneapi::mkl::uplo uplo, std::int64_t n,
+sycl::event hetrf(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n,
                   std::complex<float>* a, std::int64_t lda, std::int64_t* ipiv,
                   std::complex<float>* scratchpad, std::int64_t scratchpad_size,
                   const std::vector<sycl::event>& dependencies) {
     throw unimplemented("lapack", "hetrf");
 }
-sycl::event hetrf(sycl::queue& queue, oneapi::mkl::uplo uplo, std::int64_t n,
+sycl::event hetrf(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n,
                   std::complex<double>* a, std::int64_t lda, std::int64_t* ipiv,
                   std::complex<double>* scratchpad, std::int64_t scratchpad_size,
                   const std::vector<sycl::event>& dependencies) {
@@ -1656,7 +1656,7 @@ sycl::event hetrf(sycl::queue& queue, oneapi::mkl::uplo uplo, std::int64_t n,
 
 template <typename Func, typename T>
 inline sycl::event orgbr(const char* func_name, Func func, sycl::queue& queue,
-                         oneapi::mkl::generate vec, std::int64_t m, std::int64_t n, std::int64_t k,
+                         oneapi::math::generate vec, std::int64_t m, std::int64_t n, std::int64_t k,
                          T* a, std::int64_t lda, T* tau, T* scratchpad,
                          std::int64_t scratchpad_size,
                          const std::vector<sycl::event>& dependencies) {
@@ -1667,7 +1667,7 @@ inline sycl::event orgbr(const char* func_name, Func func, sycl::queue& queue,
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+        onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             auto a_ = reinterpret_cast<cuDataType*>(a);
             auto tau_ = reinterpret_cast<cuDataType*>(tau);
@@ -1681,7 +1681,7 @@ inline sycl::event orgbr(const char* func_name, Func func, sycl::queue& queue,
 }
 
 #define ORGBR_LAUNCHER_USM(TYPE, CUSOLVER_ROUTINE)                                          \
-    sycl::event orgbr(sycl::queue& queue, oneapi::mkl::generate vec, std::int64_t m,        \
+    sycl::event orgbr(sycl::queue& queue, oneapi::math::generate vec, std::int64_t m,       \
                       std::int64_t n, std::int64_t k, TYPE* a, std::int64_t lda, TYPE* tau, \
                       TYPE* scratchpad, std::int64_t scratchpad_size,                       \
                       const std::vector<sycl::event>& dependencies) {                       \
@@ -1706,7 +1706,7 @@ inline sycl::event orgqr(const char* func_name, Func func, sycl::queue& queue, s
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+        onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             auto a_ = reinterpret_cast<cuDataType*>(a);
             auto tau_ = reinterpret_cast<cuDataType*>(tau);
@@ -1734,7 +1734,7 @@ ORGQR_LAUNCHER_USM(double, cusolverDnDorgqr)
 
 template <typename Func, typename T>
 inline sycl::event orgtr(const char* func_name, Func func, sycl::queue& queue,
-                         oneapi::mkl::uplo uplo, std::int64_t n, T* a, std::int64_t lda, T* tau,
+                         oneapi::math::uplo uplo, std::int64_t n, T* a, std::int64_t lda, T* tau,
                          T* scratchpad, std::int64_t scratchpad_size,
                          const std::vector<sycl::event>& dependencies) {
     using cuDataType = typename CudaEquivalentType<T>::Type;
@@ -1744,7 +1744,7 @@ inline sycl::event orgtr(const char* func_name, Func func, sycl::queue& queue,
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+        onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             auto a_ = reinterpret_cast<cuDataType*>(a);
             auto tau_ = reinterpret_cast<cuDataType*>(tau);
@@ -1758,7 +1758,7 @@ inline sycl::event orgtr(const char* func_name, Func func, sycl::queue& queue,
 }
 
 #define ORGTR_LAUNCHER_USM(TYPE, CUSOLVER_ROUTINE)                                                 \
-    sycl::event orgtr(sycl::queue& queue, oneapi::mkl::uplo uplo, std::int64_t n, TYPE* a,         \
+    sycl::event orgtr(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n, TYPE* a,        \
                       std::int64_t lda, TYPE* tau, TYPE* scratchpad, std::int64_t scratchpad_size, \
                       const std::vector<sycl::event>& dependencies) {                              \
         return orgtr(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, uplo, n, a, lda, tau, scratchpad, \
@@ -1772,8 +1772,8 @@ ORGTR_LAUNCHER_USM(double, cusolverDnDorgtr)
 
 template <typename Func, typename T>
 inline sycl::event ormtr(const char* func_name, Func func, sycl::queue& queue,
-                         oneapi::mkl::side side, oneapi::mkl::uplo uplo,
-                         oneapi::mkl::transpose trans, std::int64_t m, std::int64_t n, T* a,
+                         oneapi::math::side side, oneapi::math::uplo uplo,
+                         oneapi::math::transpose trans, std::int64_t m, std::int64_t n, T* a,
                          std::int64_t lda, T* tau, T* c, std::int64_t ldc, T* scratchpad,
                          std::int64_t scratchpad_size,
                          const std::vector<sycl::event>& dependencies) {
@@ -1784,7 +1784,7 @@ inline sycl::event ormtr(const char* func_name, Func func, sycl::queue& queue,
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+        onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             auto a_ = reinterpret_cast<cuDataType*>(a);
             auto tau_ = reinterpret_cast<cuDataType*>(tau);
@@ -1801,8 +1801,8 @@ inline sycl::event ormtr(const char* func_name, Func func, sycl::queue& queue,
 }
 
 #define ORMTR_LAUNCHER_USM(TYPE, CUSOLVER_ROUTINE)                                                \
-    sycl::event ormtr(sycl::queue& queue, oneapi::mkl::side side, oneapi::mkl::uplo uplo,         \
-                      oneapi::mkl::transpose trans, std::int64_t m, std::int64_t n, TYPE* a,      \
+    sycl::event ormtr(sycl::queue& queue, oneapi::math::side side, oneapi::math::uplo uplo,       \
+                      oneapi::math::transpose trans, std::int64_t m, std::int64_t n, TYPE* a,     \
                       std::int64_t lda, TYPE* tau, TYPE* c, std::int64_t ldc, TYPE* scratchpad,   \
                       std::int64_t scratchpad_size,                                               \
                       const std::vector<sycl::event>& dependencies) {                             \
@@ -1815,13 +1815,13 @@ ORMTR_LAUNCHER_USM(double, cusolverDnDormtr)
 
 #undef ORMTR_LAUNCHER_USM
 
-sycl::event ormrq(sycl::queue& queue, oneapi::mkl::side side, oneapi::mkl::transpose trans,
+sycl::event ormrq(sycl::queue& queue, oneapi::math::side side, oneapi::math::transpose trans,
                   std::int64_t m, std::int64_t n, std::int64_t k, float* a, std::int64_t lda,
                   float* tau, float* c, std::int64_t ldc, float* scratchpad,
                   std::int64_t scratchpad_size, const std::vector<sycl::event>& dependencies) {
     throw unimplemented("lapack", "ormrq");
 }
-sycl::event ormrq(sycl::queue& queue, oneapi::mkl::side side, oneapi::mkl::transpose trans,
+sycl::event ormrq(sycl::queue& queue, oneapi::math::side side, oneapi::math::transpose trans,
                   std::int64_t m, std::int64_t n, std::int64_t k, double* a, std::int64_t lda,
                   double* tau, double* c, std::int64_t ldc, double* scratchpad,
                   std::int64_t scratchpad_size, const std::vector<sycl::event>& dependencies) {
@@ -1830,7 +1830,7 @@ sycl::event ormrq(sycl::queue& queue, oneapi::mkl::side side, oneapi::mkl::trans
 
 template <typename Func, typename T>
 inline sycl::event ormqr(const char* func_name, Func func, sycl::queue& queue,
-                         oneapi::mkl::side side, oneapi::mkl::transpose trans, std::int64_t m,
+                         oneapi::math::side side, oneapi::math::transpose trans, std::int64_t m,
                          std::int64_t n, std::int64_t k, T* a, std::int64_t lda, T* tau, T* c,
                          std::int64_t ldc, T* scratchpad, std::int64_t scratchpad_size,
                          const std::vector<sycl::event>& dependencies) {
@@ -1841,7 +1841,7 @@ inline sycl::event ormqr(const char* func_name, Func func, sycl::queue& queue,
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+        onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             auto a_ = reinterpret_cast<cuDataType*>(a);
             auto tau_ = reinterpret_cast<cuDataType*>(tau);
@@ -1856,14 +1856,14 @@ inline sycl::event ormqr(const char* func_name, Func func, sycl::queue& queue,
     return done;
 }
 
-#define ORMQR_LAUNCHER_USM(TYPE, CUSOLVER_ROUTINE)                                               \
-    sycl::event ormqr(sycl::queue& queue, oneapi::mkl::side side, oneapi::mkl::transpose trans,  \
-                      std::int64_t m, std::int64_t n, std::int64_t k, TYPE* a, std::int64_t lda, \
-                      TYPE* tau, TYPE* c, std::int64_t ldc, TYPE* scratchpad,                    \
-                      std::int64_t scratchpad_size,                                              \
-                      const std::vector<sycl::event>& dependencies) {                            \
-        return ormqr(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, side, trans, m, n, k, a, lda,   \
-                     tau, c, ldc, scratchpad, scratchpad_size, dependencies);                    \
+#define ORMQR_LAUNCHER_USM(TYPE, CUSOLVER_ROUTINE)                                                \
+    sycl::event ormqr(sycl::queue& queue, oneapi::math::side side, oneapi::math::transpose trans, \
+                      std::int64_t m, std::int64_t n, std::int64_t k, TYPE* a, std::int64_t lda,  \
+                      TYPE* tau, TYPE* c, std::int64_t ldc, TYPE* scratchpad,                     \
+                      std::int64_t scratchpad_size,                                               \
+                      const std::vector<sycl::event>& dependencies) {                             \
+        return ormqr(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, side, trans, m, n, k, a, lda,    \
+                     tau, c, ldc, scratchpad, scratchpad_size, dependencies);                     \
     }
 
 ORMQR_LAUNCHER_USM(float, cusolverDnSormqr)
@@ -1873,7 +1873,7 @@ ORMQR_LAUNCHER_USM(double, cusolverDnDormqr)
 
 template <typename Func, typename T>
 inline sycl::event potrf(const char* func_name, Func func, sycl::queue& queue,
-                         oneapi::mkl::uplo uplo, std::int64_t n, T* a, std::int64_t lda,
+                         oneapi::math::uplo uplo, std::int64_t n, T* a, std::int64_t lda,
                          T* scratchpad, std::int64_t scratchpad_size,
                          const std::vector<sycl::event>& dependencies) {
     using cuDataType = typename CudaEquivalentType<T>::Type;
@@ -1884,7 +1884,7 @@ inline sycl::event potrf(const char* func_name, Func func, sycl::queue& queue,
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+        onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             auto a_ = reinterpret_cast<cuDataType*>(a);
             auto devInfo_ = reinterpret_cast<int*>(devInfo);
@@ -1900,7 +1900,7 @@ inline sycl::event potrf(const char* func_name, Func func, sycl::queue& queue,
 }
 
 #define POTRF_LAUNCHER_USM(TYPE, CUSOLVER_ROUTINE)                                            \
-    sycl::event potrf(sycl::queue& queue, oneapi::mkl::uplo uplo, std::int64_t n, TYPE* a,    \
+    sycl::event potrf(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n, TYPE* a,   \
                       std::int64_t lda, TYPE* scratchpad, std::int64_t scratchpad_size,       \
                       const std::vector<sycl::event>& dependencies) {                         \
         return potrf(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, uplo, n, a, lda, scratchpad, \
@@ -1916,7 +1916,7 @@ POTRF_LAUNCHER_USM(std::complex<double>, cusolverDnZpotrf)
 
 template <typename Func, typename T>
 inline sycl::event potri(const char* func_name, Func func, sycl::queue& queue,
-                         oneapi::mkl::uplo uplo, std::int64_t n, T* a, std::int64_t lda,
+                         oneapi::math::uplo uplo, std::int64_t n, T* a, std::int64_t lda,
                          T* scratchpad, std::int64_t scratchpad_size,
                          const std::vector<sycl::event>& dependencies) {
     using cuDataType = typename CudaEquivalentType<T>::Type;
@@ -1927,7 +1927,7 @@ inline sycl::event potri(const char* func_name, Func func, sycl::queue& queue,
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+        onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             auto a_ = reinterpret_cast<cuDataType*>(a);
             auto scratch_ = reinterpret_cast<cuDataType*>(scratchpad);
@@ -1943,7 +1943,7 @@ inline sycl::event potri(const char* func_name, Func func, sycl::queue& queue,
 }
 
 #define POTRI_LAUNCHER_USM(TYPE, CUSOLVER_ROUTINE)                                            \
-    sycl::event potri(sycl::queue& queue, oneapi::mkl::uplo uplo, std::int64_t n, TYPE* a,    \
+    sycl::event potri(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n, TYPE* a,   \
                       std::int64_t lda, TYPE* scratchpad, std::int64_t scratchpad_size,       \
                       const std::vector<sycl::event>& dependencies) {                         \
         return potri(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, uplo, n, a, lda, scratchpad, \
@@ -1960,7 +1960,7 @@ POTRI_LAUNCHER_USM(std::complex<double>, cusolverDnZpotri)
 // cusolverDnXpotrs does not use scratchpad memory
 template <typename Func, typename T>
 inline sycl::event potrs(const char* func_name, Func func, sycl::queue& queue,
-                         oneapi::mkl::uplo uplo, std::int64_t n, std::int64_t nrhs, T* a,
+                         oneapi::math::uplo uplo, std::int64_t n, std::int64_t nrhs, T* a,
                          std::int64_t lda, T* b, std::int64_t ldb, T* scratchpad,
                          std::int64_t scratchpad_size,
                          const std::vector<sycl::event>& dependencies) {
@@ -1971,7 +1971,7 @@ inline sycl::event potrs(const char* func_name, Func func, sycl::queue& queue,
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+        onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             auto a_ = reinterpret_cast<cuDataType*>(a);
             auto b_ = reinterpret_cast<cuDataType*>(b);
@@ -1984,7 +1984,7 @@ inline sycl::event potrs(const char* func_name, Func func, sycl::queue& queue,
 }
 
 #define POTRS_LAUNCHER_USM(TYPE, CUSOLVER_ROUTINE)                                              \
-    sycl::event potrs(sycl::queue& queue, oneapi::mkl::uplo uplo, std::int64_t n,               \
+    sycl::event potrs(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n,              \
                       std::int64_t nrhs, TYPE* a, std::int64_t lda, TYPE* b, std::int64_t ldb,  \
                       TYPE* scratchpad, std::int64_t scratchpad_size,                           \
                       const std::vector<sycl::event>& dependencies) {                           \
@@ -2001,7 +2001,7 @@ POTRS_LAUNCHER_USM(std::complex<double>, cusolverDnZpotrs)
 
 template <typename Func, typename T>
 inline sycl::event syevd(const char* func_name, Func func, sycl::queue& queue,
-                         oneapi::mkl::job jobz, oneapi::mkl::uplo uplo, std::int64_t n, T* a,
+                         oneapi::math::job jobz, oneapi::math::uplo uplo, std::int64_t n, T* a,
                          std::int64_t lda, T* w, T* scratchpad, std::int64_t scratchpad_size,
                          const std::vector<sycl::event>& dependencies) {
     using cuDataType = typename CudaEquivalentType<T>::Type;
@@ -2012,7 +2012,7 @@ inline sycl::event syevd(const char* func_name, Func func, sycl::queue& queue,
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+        onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             auto a_ = reinterpret_cast<cuDataType*>(a);
             auto w_ = reinterpret_cast<cuDataType*>(w);
@@ -2030,7 +2030,7 @@ inline sycl::event syevd(const char* func_name, Func func, sycl::queue& queue,
 }
 
 #define SYEVD_LAUNCHER_USM(TYPE, CUSOLVER_ROUTINE)                                          \
-    sycl::event syevd(sycl::queue& queue, oneapi::mkl::job jobz, oneapi::mkl::uplo uplo,    \
+    sycl::event syevd(sycl::queue& queue, oneapi::math::job jobz, oneapi::math::uplo uplo,  \
                       std::int64_t n, TYPE* a, std::int64_t lda, TYPE* w, TYPE* scratchpad, \
                       std::int64_t scratchpad_size,                                         \
                       const std::vector<sycl::event>& dependencies) {                       \
@@ -2045,7 +2045,7 @@ SYEVD_LAUNCHER_USM(double, cusolverDnDsyevd)
 
 template <typename Func, typename T>
 inline sycl::event sygvd(const char* func_name, Func func, sycl::queue& queue, std::int64_t itype,
-                         oneapi::mkl::job jobz, oneapi::mkl::uplo uplo, std::int64_t n, T* a,
+                         oneapi::math::job jobz, oneapi::math::uplo uplo, std::int64_t n, T* a,
                          std::int64_t lda, T* b, std::int64_t ldb, T* w, T* scratchpad,
                          std::int64_t scratchpad_size,
                          const std::vector<sycl::event>& dependencies) {
@@ -2057,7 +2057,7 @@ inline sycl::event sygvd(const char* func_name, Func func, sycl::queue& queue, s
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+        onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             auto a_ = reinterpret_cast<cuDataType*>(a);
             auto b_ = reinterpret_cast<cuDataType*>(b);
@@ -2075,13 +2075,13 @@ inline sycl::event sygvd(const char* func_name, Func func, sycl::queue& queue, s
     return done;
 }
 
-#define SYGVD_LAUNCHER_USM(TYPE, CUSOLVER_ROUTINE)                                                \
-    sycl::event sygvd(sycl::queue& queue, std::int64_t itype, oneapi::mkl::job jobz,              \
-                      oneapi::mkl::uplo uplo, std::int64_t n, TYPE* a, std::int64_t lda, TYPE* b, \
-                      std::int64_t ldb, TYPE* w, TYPE* scratchpad, std::int64_t scratchpad_size,  \
-                      const std::vector<sycl::event>& dependencies) {                             \
-        return sygvd(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, itype, jobz, uplo, n, a, lda, b, \
-                     ldb, w, scratchpad, scratchpad_size, dependencies);                          \
+#define SYGVD_LAUNCHER_USM(TYPE, CUSOLVER_ROUTINE)                                                 \
+    sycl::event sygvd(sycl::queue& queue, std::int64_t itype, oneapi::math::job jobz,              \
+                      oneapi::math::uplo uplo, std::int64_t n, TYPE* a, std::int64_t lda, TYPE* b, \
+                      std::int64_t ldb, TYPE* w, TYPE* scratchpad, std::int64_t scratchpad_size,   \
+                      const std::vector<sycl::event>& dependencies) {                              \
+        return sygvd(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, itype, jobz, uplo, n, a, lda, b,  \
+                     ldb, w, scratchpad, scratchpad_size, dependencies);                           \
     }
 
 SYGVD_LAUNCHER_USM(float, cusolverDnSsygvd)
@@ -2091,8 +2091,8 @@ SYGVD_LAUNCHER_USM(double, cusolverDnDsygvd)
 
 template <typename Func, typename T>
 inline sycl::event sytrd(const char* func_name, Func func, sycl::queue& queue,
-                         oneapi::mkl::uplo uplo, std::int64_t n, T* a, std::int64_t lda, T* d, T* e,
-                         T* tau, T* scratchpad, std::int64_t scratchpad_size,
+                         oneapi::math::uplo uplo, std::int64_t n, T* a, std::int64_t lda, T* d,
+                         T* e, T* tau, T* scratchpad, std::int64_t scratchpad_size,
                          const std::vector<sycl::event>& dependencies) {
     using cuDataType = typename CudaEquivalentType<T>::Type;
     overflow_check(n, lda, scratchpad_size);
@@ -2102,7 +2102,7 @@ inline sycl::event sytrd(const char* func_name, Func func, sycl::queue& queue,
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+        onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             auto a_ = reinterpret_cast<cuDataType*>(a);
             auto d_ = reinterpret_cast<cuDataType*>(d);
@@ -2121,7 +2121,7 @@ inline sycl::event sytrd(const char* func_name, Func func, sycl::queue& queue,
 }
 
 #define SYTRD_LAUNCHER_USM(TYPE, CUSOLVER_ROUTINE)                                           \
-    sycl::event sytrd(sycl::queue& queue, oneapi::mkl::uplo uplo, std::int64_t n, TYPE* a,   \
+    sycl::event sytrd(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n, TYPE* a,  \
                       std::int64_t lda, TYPE* d, TYPE* e, TYPE* tau, TYPE* scratchpad,       \
                       std::int64_t scratchpad_size,                                          \
                       const std::vector<sycl::event>& dependencies) {                        \
@@ -2136,7 +2136,7 @@ SYTRD_LAUNCHER_USM(double, cusolverDnDsytrd)
 
 template <typename Func, typename T>
 inline sycl::event sytrf(const char* func_name, Func func, sycl::queue& queue,
-                         oneapi::mkl::uplo uplo, std::int64_t n, T* a, std::int64_t lda,
+                         oneapi::math::uplo uplo, std::int64_t n, T* a, std::int64_t lda,
                          std::int64_t* ipiv, T* scratchpad, std::int64_t scratchpad_size,
                          const std::vector<sycl::event>& dependencies) {
     using cuDataType = typename CudaEquivalentType<T>::Type;
@@ -2154,7 +2154,7 @@ inline sycl::event sytrf(const char* func_name, Func func, sycl::queue& queue,
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+        onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             auto a_ = reinterpret_cast<cuDataType*>(a);
             auto scratch_ = reinterpret_cast<cuDataType*>(scratchpad);
@@ -2183,13 +2183,13 @@ inline sycl::event sytrf(const char* func_name, Func func, sycl::queue& queue,
     return done_casting;
 }
 
-#define SYTRF_LAUNCHER_USM(TYPE, CUSOLVER_ROUTINE)                                         \
-    sycl::event sytrf(sycl::queue& queue, oneapi::mkl::uplo uplo, std::int64_t n, TYPE* a, \
-                      std::int64_t lda, std::int64_t* ipiv, TYPE* scratchpad,              \
-                      std::int64_t scratchpad_size,                                        \
-                      const std::vector<sycl::event>& dependencies) {                      \
-        return sytrf(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, uplo, n, a, lda, ipiv,    \
-                     scratchpad, scratchpad_size, dependencies);                           \
+#define SYTRF_LAUNCHER_USM(TYPE, CUSOLVER_ROUTINE)                                          \
+    sycl::event sytrf(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n, TYPE* a, \
+                      std::int64_t lda, std::int64_t* ipiv, TYPE* scratchpad,               \
+                      std::int64_t scratchpad_size,                                         \
+                      const std::vector<sycl::event>& dependencies) {                       \
+        return sytrf(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, uplo, n, a, lda, ipiv,     \
+                     scratchpad, scratchpad_size, dependencies);                            \
     }
 
 SYTRF_LAUNCHER_USM(float, cusolverDnSsytrf)
@@ -2199,27 +2199,27 @@ SYTRF_LAUNCHER_USM(std::complex<double>, cusolverDnZsytrf)
 
 #undef SYTRF_LAUNCHER_USM
 
-sycl::event trtrs(sycl::queue& queue, oneapi::mkl::uplo uplo, oneapi::mkl::transpose trans,
-                  oneapi::mkl::diag diag, std::int64_t n, std::int64_t nrhs, std::complex<float>* a,
-                  std::int64_t lda, std::complex<float>* b, std::int64_t ldb,
-                  std::complex<float>* scratchpad, std::int64_t scratchpad_size,
+sycl::event trtrs(sycl::queue& queue, oneapi::math::uplo uplo, oneapi::math::transpose trans,
+                  oneapi::math::diag diag, std::int64_t n, std::int64_t nrhs,
+                  std::complex<float>* a, std::int64_t lda, std::complex<float>* b,
+                  std::int64_t ldb, std::complex<float>* scratchpad, std::int64_t scratchpad_size,
                   const std::vector<sycl::event>& dependencies) {
     throw unimplemented("lapack", "trtrs");
 }
-sycl::event trtrs(sycl::queue& queue, oneapi::mkl::uplo uplo, oneapi::mkl::transpose trans,
-                  oneapi::mkl::diag diag, std::int64_t n, std::int64_t nrhs, double* a,
+sycl::event trtrs(sycl::queue& queue, oneapi::math::uplo uplo, oneapi::math::transpose trans,
+                  oneapi::math::diag diag, std::int64_t n, std::int64_t nrhs, double* a,
                   std::int64_t lda, double* b, std::int64_t ldb, double* scratchpad,
                   std::int64_t scratchpad_size, const std::vector<sycl::event>& dependencies) {
     throw unimplemented("lapack", "trtrs");
 }
-sycl::event trtrs(sycl::queue& queue, oneapi::mkl::uplo uplo, oneapi::mkl::transpose trans,
-                  oneapi::mkl::diag diag, std::int64_t n, std::int64_t nrhs, float* a,
+sycl::event trtrs(sycl::queue& queue, oneapi::math::uplo uplo, oneapi::math::transpose trans,
+                  oneapi::math::diag diag, std::int64_t n, std::int64_t nrhs, float* a,
                   std::int64_t lda, float* b, std::int64_t ldb, float* scratchpad,
                   std::int64_t scratchpad_size, const std::vector<sycl::event>& dependencies) {
     throw unimplemented("lapack", "trtrs");
 }
-sycl::event trtrs(sycl::queue& queue, oneapi::mkl::uplo uplo, oneapi::mkl::transpose trans,
-                  oneapi::mkl::diag diag, std::int64_t n, std::int64_t nrhs,
+sycl::event trtrs(sycl::queue& queue, oneapi::math::uplo uplo, oneapi::math::transpose trans,
+                  oneapi::math::diag diag, std::int64_t n, std::int64_t nrhs,
                   std::complex<double>* a, std::int64_t lda, std::complex<double>* b,
                   std::int64_t ldb, std::complex<double>* scratchpad, std::int64_t scratchpad_size,
                   const std::vector<sycl::event>& dependencies) {
@@ -2228,7 +2228,7 @@ sycl::event trtrs(sycl::queue& queue, oneapi::mkl::uplo uplo, oneapi::mkl::trans
 
 template <typename Func, typename T>
 inline sycl::event ungbr(const char* func_name, Func func, sycl::queue& queue,
-                         oneapi::mkl::generate vec, std::int64_t m, std::int64_t n, std::int64_t k,
+                         oneapi::math::generate vec, std::int64_t m, std::int64_t n, std::int64_t k,
                          T* a, std::int64_t lda, T* tau, T* scratchpad,
                          std::int64_t scratchpad_size,
                          const std::vector<sycl::event>& dependencies) {
@@ -2239,7 +2239,7 @@ inline sycl::event ungbr(const char* func_name, Func func, sycl::queue& queue,
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+        onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             auto a_ = reinterpret_cast<cuDataType*>(a);
             auto tau_ = reinterpret_cast<cuDataType*>(tau);
@@ -2253,7 +2253,7 @@ inline sycl::event ungbr(const char* func_name, Func func, sycl::queue& queue,
 }
 
 #define UNGBR_LAUNCHER_USM(TYPE, CUSOLVER_ROUTINE)                                          \
-    sycl::event ungbr(sycl::queue& queue, oneapi::mkl::generate vec, std::int64_t m,        \
+    sycl::event ungbr(sycl::queue& queue, oneapi::math::generate vec, std::int64_t m,       \
                       std::int64_t n, std::int64_t k, TYPE* a, std::int64_t lda, TYPE* tau, \
                       TYPE* scratchpad, std::int64_t scratchpad_size,                       \
                       const std::vector<sycl::event>& dependencies) {                       \
@@ -2278,7 +2278,7 @@ inline sycl::event ungqr(const char* func_name, Func func, sycl::queue& queue, s
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+        onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             auto a_ = reinterpret_cast<cuDataType*>(a);
             auto tau_ = reinterpret_cast<cuDataType*>(tau);
@@ -2306,7 +2306,7 @@ UNGQR_LAUNCHER_USM(std::complex<double>, cusolverDnZungqr)
 
 template <typename Func, typename T>
 inline sycl::event ungtr(const char* func_name, Func func, sycl::queue& queue,
-                         oneapi::mkl::uplo uplo, std::int64_t n, T* a, std::int64_t lda, T* tau,
+                         oneapi::math::uplo uplo, std::int64_t n, T* a, std::int64_t lda, T* tau,
                          T* scratchpad, std::int64_t scratchpad_size,
                          const std::vector<sycl::event>& dependencies) {
     using cuDataType = typename CudaEquivalentType<T>::Type;
@@ -2316,7 +2316,7 @@ inline sycl::event ungtr(const char* func_name, Func func, sycl::queue& queue,
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+        onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             auto a_ = reinterpret_cast<cuDataType*>(a);
             auto tau_ = reinterpret_cast<cuDataType*>(tau);
@@ -2330,7 +2330,7 @@ inline sycl::event ungtr(const char* func_name, Func func, sycl::queue& queue,
 }
 
 #define UNGTR_LAUNCHER_USM(TYPE, CUSOLVER_ROUTINE)                                                 \
-    sycl::event ungtr(sycl::queue& queue, oneapi::mkl::uplo uplo, std::int64_t n, TYPE* a,         \
+    sycl::event ungtr(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n, TYPE* a,        \
                       std::int64_t lda, TYPE* tau, TYPE* scratchpad, std::int64_t scratchpad_size, \
                       const std::vector<sycl::event>& dependencies) {                              \
         return ungtr(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, uplo, n, a, lda, tau, scratchpad, \
@@ -2342,14 +2342,14 @@ UNGTR_LAUNCHER_USM(std::complex<double>, cusolverDnZungtr)
 
 #undef UNGTR_LAUNCHER_USM
 
-sycl::event unmrq(sycl::queue& queue, oneapi::mkl::side side, oneapi::mkl::transpose trans,
+sycl::event unmrq(sycl::queue& queue, oneapi::math::side side, oneapi::math::transpose trans,
                   std::int64_t m, std::int64_t n, std::int64_t k, std::complex<float>* a,
                   std::int64_t lda, std::complex<float>* tau, std::complex<float>* c,
                   std::int64_t ldc, std::complex<float>* scratchpad, std::int64_t scratchpad_size,
                   const std::vector<sycl::event>& dependencies) {
     throw unimplemented("lapack", "unmrq");
 }
-sycl::event unmrq(sycl::queue& queue, oneapi::mkl::side side, oneapi::mkl::transpose trans,
+sycl::event unmrq(sycl::queue& queue, oneapi::math::side side, oneapi::math::transpose trans,
                   std::int64_t m, std::int64_t n, std::int64_t k, std::complex<double>* a,
                   std::int64_t lda, std::complex<double>* tau, std::complex<double>* c,
                   std::int64_t ldc, std::complex<double>* scratchpad, std::int64_t scratchpad_size,
@@ -2359,7 +2359,7 @@ sycl::event unmrq(sycl::queue& queue, oneapi::mkl::side side, oneapi::mkl::trans
 
 template <typename Func, typename T>
 inline sycl::event unmqr(const char* func_name, Func func, sycl::queue& queue,
-                         oneapi::mkl::side side, oneapi::mkl::transpose trans, std::int64_t m,
+                         oneapi::math::side side, oneapi::math::transpose trans, std::int64_t m,
                          std::int64_t n, std::int64_t k, T* a, std::int64_t lda, T* tau, T* c,
                          std::int64_t ldc, T* scratchpad, std::int64_t scratchpad_size,
                          const std::vector<sycl::event>& dependencies) {
@@ -2370,7 +2370,7 @@ inline sycl::event unmqr(const char* func_name, Func func, sycl::queue& queue,
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+        onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             auto a_ = reinterpret_cast<cuDataType*>(a);
             auto tau_ = reinterpret_cast<cuDataType*>(tau);
@@ -2385,14 +2385,14 @@ inline sycl::event unmqr(const char* func_name, Func func, sycl::queue& queue,
     return done;
 }
 
-#define UNMQR_LAUNCHER_USM(TYPE, CUSOLVER_ROUTINE)                                               \
-    sycl::event unmqr(sycl::queue& queue, oneapi::mkl::side side, oneapi::mkl::transpose trans,  \
-                      std::int64_t m, std::int64_t n, std::int64_t k, TYPE* a, std::int64_t lda, \
-                      TYPE* tau, TYPE* c, std::int64_t ldc, TYPE* scratchpad,                    \
-                      std::int64_t scratchpad_size,                                              \
-                      const std::vector<sycl::event>& dependencies) {                            \
-        return unmqr(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, side, trans, m, n, k, a, lda,   \
-                     tau, c, ldc, scratchpad, scratchpad_size, dependencies);                    \
+#define UNMQR_LAUNCHER_USM(TYPE, CUSOLVER_ROUTINE)                                                \
+    sycl::event unmqr(sycl::queue& queue, oneapi::math::side side, oneapi::math::transpose trans, \
+                      std::int64_t m, std::int64_t n, std::int64_t k, TYPE* a, std::int64_t lda,  \
+                      TYPE* tau, TYPE* c, std::int64_t ldc, TYPE* scratchpad,                     \
+                      std::int64_t scratchpad_size,                                               \
+                      const std::vector<sycl::event>& dependencies) {                             \
+        return unmqr(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, side, trans, m, n, k, a, lda,    \
+                     tau, c, ldc, scratchpad, scratchpad_size, dependencies);                     \
     }
 
 UNMQR_LAUNCHER_USM(std::complex<float>, cusolverDnCunmqr)
@@ -2402,8 +2402,8 @@ UNMQR_LAUNCHER_USM(std::complex<double>, cusolverDnZunmqr)
 
 template <typename Func, typename T>
 inline sycl::event unmtr(const char* func_name, Func func, sycl::queue& queue,
-                         oneapi::mkl::side side, oneapi::mkl::uplo uplo,
-                         oneapi::mkl::transpose trans, std::int64_t m, std::int64_t n, T* a,
+                         oneapi::math::side side, oneapi::math::uplo uplo,
+                         oneapi::math::transpose trans, std::int64_t m, std::int64_t n, T* a,
                          std::int64_t lda, T* tau, T* c, std::int64_t ldc, T* scratchpad,
                          std::int64_t scratchpad_size,
                          const std::vector<sycl::event>& dependencies) {
@@ -2414,7 +2414,7 @@ inline sycl::event unmtr(const char* func_name, Func func, sycl::queue& queue,
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+        onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             auto a_ = reinterpret_cast<cuDataType*>(a);
             auto tau_ = reinterpret_cast<cuDataType*>(tau);
@@ -2431,8 +2431,8 @@ inline sycl::event unmtr(const char* func_name, Func func, sycl::queue& queue,
 }
 
 #define UNMTR_LAUNCHER_USM(TYPE, CUSOLVER_ROUTINE)                                                \
-    sycl::event unmtr(sycl::queue& queue, oneapi::mkl::side side, oneapi::mkl::uplo uplo,         \
-                      oneapi::mkl::transpose trans, std::int64_t m, std::int64_t n, TYPE* a,      \
+    sycl::event unmtr(sycl::queue& queue, oneapi::math::side side, oneapi::math::uplo uplo,       \
+                      oneapi::math::transpose trans, std::int64_t m, std::int64_t n, TYPE* a,     \
                       std::int64_t lda, TYPE* tau, TYPE* c, std::int64_t ldc, TYPE* scratchpad,   \
                       std::int64_t scratchpad_size,                                               \
                       const std::vector<sycl::event>& dependencies) {                             \
@@ -2453,7 +2453,7 @@ inline void gebrd_scratchpad_size(const char* func_name, Func func, sycl::queue&
                                   int* scratch_size) {
     queue
         .submit([&](sycl::handler& cgh) {
-            onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+            onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
                 auto handle = sc.get_handle(queue);
                 cusolverStatus_t err;
                 CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, m, n, scratch_size);
@@ -2506,7 +2506,7 @@ inline void geqrf_scratchpad_size(const char* func_name, Func func, sycl::queue&
                                   int* scratch_size) {
     queue
         .submit([&](sycl::handler& cgh) {
-            onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+            onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
                 auto handle = sc.get_handle(queue);
                 cusolverStatus_t err;
                 CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, m, n, nullptr, lda,
@@ -2535,12 +2535,12 @@ GEQRF_LAUNCHER_SCRATCH(std::complex<double>, cusolverDnZgeqrf_bufferSize)
 
 template <typename Func>
 inline void gesvd_scratchpad_size(const char* func_name, Func func, sycl::queue& queue,
-                                  oneapi::mkl::jobsvd jobu, oneapi::mkl::jobsvd jobvt,
+                                  oneapi::math::jobsvd jobu, oneapi::math::jobsvd jobvt,
                                   std::int64_t m, std::int64_t n, std::int64_t lda,
                                   std::int64_t ldu, std::int64_t ldvt, int* scratch_size) {
     queue
         .submit([&](sycl::handler& cgh) {
-            onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+            onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
                 auto handle = sc.get_handle(queue);
                 cusolverStatus_t err;
                 CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, m, n, scratch_size);
@@ -2552,8 +2552,8 @@ inline void gesvd_scratchpad_size(const char* func_name, Func func, sycl::queue&
 #define GESVD_LAUNCHER_SCRATCH(TYPE, CUSOLVER_ROUTINE)                                            \
     template <>                                                                                   \
     std::int64_t gesvd_scratchpad_size<TYPE>(                                                     \
-        sycl::queue & queue, oneapi::mkl::jobsvd jobu, oneapi::mkl::jobsvd jobvt, std::int64_t m, \
-        std::int64_t n, std::int64_t lda, std::int64_t ldu, std::int64_t ldvt) {                  \
+        sycl::queue & queue, oneapi::math::jobsvd jobu, oneapi::math::jobsvd jobvt,               \
+        std::int64_t m, std::int64_t n, std::int64_t lda, std::int64_t ldu, std::int64_t ldvt) {  \
         int scratch_size;                                                                         \
         gesvd_scratchpad_size(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, jobu, jobvt, m, n, lda, \
                               ldu, ldvt, &scratch_size);                                          \
@@ -2573,7 +2573,7 @@ inline void getrf_scratchpad_size(const char* func_name, Func func, sycl::queue&
                                   int* scratch_size) {
     queue
         .submit([&](sycl::handler& cgh) {
-            onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+            onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
                 auto handle = sc.get_handle(queue);
                 cusolverStatus_t err;
                 CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, m, n, nullptr, lda,
@@ -2617,7 +2617,7 @@ GETRI_LAUNCHER_SCRATCH(std::complex<double>)
 // cusolverDnXgetrs does not use scratchpad memory
 #define GETRS_LAUNCHER_SCRATCH(TYPE)                                                              \
     template <>                                                                                   \
-    std::int64_t getrs_scratchpad_size<TYPE>(sycl::queue & queue, oneapi::mkl::transpose trans,   \
+    std::int64_t getrs_scratchpad_size<TYPE>(sycl::queue & queue, oneapi::math::transpose trans,  \
                                              std::int64_t n, std::int64_t nrhs, std::int64_t lda, \
                                              std::int64_t ldb) {                                  \
         return 0;                                                                                 \
@@ -2632,11 +2632,11 @@ GETRS_LAUNCHER_SCRATCH(std::complex<double>)
 
 template <typename Func>
 inline void heevd_scratchpad_size(const char* func_name, Func func, sycl::queue& queue,
-                                  oneapi::mkl::job jobz, oneapi::mkl::uplo uplo, std::int64_t n,
+                                  oneapi::math::job jobz, oneapi::math::uplo uplo, std::int64_t n,
                                   std::int64_t lda, int* scratch_size) {
     queue
         .submit([&](sycl::handler& cgh) {
-            onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+            onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
                 auto handle = sc.get_handle(queue);
                 cusolverStatus_t err;
                 CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cusolver_job(jobz),
@@ -2649,8 +2649,8 @@ inline void heevd_scratchpad_size(const char* func_name, Func func, sycl::queue&
 
 #define HEEVD_LAUNCHER_SCRATCH(TYPE, CUSOLVER_ROUTINE)                                        \
     template <>                                                                               \
-    std::int64_t heevd_scratchpad_size<TYPE>(sycl::queue & queue, oneapi::mkl::job jobz,      \
-                                             oneapi::mkl::uplo uplo, std::int64_t n,          \
+    std::int64_t heevd_scratchpad_size<TYPE>(sycl::queue & queue, oneapi::math::job jobz,     \
+                                             oneapi::math::uplo uplo, std::int64_t n,         \
                                              std::int64_t lda) {                              \
         int scratch_size;                                                                     \
         heevd_scratchpad_size(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, jobz, uplo, n, lda, \
@@ -2665,12 +2665,12 @@ HEEVD_LAUNCHER_SCRATCH(std::complex<double>, cusolverDnZheevd_bufferSize)
 
 template <typename Func>
 inline void hegvd_scratchpad_size(const char* func_name, Func func, sycl::queue& queue,
-                                  std::int64_t itype, oneapi::mkl::job jobz, oneapi::mkl::uplo uplo,
-                                  std::int64_t n, std::int64_t lda, std::int64_t ldb,
-                                  int* scratch_size) {
+                                  std::int64_t itype, oneapi::math::job jobz,
+                                  oneapi::math::uplo uplo, std::int64_t n, std::int64_t lda,
+                                  std::int64_t ldb, int* scratch_size) {
     queue
         .submit([&](sycl::handler& cgh) {
-            onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+            onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
                 auto handle = sc.get_handle(queue);
                 cusolverStatus_t err;
                 CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cusolver_itype(itype),
@@ -2684,7 +2684,7 @@ inline void hegvd_scratchpad_size(const char* func_name, Func func, sycl::queue&
 #define HEGVD_LAUNCHER_SCRATCH(TYPE, CUSOLVER_ROUTINE)                                             \
     template <>                                                                                    \
     std::int64_t hegvd_scratchpad_size<TYPE>(sycl::queue & queue, std::int64_t itype,              \
-                                             oneapi::mkl::job jobz, oneapi::mkl::uplo uplo,        \
+                                             oneapi::math::job jobz, oneapi::math::uplo uplo,      \
                                              std::int64_t n, std::int64_t lda, std::int64_t ldb) { \
         int scratch_size;                                                                          \
         hegvd_scratchpad_size(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, itype, jobz, uplo, n,    \
@@ -2699,11 +2699,11 @@ HEGVD_LAUNCHER_SCRATCH(std::complex<double>, cusolverDnZhegvd_bufferSize)
 
 template <typename Func>
 inline void hetrd_scratchpad_size(const char* func_name, Func func, sycl::queue& queue,
-                                  oneapi::mkl::uplo uplo, std::int64_t n, std::int64_t lda,
+                                  oneapi::math::uplo uplo, std::int64_t n, std::int64_t lda,
                                   int* scratch_size) {
     queue
         .submit([&](sycl::handler& cgh) {
-            onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+            onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
                 auto handle = sc.get_handle(queue);
                 cusolverStatus_t err;
                 CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cublas_fill_mode(uplo),
@@ -2714,14 +2714,14 @@ inline void hetrd_scratchpad_size(const char* func_name, Func func, sycl::queue&
         .wait();
 }
 
-#define HETRD_LAUNCHER_SCRATCH(TYPE, CUSOLVER_ROUTINE)                                    \
-    template <>                                                                           \
-    std::int64_t hetrd_scratchpad_size<TYPE>(sycl::queue & queue, oneapi::mkl::uplo uplo, \
-                                             std::int64_t n, std::int64_t lda) {          \
-        int scratch_size;                                                                 \
-        hetrd_scratchpad_size(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, uplo, n, lda,   \
-                              &scratch_size);                                             \
-        return scratch_size;                                                              \
+#define HETRD_LAUNCHER_SCRATCH(TYPE, CUSOLVER_ROUTINE)                                     \
+    template <>                                                                            \
+    std::int64_t hetrd_scratchpad_size<TYPE>(sycl::queue & queue, oneapi::math::uplo uplo, \
+                                             std::int64_t n, std::int64_t lda) {           \
+        int scratch_size;                                                                  \
+        hetrd_scratchpad_size(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, uplo, n, lda,    \
+                              &scratch_size);                                              \
+        return scratch_size;                                                               \
     }
 
 HETRD_LAUNCHER_SCRATCH(std::complex<float>, cusolverDnChetrd_bufferSize)
@@ -2730,23 +2730,24 @@ HETRD_LAUNCHER_SCRATCH(std::complex<double>, cusolverDnZhetrd_bufferSize)
 #undef HETRD_LAUNCHER_SCRATCH
 
 template <>
-std::int64_t hetrf_scratchpad_size<std::complex<float>>(sycl::queue& queue, oneapi::mkl::uplo uplo,
+std::int64_t hetrf_scratchpad_size<std::complex<float>>(sycl::queue& queue, oneapi::math::uplo uplo,
                                                         std::int64_t n, std::int64_t lda) {
     throw unimplemented("lapack", "hetrf_scratchpad_size");
 }
 template <>
-std::int64_t hetrf_scratchpad_size<std::complex<double>>(sycl::queue& queue, oneapi::mkl::uplo uplo,
-                                                         std::int64_t n, std::int64_t lda) {
+std::int64_t hetrf_scratchpad_size<std::complex<double>>(sycl::queue& queue,
+                                                         oneapi::math::uplo uplo, std::int64_t n,
+                                                         std::int64_t lda) {
     throw unimplemented("lapack", "hetrf_scratchpad_size");
 }
 
 template <typename Func>
 inline void orgbr_scratchpad_size(const char* func_name, Func func, sycl::queue& queue,
-                                  oneapi::mkl::generate vec, std::int64_t m, std::int64_t n,
+                                  oneapi::math::generate vec, std::int64_t m, std::int64_t n,
                                   std::int64_t k, std::int64_t lda, int* scratch_size) {
     queue
         .submit([&](sycl::handler& cgh) {
-            onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+            onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
                 auto handle = sc.get_handle(queue);
                 cusolverStatus_t err;
                 CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cublas_generate(vec),
@@ -2756,15 +2757,15 @@ inline void orgbr_scratchpad_size(const char* func_name, Func func, sycl::queue&
         .wait();
 }
 
-#define ORGBR_LAUNCHER_SCRATCH(TYPE, CUSOLVER_ROUTINE)                                       \
-    template <>                                                                              \
-    std::int64_t orgbr_scratchpad_size<TYPE>(sycl::queue & queue, oneapi::mkl::generate vec, \
-                                             std::int64_t m, std::int64_t n, std::int64_t k, \
-                                             std::int64_t lda) {                             \
-        int scratch_size;                                                                    \
-        orgbr_scratchpad_size(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, vec, m, n, k, lda, \
-                              &scratch_size);                                                \
-        return scratch_size;                                                                 \
+#define ORGBR_LAUNCHER_SCRATCH(TYPE, CUSOLVER_ROUTINE)                                        \
+    template <>                                                                               \
+    std::int64_t orgbr_scratchpad_size<TYPE>(sycl::queue & queue, oneapi::math::generate vec, \
+                                             std::int64_t m, std::int64_t n, std::int64_t k,  \
+                                             std::int64_t lda) {                              \
+        int scratch_size;                                                                     \
+        orgbr_scratchpad_size(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, vec, m, n, k, lda,  \
+                              &scratch_size);                                                 \
+        return scratch_size;                                                                  \
     }
 
 ORGBR_LAUNCHER_SCRATCH(float, cusolverDnSorgbr_bufferSize)
@@ -2774,11 +2775,11 @@ ORGBR_LAUNCHER_SCRATCH(double, cusolverDnDorgbr_bufferSize)
 
 template <typename Func>
 inline void orgtr_scratchpad_size(const char* func_name, Func func, sycl::queue& queue,
-                                  oneapi::mkl::uplo uplo, std::int64_t n, std::int64_t lda,
+                                  oneapi::math::uplo uplo, std::int64_t n, std::int64_t lda,
                                   int* scratch_size) {
     queue
         .submit([&](sycl::handler& cgh) {
-            onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+            onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
                 auto handle = sc.get_handle(queue);
                 cusolverStatus_t err;
                 CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cublas_fill_mode(uplo),
@@ -2788,14 +2789,14 @@ inline void orgtr_scratchpad_size(const char* func_name, Func func, sycl::queue&
         .wait();
 }
 
-#define ORGTR_LAUNCHER_SCRATCH(TYPE, CUSOLVER_ROUTINE)                                    \
-    template <>                                                                           \
-    std::int64_t orgtr_scratchpad_size<TYPE>(sycl::queue & queue, oneapi::mkl::uplo uplo, \
-                                             std::int64_t n, std::int64_t lda) {          \
-        int scratch_size;                                                                 \
-        orgtr_scratchpad_size(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, uplo, n, lda,   \
-                              &scratch_size);                                             \
-        return scratch_size;                                                              \
+#define ORGTR_LAUNCHER_SCRATCH(TYPE, CUSOLVER_ROUTINE)                                     \
+    template <>                                                                            \
+    std::int64_t orgtr_scratchpad_size<TYPE>(sycl::queue & queue, oneapi::math::uplo uplo, \
+                                             std::int64_t n, std::int64_t lda) {           \
+        int scratch_size;                                                                  \
+        orgtr_scratchpad_size(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, uplo, n, lda,    \
+                              &scratch_size);                                              \
+        return scratch_size;                                                               \
     }
 
 ORGTR_LAUNCHER_SCRATCH(float, cusolverDnSorgtr_bufferSize)
@@ -2809,7 +2810,7 @@ inline void orgqr_scratchpad_size(const char* func_name, Func func, sycl::queue&
                                   int* scratch_size) {
     queue
         .submit([&](sycl::handler& cgh) {
-            onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+            onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
                 auto handle = sc.get_handle(queue);
                 cusolverStatus_t err;
                 CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, m, n, k, nullptr, lda,
@@ -2835,15 +2836,15 @@ ORGQR_LAUNCHER_SCRATCH(double, cusolverDnDorgqr_bufferSize)
 #undef ORGQR_LAUNCHER_SCRATCH
 
 template <>
-std::int64_t ormrq_scratchpad_size<float>(sycl::queue& queue, oneapi::mkl::side side,
-                                          oneapi::mkl::transpose trans, std::int64_t m,
+std::int64_t ormrq_scratchpad_size<float>(sycl::queue& queue, oneapi::math::side side,
+                                          oneapi::math::transpose trans, std::int64_t m,
                                           std::int64_t n, std::int64_t k, std::int64_t lda,
                                           std::int64_t ldc) {
     throw unimplemented("lapack", "ormrq_scratchpad_size");
 }
 template <>
-std::int64_t ormrq_scratchpad_size<double>(sycl::queue& queue, oneapi::mkl::side side,
-                                           oneapi::mkl::transpose trans, std::int64_t m,
+std::int64_t ormrq_scratchpad_size<double>(sycl::queue& queue, oneapi::math::side side,
+                                           oneapi::math::transpose trans, std::int64_t m,
                                            std::int64_t n, std::int64_t k, std::int64_t lda,
                                            std::int64_t ldc) {
     throw unimplemented("lapack", "ormrq_scratchpad_size");
@@ -2851,12 +2852,12 @@ std::int64_t ormrq_scratchpad_size<double>(sycl::queue& queue, oneapi::mkl::side
 
 template <typename Func>
 inline void ormqr_scratchpad_size(const char* func_name, Func func, sycl::queue& queue,
-                                  oneapi::mkl::side side, oneapi::mkl::transpose trans,
+                                  oneapi::math::side side, oneapi::math::transpose trans,
                                   std::int64_t m, std::int64_t n, std::int64_t k, std::int64_t lda,
                                   std::int64_t ldc, int* scratch_size) {
     queue
         .submit([&](sycl::handler& cgh) {
-            onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+            onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
                 auto handle = sc.get_handle(queue);
                 cusolverStatus_t err;
                 CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cublas_side_mode(side),
@@ -2867,15 +2868,15 @@ inline void ormqr_scratchpad_size(const char* func_name, Func func, sycl::queue&
         .wait();
 }
 
-#define ORMQRF_LAUNCHER_SCRATCH(TYPE, CUSOLVER_ROUTINE)                                            \
-    template <>                                                                                    \
-    std::int64_t ormqr_scratchpad_size<TYPE>(                                                      \
-        sycl::queue & queue, oneapi::mkl::side side, oneapi::mkl::transpose trans, std::int64_t m, \
-        std::int64_t n, std::int64_t k, std::int64_t lda, std::int64_t ldc) {                      \
-        int scratch_size;                                                                          \
-        ormqr_scratchpad_size(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, side, trans, m, n, k,    \
-                              lda, ldc, &scratch_size);                                            \
-        return scratch_size;                                                                       \
+#define ORMQRF_LAUNCHER_SCRATCH(TYPE, CUSOLVER_ROUTINE)                                         \
+    template <>                                                                                 \
+    std::int64_t ormqr_scratchpad_size<TYPE>(                                                   \
+        sycl::queue & queue, oneapi::math::side side, oneapi::math::transpose trans,            \
+        std::int64_t m, std::int64_t n, std::int64_t k, std::int64_t lda, std::int64_t ldc) {   \
+        int scratch_size;                                                                       \
+        ormqr_scratchpad_size(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, side, trans, m, n, k, \
+                              lda, ldc, &scratch_size);                                         \
+        return scratch_size;                                                                    \
     }
 
 ORMQRF_LAUNCHER_SCRATCH(float, cusolverDnSormqr_bufferSize)
@@ -2885,12 +2886,12 @@ ORMQRF_LAUNCHER_SCRATCH(double, cusolverDnDormqr_bufferSize)
 
 template <typename Func>
 inline void ormtr_scratchpad_size(const char* func_name, Func func, sycl::queue& queue,
-                                  oneapi::mkl::side side, oneapi::mkl::uplo uplo,
-                                  oneapi::mkl::transpose trans, std::int64_t m, std::int64_t n,
+                                  oneapi::math::side side, oneapi::math::uplo uplo,
+                                  oneapi::math::transpose trans, std::int64_t m, std::int64_t n,
                                   std::int64_t lda, std::int64_t ldc, int* scratch_size) {
     queue
         .submit([&](sycl::handler& cgh) {
-            onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+            onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
                 auto handle = sc.get_handle(queue);
                 cusolverStatus_t err;
                 CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cublas_side_mode(side),
@@ -2903,10 +2904,10 @@ inline void ormtr_scratchpad_size(const char* func_name, Func func, sycl::queue&
 
 #define ORMTR_LAUNCHER_SCRATCH(TYPE, CUSOLVER_ROUTINE)                                             \
     template <>                                                                                    \
-    std::int64_t ormtr_scratchpad_size<TYPE>(sycl::queue & queue, oneapi::mkl::side side,          \
-                                             oneapi::mkl::uplo uplo, oneapi::mkl::transpose trans, \
-                                             std::int64_t m, std::int64_t n, std::int64_t lda,     \
-                                             std::int64_t ldc) {                                   \
+    std::int64_t ormtr_scratchpad_size<TYPE>(sycl::queue & queue, oneapi::math::side side,         \
+                                             oneapi::math::uplo uplo,                              \
+                                             oneapi::math::transpose trans, std::int64_t m,        \
+                                             std::int64_t n, std::int64_t lda, std::int64_t ldc) { \
         int scratch_size;                                                                          \
         ormtr_scratchpad_size(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, side, uplo, trans, m, n, \
                               lda, ldc, &scratch_size);                                            \
@@ -2920,11 +2921,11 @@ ORMTR_LAUNCHER_SCRATCH(double, cusolverDnDormtr_bufferSize)
 
 template <typename Func>
 inline void potrf_scratchpad_size(const char* func_name, Func func, sycl::queue& queue,
-                                  oneapi::mkl::uplo uplo, std::int64_t n, std::int64_t lda,
+                                  oneapi::math::uplo uplo, std::int64_t n, std::int64_t lda,
                                   int* scratch_size) {
     queue
         .submit([&](sycl::handler& cgh) {
-            onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+            onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
                 auto handle = sc.get_handle(queue);
                 cusolverStatus_t err;
                 CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cublas_fill_mode(uplo),
@@ -2934,14 +2935,14 @@ inline void potrf_scratchpad_size(const char* func_name, Func func, sycl::queue&
         .wait();
 }
 
-#define POTRF_LAUNCHER_SCRATCH(TYPE, CUSOLVER_ROUTINE)                                    \
-    template <>                                                                           \
-    std::int64_t potrf_scratchpad_size<TYPE>(sycl::queue & queue, oneapi::mkl::uplo uplo, \
-                                             std::int64_t n, std::int64_t lda) {          \
-        int scratch_size;                                                                 \
-        potrf_scratchpad_size(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, uplo, n, lda,   \
-                              &scratch_size);                                             \
-        return scratch_size;                                                              \
+#define POTRF_LAUNCHER_SCRATCH(TYPE, CUSOLVER_ROUTINE)                                     \
+    template <>                                                                            \
+    std::int64_t potrf_scratchpad_size<TYPE>(sycl::queue & queue, oneapi::math::uplo uplo, \
+                                             std::int64_t n, std::int64_t lda) {           \
+        int scratch_size;                                                                  \
+        potrf_scratchpad_size(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, uplo, n, lda,    \
+                              &scratch_size);                                              \
+        return scratch_size;                                                               \
     }
 
 POTRF_LAUNCHER_SCRATCH(float, cusolverDnSpotrf_bufferSize)
@@ -2954,7 +2955,7 @@ POTRF_LAUNCHER_SCRATCH(std::complex<double>, cusolverDnZpotrf_bufferSize)
 // cusolverDnXpotrs does not use scratchpad memory
 #define POTRS_LAUNCHER_SCRATCH(TYPE)                                                              \
     template <>                                                                                   \
-    std::int64_t potrs_scratchpad_size<TYPE>(sycl::queue & queue, oneapi::mkl::uplo uplo,         \
+    std::int64_t potrs_scratchpad_size<TYPE>(sycl::queue & queue, oneapi::math::uplo uplo,        \
                                              std::int64_t n, std::int64_t nrhs, std::int64_t lda, \
                                              std::int64_t ldb) {                                  \
         return 0;                                                                                 \
@@ -2969,11 +2970,11 @@ POTRS_LAUNCHER_SCRATCH(std::complex<double>)
 
 template <typename Func>
 inline void potri_scratchpad_size(const char* func_name, Func func, sycl::queue& queue,
-                                  oneapi::mkl::uplo uplo, std::int64_t n, std::int64_t lda,
+                                  oneapi::math::uplo uplo, std::int64_t n, std::int64_t lda,
                                   int* scratch_size) {
     queue
         .submit([&](sycl::handler& cgh) {
-            onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+            onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
                 auto handle = sc.get_handle(queue);
                 cusolverStatus_t err;
                 CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cublas_fill_mode(uplo),
@@ -2983,14 +2984,14 @@ inline void potri_scratchpad_size(const char* func_name, Func func, sycl::queue&
         .wait();
 }
 
-#define POTRI_LAUNCHER_SCRATCH(TYPE, CUSOLVER_ROUTINE)                                    \
-    template <>                                                                           \
-    std::int64_t potri_scratchpad_size<TYPE>(sycl::queue & queue, oneapi::mkl::uplo uplo, \
-                                             std::int64_t n, std::int64_t lda) {          \
-        int scratch_size;                                                                 \
-        potri_scratchpad_size(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, uplo, n, lda,   \
-                              &scratch_size);                                             \
-        return scratch_size;                                                              \
+#define POTRI_LAUNCHER_SCRATCH(TYPE, CUSOLVER_ROUTINE)                                     \
+    template <>                                                                            \
+    std::int64_t potri_scratchpad_size<TYPE>(sycl::queue & queue, oneapi::math::uplo uplo, \
+                                             std::int64_t n, std::int64_t lda) {           \
+        int scratch_size;                                                                  \
+        potri_scratchpad_size(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, uplo, n, lda,    \
+                              &scratch_size);                                              \
+        return scratch_size;                                                               \
     }
 
 POTRI_LAUNCHER_SCRATCH(float, cusolverDnSpotri_bufferSize)
@@ -3002,11 +3003,11 @@ POTRI_LAUNCHER_SCRATCH(std::complex<double>, cusolverDnZpotri_bufferSize)
 
 template <typename Func>
 inline void sytrf_scratchpad_size(const char* func_name, Func func, sycl::queue& queue,
-                                  oneapi::mkl::uplo uplo, std::int64_t n, std::int64_t lda,
+                                  oneapi::math::uplo uplo, std::int64_t n, std::int64_t lda,
                                   int* scratch_size) {
     queue
         .submit([&](sycl::handler& cgh) {
-            onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+            onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
                 auto handle = sc.get_handle(queue);
                 cusolverStatus_t err;
                 CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, n, nullptr, lda,
@@ -3016,14 +3017,14 @@ inline void sytrf_scratchpad_size(const char* func_name, Func func, sycl::queue&
         .wait();
 }
 
-#define SYTRF_LAUNCHER_SCRATCH(TYPE, CUSOLVER_ROUTINE)                                    \
-    template <>                                                                           \
-    std::int64_t sytrf_scratchpad_size<TYPE>(sycl::queue & queue, oneapi::mkl::uplo uplo, \
-                                             std::int64_t n, std::int64_t lda) {          \
-        int scratch_size;                                                                 \
-        sytrf_scratchpad_size(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, uplo, n, lda,   \
-                              &scratch_size);                                             \
-        return scratch_size;                                                              \
+#define SYTRF_LAUNCHER_SCRATCH(TYPE, CUSOLVER_ROUTINE)                                     \
+    template <>                                                                            \
+    std::int64_t sytrf_scratchpad_size<TYPE>(sycl::queue & queue, oneapi::math::uplo uplo, \
+                                             std::int64_t n, std::int64_t lda) {           \
+        int scratch_size;                                                                  \
+        sytrf_scratchpad_size(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, uplo, n, lda,    \
+                              &scratch_size);                                              \
+        return scratch_size;                                                               \
     }
 
 SYTRF_LAUNCHER_SCRATCH(float, cusolverDnSsytrf_bufferSize)
@@ -3035,11 +3036,11 @@ SYTRF_LAUNCHER_SCRATCH(std::complex<double>, cusolverDnZsytrf_bufferSize)
 
 template <typename Func>
 inline void syevd_scratchpad_size(const char* func_name, Func func, sycl::queue& queue,
-                                  oneapi::mkl::job jobz, oneapi::mkl::uplo uplo, std::int64_t n,
+                                  oneapi::math::job jobz, oneapi::math::uplo uplo, std::int64_t n,
                                   std::int64_t lda, int* scratch_size) {
     queue
         .submit([&](sycl::handler& cgh) {
-            onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+            onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
                 auto handle = sc.get_handle(queue);
                 cusolverStatus_t err;
                 CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cusolver_job(jobz),
@@ -3052,8 +3053,8 @@ inline void syevd_scratchpad_size(const char* func_name, Func func, sycl::queue&
 
 #define SYEVD_LAUNCHER_SCRATCH(TYPE, CUSOLVER_ROUTINE)                                        \
     template <>                                                                               \
-    std::int64_t syevd_scratchpad_size<TYPE>(sycl::queue & queue, oneapi::mkl::job jobz,      \
-                                             oneapi::mkl::uplo uplo, std::int64_t n,          \
+    std::int64_t syevd_scratchpad_size<TYPE>(sycl::queue & queue, oneapi::math::job jobz,     \
+                                             oneapi::math::uplo uplo, std::int64_t n,         \
                                              std::int64_t lda) {                              \
         int scratch_size;                                                                     \
         syevd_scratchpad_size(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, jobz, uplo, n, lda, \
@@ -3068,12 +3069,12 @@ SYEVD_LAUNCHER_SCRATCH(double, cusolverDnDsyevd_bufferSize)
 
 template <typename Func>
 inline void sygvd_scratchpad_size(const char* func_name, Func func, sycl::queue& queue,
-                                  std::int64_t itype, oneapi::mkl::job jobz, oneapi::mkl::uplo uplo,
-                                  std::int64_t n, std::int64_t lda, std::int64_t ldb,
-                                  int* scratch_size) {
+                                  std::int64_t itype, oneapi::math::job jobz,
+                                  oneapi::math::uplo uplo, std::int64_t n, std::int64_t lda,
+                                  std::int64_t ldb, int* scratch_size) {
     queue
         .submit([&](sycl::handler& cgh) {
-            onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+            onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
                 auto handle = sc.get_handle(queue);
                 cusolverStatus_t err;
                 CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cusolver_itype(itype),
@@ -3087,7 +3088,7 @@ inline void sygvd_scratchpad_size(const char* func_name, Func func, sycl::queue&
 #define SYGVD_LAUNCHER_SCRATCH(TYPE, CUSOLVER_ROUTINE)                                             \
     template <>                                                                                    \
     std::int64_t sygvd_scratchpad_size<TYPE>(sycl::queue & queue, std::int64_t itype,              \
-                                             oneapi::mkl::job jobz, oneapi::mkl::uplo uplo,        \
+                                             oneapi::math::job jobz, oneapi::math::uplo uplo,      \
                                              std::int64_t n, std::int64_t lda, std::int64_t ldb) { \
         int scratch_size;                                                                          \
         sygvd_scratchpad_size(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, itype, jobz, uplo, n,    \
@@ -3102,11 +3103,11 @@ SYGVD_LAUNCHER_SCRATCH(double, cusolverDnDsygvd_bufferSize)
 
 template <typename Func>
 inline void sytrd_scratchpad_size(const char* func_name, Func func, sycl::queue& queue,
-                                  oneapi::mkl::uplo uplo, std::int64_t n, std::int64_t lda,
+                                  oneapi::math::uplo uplo, std::int64_t n, std::int64_t lda,
                                   int* scratch_size) {
     queue
         .submit([&](sycl::handler& cgh) {
-            onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+            onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
                 auto handle = sc.get_handle(queue);
                 cusolverStatus_t err;
                 CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cublas_fill_mode(uplo),
@@ -3117,14 +3118,14 @@ inline void sytrd_scratchpad_size(const char* func_name, Func func, sycl::queue&
         .wait();
 }
 
-#define SYTRD_LAUNCHER_SCRATCH(TYPE, CUSOLVER_ROUTINE)                                    \
-    template <>                                                                           \
-    std::int64_t sytrd_scratchpad_size<TYPE>(sycl::queue & queue, oneapi::mkl::uplo uplo, \
-                                             std::int64_t n, std::int64_t lda) {          \
-        int scratch_size;                                                                 \
-        sytrd_scratchpad_size(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, uplo, n, lda,   \
-                              &scratch_size);                                             \
-        return scratch_size;                                                              \
+#define SYTRD_LAUNCHER_SCRATCH(TYPE, CUSOLVER_ROUTINE)                                     \
+    template <>                                                                            \
+    std::int64_t sytrd_scratchpad_size<TYPE>(sycl::queue & queue, oneapi::math::uplo uplo, \
+                                             std::int64_t n, std::int64_t lda) {           \
+        int scratch_size;                                                                  \
+        sytrd_scratchpad_size(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, uplo, n, lda,    \
+                              &scratch_size);                                              \
+        return scratch_size;                                                               \
     }
 
 SYTRD_LAUNCHER_SCRATCH(float, cusolverDnSsytrd_bufferSize)
@@ -3133,31 +3134,32 @@ SYTRD_LAUNCHER_SCRATCH(double, cusolverDnDsytrd_bufferSize)
 #undef SYTRD_LAUNCHER_SCRATCH
 
 template <>
-std::int64_t trtrs_scratchpad_size<float>(sycl::queue& queue, oneapi::mkl::uplo uplo,
-                                          oneapi::mkl::transpose trans, oneapi::mkl::diag diag,
+std::int64_t trtrs_scratchpad_size<float>(sycl::queue& queue, oneapi::math::uplo uplo,
+                                          oneapi::math::transpose trans, oneapi::math::diag diag,
                                           std::int64_t n, std::int64_t nrhs, std::int64_t lda,
                                           std::int64_t ldb) {
     throw unimplemented("lapack", "trtrs_scratchpad_size");
 }
 template <>
-std::int64_t trtrs_scratchpad_size<double>(sycl::queue& queue, oneapi::mkl::uplo uplo,
-                                           oneapi::mkl::transpose trans, oneapi::mkl::diag diag,
+std::int64_t trtrs_scratchpad_size<double>(sycl::queue& queue, oneapi::math::uplo uplo,
+                                           oneapi::math::transpose trans, oneapi::math::diag diag,
                                            std::int64_t n, std::int64_t nrhs, std::int64_t lda,
                                            std::int64_t ldb) {
     throw unimplemented("lapack", "trtrs_scratchpad_size");
 }
 template <>
-std::int64_t trtrs_scratchpad_size<std::complex<float>>(sycl::queue& queue, oneapi::mkl::uplo uplo,
-                                                        oneapi::mkl::transpose trans,
-                                                        oneapi::mkl::diag diag, std::int64_t n,
+std::int64_t trtrs_scratchpad_size<std::complex<float>>(sycl::queue& queue, oneapi::math::uplo uplo,
+                                                        oneapi::math::transpose trans,
+                                                        oneapi::math::diag diag, std::int64_t n,
                                                         std::int64_t nrhs, std::int64_t lda,
                                                         std::int64_t ldb) {
     throw unimplemented("lapack", "trtrs_scratchpad_size");
 }
 template <>
-std::int64_t trtrs_scratchpad_size<std::complex<double>>(sycl::queue& queue, oneapi::mkl::uplo uplo,
-                                                         oneapi::mkl::transpose trans,
-                                                         oneapi::mkl::diag diag, std::int64_t n,
+std::int64_t trtrs_scratchpad_size<std::complex<double>>(sycl::queue& queue,
+                                                         oneapi::math::uplo uplo,
+                                                         oneapi::math::transpose trans,
+                                                         oneapi::math::diag diag, std::int64_t n,
                                                          std::int64_t nrhs, std::int64_t lda,
                                                          std::int64_t ldb) {
     throw unimplemented("lapack", "trtrs_scratchpad_size");
@@ -3165,11 +3167,11 @@ std::int64_t trtrs_scratchpad_size<std::complex<double>>(sycl::queue& queue, one
 
 template <typename Func>
 inline void ungbr_scratchpad_size(const char* func_name, Func func, sycl::queue& queue,
-                                  oneapi::mkl::generate vec, std::int64_t m, std::int64_t n,
+                                  oneapi::math::generate vec, std::int64_t m, std::int64_t n,
                                   std::int64_t k, std::int64_t lda, int* scratch_size) {
     queue
         .submit([&](sycl::handler& cgh) {
-            onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+            onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
                 auto handle = sc.get_handle(queue);
                 cusolverStatus_t err;
                 CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cublas_generate(vec),
@@ -3179,15 +3181,15 @@ inline void ungbr_scratchpad_size(const char* func_name, Func func, sycl::queue&
         .wait();
 }
 
-#define UNGBR_LAUNCHER_SCRATCH(TYPE, CUSOLVER_ROUTINE)                                       \
-    template <>                                                                              \
-    std::int64_t ungbr_scratchpad_size<TYPE>(sycl::queue & queue, oneapi::mkl::generate vec, \
-                                             std::int64_t m, std::int64_t n, std::int64_t k, \
-                                             std::int64_t lda) {                             \
-        int scratch_size;                                                                    \
-        ungbr_scratchpad_size(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, vec, m, n, k, lda, \
-                              &scratch_size);                                                \
-        return scratch_size;                                                                 \
+#define UNGBR_LAUNCHER_SCRATCH(TYPE, CUSOLVER_ROUTINE)                                        \
+    template <>                                                                               \
+    std::int64_t ungbr_scratchpad_size<TYPE>(sycl::queue & queue, oneapi::math::generate vec, \
+                                             std::int64_t m, std::int64_t n, std::int64_t k,  \
+                                             std::int64_t lda) {                              \
+        int scratch_size;                                                                     \
+        ungbr_scratchpad_size(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, vec, m, n, k, lda,  \
+                              &scratch_size);                                                 \
+        return scratch_size;                                                                  \
     }
 
 UNGBR_LAUNCHER_SCRATCH(std::complex<float>, cusolverDnCungbr_bufferSize)
@@ -3201,7 +3203,7 @@ inline void ungqr_scratchpad_size(const char* func_name, Func func, sycl::queue&
                                   int* scratch_size) {
     queue
         .submit([&](sycl::handler& cgh) {
-            onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+            onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
                 auto handle = sc.get_handle(queue);
                 cusolverStatus_t err;
                 CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, m, n, k, nullptr, lda,
@@ -3228,11 +3230,11 @@ UNGQR_LAUNCHER_SCRATCH(std::complex<double>, cusolverDnZungqr_bufferSize)
 
 template <typename Func>
 inline void ungtr_scratchpad_size(const char* func_name, Func func, sycl::queue& queue,
-                                  oneapi::mkl::uplo uplo, std::int64_t n, std::int64_t lda,
+                                  oneapi::math::uplo uplo, std::int64_t n, std::int64_t lda,
                                   int* scratch_size) {
     queue
         .submit([&](sycl::handler& cgh) {
-            onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+            onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
                 auto handle = sc.get_handle(queue);
                 cusolverStatus_t err;
                 CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cublas_fill_mode(uplo),
@@ -3242,14 +3244,14 @@ inline void ungtr_scratchpad_size(const char* func_name, Func func, sycl::queue&
         .wait();
 }
 
-#define UNGTR_LAUNCHER_SCRATCH(TYPE, CUSOLVER_ROUTINE)                                    \
-    template <>                                                                           \
-    std::int64_t ungtr_scratchpad_size<TYPE>(sycl::queue & queue, oneapi::mkl::uplo uplo, \
-                                             std::int64_t n, std::int64_t lda) {          \
-        int scratch_size;                                                                 \
-        ungtr_scratchpad_size(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, uplo, n, lda,   \
-                              &scratch_size);                                             \
-        return scratch_size;                                                              \
+#define UNGTR_LAUNCHER_SCRATCH(TYPE, CUSOLVER_ROUTINE)                                     \
+    template <>                                                                            \
+    std::int64_t ungtr_scratchpad_size<TYPE>(sycl::queue & queue, oneapi::math::uplo uplo, \
+                                             std::int64_t n, std::int64_t lda) {           \
+        int scratch_size;                                                                  \
+        ungtr_scratchpad_size(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, uplo, n, lda,    \
+                              &scratch_size);                                              \
+        return scratch_size;                                                               \
     }
 
 UNGTR_LAUNCHER_SCRATCH(std::complex<float>, cusolverDnCungtr_bufferSize)
@@ -3258,30 +3260,28 @@ UNGTR_LAUNCHER_SCRATCH(std::complex<double>, cusolverDnZungtr_bufferSize)
 #undef UNGTR_LAUNCHER_SCRATCH
 
 template <>
-std::int64_t unmrq_scratchpad_size<std::complex<float>>(sycl::queue& queue, oneapi::mkl::side side,
-                                                        oneapi::mkl::transpose trans,
+std::int64_t unmrq_scratchpad_size<std::complex<float>>(sycl::queue& queue, oneapi::math::side side,
+                                                        oneapi::math::transpose trans,
                                                         std::int64_t m, std::int64_t n,
                                                         std::int64_t k, std::int64_t lda,
                                                         std::int64_t ldc) {
     throw unimplemented("lapack", "unmrq_scratchpad_size");
 }
 template <>
-std::int64_t unmrq_scratchpad_size<std::complex<double>>(sycl::queue& queue, oneapi::mkl::side side,
-                                                         oneapi::mkl::transpose trans,
-                                                         std::int64_t m, std::int64_t n,
-                                                         std::int64_t k, std::int64_t lda,
-                                                         std::int64_t ldc) {
+std::int64_t unmrq_scratchpad_size<std::complex<double>>(
+    sycl::queue& queue, oneapi::math::side side, oneapi::math::transpose trans, std::int64_t m,
+    std::int64_t n, std::int64_t k, std::int64_t lda, std::int64_t ldc) {
     throw unimplemented("lapack", "unmrq_scratchpad_size");
 }
 
 template <typename Func>
 inline void unmqr_scratchpad_size(const char* func_name, Func func, sycl::queue& queue,
-                                  oneapi::mkl::side side, oneapi::mkl::transpose trans,
+                                  oneapi::math::side side, oneapi::math::transpose trans,
                                   std::int64_t m, std::int64_t n, std::int64_t k, std::int64_t lda,
                                   std::int64_t ldc, int* scratch_size) {
     queue
         .submit([&](sycl::handler& cgh) {
-            onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+            onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
                 auto handle = sc.get_handle(queue);
                 cusolverStatus_t err;
                 CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cublas_side_mode(side),
@@ -3292,15 +3292,15 @@ inline void unmqr_scratchpad_size(const char* func_name, Func func, sycl::queue&
         .wait();
 }
 
-#define UNMQR_LAUNCHER_SCRATCH(TYPE, CUSOLVER_ROUTINE)                                             \
-    template <>                                                                                    \
-    std::int64_t unmqr_scratchpad_size<TYPE>(                                                      \
-        sycl::queue & queue, oneapi::mkl::side side, oneapi::mkl::transpose trans, std::int64_t m, \
-        std::int64_t n, std::int64_t k, std::int64_t lda, std::int64_t ldc) {                      \
-        int scratch_size;                                                                          \
-        unmqr_scratchpad_size(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, side, trans, m, n, k,    \
-                              lda, ldc, &scratch_size);                                            \
-        return scratch_size;                                                                       \
+#define UNMQR_LAUNCHER_SCRATCH(TYPE, CUSOLVER_ROUTINE)                                          \
+    template <>                                                                                 \
+    std::int64_t unmqr_scratchpad_size<TYPE>(                                                   \
+        sycl::queue & queue, oneapi::math::side side, oneapi::math::transpose trans,            \
+        std::int64_t m, std::int64_t n, std::int64_t k, std::int64_t lda, std::int64_t ldc) {   \
+        int scratch_size;                                                                       \
+        unmqr_scratchpad_size(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, side, trans, m, n, k, \
+                              lda, ldc, &scratch_size);                                         \
+        return scratch_size;                                                                    \
     }
 
 UNMQR_LAUNCHER_SCRATCH(std::complex<float>, cusolverDnCunmqr_bufferSize)
@@ -3310,12 +3310,12 @@ UNMQR_LAUNCHER_SCRATCH(std::complex<double>, cusolverDnZunmqr_bufferSize)
 
 template <typename Func>
 inline void unmtr_scratchpad_size(const char* func_name, Func func, sycl::queue& queue,
-                                  oneapi::mkl::side side, oneapi::mkl::uplo uplo,
-                                  oneapi::mkl::transpose trans, std::int64_t m, std::int64_t n,
+                                  oneapi::math::side side, oneapi::math::uplo uplo,
+                                  oneapi::math::transpose trans, std::int64_t m, std::int64_t n,
                                   std::int64_t lda, std::int64_t ldc, int* scratch_size) {
     queue
         .submit([&](sycl::handler& cgh) {
-            onemkl_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+            onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
                 auto handle = sc.get_handle(queue);
                 cusolverStatus_t err;
                 CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, get_cublas_side_mode(side),
@@ -3328,10 +3328,10 @@ inline void unmtr_scratchpad_size(const char* func_name, Func func, sycl::queue&
 
 #define UNMTR_LAUNCHER_SCRATCH(TYPE, CUSOLVER_ROUTINE)                                             \
     template <>                                                                                    \
-    std::int64_t unmtr_scratchpad_size<TYPE>(sycl::queue & queue, oneapi::mkl::side side,          \
-                                             oneapi::mkl::uplo uplo, oneapi::mkl::transpose trans, \
-                                             std::int64_t m, std::int64_t n, std::int64_t lda,     \
-                                             std::int64_t ldc) {                                   \
+    std::int64_t unmtr_scratchpad_size<TYPE>(sycl::queue & queue, oneapi::math::side side,         \
+                                             oneapi::math::uplo uplo,                              \
+                                             oneapi::math::transpose trans, std::int64_t m,        \
+                                             std::int64_t n, std::int64_t lda, std::int64_t ldc) { \
         int scratch_size;                                                                          \
         unmtr_scratchpad_size(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, side, uplo, trans, m, n, \
                               lda, ldc, &scratch_size);                                            \
@@ -3345,5 +3345,5 @@ UNMTR_LAUNCHER_SCRATCH(std::complex<double>, cusolverDnZunmtr_bufferSize)
 
 } // namespace cusolver
 } // namespace lapack
-} // namespace mkl
+} // namespace math
 } // namespace oneapi

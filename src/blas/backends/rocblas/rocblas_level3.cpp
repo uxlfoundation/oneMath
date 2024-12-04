@@ -22,11 +22,11 @@
 #include "rocblas_helper.hpp"
 #include "rocblas_task.hpp"
 
-#include "oneapi/mkl/exceptions.hpp"
-#include "oneapi/mkl/blas/detail/rocblas/onemkl_blas_rocblas.hpp"
+#include "oneapi/math/exceptions.hpp"
+#include "oneapi/math/blas/detail/rocblas/onemath_blas_rocblas.hpp"
 
 namespace oneapi {
-namespace mkl {
+namespace math {
 namespace blas {
 namespace rocblas {
 namespace column_major {
@@ -44,7 +44,7 @@ inline void gemm(Func func, sycl::queue& queue, transpose transa, transpose tran
         auto a_acc = a.template get_access<sycl::access::mode::read>(cgh);
         auto b_acc = b.template get_access<sycl::access::mode::read>(cgh);
         auto c_acc = c.template get_access<sycl::access::mode::read_write>(cgh);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
+        onemath_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
 
             auto a_ = sc.get_mem<rocDataType*>(a_acc);
@@ -91,7 +91,7 @@ inline void gemm_ex(Func func, DATATYPE_A DT_A, DATATYPE_B DT_B, DATATYPE_C DT_C
         auto a_acc = a.template get_access<sycl::access::mode::read>(cgh);
         auto b_acc = b.template get_access<sycl::access::mode::read>(cgh);
         auto c_acc = c.template get_access<sycl::access::mode::read_write>(cgh);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
+        onemath_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
 
             auto a_ = sc.get_mem<rocDataType_A*>(a_acc);
@@ -140,7 +140,7 @@ inline void symm(Func func, sycl::queue& queue, side left_right, uplo upper_lowe
         auto a_acc = a.template get_access<sycl::access::mode::read>(cgh);
         auto b_acc = b.template get_access<sycl::access::mode::read>(cgh);
         auto c_acc = c.template get_access<sycl::access::mode::read_write>(cgh);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
+        onemath_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
 
             auto a_ = sc.get_mem<rocDataType*>(a_acc);
@@ -180,7 +180,7 @@ inline void hemm(Func func, sycl::queue& queue, side left_right, uplo upper_lowe
         auto a_acc = a.template get_access<sycl::access::mode::read>(cgh);
         auto b_acc = b.template get_access<sycl::access::mode::read>(cgh);
         auto c_acc = c.template get_access<sycl::access::mode::read_write>(cgh);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
+        onemath_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
 
             auto a_ = sc.get_mem<rocDataType*>(a_acc);
@@ -217,7 +217,7 @@ inline void syrk(Func func, sycl::queue& queue, uplo upper_lower, transpose tran
     queue.submit([&](sycl::handler& cgh) {
         auto a_acc = a.template get_access<sycl::access::mode::read>(cgh);
         auto c_acc = c.template get_access<sycl::access::mode::read_write>(cgh);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
+        onemath_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
 
             auto a_ = sc.get_mem<rocDataType*>(a_acc);
@@ -255,7 +255,7 @@ inline void herk(Func func, sycl::queue& queue, uplo upper_lower, transpose tran
     queue.submit([&](sycl::handler& cgh) {
         auto a_acc = a.template get_access<sycl::access::mode::read>(cgh);
         auto c_acc = c.template get_access<sycl::access::mode::read_write>(cgh);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
+        onemath_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
 
             auto a_ = sc.get_mem<rocDataType*>(a_acc);
@@ -291,7 +291,7 @@ inline void syr2k(Func func, sycl::queue& queue, uplo upper_lower, transpose tra
         auto a_acc = a.template get_access<sycl::access::mode::read>(cgh);
         auto b_acc = b.template get_access<sycl::access::mode::read>(cgh);
         auto c_acc = c.template get_access<sycl::access::mode::read_write>(cgh);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
+        onemath_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
 
             auto a_ = sc.get_mem<rocDataType*>(a_acc);
@@ -333,7 +333,7 @@ inline void her2k(Func func, sycl::queue& queue, uplo upper_lower, transpose tra
         auto a_acc = a.template get_access<sycl::access::mode::read>(cgh);
         auto b_acc = b.template get_access<sycl::access::mode::read>(cgh);
         auto c_acc = c.template get_access<sycl::access::mode::read_write>(cgh);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
+        onemath_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
 
             auto a_ = sc.get_mem<rocDataType*>(a_acc);
@@ -375,7 +375,7 @@ inline void trmm(Func func, sycl::queue& queue, side left_right, uplo upper_lowe
     queue.submit([&](sycl::handler& cgh) {
         auto a_acc = a.template get_access<sycl::access::mode::read>(cgh);
         auto b_acc = b.template get_access<sycl::access::mode::read_write>(cgh);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
+        onemath_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
 
             auto a_ = sc.get_mem<rocDataType*>(a_acc);
@@ -421,7 +421,7 @@ inline void trsm(Func func, sycl::queue& queue, side left_right, uplo upper_lowe
     queue.submit([&](sycl::handler& cgh) {
         auto a_acc = a.template get_access<sycl::access::mode::read>(cgh);
         auto b_acc = b.template get_access<sycl::access::mode::read_write>(cgh);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
+        onemath_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
 
             auto a_ = sc.get_mem<rocDataType*>(a_acc);
@@ -462,7 +462,7 @@ inline sycl::event gemm(Func func, sycl::queue& queue, transpose transa, transpo
 
     auto done = queue.submit([&](sycl::handler& cgh) {
         cgh.depends_on(dependencies);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
+        onemath_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
 
             auto a_ = reinterpret_cast<const rocDataType*>(a);
@@ -509,7 +509,7 @@ inline sycl::event gemm_ex(Func func, DATATYPE_A DT_A, DATATYPE_B DT_B, DATATYPE
 
     auto done = queue.submit([&](sycl::handler& cgh) {
         cgh.depends_on(dependencies);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
+        onemath_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
 
             auto a_ = reinterpret_cast<const rocDataType_A*>(a);
@@ -559,7 +559,7 @@ inline sycl::event symm(Func func, sycl::queue& queue, side left_right, uplo upp
 
     auto done = queue.submit([&](sycl::handler& cgh) {
         cgh.depends_on(dependencies);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
+        onemath_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
 
             auto a_ = reinterpret_cast<const rocDataType*>(a);
@@ -600,7 +600,7 @@ inline sycl::event hemm(Func func, sycl::queue& queue, side left_right, uplo upp
 
     auto done = queue.submit([&](sycl::handler& cgh) {
         cgh.depends_on(dependencies);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
+        onemath_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
 
             auto a_ = reinterpret_cast<const rocDataType*>(a);
@@ -639,7 +639,7 @@ inline sycl::event syrk(Func func, sycl::queue& queue, uplo upper_lower, transpo
 
     auto done = queue.submit([&](sycl::handler& cgh) {
         cgh.depends_on(dependencies);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
+        onemath_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
 
             auto a_ = reinterpret_cast<const rocDataType*>(a);
@@ -680,7 +680,7 @@ inline sycl::event herk(Func func, sycl::queue& queue, uplo upper_lower, transpo
 
     auto done = queue.submit([&](sycl::handler& cgh) {
         cgh.depends_on(dependencies);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
+        onemath_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
 
             auto a_ = reinterpret_cast<const rocDataType*>(a);
@@ -719,7 +719,7 @@ inline sycl::event syr2k(Func func, sycl::queue& queue, uplo upper_lower, transp
 
     auto done = queue.submit([&](sycl::handler& cgh) {
         cgh.depends_on(dependencies);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
+        onemath_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
 
             auto a_ = reinterpret_cast<const rocDataType*>(a);
@@ -762,7 +762,7 @@ inline sycl::event her2k(Func func, sycl::queue& queue, uplo upper_lower, transp
 
     auto done = queue.submit([&](sycl::handler& cgh) {
         cgh.depends_on(dependencies);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
+        onemath_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
 
             auto a_ = reinterpret_cast<const rocDataType*>(a);
@@ -806,7 +806,7 @@ inline sycl::event trmm(Func func, sycl::queue& queue, side left_right, uplo upp
 
     auto done = queue.submit([&](sycl::handler& cgh) {
         cgh.depends_on(dependencies);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
+        onemath_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
 
             auto a_ = reinterpret_cast<const rocDataType*>(a);
@@ -854,7 +854,7 @@ inline sycl::event trsm(Func func, sycl::queue& queue, side left_right, uplo upp
 
     auto done = queue.submit([&](sycl::handler& cgh) {
         cgh.depends_on(dependencies);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
+        onemath_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
 
             auto a_ = reinterpret_cast<const rocDataType*>(a);
@@ -959,10 +959,10 @@ template <typename Func, typename T>
 inline void symm(Func func, sycl::queue& queue, side left_right, uplo upper_lower, int64_t m,
                  int64_t n, T alpha, sycl::buffer<T, 1>& a, int64_t lda, sycl::buffer<T, 1>& b,
                  int64_t ldb, T beta, sycl::buffer<T, 1>& c, int64_t ldc) {
-    auto new_side =
-        left_right == oneapi::mkl::side::left ? oneapi::mkl::side::right : oneapi::mkl::side::left;
-    auto new_uplo = upper_lower == oneapi::mkl::uplo::lower ? oneapi::mkl::uplo::upper
-                                                            : oneapi::mkl::uplo::lower;
+    auto new_side = left_right == oneapi::math::side::left ? oneapi::math::side::right
+                                                           : oneapi::math::side::left;
+    auto new_uplo = upper_lower == oneapi::math::uplo::lower ? oneapi::math::uplo::upper
+                                                             : oneapi::math::uplo::lower;
 
     column_major::symm(func, queue, new_side, new_uplo, n, m, alpha, a, lda, b, ldb, beta, c, ldc);
 }
@@ -986,10 +986,10 @@ template <typename Func, typename T>
 inline void hemm(Func func, sycl::queue& queue, side left_right, uplo upper_lower, int64_t m,
                  int64_t n, T alpha, sycl::buffer<T, 1>& a, int64_t lda, sycl::buffer<T, 1>& b,
                  int64_t ldb, T beta, sycl::buffer<T, 1>& c, int64_t ldc) {
-    auto new_side =
-        left_right == oneapi::mkl::side::left ? oneapi::mkl::side::right : oneapi::mkl::side::left;
-    auto new_uplo = upper_lower == oneapi::mkl::uplo::lower ? oneapi::mkl::uplo::upper
-                                                            : oneapi::mkl::uplo::lower;
+    auto new_side = left_right == oneapi::math::side::left ? oneapi::math::side::right
+                                                           : oneapi::math::side::left;
+    auto new_uplo = upper_lower == oneapi::math::uplo::lower ? oneapi::math::uplo::upper
+                                                             : oneapi::math::uplo::lower;
 
     column_major::hemm(func, queue, new_side, new_uplo, n, m, alpha, a, lda, b, ldb, beta, c, ldc);
 }
@@ -1011,10 +1011,10 @@ template <typename Func, typename T>
 inline void syrk(Func func, sycl::queue& queue, uplo upper_lower, transpose trans, int64_t n,
                  int64_t k, T alpha, sycl::buffer<T, 1>& a, int64_t lda, T beta,
                  sycl::buffer<T, 1>& c, int64_t ldc) {
-    auto new_uplo = upper_lower == oneapi::mkl::uplo::lower ? oneapi::mkl::uplo::upper
-                                                            : oneapi::mkl::uplo::lower;
-    auto new_trans = trans == oneapi::mkl::transpose::nontrans ? oneapi::mkl::transpose::trans
-                                                               : oneapi::mkl::transpose::nontrans;
+    auto new_uplo = upper_lower == oneapi::math::uplo::lower ? oneapi::math::uplo::upper
+                                                             : oneapi::math::uplo::lower;
+    auto new_trans = trans == oneapi::math::transpose::nontrans ? oneapi::math::transpose::trans
+                                                                : oneapi::math::transpose::nontrans;
 
     column_major::syrk(func, queue, new_uplo, new_trans, n, k, alpha, a, lda, beta, c, ldc);
 }
@@ -1037,10 +1037,10 @@ template <typename Func, typename DataType, typename ScalarType>
 inline void herk(Func func, sycl::queue& queue, uplo upper_lower, transpose trans, int64_t n,
                  int64_t k, ScalarType alpha, sycl::buffer<DataType, 1>& a, int64_t lda,
                  ScalarType beta, sycl::buffer<DataType, 1>& c, int64_t ldc) {
-    auto new_uplo = upper_lower == oneapi::mkl::uplo::lower ? oneapi::mkl::uplo::upper
-                                                            : oneapi::mkl::uplo::lower;
-    auto new_trans = trans == oneapi::mkl::transpose::nontrans ? oneapi::mkl::transpose::conjtrans
-                                                               : oneapi::mkl::transpose::nontrans;
+    auto new_uplo = upper_lower == oneapi::math::uplo::lower ? oneapi::math::uplo::upper
+                                                             : oneapi::math::uplo::lower;
+    auto new_trans = trans == oneapi::math::transpose::nontrans ? oneapi::math::transpose::conjtrans
+                                                                : oneapi::math::transpose::nontrans;
 
     column_major::herk(func, queue, new_uplo, new_trans, n, k, alpha, a, lda, beta, c, ldc);
 }
@@ -1061,10 +1061,10 @@ template <typename Func, typename T>
 inline void syr2k(Func func, sycl::queue& queue, uplo upper_lower, transpose trans, int64_t n,
                   int64_t k, T alpha, sycl::buffer<T, 1>& a, int64_t lda, sycl::buffer<T, 1>& b,
                   int64_t ldb, T beta, sycl::buffer<T, 1>& c, int64_t ldc) {
-    auto new_uplo = upper_lower == oneapi::mkl::uplo::lower ? oneapi::mkl::uplo::upper
-                                                            : oneapi::mkl::uplo::lower;
-    auto new_trans = trans == oneapi::mkl::transpose::nontrans ? oneapi::mkl::transpose::trans
-                                                               : oneapi::mkl::transpose::nontrans;
+    auto new_uplo = upper_lower == oneapi::math::uplo::lower ? oneapi::math::uplo::upper
+                                                             : oneapi::math::uplo::lower;
+    auto new_trans = trans == oneapi::math::transpose::nontrans ? oneapi::math::transpose::trans
+                                                                : oneapi::math::transpose::nontrans;
 
     column_major::syr2k(func, queue, new_uplo, new_trans, n, k, alpha, a, lda, b, ldb, beta, c,
                         ldc);
@@ -1090,10 +1090,10 @@ inline void her2k(Func func, sycl::queue& queue, uplo upper_lower, transpose tra
                   int64_t k, DataType alpha, sycl::buffer<DataType, 1>& a, int64_t lda,
                   sycl::buffer<DataType, 1>& b, int64_t ldb, ScalarType beta,
                   sycl::buffer<DataType, 1>& c, int64_t ldc) {
-    auto new_uplo = upper_lower == oneapi::mkl::uplo::lower ? oneapi::mkl::uplo::upper
-                                                            : oneapi::mkl::uplo::lower;
-    auto new_trans = trans == oneapi::mkl::transpose::nontrans ? oneapi::mkl::transpose::conjtrans
-                                                               : oneapi::mkl::transpose::nontrans;
+    auto new_uplo = upper_lower == oneapi::math::uplo::lower ? oneapi::math::uplo::upper
+                                                             : oneapi::math::uplo::lower;
+    auto new_trans = trans == oneapi::math::transpose::nontrans ? oneapi::math::transpose::conjtrans
+                                                                : oneapi::math::transpose::nontrans;
     auto new_alpha = std::conj(alpha);
 
     column_major::her2k(func, queue, new_uplo, new_trans, n, k, new_alpha, a, lda, b, ldb, beta, c,
@@ -1122,10 +1122,10 @@ template <typename Func, typename T>
 inline void trmm(Func func, sycl::queue& queue, side left_right, uplo upper_lower, transpose trans,
                  diag unit_diag, int64_t m, int64_t n, T alpha, sycl::buffer<T, 1>& a, int64_t lda,
                  sycl::buffer<T, 1>& b, int64_t ldb) {
-    auto new_side =
-        left_right == oneapi::mkl::side::left ? oneapi::mkl::side::right : oneapi::mkl::side::left;
-    auto new_uplo = upper_lower == oneapi::mkl::uplo::lower ? oneapi::mkl::uplo::upper
-                                                            : oneapi::mkl::uplo::lower;
+    auto new_side = left_right == oneapi::math::side::left ? oneapi::math::side::right
+                                                           : oneapi::math::side::left;
+    auto new_uplo = upper_lower == oneapi::math::uplo::lower ? oneapi::math::uplo::upper
+                                                             : oneapi::math::uplo::lower;
 
     column_major::trmm(func, queue, new_side, new_uplo, trans, unit_diag, n, m, alpha, a, lda, b,
                        ldb);
@@ -1150,10 +1150,10 @@ template <typename Func, typename T>
 inline void trsm(Func func, sycl::queue& queue, side left_right, uplo upper_lower, transpose trans,
                  diag unit_diag, int64_t m, int64_t n, T alpha, sycl::buffer<T, 1>& a, int64_t lda,
                  sycl::buffer<T, 1>& b, int64_t ldb) {
-    auto new_side =
-        left_right == oneapi::mkl::side::left ? oneapi::mkl::side::right : oneapi::mkl::side::left;
-    auto new_uplo = upper_lower == oneapi::mkl::uplo::lower ? oneapi::mkl::uplo::upper
-                                                            : oneapi::mkl::uplo::lower;
+    auto new_side = left_right == oneapi::math::side::left ? oneapi::math::side::right
+                                                           : oneapi::math::side::left;
+    auto new_uplo = upper_lower == oneapi::math::uplo::lower ? oneapi::math::uplo::upper
+                                                             : oneapi::math::uplo::lower;
 
     column_major::trsm(func, queue, new_side, new_uplo, trans, unit_diag, n, m, alpha, a, lda, b,
                        ldb);
@@ -1246,10 +1246,10 @@ template <typename Func, typename T>
 inline sycl::event symm(Func func, sycl::queue& queue, side left_right, uplo upper_lower, int64_t m,
                         int64_t n, T alpha, const T* a, int64_t lda, const T* b, int64_t ldb,
                         T beta, T* c, int64_t ldc, const std::vector<sycl::event>& dependencies) {
-    auto new_side =
-        left_right == oneapi::mkl::side::left ? oneapi::mkl::side::right : oneapi::mkl::side::left;
-    auto new_uplo = upper_lower == oneapi::mkl::uplo::lower ? oneapi::mkl::uplo::upper
-                                                            : oneapi::mkl::uplo::lower;
+    auto new_side = left_right == oneapi::math::side::left ? oneapi::math::side::right
+                                                           : oneapi::math::side::left;
+    auto new_uplo = upper_lower == oneapi::math::uplo::lower ? oneapi::math::uplo::upper
+                                                             : oneapi::math::uplo::lower;
 
     return column_major::symm(func, queue, new_side, new_uplo, n, m, alpha, a, lda, b, ldb, beta, c,
                               ldc, dependencies);
@@ -1275,10 +1275,10 @@ template <typename Func, typename T>
 inline sycl::event hemm(Func func, sycl::queue& queue, side left_right, uplo upper_lower, int64_t m,
                         int64_t n, T alpha, const T* a, int64_t lda, const T* b, int64_t ldb,
                         T beta, T* c, int64_t ldc, const std::vector<sycl::event>& dependencies) {
-    auto new_side =
-        left_right == oneapi::mkl::side::left ? oneapi::mkl::side::right : oneapi::mkl::side::left;
-    auto new_uplo = upper_lower == oneapi::mkl::uplo::lower ? oneapi::mkl::uplo::upper
-                                                            : oneapi::mkl::uplo::lower;
+    auto new_side = left_right == oneapi::math::side::left ? oneapi::math::side::right
+                                                           : oneapi::math::side::left;
+    auto new_uplo = upper_lower == oneapi::math::uplo::lower ? oneapi::math::uplo::upper
+                                                             : oneapi::math::uplo::lower;
 
     return column_major::hemm(func, queue, new_side, new_uplo, n, m, alpha, a, lda, b, ldb, beta, c,
                               ldc, dependencies);
@@ -1302,10 +1302,10 @@ template <typename Func, typename T>
 inline sycl::event syrk(Func func, sycl::queue& queue, uplo upper_lower, transpose trans, int64_t n,
                         int64_t k, T alpha, const T* a, int64_t lda, T beta, T* c, int64_t ldc,
                         const std::vector<sycl::event>& dependencies) {
-    auto new_uplo = upper_lower == oneapi::mkl::uplo::lower ? oneapi::mkl::uplo::upper
-                                                            : oneapi::mkl::uplo::lower;
-    auto new_trans = trans == oneapi::mkl::transpose::nontrans ? oneapi::mkl::transpose::trans
-                                                               : oneapi::mkl::transpose::nontrans;
+    auto new_uplo = upper_lower == oneapi::math::uplo::lower ? oneapi::math::uplo::upper
+                                                             : oneapi::math::uplo::lower;
+    auto new_trans = trans == oneapi::math::transpose::nontrans ? oneapi::math::transpose::trans
+                                                                : oneapi::math::transpose::nontrans;
 
     return column_major::syrk(func, queue, new_uplo, new_trans, n, k, alpha, a, lda, beta, c, ldc,
                               dependencies);
@@ -1331,10 +1331,10 @@ inline sycl::event herk(Func func, sycl::queue& queue, uplo upper_lower, transpo
                         int64_t k, const ScalarType alpha, const DataType* a, int64_t lda,
                         const ScalarType beta, DataType* c, int64_t ldc,
                         const std::vector<sycl::event>& dependencies) {
-    auto new_uplo = upper_lower == oneapi::mkl::uplo::lower ? oneapi::mkl::uplo::upper
-                                                            : oneapi::mkl::uplo::lower;
-    auto new_trans = trans == oneapi::mkl::transpose::nontrans ? oneapi::mkl::transpose::conjtrans
-                                                               : oneapi::mkl::transpose::nontrans;
+    auto new_uplo = upper_lower == oneapi::math::uplo::lower ? oneapi::math::uplo::upper
+                                                             : oneapi::math::uplo::lower;
+    auto new_trans = trans == oneapi::math::transpose::nontrans ? oneapi::math::transpose::conjtrans
+                                                                : oneapi::math::transpose::nontrans;
 
     return column_major::herk(func, queue, new_uplo, new_trans, n, k, alpha, a, lda, beta, c, ldc,
                               dependencies);
@@ -1359,10 +1359,10 @@ inline sycl::event syr2k(Func func, sycl::queue& queue, uplo upper_lower, transp
                          int64_t n, int64_t k, T alpha, const T* a, int64_t lda, const T* b,
                          int64_t ldb, T beta, T* c, int64_t ldc,
                          const std::vector<sycl::event>& dependencies) {
-    auto new_uplo = upper_lower == oneapi::mkl::uplo::lower ? oneapi::mkl::uplo::upper
-                                                            : oneapi::mkl::uplo::lower;
-    auto new_trans = trans == oneapi::mkl::transpose::nontrans ? oneapi::mkl::transpose::trans
-                                                               : oneapi::mkl::transpose::nontrans;
+    auto new_uplo = upper_lower == oneapi::math::uplo::lower ? oneapi::math::uplo::upper
+                                                             : oneapi::math::uplo::lower;
+    auto new_trans = trans == oneapi::math::transpose::nontrans ? oneapi::math::transpose::trans
+                                                                : oneapi::math::transpose::nontrans;
 
     return column_major::syr2k(func, queue, new_uplo, new_trans, n, k, alpha, a, lda, b, ldb, beta,
                                c, ldc, dependencies);
@@ -1389,10 +1389,10 @@ inline sycl::event her2k(Func func, sycl::queue& queue, uplo upper_lower, transp
                          int64_t n, int64_t k, const DataType alpha, const DataType* a, int64_t lda,
                          const DataType* b, int64_t ldb, const ScalarType beta, DataType* c,
                          int64_t ldc, const std::vector<sycl::event>& dependencies) {
-    auto new_uplo = upper_lower == oneapi::mkl::uplo::lower ? oneapi::mkl::uplo::upper
-                                                            : oneapi::mkl::uplo::lower;
-    auto new_trans = trans == oneapi::mkl::transpose::nontrans ? oneapi::mkl::transpose::conjtrans
-                                                               : oneapi::mkl::transpose::nontrans;
+    auto new_uplo = upper_lower == oneapi::math::uplo::lower ? oneapi::math::uplo::upper
+                                                             : oneapi::math::uplo::lower;
+    auto new_trans = trans == oneapi::math::transpose::nontrans ? oneapi::math::transpose::conjtrans
+                                                                : oneapi::math::transpose::nontrans;
     auto new_alpha = std::conj(alpha);
 
     return column_major::her2k(func, queue, new_uplo, new_trans, n, k, new_alpha, a, lda, b, ldb,
@@ -1422,10 +1422,10 @@ inline sycl::event trmm(Func func, sycl::queue& queue, side left_right, uplo upp
                         transpose trans, diag unit_diag, int64_t m, int64_t n, T alpha, const T* a,
                         int64_t lda, T* b, int64_t ldb,
                         const std::vector<sycl::event>& dependencies) {
-    auto new_side =
-        left_right == oneapi::mkl::side::left ? oneapi::mkl::side::right : oneapi::mkl::side::left;
-    auto new_uplo = upper_lower == oneapi::mkl::uplo::lower ? oneapi::mkl::uplo::upper
-                                                            : oneapi::mkl::uplo::lower;
+    auto new_side = left_right == oneapi::math::side::left ? oneapi::math::side::right
+                                                           : oneapi::math::side::left;
+    auto new_uplo = upper_lower == oneapi::math::uplo::lower ? oneapi::math::uplo::upper
+                                                             : oneapi::math::uplo::lower;
 
     return column_major::trmm(func, queue, new_side, new_uplo, trans, unit_diag, n, m, alpha, a,
                               lda, b, ldb, dependencies);
@@ -1451,10 +1451,10 @@ inline sycl::event trsm(Func func, sycl::queue& queue, side left_right, uplo upp
                         transpose trans, diag unit_diag, int64_t m, int64_t n, T alpha, const T* a,
                         int64_t lda, T* b, int64_t ldb,
                         const std::vector<sycl::event>& dependencies) {
-    auto new_side =
-        left_right == oneapi::mkl::side::left ? oneapi::mkl::side::right : oneapi::mkl::side::left;
-    auto new_uplo = upper_lower == oneapi::mkl::uplo::lower ? oneapi::mkl::uplo::upper
-                                                            : oneapi::mkl::uplo::lower;
+    auto new_side = left_right == oneapi::math::side::left ? oneapi::math::side::right
+                                                           : oneapi::math::side::left;
+    auto new_uplo = upper_lower == oneapi::math::uplo::lower ? oneapi::math::uplo::upper
+                                                             : oneapi::math::uplo::lower;
 
     return column_major::trsm(func, queue, new_side, new_uplo, trans, unit_diag, n, m, alpha, a,
                               lda, b, ldb, dependencies);
@@ -1478,5 +1478,5 @@ TRSM_LAUNCHER_USM(std::complex<double>, rocblas_ztrsm)
 } // namespace row_major
 } // namespace rocblas
 } // namespace blas
-} // namespace mkl
+} // namespace math
 } // namespace oneapi

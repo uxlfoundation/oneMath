@@ -17,22 +17,20 @@
 *
 **************************************************************************/
 
-#ifndef _ONEMKL_SRC_SPARSE_BLAS_BACKENDS_MKL_COMMON_MKL_HANDLES_HPP_
-#define _ONEMKL_SRC_SPARSE_BLAS_BACKENDS_MKL_COMMON_MKL_HANDLES_HPP_
+#ifndef _ONEMATH_SRC_SPARSE_BLAS_BACKENDS_MKL_COMMON_MKL_HANDLES_HPP_
+#define _ONEMATH_SRC_SPARSE_BLAS_BACKENDS_MKL_COMMON_MKL_HANDLES_HPP_
 
-// MKLCPU and MKLGPU backends include
-// This include defines its own oneapi::mkl::sparse namespace with some of the
-// types that are used here: matrix_handle_t, index_base, transpose, uplo, diag.
-#include <oneapi/mkl/spblas.hpp>
+// Intel(R) oneMKL header
+#include <mkl/spblas.hpp>
 
 #include "sparse_blas/generic_container.hpp"
 #include "sparse_blas/macros.hpp"
 #include "sparse_blas/sycl_helper.hpp"
 
-namespace oneapi::mkl::sparse {
+namespace oneapi::math::sparse {
 
 // Complete the definition of incomplete types dense_vector_handle and
-// dense_matrix_handle as they don't exist in oneMKL backends yet.
+// dense_matrix_handle as they don't exist in oneMath backends yet.
 
 struct dense_vector_handle : public detail::generic_dense_vector_handle<void*> {
     template <typename T>
@@ -58,25 +56,27 @@ struct dense_matrix_handle : public detail::generic_dense_matrix_handle<void*> {
                                                          ld, dense_layout) {}
 };
 
-} // namespace oneapi::mkl::sparse
+} // namespace oneapi::math::sparse
 
-namespace oneapi::mkl::sparse::detail {
+namespace oneapi::math::sparse::detail {
+
+using namespace oneapi::math::detail;
 
 /**
  * Internal sparse_matrix_handle type for MKLCPU and MKLGPU backends.
  * Here \p matrix_handle_t is the type of the backend's handle.
  * The user-facing incomplete type matrix_handle_t must be kept incomplete.
  * Internally matrix_handle_t is reinterpret_cast as
- * oneapi::mkl::sparse::detail::sparse_matrix_handle which holds another
+ * oneapi::math::sparse::detail::sparse_matrix_handle which holds another
  * matrix_handle_t for the backend handle.
  */
-using sparse_matrix_handle = detail::generic_sparse_handle<matrix_handle_t>;
+using sparse_matrix_handle = detail::generic_sparse_handle<oneapi::mkl::sparse::matrix_handle_t>;
 
-/// Cast to oneMKL's interface handle type
-inline auto get_internal_handle(matrix_handle_t handle) {
+/// Cast to oneMath's internal handle type
+inline auto get_internal_handle(oneapi::math::sparse::matrix_handle_t handle) {
     return reinterpret_cast<sparse_matrix_handle*>(handle);
 }
 
-} // namespace oneapi::mkl::sparse::detail
+} // namespace oneapi::math::sparse::detail
 
-#endif // _ONEMKL_SRC_SPARSE_BLAS_BACKENDS_MKL_COMMON_MKL_HANDLES_HPP_
+#endif // _ONEMATH_SRC_SPARSE_BLAS_BACKENDS_MKL_COMMON_MKL_HANDLES_HPP_

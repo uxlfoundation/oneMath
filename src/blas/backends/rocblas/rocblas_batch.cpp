@@ -22,8 +22,8 @@
 #include "rocblas_helper.hpp"
 #include "rocblas_task.hpp"
 
-#include "oneapi/mkl/exceptions.hpp"
-#include "oneapi/mkl/blas/detail/rocblas/onemkl_blas_rocblas.hpp"
+#include "oneapi/math/exceptions.hpp"
+#include "oneapi/math/blas/detail/rocblas/onemath_blas_rocblas.hpp"
 
 // Helper Functions
 
@@ -64,7 +64,7 @@ static inline void conj_vector(sycl::handler& cgh, T** ptr, const int64_t len, c
 }
 
 namespace oneapi {
-namespace mkl {
+namespace math {
 namespace blas {
 namespace rocblas {
 namespace column_major {
@@ -81,7 +81,7 @@ inline void copy_batch(Func func, sycl::queue& queue, int64_t n, sycl::buffer<T,
     queue.submit([&](sycl::handler& cgh) {
         auto x_acc = x.template get_access<sycl::access::mode::read>(cgh);
         auto y_acc = y.template get_access<sycl::access::mode::read_write>(cgh);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
+        onemath_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
 
             auto x_ = sc.get_mem<rocDataType*>(x_acc);
@@ -117,7 +117,7 @@ inline void axpy_batch(Func func, sycl::queue& queue, int64_t n, T alpha, sycl::
     queue.submit([&](sycl::handler& cgh) {
         auto x_acc = x.template get_access<sycl::access::mode::read>(cgh);
         auto y_acc = y.template get_access<sycl::access::mode::read_write>(cgh);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
+        onemath_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
 
             auto x_ = sc.get_mem<rocDataType*>(x_acc);
@@ -156,7 +156,7 @@ inline void gemv_batch(Func func, sycl::queue& queue, transpose trans, int64_t m
         auto a_acc = a.template get_access<sycl::access::mode::read>(cgh);
         auto x_acc = x.template get_access<sycl::access::mode::read>(cgh);
         auto y_acc = y.template get_access<sycl::access::mode::read_write>(cgh);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
+        onemath_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
 
             auto a_ = sc.get_mem<const rocDataType*>(a_acc);
@@ -198,7 +198,7 @@ inline void dgmm_batch(Func func, sycl::queue& queue, side left_right, int64_t m
         auto a_acc = a.template get_access<sycl::access::mode::read>(cgh);
         auto x_acc = x.template get_access<sycl::access::mode::read>(cgh);
         auto c_acc = c.template get_access<sycl::access::mode::read_write>(cgh);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
+        onemath_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
 
             auto a_ = sc.get_mem<const rocDataType*>(a_acc);
@@ -245,7 +245,7 @@ inline void gemm_batch_impl(sycl::queue& queue, transpose transa, transpose tran
         auto a_acc = a.template get_access<sycl::access::mode::read>(cgh);
         auto b_acc = b.template get_access<sycl::access::mode::read>(cgh);
         auto c_acc = c.template get_access<sycl::access::mode::read_write>(cgh);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
+        onemath_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
 
             auto a_ = sc.get_mem<const rocTypeA*>(a_acc);
@@ -314,7 +314,7 @@ inline void trsm_batch(Func func, sycl::queue& queue, side left_right, uplo uppe
     queue.submit([&](sycl::handler& cgh) {
         auto a_acc = a.template get_access<sycl::access::mode::read>(cgh);
         auto b_acc = b.template get_access<sycl::access::mode::read_write>(cgh);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
+        onemath_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
 
             auto a_ = sc.get_mem<const rocDataType*>(a_acc);
@@ -355,7 +355,7 @@ inline void syrk_batch(Func func, sycl::queue& queue, uplo upper_lower, transpos
     queue.submit([&](sycl::handler& cgh) {
         auto a_acc = a.template get_access<sycl::access::mode::read>(cgh);
         auto c_acc = c.template get_access<sycl::access::mode::read_write>(cgh);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
+        onemath_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
 
             auto a_ = sc.get_mem<const rocDataType*>(a_acc);
@@ -392,13 +392,13 @@ inline void omatcopy_batch(Func func, sycl::queue& queue, transpose trans, int64
     overflow_check(m, n, lda, ldb, stridea, strideb, batch_size);
 
     const T beta = 0;
-    const int64_t new_m = trans == oneapi::mkl::transpose::nontrans ? m : n;
-    const int64_t new_n = trans == oneapi::mkl::transpose::nontrans ? n : m;
+    const int64_t new_m = trans == oneapi::math::transpose::nontrans ? m : n;
+    const int64_t new_n = trans == oneapi::math::transpose::nontrans ? n : m;
 
     queue.submit([&](sycl::handler& cgh) {
         auto a_acc = a.template get_access<sycl::access::mode::read>(cgh);
         auto b_acc = b.template get_access<sycl::access::mode::read_write>(cgh);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
+        onemath_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
 
             auto a_ = sc.get_mem<const rocDataType*>(a_acc);
@@ -465,7 +465,7 @@ inline void omatadd_batch(Func func, sycl::queue& queue, transpose transa, trans
         auto a_acc = a.template get_access<sycl::access::mode::read>(cgh);
         auto b_acc = b.template get_access<sycl::access::mode::read>(cgh);
         auto c_acc = c.template get_access<sycl::access::mode::read_write>(cgh);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
+        onemath_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
 
             auto a_ = sc.get_mem<const rocDataType*>(a_acc);
@@ -510,7 +510,7 @@ inline sycl::event copy_batch(Func func, sycl::queue& queue, int64_t* n, const T
 
     auto done = queue.submit([&](sycl::handler& cgh) {
         cgh.depends_on(dependencies);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
+        onemath_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
 
             int64_t offset = 0;
@@ -552,7 +552,7 @@ inline sycl::event copy_batch(Func func, sycl::queue& queue, int64_t n, const T*
 
     auto done = queue.submit([&](sycl::handler& cgh) {
         cgh.depends_on(dependencies);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
+        onemath_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
 
             auto x_ = reinterpret_cast<const rocDataType*>(x);
@@ -592,7 +592,7 @@ inline sycl::event axpy_batch(Func func, sycl::queue& queue, int64_t* n, T* alph
 
     auto done = queue.submit([&](sycl::handler& cgh) {
         cgh.depends_on(dependencies);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
+        onemath_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
 
             int64_t offset = 0;
@@ -635,7 +635,7 @@ inline sycl::event axpy_batch(Func func, sycl::queue& queue, int64_t n, T alpha,
 
     auto done = queue.submit([&](sycl::handler& cgh) {
         cgh.depends_on(dependencies);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
+        onemath_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
 
             auto x_ = reinterpret_cast<const rocDataType*>(x);
@@ -675,7 +675,7 @@ inline sycl::event gemv_batch(Func func, sycl::queue& queue, transpose trans, in
 
     auto done = queue.submit([&](sycl::handler& cgh) {
         cgh.depends_on(dependencies);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
+        onemath_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
 
             auto a_ = reinterpret_cast<const rocDataType*>(a);
@@ -720,7 +720,7 @@ inline sycl::event gemv_batch(Func func, sycl::queue& queue, transpose* trans, i
 
     auto done = queue.submit([&](sycl::handler& cgh) {
         cgh.depends_on(dependencies);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
+        onemath_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
 
             int64_t offset = 0;
@@ -767,7 +767,7 @@ inline sycl::event dgmm_batch(Func func, sycl::queue& queue, side left_right, in
 
     auto done = queue.submit([&](sycl::handler& cgh) {
         cgh.depends_on(dependencies);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
+        onemath_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
 
             auto a_ = reinterpret_cast<const rocDataType*>(a);
@@ -810,7 +810,7 @@ inline sycl::event dgmm_batch(Func func, sycl::queue& queue, side* left_right, i
 
     auto done = queue.submit([&](sycl::handler& cgh) {
         cgh.depends_on(dependencies);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
+        onemath_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             int64_t offset = 0;
             rocblas_status err;
@@ -864,7 +864,7 @@ inline sycl::event gemm_batch_strided_usm_impl(sycl::queue& queue, transpose tra
     rocblas_gemm_flags flags = rocblas_gemm_flags_none;
     auto done = queue.submit([&](sycl::handler& cgh) {
         cgh.depends_on(dependencies);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
+        onemath_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
 
             auto a_ = reinterpret_cast<const rocTypeA*>(a);
@@ -942,7 +942,7 @@ inline sycl::event gemm_batch_usm_impl(sycl::queue& queue, transpose* transa, tr
     rocblas_gemm_flags flags = rocblas_gemm_flags_none;
     auto done = queue.submit([&](sycl::handler& cgh) {
         cgh.depends_on(dependencies);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
+        onemath_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
 
             int64_t offset = 0;
@@ -1017,7 +1017,7 @@ inline sycl::event trsm_batch(Func func, sycl::queue& queue, side left_right, up
 
     auto done = queue.submit([&](sycl::handler& cgh) {
         cgh.depends_on(dependencies);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
+        onemath_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
 
             auto a_ = reinterpret_cast<const rocDataType*>(a);
@@ -1061,7 +1061,7 @@ inline sycl::event trsm_batch(Func func, sycl::queue& queue, side* left_right, u
 
     auto done = queue.submit([&](sycl::handler& cgh) {
         cgh.depends_on(dependencies);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
+        onemath_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             int64_t offset = 0;
             rocblas_status err;
@@ -1112,7 +1112,7 @@ inline sycl::event syrk_batch(Func func, sycl::queue& queue, uplo* upper_lower, 
 
     auto done = queue.submit([&](sycl::handler& cgh) {
         cgh.depends_on(dependencies);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
+        onemath_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             int64_t offset = 0;
             rocblas_status err;
@@ -1159,7 +1159,7 @@ inline sycl::event syrk_batch(Func func, sycl::queue& queue, uplo upper_lower, t
 
     auto done = queue.submit([&](sycl::handler& cgh) {
         cgh.depends_on(dependencies);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
+        onemath_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
 
             auto a_ = reinterpret_cast<const rocDataType*>(a);
@@ -1201,12 +1201,12 @@ inline sycl::event omatcopy_batch(Func func, sycl::queue& queue, transpose trans
     overflow_check(m, n, lda, ldb, stridea, strideb, batch_size);
 
     const T beta = 0;
-    const int64_t new_m = trans == oneapi::mkl::transpose::nontrans ? m : n;
-    const int64_t new_n = trans == oneapi::mkl::transpose::nontrans ? n : m;
+    const int64_t new_m = trans == oneapi::math::transpose::nontrans ? m : n;
+    const int64_t new_n = trans == oneapi::math::transpose::nontrans ? n : m;
 
     auto done = queue.submit([&](sycl::handler& cgh) {
         cgh.depends_on(dependencies);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
+        onemath_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
 
             auto a_ = reinterpret_cast<const rocDataType*>(a);
@@ -1275,7 +1275,7 @@ inline sycl::event omatadd_batch(Func func, sycl::queue& queue, transpose transa
 
     auto done = queue.submit([&](sycl::handler& cgh) {
         cgh.depends_on(dependencies);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
+        onemath_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
 
             auto a_ = reinterpret_cast<const rocDataType*>(a);
@@ -1321,7 +1321,7 @@ inline sycl::event omatcopy_batch(Func func, sycl::queue& queue, transpose* tran
 
     auto done = queue.submit([&](sycl::handler& cgh) {
         cgh.depends_on(dependencies);
-        onemkl_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
+        onemath_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             int64_t offset = 0;
             rocblas_status err;
@@ -1331,8 +1331,8 @@ inline sycl::event omatcopy_batch(Func func, sycl::queue& queue, transpose* tran
                 auto** b_ = reinterpret_cast<rocDataType**>(b);
 
                 const T beta = 0;
-                const auto new_m = trans[i] == oneapi::mkl::transpose::nontrans ? m[i] : n[i];
-                const auto new_n = trans[i] == oneapi::mkl::transpose::nontrans ? n[i] : m[i];
+                const auto new_m = trans[i] == oneapi::math::transpose::nontrans ? m[i] : n[i];
+                const auto new_n = trans[i] == oneapi::math::transpose::nontrans ? n[i] : m[i];
 
                 rocblas_native_func(func, err, handle, get_rocblas_operation(trans[i]),
                                     get_rocblas_operation(trans[i]), (int)new_m, (int)new_n,
@@ -1446,10 +1446,10 @@ inline void gemv_batch(Func func, sycl::queue& queue, transpose trans, int64_t m
                        int64_t stridea, sycl::buffer<std::complex<T>, 1>& x, int64_t incx,
                        int64_t stridex, std::complex<T> beta, sycl::buffer<std::complex<T>, 1>& y,
                        int64_t incy, int64_t stridey, int64_t batch_size) {
-    auto new_trans = trans == oneapi::mkl::transpose::nontrans ? oneapi::mkl::transpose::trans
-                                                               : oneapi::mkl::transpose::nontrans;
+    auto new_trans = trans == oneapi::math::transpose::nontrans ? oneapi::math::transpose::trans
+                                                                : oneapi::math::transpose::nontrans;
 
-    if (trans == oneapi::mkl::transpose::conjtrans) {
+    if (trans == oneapi::math::transpose::conjtrans) {
         alpha = std::conj(alpha);
         beta = std::conj(beta);
 
@@ -1467,7 +1467,7 @@ inline void gemv_batch(Func func, sycl::queue& queue, transpose trans, int64_t m
     column_major::gemv_batch(func, queue, new_trans, n, m, alpha, a, lda, stridea, x, incx, stridex,
                              beta, y, incy, stridey, batch_size);
 
-    if (trans == oneapi::mkl::transpose::conjtrans) {
+    if (trans == oneapi::math::transpose::conjtrans) {
         if (n > 0) {
             queue.submit(
                 [&](sycl::handler& cgh) { conj_vector(cgh, y, n, incy, stridey, batch_size); });
@@ -1480,8 +1480,8 @@ inline void gemv_batch(Func func, sycl::queue& queue, transpose trans, int64_t m
                        T alpha, sycl::buffer<T, 1>& a, int64_t lda, int64_t stridea,
                        sycl::buffer<T, 1>& x, int64_t incx, int64_t stridex, T beta,
                        sycl::buffer<T, 1>& y, int64_t incy, int64_t stridey, int64_t batch_size) {
-    auto new_trans = trans == oneapi::mkl::transpose::nontrans ? oneapi::mkl::transpose::trans
-                                                               : oneapi::mkl::transpose::nontrans;
+    auto new_trans = trans == oneapi::math::transpose::nontrans ? oneapi::math::transpose::trans
+                                                                : oneapi::math::transpose::nontrans;
 
     column_major::gemv_batch(func, queue, new_trans, n, m, alpha, a, lda, stridea, x, incx, stridex,
                              beta, y, incy, stridey, batch_size);
@@ -1508,8 +1508,8 @@ inline void dgmm_batch(Func func, sycl::queue& queue, side left_right, int64_t m
                        sycl::buffer<T, 1>& a, int64_t lda, int64_t stridea, sycl::buffer<T, 1>& x,
                        int64_t incx, int64_t stridex, sycl::buffer<T, 1>& c, int64_t ldc,
                        int64_t stridec, int64_t batch_size) {
-    auto new_side =
-        left_right == oneapi::mkl::side::left ? oneapi::mkl::side::right : oneapi::mkl::side::left;
+    auto new_side = left_right == oneapi::math::side::left ? oneapi::math::side::right
+                                                           : oneapi::math::side::left;
 
     column_major::dgmm_batch(func, queue, new_side, n, m, a, lda, stridea, x, incx, stridex, c, ldc,
                              stridec, batch_size);
@@ -1588,10 +1588,10 @@ inline void trsm_batch(Func func, sycl::queue& queue, side left_right, uplo uppe
                        transpose trans, diag unit_diag, int64_t m, int64_t n, T alpha,
                        sycl::buffer<T, 1>& a, int64_t lda, int64_t stridea, sycl::buffer<T, 1>& b,
                        int64_t ldb, int64_t strideb, int64_t batch_size) {
-    auto new_side =
-        left_right == oneapi::mkl::side::left ? oneapi::mkl::side::right : oneapi::mkl::side::left;
-    auto new_uplo = upper_lower == oneapi::mkl::uplo::lower ? oneapi::mkl::uplo::upper
-                                                            : oneapi::mkl::uplo::lower;
+    auto new_side = left_right == oneapi::math::side::left ? oneapi::math::side::right
+                                                           : oneapi::math::side::left;
+    auto new_uplo = upper_lower == oneapi::math::uplo::lower ? oneapi::math::uplo::upper
+                                                             : oneapi::math::uplo::lower;
 
     column_major::trsm_batch(func, queue, new_side, new_uplo, trans, unit_diag, n, m, alpha, a, lda,
                              stridea, b, ldb, strideb, batch_size);
@@ -1618,10 +1618,10 @@ inline void syrk_batch(Func func, sycl::queue& queue, uplo upper_lower, transpos
                        int64_t k, T alpha, sycl::buffer<T, 1>& a, int64_t lda, int64_t stridea,
                        T beta, sycl::buffer<T, 1>& c, int64_t ldc, int64_t stridec,
                        int64_t batch_size) {
-    auto new_uplo = upper_lower == oneapi::mkl::uplo::lower ? oneapi::mkl::uplo::upper
-                                                            : oneapi::mkl::uplo::lower;
-    auto new_trans = trans == oneapi::mkl::transpose::nontrans ? oneapi::mkl::transpose::trans
-                                                               : oneapi::mkl::transpose::nontrans;
+    auto new_uplo = upper_lower == oneapi::math::uplo::lower ? oneapi::math::uplo::upper
+                                                             : oneapi::math::uplo::lower;
+    auto new_trans = trans == oneapi::math::transpose::nontrans ? oneapi::math::transpose::trans
+                                                                : oneapi::math::transpose::nontrans;
 
     column_major::syrk_batch(func, queue, new_uplo, new_trans, n, k, alpha, a, lda, stridea, beta,
                              c, ldc, stridec, batch_size);
@@ -1821,10 +1821,10 @@ inline sycl::event gemv_batch(Func func, sycl::queue& queue, transpose trans, in
                               const std::vector<sycl::event>& dependencies) {
     sycl::event done;
 
-    auto new_trans = trans == oneapi::mkl::transpose::nontrans ? oneapi::mkl::transpose::trans
-                                                               : oneapi::mkl::transpose::nontrans;
+    auto new_trans = trans == oneapi::math::transpose::nontrans ? oneapi::math::transpose::trans
+                                                                : oneapi::math::transpose::nontrans;
 
-    if (trans == oneapi::mkl::transpose::conjtrans) {
+    if (trans == oneapi::math::transpose::conjtrans) {
         alpha = std::conj(alpha);
         beta = std::conj(beta);
 
@@ -1845,7 +1845,7 @@ inline sycl::event gemv_batch(Func func, sycl::queue& queue, transpose trans, in
     done = column_major::gemv_batch(func, queue, new_trans, n, m, alpha, a, lda, stridea, x, incx,
                                     stridex, beta, y, incy, stridey, batch_size, dependencies);
 
-    if (trans == oneapi::mkl::transpose::conjtrans) {
+    if (trans == oneapi::math::transpose::conjtrans) {
         if (n > 0) {
             done = queue.submit([&](sycl::handler& cgh) {
                 cgh.depends_on(done);
@@ -1863,8 +1863,8 @@ inline sycl::event gemv_batch(Func func, sycl::queue& queue, transpose trans, in
                               int64_t incx, int64_t stridex, T beta, T* y, int64_t incy,
                               int64_t stridey, int64_t batch_size,
                               const std::vector<sycl::event>& dependencies) {
-    auto new_trans = trans == oneapi::mkl::transpose::nontrans ? oneapi::mkl::transpose::trans
-                                                               : oneapi::mkl::transpose::nontrans;
+    auto new_trans = trans == oneapi::math::transpose::nontrans ? oneapi::math::transpose::trans
+                                                                : oneapi::math::transpose::nontrans;
 
     return column_major::gemv_batch(func, queue, new_trans, n, m, alpha, a, lda, stridea, x, incx,
                                     stridex, beta, y, incy, stridey, batch_size, dependencies);
@@ -1898,7 +1898,7 @@ inline sycl::event gemv_batch(Func func, sycl::queue& queue, transpose* trans, i
 
     int64_t stride = 0;
     for (int64_t i = 0; i < group_count; i++) {
-        if (trans[i] == oneapi::mkl::transpose::conjtrans) {
+        if (trans[i] == oneapi::math::transpose::conjtrans) {
             alpha[i] = std::conj(alpha[i]);
             beta[i] = std::conj(beta[i]);
 
@@ -1921,9 +1921,9 @@ inline sycl::event gemv_batch(Func func, sycl::queue& queue, transpose* trans, i
 
     auto tmp_trans = std::vector<transpose>{ (std::size_t)group_count };
     for (int64_t i = 0; i < group_count; i++) {
-        const auto new_trans = trans[i] == oneapi::mkl::transpose::nontrans
-                                   ? oneapi::mkl::transpose::trans
-                                   : oneapi::mkl::transpose::nontrans;
+        const auto new_trans = trans[i] == oneapi::math::transpose::nontrans
+                                   ? oneapi::math::transpose::trans
+                                   : oneapi::math::transpose::nontrans;
         tmp_trans[i] = trans[i];
         trans[i] = new_trans;
     }
@@ -1936,7 +1936,7 @@ inline sycl::event gemv_batch(Func func, sycl::queue& queue, transpose* trans, i
 
     stride = 0;
     for (int64_t i = 0; i < group_count; i++) {
-        if (trans[i] == oneapi::mkl::transpose::conjtrans) {
+        if (trans[i] == oneapi::math::transpose::conjtrans) {
             if (n[i] > 0) {
                 done = queue.submit([&](sycl::handler& cgh) {
                     conj_vector(cgh, y, n[i], incy[i], stride, group_size[i]);
@@ -1957,9 +1957,9 @@ inline sycl::event gemv_batch(Func func, sycl::queue& queue, transpose* trans, i
     auto tmp_trans = std::vector<transpose>{ static_cast<std::size_t>(group_count) };
 
     for (int64_t i = 0; i < group_count; i++) {
-        const auto new_trans = trans[i] == oneapi::mkl::transpose::nontrans
-                                   ? oneapi::mkl::transpose::trans
-                                   : oneapi::mkl::transpose::nontrans;
+        const auto new_trans = trans[i] == oneapi::math::transpose::nontrans
+                                   ? oneapi::math::transpose::trans
+                                   : oneapi::math::transpose::nontrans;
         tmp_trans[i] = trans[i];
         trans[i] = new_trans;
     }
@@ -1994,8 +1994,8 @@ inline sycl::event dgmm_batch(Func func, sycl::queue& queue, side left_right, in
                               const T* a, int64_t lda, int64_t stridea, const T* x, int64_t incx,
                               int64_t stridex, T* c, int64_t ldc, int64_t stridec,
                               int64_t batch_size, const std::vector<sycl::event>& dependencies) {
-    auto new_side =
-        left_right == oneapi::mkl::side::left ? oneapi::mkl::side::right : oneapi::mkl::side::left;
+    auto new_side = left_right == oneapi::math::side::left ? oneapi::math::side::right
+                                                           : oneapi::math::side::left;
 
     return column_major::dgmm_batch(func, queue, new_side, n, m, a, lda, stridea, x, incx, stridex,
                                     c, ldc, stridec, batch_size, dependencies);
@@ -2023,8 +2023,8 @@ inline sycl::event dgmm_batch(Func func, sycl::queue& queue, side* left_right, i
                               T** c, int64_t* ldc, int64_t group_count, int64_t* group_size,
                               const std::vector<sycl::event>& dependencies) {
     for (int64_t i = 0; i < group_count; i++) {
-        const auto new_side = left_right[i] == oneapi::mkl::side::left ? oneapi::mkl::side::right
-                                                                       : oneapi::mkl::side::left;
+        const auto new_side = left_right[i] == oneapi::math::side::left ? oneapi::math::side::right
+                                                                        : oneapi::math::side::left;
         left_right[i] = new_side;
     }
 
@@ -2161,10 +2161,10 @@ inline sycl::event trsm_batch(Func func, sycl::queue& queue, side left_right, up
                               const T* a, int64_t lda, int64_t stridea, T* b, int64_t ldb,
                               int64_t strideb, int64_t batch_size,
                               const std::vector<sycl::event>& dependencies) {
-    auto new_side =
-        left_right == oneapi::mkl::side::left ? oneapi::mkl::side::right : oneapi::mkl::side::left;
-    auto new_uplo = upper_lower == oneapi::mkl::uplo::lower ? oneapi::mkl::uplo::upper
-                                                            : oneapi::mkl::uplo::lower;
+    auto new_side = left_right == oneapi::math::side::left ? oneapi::math::side::right
+                                                           : oneapi::math::side::left;
+    auto new_uplo = upper_lower == oneapi::math::uplo::lower ? oneapi::math::uplo::upper
+                                                             : oneapi::math::uplo::lower;
 
     return column_major::trsm_batch(func, queue, new_side, new_uplo, trans, unit_diag, n, m, alpha,
                                     a, lda, stridea, b, ldb, strideb, batch_size, dependencies);
@@ -2192,12 +2192,13 @@ inline sycl::event trsm_batch(Func func, sycl::queue& queue, side* left_right, u
                               const T** a, int64_t* lda, T** b, int64_t* ldb, int64_t group_count,
                               int64_t* group_size, const std::vector<sycl::event>& dependencies) {
     for (int64_t i = 0; i < group_count; i++) {
-        const auto new_side = left_right[i] == oneapi::mkl::side::left ? oneapi::mkl::side::right
-                                                                       : oneapi::mkl::side::left;
+        const auto new_side = left_right[i] == oneapi::math::side::left ? oneapi::math::side::right
+                                                                        : oneapi::math::side::left;
         left_right[i] = new_side;
 
-        const auto new_uplo = upper_lower[i] == oneapi::mkl::uplo::lower ? oneapi::mkl::uplo::upper
-                                                                         : oneapi::mkl::uplo::lower;
+        const auto new_uplo = upper_lower[i] == oneapi::math::uplo::lower
+                                  ? oneapi::math::uplo::upper
+                                  : oneapi::math::uplo::lower;
         upper_lower[i] = new_uplo;
     }
 
@@ -2228,13 +2229,14 @@ inline sycl::event syrk_batch(Func func, sycl::queue& queue, uplo* upper_lower, 
                               T** c, int64_t* ldc, int64_t group_count, int64_t* group_size,
                               const std::vector<sycl::event>& dependencies) {
     for (int64_t i = 0; i < group_count; i++) {
-        const auto new_uplo = upper_lower[i] == oneapi::mkl::uplo::lower ? oneapi::mkl::uplo::upper
-                                                                         : oneapi::mkl::uplo::lower;
+        const auto new_uplo = upper_lower[i] == oneapi::math::uplo::lower
+                                  ? oneapi::math::uplo::upper
+                                  : oneapi::math::uplo::lower;
         upper_lower[i] = new_uplo;
 
-        const auto new_trans = trans[i] == oneapi::mkl::transpose::nontrans
-                                   ? oneapi::mkl::transpose::trans
-                                   : oneapi::mkl::transpose::nontrans;
+        const auto new_trans = trans[i] == oneapi::math::transpose::nontrans
+                                   ? oneapi::math::transpose::trans
+                                   : oneapi::math::transpose::nontrans;
         trans[i] = new_trans;
     }
 
@@ -2263,10 +2265,10 @@ inline sycl::event syrk_batch(Func func, sycl::queue& queue, uplo upper_lower, t
                               int64_t n, int64_t k, const T alpha, const T* a, int64_t lda,
                               int64_t stridea, const T beta, T* c, int64_t ldc, int64_t stridec,
                               int64_t batch_size, const std::vector<sycl::event>& dependencies) {
-    auto new_uplo = upper_lower == oneapi::mkl::uplo::lower ? oneapi::mkl::uplo::upper
-                                                            : oneapi::mkl::uplo::lower;
-    auto new_trans = trans == oneapi::mkl::transpose::nontrans ? oneapi::mkl::transpose::trans
-                                                               : oneapi::mkl::transpose::nontrans;
+    auto new_uplo = upper_lower == oneapi::math::uplo::lower ? oneapi::math::uplo::upper
+                                                             : oneapi::math::uplo::lower;
+    auto new_trans = trans == oneapi::math::transpose::nontrans ? oneapi::math::transpose::trans
+                                                                : oneapi::math::transpose::nontrans;
 
     return column_major::syrk_batch(func, queue, new_uplo, new_trans, n, k, alpha, a, lda, stridea,
                                     beta, c, ldc, stridec, batch_size, dependencies);
@@ -2425,5 +2427,5 @@ sycl::event imatcopy_batch(sycl::queue& queue, transpose* trans, int64_t* m, int
 } // namespace row_major
 } // namespace rocblas
 } // namespace blas
-} // namespace mkl
+} // namespace math
 } // namespace oneapi

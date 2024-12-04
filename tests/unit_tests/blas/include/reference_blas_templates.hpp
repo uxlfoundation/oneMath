@@ -24,7 +24,7 @@
 #include <complex>
 #include <cstdint>
 #include "cblas.h"
-#include "oneapi/mkl/types.hpp"
+#include "oneapi/math/types.hpp"
 #include "test_helper.hpp"
 #include "reference_blas_wrappers.hpp"
 
@@ -162,18 +162,18 @@ void gemm(CBLAS_LAYOUT layout, CBLAS_TRANSPOSE transa, CBLAS_TRANSPOSE transb, c
         sizeb = (transb == CblasNoTrans) ? *ldb * *k : *ldb * *n;
         sizec = *ldc * *m;
     }
-    float* af = (float*)oneapi::mkl::aligned_alloc(64, sizeof(float) * sizea);
-    float* bf = (float*)oneapi::mkl::aligned_alloc(64, sizeof(float) * sizeb);
-    float* cf = (float*)oneapi::mkl::aligned_alloc(64, sizeof(float) * sizec);
+    float* af = (float*)oneapi::math::aligned_alloc(64, sizeof(float) * sizea);
+    float* bf = (float*)oneapi::math::aligned_alloc(64, sizeof(float) * sizeb);
+    float* cf = (float*)oneapi::math::aligned_alloc(64, sizeof(float) * sizec);
     copy_mat(a, layout, transa, *m, *k, *lda, af);
     copy_mat(b, layout, transb, *k, *n, *ldb, bf);
     copy_mat(c, layout, CblasNoTrans, *m, *n, *ldc, cf);
     cblas_sgemm_wrapper(layout, transa, transb, *m, *n, *k, alphaf, af, *lda, bf, *ldb, betaf, cf,
                         *ldc);
     copy_mat(cf, layout, CblasNoTrans, *m, *n, *ldc, c);
-    oneapi::mkl::aligned_free(af);
-    oneapi::mkl::aligned_free(bf);
-    oneapi::mkl::aligned_free(cf);
+    oneapi::math::aligned_free(af);
+    oneapi::math::aligned_free(bf);
+    oneapi::math::aligned_free(cf);
 }
 
 template <>
@@ -230,20 +230,20 @@ void gemm(CBLAS_LAYOUT layout, CBLAS_TRANSPOSE transa, CBLAS_TRANSPOSE transb, c
         sizea = (transa == CblasNoTrans) ? *lda * *m : *lda * *k;
         sizeb = (transb == CblasNoTrans) ? *ldb * *k : *ldb * *n;
     }
-    float* af = (float*)oneapi::mkl::aligned_alloc(64, sizeof(float) * sizea);
-    float* bf = (float*)oneapi::mkl::aligned_alloc(64, sizeof(float) * sizeb);
+    float* af = (float*)oneapi::math::aligned_alloc(64, sizeof(float) * sizea);
+    float* bf = (float*)oneapi::math::aligned_alloc(64, sizeof(float) * sizeb);
     copy_mat(a, layout, transa, *m, *k, *lda, af);
     copy_mat(b, layout, transb, *k, *n, *ldb, bf);
     cblas_sgemm_wrapper(layout, transa, transb, *m, *n, *k, *alpha, af, *lda, bf, *ldb, *beta, c,
                         *ldc);
-    oneapi::mkl::aligned_free(af);
-    oneapi::mkl::aligned_free(bf);
+    oneapi::math::aligned_free(af);
+    oneapi::math::aligned_free(bf);
 }
 
 template <>
 void gemm(CBLAS_LAYOUT layout, CBLAS_TRANSPOSE transa, CBLAS_TRANSPOSE transb, const int* m,
-          const int* n, const int* k, const float* alpha, const oneapi::mkl::bfloat16* a,
-          const int* lda, const oneapi::mkl::bfloat16* b, const int* ldb, const float* beta,
+          const int* n, const int* k, const float* alpha, const oneapi::math::bfloat16* a,
+          const int* lda, const oneapi::math::bfloat16* b, const int* ldb, const float* beta,
           float* c, const int* ldc) {
     // Not supported in NETLIB. SGEMM is used as reference.
     int sizea, sizeb;
@@ -255,14 +255,14 @@ void gemm(CBLAS_LAYOUT layout, CBLAS_TRANSPOSE transa, CBLAS_TRANSPOSE transb, c
         sizea = (transa == CblasNoTrans) ? *lda * *m : *lda * *k;
         sizeb = (transb == CblasNoTrans) ? *ldb * *k : *ldb * *n;
     }
-    float* af = (float*)oneapi::mkl::aligned_alloc(64, sizeof(float) * sizea);
-    float* bf = (float*)oneapi::mkl::aligned_alloc(64, sizeof(float) * sizeb);
+    float* af = (float*)oneapi::math::aligned_alloc(64, sizeof(float) * sizea);
+    float* bf = (float*)oneapi::math::aligned_alloc(64, sizeof(float) * sizeb);
     copy_mat(a, layout, transa, *m, *k, *lda, af);
     copy_mat(b, layout, transb, *k, *n, *ldb, bf);
     cblas_sgemm_wrapper(layout, transa, transb, *m, *n, *k, *alpha, af, *lda, bf, *ldb, *beta, c,
                         *ldc);
-    oneapi::mkl::aligned_free(af);
-    oneapi::mkl::aligned_free(bf);
+    oneapi::math::aligned_free(af);
+    oneapi::math::aligned_free(bf);
 }
 
 template <typename fp>
@@ -1587,9 +1587,9 @@ void gemm_bias(CBLAS_LAYOUT layout, CBLAS_TRANSPOSE transa, CBLAS_TRANSPOSE tran
         sizeb = (transb == CblasNoTrans) ? *ldb * *k : *ldb * *n;
         sizec = *ldc * *m;
     }
-    double* ad = (double*)oneapi::mkl::aligned_alloc(64, sizeof(double) * sizea);
-    double* bd = (double*)oneapi::mkl::aligned_alloc(64, sizeof(double) * sizeb);
-    double* cd = (double*)oneapi::mkl::aligned_alloc(64, sizeof(double) * sizec);
+    double* ad = (double*)oneapi::math::aligned_alloc(64, sizeof(double) * sizea);
+    double* bd = (double*)oneapi::math::aligned_alloc(64, sizeof(double) * sizeb);
+    double* cd = (double*)oneapi::math::aligned_alloc(64, sizeof(double) * sizec);
     double alphad = *alpha;
     double betad = *beta;
     double aod = *ao;
@@ -1600,9 +1600,9 @@ void gemm_bias(CBLAS_LAYOUT layout, CBLAS_TRANSPOSE transa, CBLAS_TRANSPOSE tran
     cblas_dgemm_wrapper(layout, transa, transb, *m, *n, *k, alphad, ad, *lda, bd, *ldb, betad, cd,
                         *ldc);
     copy_mat(cd, layout, *m, *n, *ldc, offsetc, co, c);
-    oneapi::mkl::aligned_free(ad);
-    oneapi::mkl::aligned_free(bd);
-    oneapi::mkl::aligned_free(cd);
+    oneapi::math::aligned_free(ad);
+    oneapi::math::aligned_free(bd);
+    oneapi::math::aligned_free(cd);
 }
 
 template <>
@@ -1623,9 +1623,9 @@ void gemm_bias(CBLAS_LAYOUT layout, CBLAS_TRANSPOSE transa, CBLAS_TRANSPOSE tran
         sizeb = (transb == CblasNoTrans) ? *ldb * *k : *ldb * *n;
         sizec = *ldc * *m;
     }
-    double* ad = (double*)oneapi::mkl::aligned_alloc(64, sizeof(double) * sizea);
-    double* bd = (double*)oneapi::mkl::aligned_alloc(64, sizeof(double) * sizeb);
-    double* cd = (double*)oneapi::mkl::aligned_alloc(64, sizeof(double) * sizec);
+    double* ad = (double*)oneapi::math::aligned_alloc(64, sizeof(double) * sizea);
+    double* bd = (double*)oneapi::math::aligned_alloc(64, sizeof(double) * sizeb);
+    double* cd = (double*)oneapi::math::aligned_alloc(64, sizeof(double) * sizec);
     double alphad = *alpha;
     double betad = *beta;
     double aod = *ao;
@@ -1636,9 +1636,9 @@ void gemm_bias(CBLAS_LAYOUT layout, CBLAS_TRANSPOSE transa, CBLAS_TRANSPOSE tran
     cblas_dgemm_wrapper(layout, transa, transb, *m, *n, *k, alphad, ad, *lda, bd, *ldb, betad, cd,
                         *ldc);
     copy_mat(cd, layout, *m, *n, *ldc, offsetc, co, c);
-    oneapi::mkl::aligned_free(ad);
-    oneapi::mkl::aligned_free(bd);
-    oneapi::mkl::aligned_free(cd);
+    oneapi::math::aligned_free(ad);
+    oneapi::math::aligned_free(bd);
+    oneapi::math::aligned_free(cd);
 }
 
 template <>
@@ -1658,9 +1658,9 @@ void gemm_bias(CBLAS_LAYOUT layout, CBLAS_TRANSPOSE transa, CBLAS_TRANSPOSE tran
         sizeb = (transb == CblasNoTrans) ? *ldb * *k : *ldb * *n;
         sizec = *ldc * *m;
     }
-    double* ad = (double*)oneapi::mkl::aligned_alloc(64, sizeof(double) * sizea);
-    double* bd = (double*)oneapi::mkl::aligned_alloc(64, sizeof(double) * sizeb);
-    double* cd = (double*)oneapi::mkl::aligned_alloc(64, sizeof(double) * sizec);
+    double* ad = (double*)oneapi::math::aligned_alloc(64, sizeof(double) * sizea);
+    double* bd = (double*)oneapi::math::aligned_alloc(64, sizeof(double) * sizeb);
+    double* cd = (double*)oneapi::math::aligned_alloc(64, sizeof(double) * sizec);
     double alphad = *alpha;
     double betad = *beta;
     double aod = *ao;
@@ -1671,9 +1671,9 @@ void gemm_bias(CBLAS_LAYOUT layout, CBLAS_TRANSPOSE transa, CBLAS_TRANSPOSE tran
     cblas_dgemm_wrapper(layout, transa, transb, *m, *n, *k, alphad, ad, *lda, bd, *ldb, betad, cd,
                         *ldc);
     copy_mat(cd, layout, *m, *n, *ldc, offsetc, co, c);
-    oneapi::mkl::aligned_free(ad);
-    oneapi::mkl::aligned_free(bd);
-    oneapi::mkl::aligned_free(cd);
+    oneapi::math::aligned_free(ad);
+    oneapi::math::aligned_free(bd);
+    oneapi::math::aligned_free(cd);
 }
 
 template <>
@@ -1694,9 +1694,9 @@ void gemm_bias(CBLAS_LAYOUT layout, CBLAS_TRANSPOSE transa, CBLAS_TRANSPOSE tran
         sizeb = (transb == CblasNoTrans) ? *ldb * *k : *ldb * *n;
         sizec = *ldc * *m;
     }
-    double* ad = (double*)oneapi::mkl::aligned_alloc(64, sizeof(double) * sizea);
-    double* bd = (double*)oneapi::mkl::aligned_alloc(64, sizeof(double) * sizeb);
-    double* cd = (double*)oneapi::mkl::aligned_alloc(64, sizeof(double) * sizec);
+    double* ad = (double*)oneapi::math::aligned_alloc(64, sizeof(double) * sizea);
+    double* bd = (double*)oneapi::math::aligned_alloc(64, sizeof(double) * sizeb);
+    double* cd = (double*)oneapi::math::aligned_alloc(64, sizeof(double) * sizec);
     double alphad = *alpha;
     double betad = *beta;
     double aod = *ao;
@@ -1707,9 +1707,9 @@ void gemm_bias(CBLAS_LAYOUT layout, CBLAS_TRANSPOSE transa, CBLAS_TRANSPOSE tran
     cblas_dgemm_wrapper(layout, transa, transb, *m, *n, *k, alphad, ad, *lda, bd, *ldb, betad, cd,
                         *ldc);
     copy_mat(cd, layout, *m, *n, *ldc, offsetc, co, c);
-    oneapi::mkl::aligned_free(ad);
-    oneapi::mkl::aligned_free(bd);
-    oneapi::mkl::aligned_free(cd);
+    oneapi::math::aligned_free(ad);
+    oneapi::math::aligned_free(bd);
+    oneapi::math::aligned_free(cd);
 }
 
 template <typename fp>
@@ -1726,12 +1726,12 @@ void gemmt(CBLAS_LAYOUT layout, CBLAS_UPLO upper_lower, CBLAS_TRANSPOSE transa,
     // Not supported in NETLIB. SGEMM is used as reference.
     int sizec;
     sizec = *ldc * *n;
-    float* cf = (float*)oneapi::mkl::aligned_alloc(64, sizeof(float) * sizec);
+    float* cf = (float*)oneapi::math::aligned_alloc(64, sizeof(float) * sizec);
     update_c(c, layout, upper_lower, *n, *n, *ldc, cf);
     cblas_sgemm_wrapper(layout, transa, transb, *n, *n, *k, *alpha, a, *lda, b, *ldb, *beta, cf,
                         *ldc);
     update_c(cf, layout, upper_lower, *n, *n, *ldc, c);
-    oneapi::mkl::aligned_free(cf);
+    oneapi::math::aligned_free(cf);
 }
 
 template <>
@@ -1742,12 +1742,12 @@ void gemmt(CBLAS_LAYOUT layout, CBLAS_UPLO upper_lower, CBLAS_TRANSPOSE transa,
     // Not supported in NETLIB. DGEMM is used as reference.
     int sizec;
     sizec = *ldc * *n;
-    double* cf = (double*)oneapi::mkl::aligned_alloc(64, sizeof(double) * sizec);
+    double* cf = (double*)oneapi::math::aligned_alloc(64, sizeof(double) * sizec);
     update_c(c, layout, upper_lower, *n, *n, *ldc, cf);
     cblas_dgemm_wrapper(layout, transa, transb, *n, *n, *k, *alpha, a, *lda, b, *ldb, *beta, cf,
                         *ldc);
     update_c(cf, layout, upper_lower, *n, *n, *ldc, c);
-    oneapi::mkl::aligned_free(cf);
+    oneapi::math::aligned_free(cf);
 }
 
 template <>
@@ -1760,12 +1760,12 @@ void gemmt(CBLAS_LAYOUT layout, CBLAS_UPLO upper_lower, CBLAS_TRANSPOSE transa,
     int sizec;
     sizec = *ldc * *n;
     std::complex<float>* cf =
-        (std::complex<float>*)oneapi::mkl::aligned_alloc(64, sizeof(std::complex<float>) * sizec);
+        (std::complex<float>*)oneapi::math::aligned_alloc(64, sizeof(std::complex<float>) * sizec);
     update_c(c, layout, upper_lower, *n, *n, *ldc, cf);
     cblas_cgemm_wrapper(layout, transa, transb, *n, *n, *k, alpha, a, *lda, b, *ldb, beta, cf,
                         *ldc);
     update_c(cf, layout, upper_lower, *n, *n, *ldc, c);
-    oneapi::mkl::aligned_free(cf);
+    oneapi::math::aligned_free(cf);
 }
 
 template <>
@@ -1777,13 +1777,13 @@ void gemmt(CBLAS_LAYOUT layout, CBLAS_UPLO upper_lower, CBLAS_TRANSPOSE transa,
     // Not supported in NETLIB. ZGEMM is used as reference.
     int sizec;
     sizec = *ldc * *n;
-    std::complex<double>* cf =
-        (std::complex<double>*)oneapi::mkl::aligned_alloc(64, sizeof(std::complex<double>) * sizec);
+    std::complex<double>* cf = (std::complex<double>*)oneapi::math::aligned_alloc(
+        64, sizeof(std::complex<double>) * sizec);
     update_c(c, layout, upper_lower, *n, *n, *ldc, cf);
     cblas_zgemm_wrapper(layout, transa, transb, *n, *n, *k, alpha, a, *lda, b, *ldb, beta, cf,
                         *ldc);
     update_c(cf, layout, upper_lower, *n, *n, *ldc, c);
-    oneapi::mkl::aligned_free(cf);
+    oneapi::math::aligned_free(cf);
 }
 
 template <typename fp>
@@ -1974,10 +1974,10 @@ fp sametype_conj(fp x) {
 }
 
 template <typename fp>
-void omatcopy_ref(oneapi::mkl::layout layout, oneapi::mkl::transpose trans, int64_t m, int64_t n,
+void omatcopy_ref(oneapi::math::layout layout, oneapi::math::transpose trans, int64_t m, int64_t n,
                   fp alpha, fp* A, int64_t lda, fp* B, int64_t ldb) {
     int64_t logical_m, logical_n;
-    if (layout == oneapi::mkl::layout::col_major) {
+    if (layout == oneapi::math::layout::col_major) {
         logical_m = m;
         logical_n = n;
     }
@@ -1985,14 +1985,14 @@ void omatcopy_ref(oneapi::mkl::layout layout, oneapi::mkl::transpose trans, int6
         logical_m = n;
         logical_n = m;
     }
-    if (trans == oneapi::mkl::transpose::nontrans) {
+    if (trans == oneapi::math::transpose::nontrans) {
         for (int64_t j = 0; j < logical_n; j++) {
             for (int64_t i = 0; i < logical_m; i++) {
                 B[j * ldb + i] = alpha * A[j * lda + i];
             }
         }
     }
-    else if (trans == oneapi::mkl::transpose::trans) {
+    else if (trans == oneapi::math::transpose::trans) {
         for (int64_t j = 0; j < logical_n; j++) {
             for (int64_t i = 0; i < logical_m; i++) {
                 B[i * ldb + j] = alpha * A[j * lda + i];
@@ -2010,12 +2010,12 @@ void omatcopy_ref(oneapi::mkl::layout layout, oneapi::mkl::transpose trans, int6
 }
 
 template <typename fp>
-void omatcopy2_ref(oneapi::mkl::layout layout, oneapi::mkl::transpose trans, const int64_t& m,
+void omatcopy2_ref(oneapi::math::layout layout, oneapi::math::transpose trans, const int64_t& m,
                    const int64_t& n, const fp& alpha, const fp* in_matrix, const int64_t& ld_in,
                    const int64_t& inc_in, fp* out_matrix, const int64_t& ld_out,
                    const int64_t inc_out) {
     int64_t logical_m, logical_n;
-    if (layout == oneapi::mkl::layout::col_major) {
+    if (layout == oneapi::math::layout::col_major) {
         logical_m = m;
         logical_n = n;
     }
@@ -2023,7 +2023,7 @@ void omatcopy2_ref(oneapi::mkl::layout layout, oneapi::mkl::transpose trans, con
         logical_m = n;
         logical_n = m;
     }
-    if (trans == oneapi::mkl::transpose::trans) {
+    if (trans == oneapi::math::transpose::trans) {
         for (int64_t i = 0; i < logical_m; ++i) {
             for (int64_t j = 0; j < logical_n; ++j) {
                 {
@@ -2033,7 +2033,7 @@ void omatcopy2_ref(oneapi::mkl::layout layout, oneapi::mkl::transpose trans, con
             }
         }
     }
-    else if (trans == oneapi::mkl::transpose::nontrans) {
+    else if (trans == oneapi::math::transpose::nontrans) {
         for (int i = 0; i < logical_n; ++i) {
             for (int j = 0; j < logical_m; ++j) {
                 {
@@ -2056,10 +2056,10 @@ void omatcopy2_ref(oneapi::mkl::layout layout, oneapi::mkl::transpose trans, con
 }
 
 template <typename fp>
-void imatcopy_ref(oneapi::mkl::layout layout, oneapi::mkl::transpose trans, int64_t m, int64_t n,
+void imatcopy_ref(oneapi::math::layout layout, oneapi::math::transpose trans, int64_t m, int64_t n,
                   fp alpha, fp* A, int64_t lda, int64_t ldb) {
     int64_t logical_m, logical_n;
-    if (layout == oneapi::mkl::layout::col_major) {
+    if (layout == oneapi::math::layout::col_major) {
         logical_m = m;
         logical_n = n;
     }
@@ -2068,16 +2068,16 @@ void imatcopy_ref(oneapi::mkl::layout layout, oneapi::mkl::transpose trans, int6
         logical_n = m;
     }
     std::vector<fp> temp(m * n);
-    int64_t ld_temp = (trans == oneapi::mkl::transpose::nontrans ? logical_m : logical_n);
+    int64_t ld_temp = (trans == oneapi::math::transpose::nontrans ? logical_m : logical_n);
 
-    if (trans == oneapi::mkl::transpose::nontrans) {
+    if (trans == oneapi::math::transpose::nontrans) {
         for (int64_t j = 0; j < logical_n; j++) {
             for (int64_t i = 0; i < logical_m; i++) {
                 temp[j * ld_temp + i] = alpha * A[j * lda + i];
             }
         }
     }
-    else if (trans == oneapi::mkl::transpose::trans) {
+    else if (trans == oneapi::math::transpose::trans) {
         for (int64_t j = 0; j < logical_n; j++) {
             for (int64_t i = 0; i < logical_m; i++) {
                 temp[i * ld_temp + j] = alpha * A[j * lda + i];
@@ -2093,7 +2093,7 @@ void imatcopy_ref(oneapi::mkl::layout layout, oneapi::mkl::transpose trans, int6
         }
     }
 
-    if (trans == oneapi::mkl::transpose::nontrans) {
+    if (trans == oneapi::math::transpose::nontrans) {
         for (int64_t j = 0; j < logical_n; j++) {
             for (int64_t i = 0; i < logical_m; i++) {
                 A[j * ldb + i] = temp[j * ld_temp + i];
@@ -2110,11 +2110,11 @@ void imatcopy_ref(oneapi::mkl::layout layout, oneapi::mkl::transpose trans, int6
 }
 
 template <typename fp>
-void omatadd_ref(oneapi::mkl::layout layout, oneapi::mkl::transpose transa,
-                 oneapi::mkl::transpose transb, int64_t m, int64_t n, fp alpha, fp* A, int64_t lda,
+void omatadd_ref(oneapi::math::layout layout, oneapi::math::transpose transa,
+                 oneapi::math::transpose transb, int64_t m, int64_t n, fp alpha, fp* A, int64_t lda,
                  fp beta, fp* B, int64_t ldb, fp* C, int64_t ldc) {
     int64_t logical_m, logical_n;
-    if (layout == oneapi::mkl::layout::col_major) {
+    if (layout == oneapi::math::layout::col_major) {
         logical_m = m;
         logical_n = n;
     }
@@ -2129,14 +2129,14 @@ void omatadd_ref(oneapi::mkl::layout layout, oneapi::mkl::transpose transa,
         }
     }
 
-    if (transa == oneapi::mkl::transpose::nontrans) {
+    if (transa == oneapi::math::transpose::nontrans) {
         for (int64_t j = 0; j < logical_n; j++) {
             for (int64_t i = 0; i < logical_m; i++) {
                 C[j * ldc + i] += alpha * A[j * lda + i];
             }
         }
     }
-    else if (transa == oneapi::mkl::transpose::trans) {
+    else if (transa == oneapi::math::transpose::trans) {
         for (int64_t j = 0; j < logical_n; j++) {
             for (int64_t i = 0; i < logical_m; i++) {
                 C[j * ldc + i] += alpha * A[i * lda + j];
@@ -2152,14 +2152,14 @@ void omatadd_ref(oneapi::mkl::layout layout, oneapi::mkl::transpose transa,
         }
     }
 
-    if (transb == oneapi::mkl::transpose::nontrans) {
+    if (transb == oneapi::math::transpose::nontrans) {
         for (int64_t j = 0; j < logical_n; j++) {
             for (int64_t i = 0; i < logical_m; i++) {
                 C[j * ldc + i] += beta * B[j * ldb + i];
             }
         }
     }
-    else if (transb == oneapi::mkl::transpose::trans) {
+    else if (transb == oneapi::math::transpose::trans) {
         for (int64_t j = 0; j < logical_n; j++) {
             for (int64_t i = 0; i < logical_m; i++) {
                 C[j * ldc + i] += beta * B[i * ldb + j];

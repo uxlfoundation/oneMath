@@ -17,16 +17,16 @@
 * SPDX-License-Identifier: Apache-2.0
 *******************************************************************************/
 
-#ifndef _ONEMKL_DFT_SRC_MKLCPU_HELPERS_HPP_
-#define _ONEMKL_DFT_SRC_MKLCPU_HELPERS_HPP_
+#ifndef _ONEMATH_DFT_SRC_MKLCPU_HELPERS_HPP_
+#define _ONEMATH_DFT_SRC_MKLCPU_HELPERS_HPP_
 
-#include "oneapi/mkl/exceptions.hpp"
-#include "oneapi/mkl/dft/detail/types_impl.hpp"
+#include "oneapi/math/exceptions.hpp"
+#include "oneapi/math/dft/detail/types_impl.hpp"
 
-// MKLCPU header
-#include "mkl_dfti.h"
+// Intel(R) oneMKL header
+#include <mkl_dfti.h>
 
-namespace oneapi::mkl::dft::mklcpu::detail {
+namespace oneapi::math::dft::mklcpu::detail {
 
 template <typename K, typename H, typename F>
 static inline auto host_task_internal(H& cgh, F f, int) -> decltype(cgh.host_task(f)) {
@@ -82,8 +82,8 @@ inline constexpr DFTI_CONFIG_PARAM to_mklcpu(dft::detail::config_param param) {
         case iparam::PACKED_FORMAT: return DFTI_PACKED_FORMAT;
         case iparam::COMMIT_STATUS: return DFTI_COMMIT_STATUS;
         default:
-            throw mkl::invalid_argument("dft", "MKLCPU descriptor set_value()",
-                                        "Invalid config param.");
+            throw math::invalid_argument("dft", "MKLCPU descriptor set_value()",
+                                         "Invalid config param.");
             return static_cast<DFTI_CONFIG_PARAM>(0);
     }
 }
@@ -105,8 +105,8 @@ inline constexpr int to_mklcpu<dft::detail::config_param::COMPLEX_STORAGE>(
         return DFTI_REAL_REAL;
     }
     else {
-        throw mkl::invalid_argument("dft", "MKLCPU descriptor set_value()",
-                                    "Invalid config value for complex storage.");
+        throw math::invalid_argument("dft", "MKLCPU descriptor set_value()",
+                                     "Invalid config value for complex storage.");
         return 0;
     }
 }
@@ -118,8 +118,8 @@ inline constexpr int to_mklcpu<dft::detail::config_param::REAL_STORAGE>(
         return DFTI_REAL_REAL;
     }
     else {
-        throw mkl::invalid_argument("dft", "MKLCPU descriptor set_value()",
-                                    "Invalid config value for real storage.");
+        throw math::invalid_argument("dft", "MKLCPU descriptor set_value()",
+                                     "Invalid config value for real storage.");
         return 0;
     }
 }
@@ -130,8 +130,8 @@ inline constexpr int to_mklcpu<dft::detail::config_param::CONJUGATE_EVEN_STORAGE
         return DFTI_COMPLEX_COMPLEX;
     }
     else {
-        throw mkl::invalid_argument("dft", "MKLCPU descriptor set_value()",
-                                    "Invalid config value for conjugate even storage.");
+        throw math::invalid_argument("dft", "MKLCPU descriptor set_value()",
+                                     "Invalid config value for conjugate even storage.");
         return 0;
     }
 }
@@ -146,8 +146,8 @@ inline constexpr int to_mklcpu<dft::detail::config_param::PLACEMENT>(
         return DFTI_NOT_INPLACE;
     }
     else {
-        throw mkl::invalid_argument("dft", "MKLCPU descriptor set_value()",
-                                    "Invalid config value for inplace.");
+        throw math::invalid_argument("dft", "MKLCPU descriptor set_value()",
+                                     "Invalid config value for inplace.");
         return 0;
     }
 }
@@ -159,8 +159,8 @@ inline constexpr int to_mklcpu<dft::detail::config_param::PACKED_FORMAT>(
         return DFTI_CCE_FORMAT;
     }
     else {
-        throw mkl::invalid_argument("dft", "MKLCPU descriptor set_value()",
-                                    "Invalid config value for packed format.");
+        throw math::invalid_argument("dft", "MKLCPU descriptor set_value()",
+                                     "Invalid config value for packed format.");
         return 0;
     }
 }
@@ -173,6 +173,6 @@ typename AccType::value_type* acc_to_ptr(AccType acc) {
     return acc.template get_multi_ptr<sycl::access::decorated::no>().get();
 }
 
-} // namespace oneapi::mkl::dft::mklcpu::detail
+} // namespace oneapi::math::dft::mklcpu::detail
 
-#endif // _ONEMKL_DFT_SRC_MKLCPU_HELPERS_HPP_
+#endif // _ONEMATH_DFT_SRC_MKLCPU_HELPERS_HPP_

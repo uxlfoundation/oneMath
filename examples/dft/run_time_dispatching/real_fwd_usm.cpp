@@ -21,14 +21,14 @@
 #include <iostream>
 #include <cstdint>
 
-// oneMKL/SYCL includes
+// oneMath/SYCL includes
 #if __has_include(<sycl/sycl.hpp>)
 #include <sycl/sycl.hpp>
 #else
 #include <CL/sycl.hpp>
 #endif
 
-#include "oneapi/mkl.hpp"
+#include "oneapi/math.hpp"
 
 void run_example(const sycl::device& dev) {
     constexpr std::size_t N = 16;
@@ -53,21 +53,21 @@ void run_example(const sycl::device& dev) {
     auto x_usm = sycl::malloc_shared<float>(N * 2, sycl_queue);
 
     // 1. create descriptors
-    oneapi::mkl::dft::descriptor<oneapi::mkl::dft::precision::SINGLE,
-                                 oneapi::mkl::dft::domain::REAL>
+    oneapi::math::dft::descriptor<oneapi::math::dft::precision::SINGLE,
+                                  oneapi::math::dft::domain::REAL>
         desc(static_cast<std::int64_t>(N));
 
     // 2. variadic set_value
-    desc.set_value(oneapi::mkl::dft::config_param::NUMBER_OF_TRANSFORMS,
+    desc.set_value(oneapi::math::dft::config_param::NUMBER_OF_TRANSFORMS,
                    static_cast<std::int64_t>(1));
-    desc.set_value(oneapi::mkl::dft::config_param::PLACEMENT,
-                   oneapi::mkl::dft::config_value::INPLACE);
+    desc.set_value(oneapi::math::dft::config_param::PLACEMENT,
+                   oneapi::math::dft::config_value::INPLACE);
 
     // 3. commit_descriptor (runtime dispatch)
     desc.commit(sycl_queue);
 
     // 4. compute_forward / compute_backward (runtime dispatch)
-    auto compute_event = oneapi::mkl::dft::compute_forward(desc, x_usm);
+    auto compute_event = oneapi::math::dft::compute_forward(desc, x_usm);
 
     // Do something with transformed data.
     compute_event.wait();
@@ -122,7 +122,7 @@ int main(int /*argc*/, char** /*argv*/) {
         run_example(my_dev);
         std::cout << "DFT example ran OK" << std::endl;
     }
-    catch (oneapi::mkl::unimplemented const& e) {
+    catch (oneapi::math::unimplemented const& e) {
         std::cerr << "Unsupported Configuration:" << std::endl;
         std::cerr << "\t" << e.what() << std::endl;
         return 0;

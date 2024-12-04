@@ -1,5 +1,5 @@
 /*******************************************************************************
-* Copyright 2021-2022 Intel Corporation
+* Copyright 2024 Intel Corporation
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -17,21 +17,15 @@
 * SPDX-License-Identifier: Apache-2.0
 *******************************************************************************/
 
-#pragma once
+#ifndef ONEMATH_MKL_LAPACK_HPP
+#define ONEMATH_MKL_LAPACK_HPP
 
-#include "oneapi/mkl/detail/config.hpp"
+// Deprecated header is planned to be removed late 2025.
+#pragma message( \
+    "Header `oneapi/mkl/lapack.hpp` is deprecated, please use `oneapi/math/lapack.hpp` instead")
 
-#ifdef ONEMKL_ENABLE_MKLCPU_BACKEND
-#include "oneapi/mkl/lapack/detail/mklcpu/lapack_ct.hpp"
-#endif
-#ifdef ONEMKL_ENABLE_MKLGPU_BACKEND
-#include "oneapi/mkl/lapack/detail/mklgpu/lapack_ct.hpp"
-#endif
-#ifdef ONEMKL_ENABLE_CUSOLVER_BACKEND
-#include "oneapi/mkl/lapack/detail/cusolver/lapack_ct.hpp"
-#endif
-#ifdef ONEMKL_ENABLE_ROCSOLVER_BACKEND
-#include "oneapi/mkl/lapack/detail/rocsolver/lapack_ct.hpp"
-#endif
+#include "oneapi/math/lapack.hpp"
 
-#include "oneapi/mkl/lapack/detail/lapack_rt.hpp"
+#include "namespace_alias.hpp"
+
+#endif // ONEMATH_MKL_LAPACK_HPP

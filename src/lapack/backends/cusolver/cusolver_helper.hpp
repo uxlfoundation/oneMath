@@ -33,18 +33,18 @@
 #include <cuda.h>
 #include <complex>
 
-#include "oneapi/mkl/types.hpp"
+#include "oneapi/math/types.hpp"
 #include "runtime_support_helper.hpp"
-#include "oneapi/mkl/exceptions.hpp"
-#include "oneapi/mkl/lapack/exceptions.hpp"
+#include "oneapi/math/exceptions.hpp"
+#include "oneapi/math/lapack/exceptions.hpp"
 
 namespace oneapi {
-namespace mkl {
+namespace math {
 namespace lapack {
 namespace cusolver {
 
 // The static assert to make sure that all index types used in
-// oneMKL/include/oneapi/mkl/lapack.hpp interface are int64_t
+// oneMath/include/oneapi/math/lapack.hpp interface are int64_t
 template <typename... Next>
 struct is_int64 : std::false_type {};
 
@@ -76,7 +76,7 @@ struct Overflow<Index, T...> {
 
 template <typename Index, typename... Next>
 void overflow_check(Index index, Next... indices) {
-    static_assert(is_int64<Index, Next...>::value, "oneMKL index type must be 64 bit integer.");
+    static_assert(is_int64<Index, Next...>::value, "oneMath index type must be 64 bit integer.");
     Overflow<Index, Next...>::check(index, indices...);
 }
 
@@ -219,52 +219,52 @@ inline cusolverEigType_t get_cusolver_itype(std::int64_t itype) {
     }
 }
 
-inline cusolverEigMode_t get_cusolver_job(oneapi::mkl::job jobz) {
+inline cusolverEigMode_t get_cusolver_job(oneapi::math::job jobz) {
     switch (jobz) {
-        case oneapi::mkl::job::N: return CUSOLVER_EIG_MODE_NOVECTOR;
-        case oneapi::mkl::job::V: return CUSOLVER_EIG_MODE_VECTOR;
+        case oneapi::math::job::N: return CUSOLVER_EIG_MODE_NOVECTOR;
+        case oneapi::math::job::V: return CUSOLVER_EIG_MODE_VECTOR;
         default: throw "Wrong jobz.";
     }
 }
 
-inline signed char get_cusolver_jobsvd(oneapi::mkl::jobsvd job) {
+inline signed char get_cusolver_jobsvd(oneapi::math::jobsvd job) {
     switch (job) {
-        case oneapi::mkl::jobsvd::N: return 'N';
-        case oneapi::mkl::jobsvd::A: return 'A';
-        case oneapi::mkl::jobsvd::O: return 'O';
-        case oneapi::mkl::jobsvd::S: return 'S';
+        case oneapi::math::jobsvd::N: return 'N';
+        case oneapi::math::jobsvd::A: return 'A';
+        case oneapi::math::jobsvd::O: return 'O';
+        case oneapi::math::jobsvd::S: return 'S';
     }
 }
 
-inline cublasOperation_t get_cublas_operation(oneapi::mkl::transpose trn) {
+inline cublasOperation_t get_cublas_operation(oneapi::math::transpose trn) {
     switch (trn) {
-        case oneapi::mkl::transpose::nontrans: return CUBLAS_OP_N;
-        case oneapi::mkl::transpose::trans: return CUBLAS_OP_T;
-        case oneapi::mkl::transpose::conjtrans: return CUBLAS_OP_C;
+        case oneapi::math::transpose::nontrans: return CUBLAS_OP_N;
+        case oneapi::math::transpose::trans: return CUBLAS_OP_T;
+        case oneapi::math::transpose::conjtrans: return CUBLAS_OP_C;
         default: throw "Wrong transpose Operation.";
     }
 }
 
-inline cublasFillMode_t get_cublas_fill_mode(oneapi::mkl::uplo ul) {
+inline cublasFillMode_t get_cublas_fill_mode(oneapi::math::uplo ul) {
     switch (ul) {
-        case oneapi::mkl::uplo::upper: return CUBLAS_FILL_MODE_UPPER;
-        case oneapi::mkl::uplo::lower: return CUBLAS_FILL_MODE_LOWER;
+        case oneapi::math::uplo::upper: return CUBLAS_FILL_MODE_UPPER;
+        case oneapi::math::uplo::lower: return CUBLAS_FILL_MODE_LOWER;
         default: throw "Wrong fill mode.";
     }
 }
 
-inline cublasSideMode_t get_cublas_side_mode(oneapi::mkl::side lr) {
+inline cublasSideMode_t get_cublas_side_mode(oneapi::math::side lr) {
     switch (lr) {
-        case oneapi::mkl::side::left: return CUBLAS_SIDE_LEFT;
-        case oneapi::mkl::side::right: return CUBLAS_SIDE_RIGHT;
+        case oneapi::math::side::left: return CUBLAS_SIDE_LEFT;
+        case oneapi::math::side::right: return CUBLAS_SIDE_RIGHT;
         default: throw "Wrong side mode.";
     }
 }
 
-inline cublasSideMode_t get_cublas_generate(oneapi::mkl::generate qp) {
+inline cublasSideMode_t get_cublas_generate(oneapi::math::generate qp) {
     switch (qp) {
-        case oneapi::mkl::generate::Q: return CUBLAS_SIDE_LEFT;
-        case oneapi::mkl::generate::P: return CUBLAS_SIDE_RIGHT;
+        case oneapi::math::generate::Q: return CUBLAS_SIDE_LEFT;
+        case oneapi::math::generate::P: return CUBLAS_SIDE_RIGHT;
         default: throw "Wrong generate.";
     }
 }
@@ -310,7 +310,7 @@ inline void lapack_info_check(sycl::queue& queue, DEVINFO_T devinfo, const char*
     get_cusolver_devinfo(queue, devinfo, dev_info_);
     for (const auto& val : dev_info_) {
         if (val > 0)
-            throw oneapi::mkl::lapack::computation_error(
+            throw oneapi::math::lapack::computation_error(
                 func_name, std::string(cufunc_name) + " failed with info = " + std::to_string(val),
                 val);
     }
@@ -331,6 +331,6 @@ T** create_ptr_list_from_stride(T* ptr, int64_t ptr_stride, int64_t batch_size) 
 
 } // namespace cusolver
 } // namespace lapack
-} // namespace mkl
+} // namespace math
 } // namespace oneapi
 #endif // _CUSOLVER_HELPER_HPP_

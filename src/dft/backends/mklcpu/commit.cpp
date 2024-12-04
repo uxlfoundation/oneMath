@@ -23,22 +23,24 @@
 #include <CL/sycl.hpp>
 #endif
 
-#include "oneapi/mkl/types.hpp"
-#include "oneapi/mkl/detail/backends.hpp"
-#include "oneapi/mkl/dft/types.hpp"
-#include "oneapi/mkl/dft/descriptor.hpp"
+#include "oneapi/math/types.hpp"
+#include "oneapi/math/detail/backends.hpp"
+#include "oneapi/math/dft/types.hpp"
+#include "oneapi/math/dft/descriptor.hpp"
 
-#include "oneapi/mkl/dft/detail/mklcpu/onemkl_dft_mklcpu.hpp"
+#include "oneapi/math/dft/detail/mklcpu/onemath_dft_mklcpu.hpp"
 
-#include "oneapi/mkl/dft/detail/commit_impl.hpp"
+#include "oneapi/math/dft/detail/commit_impl.hpp"
 
 #include "dft/backends/mklcpu/commit_derived_impl.hpp"
 #include "../stride_helper.hpp"
-#include "mkl_service.h"
-#include "mkl_dfti.h"
+
+// Intel(R) oneMKL header
+#include <mkl_dfti.h>
+#include <mkl_service.h>
 
 namespace oneapi {
-namespace mkl {
+namespace math {
 namespace dft {
 namespace mklcpu {
 namespace detail {
@@ -46,7 +48,7 @@ namespace detail {
 template <dft::detail::precision prec, dft::detail::domain dom>
 commit_derived_impl<prec, dom>::commit_derived_impl(
     sycl::queue queue, const dft::detail::dft_values<prec, dom>& config_values)
-        : oneapi::mkl::dft::detail::commit_impl<prec, dom>(queue, backend::mklcpu, config_values) {
+        : oneapi::math::dft::detail::commit_impl<prec, dom>(queue, backend::mklcpu, config_values) {
     // create the descriptor once for the lifetime of the descriptor class
     DFT_ERROR status[2] = { DFTI_BAD_DESCRIPTOR, DFTI_BAD_DESCRIPTOR };
 
@@ -66,7 +68,7 @@ commit_derived_impl<prec, dom>::commit_derived_impl(
         std::string err = std::string("DftiCreateDescriptor failed with status : ") +
                           DftiErrorMessage(status[0]) + std::string(", ") +
                           DftiErrorMessage(status[1]);
-        throw oneapi::mkl::exception("dft/backends/mklcpu", "create_descriptor", err);
+        throw oneapi::math::exception("dft/backends/mklcpu", "create_descriptor", err);
     }
 }
 
@@ -81,9 +83,9 @@ template <dft::detail::precision prec, dft::detail::domain dom>
 void commit_derived_impl<prec, dom>::commit(
     const dft::detail::dft_values<prec, dom>& config_values) {
     this->external_workspace_helper_ =
-        oneapi::mkl::dft::detail::external_workspace_helper<prec, dom>(
+        oneapi::math::dft::detail::external_workspace_helper<prec, dom>(
             config_values.workspace_placement ==
-            oneapi::mkl::dft::detail::config_value::WORKSPACE_EXTERNAL);
+            oneapi::math::dft::detail::config_value::WORKSPACE_EXTERNAL);
     set_value(bidirection_handle.data(), config_values);
 
     this->get_queue()
@@ -104,7 +106,7 @@ void commit_derived_impl<prec, dom>::commit(
                     std::string err = std::string("DftiCommitDescriptor failed with status : ") +
                                       DftiErrorMessage(status[0]) + std::string(", ") +
                                       DftiErrorMessage(status[1]);
-                    throw oneapi::mkl::exception("dft/backends/mklcpu", "commit", err);
+                    throw oneapi::math::exception("dft/backends/mklcpu", "commit", err);
                 }
             });
         })
@@ -122,8 +124,8 @@ void commit_derived_impl<prec, dom>::set_value_item(mklcpu_desc_t hand, enum DFT
                                                     Args... args) {
     DFT_ERROR value_err = DftiSetValue(hand, name, args...);
     if (value_err != DFTI_NO_ERROR) {
-        throw oneapi::mkl::exception("dft/backends/mklcpu", "set_value_item",
-                                     DftiErrorMessage(value_err));
+        throw oneapi::math::exception("dft/backends/mklcpu", "set_value_item",
+                                      DftiErrorMessage(value_err));
     }
 }
 
@@ -166,18 +168,18 @@ void commit_derived_impl<prec, dom>::set_value(mklcpu_desc_t* descHandle,
                        to_mklcpu<config_param::PACKED_FORMAT>(config.packed_format));
         // Setting the workspace causes an FFT_INVALID_DESCRIPTOR.
         if (config.workspace != config_value::ALLOW) {
-            throw mkl::invalid_argument("dft/backends/mklcpu", "commit",
-                                        "MKLCPU only supports workspace set to allow");
+            throw math::invalid_argument("dft/backends/mklcpu", "commit",
+                                         "MKLCPU only supports workspace set to allow");
         }
         // Setting the ordering causes an FFT_INVALID_DESCRIPTOR. Check that default is used:
         if (config.ordering != dft::detail::config_value::ORDERED) {
-            throw mkl::invalid_argument("dft/backends/mklcpu", "commit",
-                                        "MKLCPU only supports ordered ordering.");
+            throw math::invalid_argument("dft/backends/mklcpu", "commit",
+                                         "MKLCPU only supports ordered ordering.");
         }
         // Setting the transpose causes an FFT_INVALID_DESCRIPTOR. Check that default is used:
         if (config.transpose != false) {
-            throw mkl::invalid_argument("dft/backends/mklcpu", "commit",
-                                        "MKLCPU only supports non-transposed.");
+            throw math::invalid_argument("dft/backends/mklcpu", "commit",
+                                         "MKLCPU only supports non-transposed.");
         }
     }
 }
@@ -208,5 +210,5 @@ create_commit(
 
 } // namespace mklcpu
 } // namespace dft
-} // namespace mkl
+} // namespace math
 } // namespace oneapi

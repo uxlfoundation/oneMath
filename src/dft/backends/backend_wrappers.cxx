@@ -26,7 +26,7 @@ To use this:
 #define WRAPPER_VERSION <Wrapper version number>
 #define BACKEND         <Backend name eg. mklgpu>
 
-extern "C" dft_function_table_t mkl_dft_table = {
+extern "C" dft_function_table_t onemath_dft_table = {
     WRAPPER_VERSION,
 #include "dft/backends/backend_wrappers.cxx"
 };
@@ -37,10 +37,10 @@ and backend_forward_instantiations.cxx.
 */
 
 // clang-format off
-oneapi::mkl::dft::BACKEND::create_commit,
-oneapi::mkl::dft::BACKEND::create_commit,
-oneapi::mkl::dft::BACKEND::create_commit,
-oneapi::mkl::dft::BACKEND::create_commit,
+oneapi::math::dft::BACKEND::create_commit,
+oneapi::math::dft::BACKEND::create_commit,
+oneapi::math::dft::BACKEND::create_commit,
+oneapi::math::dft::BACKEND::create_commit,
 // clang-format on
 
 #undef ONEAPI_MKL_DFT_BACKEND_SIGNATURES

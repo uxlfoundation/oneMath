@@ -20,7 +20,7 @@
 /*
 *
 *  Content:
-*       oneapi::mkl::rng::device:: distributions moments test (SYCL interface)
+*       oneapi::math::rng::device:: distributions moments test (SYCL interface)
 *
 *******************************************************************************/
 
@@ -35,7 +35,7 @@
 #include <CL/sycl.hpp>
 #endif
 
-#include "oneapi/mkl/rng/device.hpp"
+#include "oneapi/math/rng/device.hpp"
 
 #include "rng_device_test_common.hpp"
 
@@ -47,19 +47,20 @@ public:
         // Note: the following methods of discrete distributions require double precision support
         if ((std::is_same_v<
                  Distribution,
-                 oneapi::mkl::rng::device::uniform<
-                     std::uint32_t, oneapi::mkl::rng::device::uniform_method::accurate>> ||
+                 oneapi::math::rng::device::uniform<
+                     std::uint32_t, oneapi::math::rng::device::uniform_method::accurate>> ||
              std::is_same_v<
                  Distribution,
-                 oneapi::mkl::rng::device::uniform<
-                     std::int32_t, oneapi::mkl::rng::device::uniform_method::accurate>> ||
-             std::is_same_v<Distribution, oneapi::mkl::rng::device::poisson<
-                                              std::uint32_t,
-                                              oneapi::mkl::rng::device::poisson_method::devroye>> ||
+                 oneapi::math::rng::device::uniform<
+                     std::int32_t, oneapi::math::rng::device::uniform_method::accurate>> ||
              std::is_same_v<
                  Distribution,
-                 oneapi::mkl::rng::device::poisson<
-                     std::int32_t, oneapi::mkl::rng::device::poisson_method::devroye>>) &&
+                 oneapi::math::rng::device::poisson<
+                     std::uint32_t, oneapi::math::rng::device::poisson_method::devroye>> ||
+             std::is_same_v<
+                 Distribution,
+                 oneapi::math::rng::device::poisson<
+                     std::int32_t, oneapi::math::rng::device::poisson_method::devroye>>) &&
             !queue.get_device().has(sycl::aspect::fp64)) {
             status = test_skipped;
             return;
@@ -78,11 +79,11 @@ public:
                     size_t id = item.get_id(0);
                     auto multiplier = Engine::vec_size;
                     if constexpr (std::is_same_v<Distribution,
-                                                 oneapi::mkl::rng::device::uniform_bits<uint64_t>>)
+                                                 oneapi::math::rng::device::uniform_bits<uint64_t>>)
                         multiplier *= 2;
                     Engine engine(SEED, id * multiplier);
                     Distribution distr;
-                    auto res = oneapi::mkl::rng::device::generate(distr, engine);
+                    auto res = oneapi::math::rng::device::generate(distr, engine);
                     if constexpr (Engine::vec_size == 1) {
                         acc[id] = res;
                     }
@@ -93,7 +94,7 @@ public:
             });
             event.wait_and_throw();
         }
-        catch (const oneapi::mkl::unimplemented& e) {
+        catch (const oneapi::math::unimplemented& e) {
             status = test_skipped;
             return;
         }
@@ -107,7 +108,7 @@ public:
 
         // validation (statistics check is turned out for mcg59)
         if constexpr (!std::is_same<Engine,
-                                    oneapi::mkl::rng::device::mcg59<Engine::vec_size>>::value) {
+                                    oneapi::math::rng::device::mcg59<Engine::vec_size>>::value) {
             statistics_device<Distribution> stat;
             status = stat.check(r, Distribution{});
         }

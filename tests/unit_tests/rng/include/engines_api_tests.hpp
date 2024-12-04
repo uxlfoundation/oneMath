@@ -30,7 +30,7 @@
 #include <CL/sycl.hpp>
 #endif
 
-#include "oneapi/mkl.hpp"
+#include "oneapi/math.hpp"
 
 #include "rng_test_common.hpp"
 
@@ -52,20 +52,20 @@ public:
             Engine engine3(engine1);
             Engine engine4 = std::move(Engine(queue, SEED));
 
-            oneapi::mkl::rng::bits<std::uint32_t> distr;
+            oneapi::math::rng::bits<std::uint32_t> distr;
 
             sycl::buffer<std::uint32_t, 1> r1_buffer(r1.data(), r1.size());
             sycl::buffer<std::uint32_t, 1> r2_buffer(r2.data(), r2.size());
             sycl::buffer<std::uint32_t, 1> r3_buffer(r3.data(), r3.size());
             sycl::buffer<std::uint32_t, 1> r4_buffer(r4.data(), r4.size());
 
-            oneapi::mkl::rng::generate(distr, engine1, N_GEN, r1_buffer);
-            oneapi::mkl::rng::generate(distr, engine2, N_GEN, r2_buffer);
-            oneapi::mkl::rng::generate(distr, engine3, N_GEN, r3_buffer);
-            oneapi::mkl::rng::generate(distr, engine4, N_GEN, r4_buffer);
+            oneapi::math::rng::generate(distr, engine1, N_GEN, r1_buffer);
+            oneapi::math::rng::generate(distr, engine2, N_GEN, r2_buffer);
+            oneapi::math::rng::generate(distr, engine3, N_GEN, r3_buffer);
+            oneapi::math::rng::generate(distr, engine4, N_GEN, r4_buffer);
             QUEUE_WAIT(queue);
         }
-        catch (const oneapi::mkl::unimplemented& e) {
+        catch (const oneapi::math::unimplemented& e) {
             status = test_skipped;
             return;
         }
@@ -99,13 +99,13 @@ public:
             Engine engine1(queue, SEED);
             Engine engine2(engine1);
 
-            oneapi::mkl::rng::bits<std::uint32_t> distr;
+            oneapi::math::rng::bits<std::uint32_t> distr;
             {
                 sycl::buffer<std::uint32_t, 1> r1_buffer(r1.data(), r1.size());
                 sycl::buffer<std::uint32_t, 1> r2_buffer(r2.data(), r2.size());
 
-                oneapi::mkl::rng::generate(distr, engine1, N_GEN, r1_buffer);
-                oneapi::mkl::rng::generate(distr, engine2, N_GEN, r2_buffer);
+                oneapi::math::rng::generate(distr, engine1, N_GEN, r1_buffer);
+                oneapi::math::rng::generate(distr, engine2, N_GEN, r2_buffer);
             }
 
             Engine engine3 = engine1;
@@ -115,13 +115,13 @@ public:
                 sycl::buffer<std::uint32_t, 1> r2_buffer(r2.data(), r2.size());
                 sycl::buffer<std::uint32_t, 1> r3_buffer(r3.data(), r3.size());
 
-                oneapi::mkl::rng::generate(distr, engine1, N_GEN, r1_buffer);
-                oneapi::mkl::rng::generate(distr, engine3, N_GEN, r2_buffer);
-                oneapi::mkl::rng::generate(distr, engine4, N_GEN, r3_buffer);
+                oneapi::math::rng::generate(distr, engine1, N_GEN, r1_buffer);
+                oneapi::math::rng::generate(distr, engine3, N_GEN, r2_buffer);
+                oneapi::math::rng::generate(distr, engine4, N_GEN, r3_buffer);
             }
             QUEUE_WAIT(queue);
         }
-        catch (const oneapi::mkl::unimplemented& e) {
+        catch (const oneapi::math::unimplemented& e) {
             status = test_skipped;
             return;
         }

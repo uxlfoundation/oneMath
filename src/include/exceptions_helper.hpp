@@ -23,14 +23,14 @@
 #include <stdexcept>
 
 namespace oneapi {
-namespace mkl {
+namespace math {
 
 class backend_unsupported_exception : public std::runtime_error {
 public:
     backend_unsupported_exception() : std::runtime_error("Not yet supported for this backend") {}
 };
 
-} // namespace mkl
+} // namespace math
 } // namespace oneapi
 
 #endif // __EXCEPTIONS_HELPER_HPP

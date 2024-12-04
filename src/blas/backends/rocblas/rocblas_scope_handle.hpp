@@ -29,8 +29,8 @@
 // After Plugin Interface removal in DPC++ ur.hpp is the new include
 #if __has_include(<sycl/detail/ur.hpp>)
 #include <sycl/detail/ur.hpp>
-#ifndef ONEMKL_PI_INTERFACE_REMOVED
-#define ONEMKL_PI_INTERFACE_REMOVED
+#ifndef ONEMATH_PI_INTERFACE_REMOVED
+#define ONEMATH_PI_INTERFACE_REMOVED
 #endif
 #elif __has_include(<sycl/detail/pi.hpp>)
 #include <sycl/detail/pi.hpp>
@@ -39,7 +39,7 @@
 #endif
 
 namespace oneapi {
-namespace mkl {
+namespace math {
 namespace blas {
 namespace rocblas {
 
@@ -55,7 +55,7 @@ class RocblasScopedContextHandler {
     sycl::context* placedContext_;
     bool needToRecover_;
     sycl::interop_handle& interop_h;
-#ifdef ONEMKL_PI_INTERFACE_REMOVED
+#ifdef ONEMATH_PI_INTERFACE_REMOVED
     static thread_local rocblas_handle_container<ur_context_handle_t> handle_helper;
 #else
     static thread_local rocblas_handle_container<pi_context> handle_helper;
@@ -79,6 +79,6 @@ public:
 
 } // namespace rocblas
 } // namespace blas
-} // namespace mkl
+} // namespace math
 } // namespace oneapi
 #endif //_ROCBLAS_SCOPED_HANDLE_HPP_

@@ -17,8 +17,8 @@
 *
 **************************************************************************/
 
-#ifndef ONEMKL_PARSEVAL_CHECK_HPP
-#define ONEMKL_PARSEVAL_CHECK_HPP
+#ifndef ONEMATH_PARSEVAL_CHECK_HPP
+#define ONEMATH_PARSEVAL_CHECK_HPP
 
 #include <algorithm>
 #include <cmath>
@@ -78,4 +78,4 @@ bool parseval_check(std::size_t dft_len, const TypeFwd* in, TypeBwd* out,
     }
     return true;
 }
-#endif // ONEMKL_PARSEVAL_CHECK_HPP
+#endif // ONEMATH_PARSEVAL_CHECK_HPP

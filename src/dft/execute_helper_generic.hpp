@@ -17,8 +17,8 @@
 * SPDX-License-Identifier: Apache-2.0
 *******************************************************************************/
 
-#ifndef _ONEMKL_DFT_SRC_EXECUTE_HELPER_GENERIC_HPP_
-#define _ONEMKL_DFT_SRC_EXECUTE_HELPER_GENERIC_HPP_
+#ifndef _ONEMATH_DFT_SRC_EXECUTE_HELPER_GENERIC_HPP_
+#define _ONEMATH_DFT_SRC_EXECUTE_HELPER_GENERIC_HPP_
 
 #if __has_include(<sycl/sycl.hpp>)
 #include <sycl/sycl.hpp>
@@ -26,7 +26,7 @@
 #include <CL/sycl.hpp>
 #endif
 
-namespace oneapi::mkl::dft::detail {
+namespace oneapi::math::dft::detail {
 
 /** Wrap interop API to launch interop host task.
  * 
@@ -48,6 +48,6 @@ static inline void fft_enqueue_task(HandlerT&& cgh, FnT&& f) {
     });
 }
 
-} // namespace oneapi::mkl::dft::detail
+} // namespace oneapi::math::dft::detail
 
-#endif // _ONEMKL_DFT_SRC_EXECUTE_HELPER_GENERIC_HPP_
+#endif // _ONEMATH_DFT_SRC_EXECUTE_HELPER_GENERIC_HPP_

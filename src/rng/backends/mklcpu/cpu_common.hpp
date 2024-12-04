@@ -27,7 +27,7 @@
 #endif
 
 namespace oneapi {
-namespace mkl {
+namespace math {
 namespace rng {
 namespace mklcpu {
 
@@ -68,7 +68,7 @@ typename Acc::value_type* get_raw_ptr(Acc acc) {
 
 } // namespace mklcpu
 } // namespace rng
-} // namespace mkl
+} // namespace math
 } // namespace oneapi
 
 #endif //_RNG_CPU_COMMON_HPP_

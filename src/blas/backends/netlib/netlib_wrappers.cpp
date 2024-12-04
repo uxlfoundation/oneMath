@@ -18,11 +18,11 @@
 *******************************************************************************/
 
 #include "blas/function_table.hpp"
-#include "oneapi/mkl/blas/detail/netlib/onemkl_blas_netlib.hpp"
+#include "oneapi/math/blas/detail/netlib/onemath_blas_netlib.hpp"
 
 #define WRAPPER_VERSION 1
 
-extern "C" ONEMKL_EXPORT blas_function_table_t mkl_blas_table = {
+extern "C" ONEMATH_EXPORT blas_function_table_t onemath_blas_table = {
     WRAPPER_VERSION,
 #define BACKEND netlib
 #define MAJOR   column_major

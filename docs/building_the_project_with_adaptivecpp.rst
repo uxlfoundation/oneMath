@@ -16,26 +16,26 @@ Environment Setup
 
 #. 
    Clone this project. The root directory of the cloned repository will be
-   referred to as ``<path to onemkl>``.
+   referred to as ``<path to onemath>``.
 
 #. 
    Download and install the `required dependencies
-   <https://github.com/oneapi-src/oneMKL?tab=readme-ov-file#software-requirements>`_
+   <https://github.com/uxlfoundation/oneMath?tab=readme-ov-file#software-requirements>`_
    manually.
 
 Build Commands
 ###############
 
-In most cases, building oneMKL Interfaces is as simple as setting the compiler and
+In most cases, building oneMath is as simple as setting the compiler and
 selecting the desired backends to build with.
 
 On Linux (other OSes are not supported with the AdaptiveCpp compiler):
 
 .. code-block:: bash
 
-  # Inside <path to onemkl>
+  # Inside <path to onemath>
   mkdir build && cd build
-  cmake .. -DONEMKL_SYCL_IMPLEMENTATION=hipsycl    \ # Indicate that AdaptiveCpp is being used.
+  cmake .. -DONEMATH_SYCL_IMPLEMENTATION=hipsycl   \ # Indicate that AdaptiveCpp is being used.
           -DENABLE_MKLGPU_BACKEND=False            \ # MKLGPU backend is not supported by AdaptiveCpp
           -DENABLE_<BACKEND_NAME>_BACKEND=True     \ # Enable backend(s) (optional)
           -DENABLE_<BACKEND_NAME_2>_BACKEND=True   \ # Multiple backends can be enabled at once.
@@ -48,9 +48,9 @@ On Linux (other OSes are not supported with the AdaptiveCpp compiler):
 Backends should be enabled by setting ``-DENABLE_<BACKEND_NAME>_BACKEND=True`` for
 each desired backend. By default, the ``MKLGPU`` and ``MKLCPU`` backends are
 enabled, but ``MKLGPU`` must be disabled with AdaptiveCpp. The supported
-backends for the compilers are given in the table at `oneMKL supported
+backends for the compilers are given in the table at `oneMath supported
 configurations table
-<https://github.com/oneapi-src/oneMKL?tab=readme-ov-file#supported-configurations>`_,
+<https://github.com/uxlfoundation/oneMath?tab=readme-ov-file#supported-configurations>`_,
 and the CMake option names are given in the table below. Some backends may
 require additional parameters to be set. See the relevant section below for
 additional guidance. The target architectures must be specified with

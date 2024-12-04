@@ -29,9 +29,9 @@
 #include <CL/sycl.hpp>
 #endif
 #include "cblas.h"
-#include "oneapi/mkl/detail/config.hpp"
-#include "oneapi/mkl.hpp"
-#include "onemkl_blas_helper.hpp"
+#include "oneapi/math/detail/config.hpp"
+#include "oneapi/math.hpp"
+#include "onemath_blas_helper.hpp"
 #include "reference_blas_templates.hpp"
 #include "test_common.hpp"
 #include "test_helper.hpp"
@@ -45,7 +45,7 @@ extern std::vector<sycl::device*> devices;
 
 namespace {
 
-int test(device* dev, oneapi::mkl::layout layout, int N, int incx, int incy, float alpha) {
+int test(device* dev, oneapi::math::layout layout, int N, int incx, int incy, float alpha) {
     // Prepare data.
     vector<float> x, y;
     float result = float(-1), result_ref = float(-1);
@@ -84,24 +84,24 @@ int test(device* dev, oneapi::mkl::layout layout, int N, int incx, int incy, flo
     try {
 #ifdef CALL_RT_API
         switch (layout) {
-            case oneapi::mkl::layout::col_major:
-                oneapi::mkl::blas::column_major::sdsdot(main_queue, N, alpha, x_buffer, incx,
-                                                        y_buffer, incy, result_buffer);
+            case oneapi::math::layout::col_major:
+                oneapi::math::blas::column_major::sdsdot(main_queue, N, alpha, x_buffer, incx,
+                                                         y_buffer, incy, result_buffer);
                 break;
-            case oneapi::mkl::layout::row_major:
-                oneapi::mkl::blas::row_major::sdsdot(main_queue, N, alpha, x_buffer, incx, y_buffer,
-                                                     incy, result_buffer);
+            case oneapi::math::layout::row_major:
+                oneapi::math::blas::row_major::sdsdot(main_queue, N, alpha, x_buffer, incx,
+                                                      y_buffer, incy, result_buffer);
                 break;
             default: break;
         }
 #else
         switch (layout) {
-            case oneapi::mkl::layout::col_major:
-                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::mkl::blas::column_major::sdsdot, N,
+            case oneapi::math::layout::col_major:
+                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::math::blas::column_major::sdsdot, N,
                                         alpha, x_buffer, incx, y_buffer, incy, result_buffer);
                 break;
-            case oneapi::mkl::layout::row_major:
-                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::mkl::blas::row_major::sdsdot, N, alpha,
+            case oneapi::math::layout::row_major:
+                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::math::blas::row_major::sdsdot, N, alpha,
                                         x_buffer, incx, y_buffer, incy, result_buffer);
                 break;
             default: break;
@@ -113,7 +113,7 @@ int test(device* dev, oneapi::mkl::layout layout, int N, int incx, int incy, flo
         print_error_code(e);
     }
 
-    catch (const oneapi::mkl::unimplemented& e) {
+    catch (const oneapi::math::unimplemented& e) {
         return test_skipped;
     }
 
@@ -130,7 +130,7 @@ int test(device* dev, oneapi::mkl::layout layout, int N, int incx, int incy, flo
 }
 
 class SdsdotTests
-        : public ::testing::TestWithParam<std::tuple<sycl::device*, oneapi::mkl::layout>> {};
+        : public ::testing::TestWithParam<std::tuple<sycl::device*, oneapi::math::layout>> {};
 
 TEST_P(SdsdotTests, RealSinglePrecision) {
     CHECK_DOUBLE_ON_DEVICE(std::get<0>(GetParam()));
@@ -141,8 +141,8 @@ TEST_P(SdsdotTests, RealSinglePrecision) {
 
 INSTANTIATE_TEST_SUITE_P(SdsdotTestSuite, SdsdotTests,
                          ::testing::Combine(testing::ValuesIn(devices),
-                                            testing::Values(oneapi::mkl::layout::col_major,
-                                                            oneapi::mkl::layout::row_major)),
+                                            testing::Values(oneapi::math::layout::col_major,
+                                                            oneapi::math::layout::row_major)),
                          ::LayoutDeviceNamePrint());
 
 } // anonymous namespace

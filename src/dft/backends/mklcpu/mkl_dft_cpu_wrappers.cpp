@@ -17,13 +17,13 @@
 * SPDX-License-Identifier: Apache-2.0
 *******************************************************************************/
 
-#include "oneapi/mkl/dft/detail/mklcpu/onemkl_dft_mklcpu.hpp"
+#include "oneapi/math/dft/detail/mklcpu/onemath_dft_mklcpu.hpp"
 #include "dft/function_table.hpp"
 
 #define WRAPPER_VERSION 1
 #define BACKEND         mklcpu
 
-extern "C" dft_function_table_t mkl_dft_table = {
+extern "C" dft_function_table_t onemath_dft_table = {
     WRAPPER_VERSION,
 #include "dft/backends/backend_wrappers.cxx"
 };

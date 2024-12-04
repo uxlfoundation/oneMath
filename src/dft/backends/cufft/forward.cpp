@@ -24,18 +24,18 @@
 #include <CL/sycl.hpp>
 #endif
 
-#include "oneapi/mkl/exceptions.hpp"
+#include "oneapi/math/exceptions.hpp"
 
-#include "oneapi/mkl/dft/detail/commit_impl.hpp"
-#include "oneapi/mkl/dft/detail/cufft/onemkl_dft_cufft.hpp"
-#include "oneapi/mkl/dft/types.hpp"
+#include "oneapi/math/dft/detail/commit_impl.hpp"
+#include "oneapi/math/dft/detail/cufft/onemath_dft_cufft.hpp"
+#include "oneapi/math/dft/types.hpp"
 
 #include "execute_helper.hpp"
 #include "../../execute_helper_generic.hpp"
 
 #include <cufft.h>
 
-namespace oneapi::mkl::dft::cufft {
+namespace oneapi::math::dft::cufft {
 
 namespace detail {
 //forward declaration
@@ -52,8 +52,8 @@ cufftHandle get_fwd_plan(dft::detail::commit_impl<prec, dom>* commit) {
 
 //In-place transform
 template <typename descriptor_type>
-ONEMKL_EXPORT void compute_forward(descriptor_type& desc,
-                                   sycl::buffer<fwd<descriptor_type>, 1>& inout) {
+ONEMATH_EXPORT void compute_forward(descriptor_type& desc,
+                                    sycl::buffer<fwd<descriptor_type>, 1>& inout) {
     const std::string func_name = "compute_forward(desc, inout)";
     detail::expect_config<dft::config_param::PLACEMENT, dft::config_value::INPLACE>(
         desc, "Unexpected value for placement");
@@ -64,7 +64,7 @@ ONEMKL_EXPORT void compute_forward(descriptor_type& desc,
 
     if constexpr (std::is_floating_point_v<fwd<descriptor_type>>) {
         if (offsets[0] % 2 != 0) {
-            throw oneapi::mkl::unimplemented(
+            throw oneapi::math::unimplemented(
                 "DFT", func_name,
                 "cuFFT requires offset (first value in strides) to be multiple of 2!");
         }
@@ -89,16 +89,17 @@ ONEMKL_EXPORT void compute_forward(descriptor_type& desc,
 
 //In-place transform, using config_param::COMPLEX_STORAGE=config_value::REAL_REAL data format
 template <typename descriptor_type>
-ONEMKL_EXPORT void compute_forward(descriptor_type&, sycl::buffer<scalar<descriptor_type>, 1>&,
-                                   sycl::buffer<scalar<descriptor_type>, 1>&) {
-    throw oneapi::mkl::unimplemented("DFT", "compute_forward(desc, inout_re, inout_im)",
-                                     "cuFFT does not support real-real complex storage.");
+ONEMATH_EXPORT void compute_forward(descriptor_type&, sycl::buffer<scalar<descriptor_type>, 1>&,
+                                    sycl::buffer<scalar<descriptor_type>, 1>&) {
+    throw oneapi::math::unimplemented("DFT", "compute_forward(desc, inout_re, inout_im)",
+                                      "cuFFT does not support real-real complex storage.");
 }
 
 //Out-of-place transform
 template <typename descriptor_type>
-ONEMKL_EXPORT void compute_forward(descriptor_type& desc, sycl::buffer<fwd<descriptor_type>, 1>& in,
-                                   sycl::buffer<bwd<descriptor_type>, 1>& out) {
+ONEMATH_EXPORT void compute_forward(descriptor_type& desc,
+                                    sycl::buffer<fwd<descriptor_type>, 1>& in,
+                                    sycl::buffer<bwd<descriptor_type>, 1>& out) {
     const std::string func_name = "compute_forward(desc, in, out)";
     detail::expect_config<dft::config_param::PLACEMENT, dft::config_value::NOT_INPLACE>(
         desc, "Unexpected value for placement");
@@ -109,7 +110,7 @@ ONEMKL_EXPORT void compute_forward(descriptor_type& desc, sycl::buffer<fwd<descr
 
     if constexpr (std::is_floating_point_v<fwd<descriptor_type>>) {
         if (offsets[0] % 2 != 0) {
-            throw oneapi::mkl::unimplemented(
+            throw oneapi::math::unimplemented(
                 "DFT", func_name,
                 "cuFFT requires offset (first value in strides) to be multiple of 2!");
         }
@@ -139,20 +140,20 @@ ONEMKL_EXPORT void compute_forward(descriptor_type& desc, sycl::buffer<fwd<descr
 
 //Out-of-place transform, using config_param::COMPLEX_STORAGE=config_value::REAL_REAL data format
 template <typename descriptor_type>
-ONEMKL_EXPORT void compute_forward(descriptor_type&, sycl::buffer<scalar<descriptor_type>, 1>&,
-                                   sycl::buffer<scalar<descriptor_type>, 1>&,
-                                   sycl::buffer<scalar<descriptor_type>, 1>&,
-                                   sycl::buffer<scalar<descriptor_type>, 1>&) {
-    throw oneapi::mkl::unimplemented("DFT", "compute_forward(desc, in_re, in_im, out_re, out_im)",
-                                     "cuFFT does not support real-real complex storage.");
+ONEMATH_EXPORT void compute_forward(descriptor_type&, sycl::buffer<scalar<descriptor_type>, 1>&,
+                                    sycl::buffer<scalar<descriptor_type>, 1>&,
+                                    sycl::buffer<scalar<descriptor_type>, 1>&,
+                                    sycl::buffer<scalar<descriptor_type>, 1>&) {
+    throw oneapi::math::unimplemented("DFT", "compute_forward(desc, in_re, in_im, out_re, out_im)",
+                                      "cuFFT does not support real-real complex storage.");
 }
 
 //USM version
 
 //In-place transform
 template <typename descriptor_type>
-ONEMKL_EXPORT sycl::event compute_forward(descriptor_type& desc, fwd<descriptor_type>* inout,
-                                          const std::vector<sycl::event>& dependencies) {
+ONEMATH_EXPORT sycl::event compute_forward(descriptor_type& desc, fwd<descriptor_type>* inout,
+                                           const std::vector<sycl::event>& dependencies) {
     const std::string func_name = "compute_forward(desc, inout, dependencies)";
     detail::expect_config<dft::config_param::PLACEMENT, dft::config_value::INPLACE>(
         desc, "Unexpected value for placement");
@@ -163,7 +164,7 @@ ONEMKL_EXPORT sycl::event compute_forward(descriptor_type& desc, fwd<descriptor_
 
     if constexpr (std::is_floating_point_v<fwd<descriptor_type>>) {
         if (offsets[0] % 2 != 0) {
-            throw oneapi::mkl::unimplemented(
+            throw oneapi::math::unimplemented(
                 "DFT", func_name,
                 "cuFFT requires offset (first value in strides) to be multiple of 2!");
         }
@@ -187,19 +188,19 @@ ONEMKL_EXPORT sycl::event compute_forward(descriptor_type& desc, fwd<descriptor_
 
 //In-place transform, using config_param::COMPLEX_STORAGE=config_value::REAL_REAL data format
 template <typename descriptor_type>
-ONEMKL_EXPORT sycl::event compute_forward(descriptor_type&, scalar<descriptor_type>*,
-                                          scalar<descriptor_type>*,
-                                          const std::vector<sycl::event>&) {
-    throw oneapi::mkl::unimplemented("DFT",
-                                     "compute_forward(desc, inout_re, inout_im, dependencies)",
-                                     "cuFFT does not support real-real complex storage.");
+ONEMATH_EXPORT sycl::event compute_forward(descriptor_type&, scalar<descriptor_type>*,
+                                           scalar<descriptor_type>*,
+                                           const std::vector<sycl::event>&) {
+    throw oneapi::math::unimplemented("DFT",
+                                      "compute_forward(desc, inout_re, inout_im, dependencies)",
+                                      "cuFFT does not support real-real complex storage.");
 }
 
 //Out-of-place transform
 template <typename descriptor_type>
-ONEMKL_EXPORT sycl::event compute_forward(descriptor_type& desc, fwd<descriptor_type>* in,
-                                          bwd<descriptor_type>* out,
-                                          const std::vector<sycl::event>& dependencies) {
+ONEMATH_EXPORT sycl::event compute_forward(descriptor_type& desc, fwd<descriptor_type>* in,
+                                           bwd<descriptor_type>* out,
+                                           const std::vector<sycl::event>& dependencies) {
     const std::string func_name = "compute_forward(desc, in, out, dependencies)";
     detail::expect_config<dft::config_param::PLACEMENT, dft::config_value::NOT_INPLACE>(
         desc, "Unexpected value for placement");
@@ -210,7 +211,7 @@ ONEMKL_EXPORT sycl::event compute_forward(descriptor_type& desc, fwd<descriptor_
 
     if constexpr (std::is_floating_point_v<fwd<descriptor_type>>) {
         if (offsets[0] % 2 != 0) {
-            throw oneapi::mkl::unimplemented(
+            throw oneapi::math::unimplemented(
                 "DFT", func_name,
                 "cuFFT requires offset (first value in strides) to be multiple of 2!");
         }
@@ -233,11 +234,11 @@ ONEMKL_EXPORT sycl::event compute_forward(descriptor_type& desc, fwd<descriptor_
 
 //Out-of-place transform, using config_param::COMPLEX_STORAGE=config_value::REAL_REAL data format
 template <typename descriptor_type>
-ONEMKL_EXPORT sycl::event compute_forward(descriptor_type&, scalar<descriptor_type>*,
-                                          scalar<descriptor_type>*, scalar<descriptor_type>*,
-                                          scalar<descriptor_type>*,
-                                          const std::vector<sycl::event>&) {
-    throw oneapi::mkl::unimplemented(
+ONEMATH_EXPORT sycl::event compute_forward(descriptor_type&, scalar<descriptor_type>*,
+                                           scalar<descriptor_type>*, scalar<descriptor_type>*,
+                                           scalar<descriptor_type>*,
+                                           const std::vector<sycl::event>&) {
+    throw oneapi::math::unimplemented(
         "DFT", "compute_forward(desc, in_re, in_im, out_re, out_im, dependencies)",
         "cuFFT does not support real-real complex storage.");
 }
@@ -245,4 +246,4 @@ ONEMKL_EXPORT sycl::event compute_forward(descriptor_type&, scalar<descriptor_ty
 // Template function instantiations
 #include "dft/backends/backend_forward_instantiations.cxx"
 
-} // namespace oneapi::mkl::dft::cufft
+} // namespace oneapi::math::dft::cufft

@@ -17,20 +17,20 @@
 *
 **************************************************************************/
 
-#ifndef _ONEMKL_SRC_SPARSE_BLAS_MATRIX_VIEW_COMPARISON_HPP_
-#define _ONEMKL_SRC_SPARSE_BLAS_MATRIX_VIEW_COMPARISON_HPP_
+#ifndef _ONEMATH_SRC_SPARSE_BLAS_MATRIX_VIEW_COMPARISON_HPP_
+#define _ONEMATH_SRC_SPARSE_BLAS_MATRIX_VIEW_COMPARISON_HPP_
 
-#include "oneapi/mkl/sparse_blas/matrix_view.hpp"
+#include "oneapi/math/sparse_blas/matrix_view.hpp"
 
-inline bool operator==(const oneapi::mkl::sparse::matrix_view& lhs,
-                       const oneapi::mkl::sparse::matrix_view& rhs) {
+inline bool operator==(const oneapi::math::sparse::matrix_view& lhs,
+                       const oneapi::math::sparse::matrix_view& rhs) {
     return lhs.type_view == rhs.type_view && lhs.uplo_view == rhs.uplo_view &&
            lhs.diag_view == rhs.diag_view;
 }
 
-inline bool operator!=(const oneapi::mkl::sparse::matrix_view& lhs,
-                       const oneapi::mkl::sparse::matrix_view& rhs) {
+inline bool operator!=(const oneapi::math::sparse::matrix_view& lhs,
+                       const oneapi::math::sparse::matrix_view& rhs) {
     return !(lhs == rhs);
 }
 
-#endif // _ONEMKL_SRC_SPARSE_BLAS_MATRIX_VIEW_COMPARISON_HPP_
+#endif // _ONEMATH_SRC_SPARSE_BLAS_MATRIX_VIEW_COMPARISON_HPP_

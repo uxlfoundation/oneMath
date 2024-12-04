@@ -19,7 +19,7 @@
 #
 #=========================================================================
 
-set(LIB_NAME onemkl_lapack_rocsolver)
+set(LIB_NAME onemath_lapack_rocsolver)
 set(LIB_OBJ ${LIB_NAME}_obj)
 find_package(hip REQUIRED)
 find_package(rocsolver REQUIRED)
@@ -27,22 +27,23 @@ find_package(Threads REQUIRED)
 
 set(SOURCES rocsolver_lapack.cpp
 		rocsolver_batch.cpp
-	        $<$<STREQUAL:${ONEMKL_SYCL_IMPLEMENTATION},dpc++>:rocsolver_scope_handle.cpp>
+	        $<$<STREQUAL:${ONEMATH_SYCL_IMPLEMENTATION},dpc++>:rocsolver_scope_handle.cpp>
           $<$<BOOL:${BUILD_SHARED_LIBS}>: rocsolver_wrappers.cpp>)
 add_library(${LIB_NAME})
+add_deprecated_library(${LIB_NAME})
 add_library(${LIB_OBJ} OBJECT ${SOURCES})
-add_dependencies(onemkl_backend_libs_lapack ${LIB_NAME})
+add_dependencies(onemath_backend_libs_lapack ${LIB_NAME})
 
 target_include_directories(${LIB_OBJ}
   PRIVATE ${PROJECT_SOURCE_DIR}/include
           ${PROJECT_SOURCE_DIR}/src/include
           ${PROJECT_SOURCE_DIR}/src
           ${CMAKE_BINARY_DIR}/bin
-          ${ONEMKL_GENERATED_INCLUDE_PATH}
+          ${ONEMATH_GENERATED_INCLUDE_PATH}
 )
-target_compile_options(${LIB_OBJ} PRIVATE ${ONEMKL_BUILD_COPT})
+target_compile_options(${LIB_OBJ} PRIVATE ${ONEMATH_BUILD_COPT})
 target_link_libraries(${LIB_OBJ} PRIVATE roc::rocsolver hip::host Threads::Threads)
-target_link_libraries(${LIB_OBJ} PUBLIC ONEMKL::SYCL::SYCL)
+target_link_libraries(${LIB_OBJ} PUBLIC ONEMATH::SYCL::SYCL)
 target_compile_features(${LIB_OBJ} PUBLIC cxx_std_17)
 set_target_properties(${LIB_OBJ} PROPERTIES
   POSITION_INDEPENDENT_CODE ON)
@@ -60,8 +61,8 @@ set_target_properties(${LIB_NAME} PROPERTIES
 list(APPEND CMAKE_BUILD_RPATH $<TARGET_FILE_DIR:${LIB_NAME}>)
 
 # Add the library to install package
-install(TARGETS ${LIB_OBJ} EXPORT oneMKLTargets)
-install(TARGETS ${LIB_NAME} EXPORT oneMKLTargets
+install(TARGETS ${LIB_OBJ} EXPORT oneMathTargets)
+install(TARGETS ${LIB_NAME} EXPORT oneMathTargets
   RUNTIME DESTINATION bin
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib

@@ -1,20 +1,18 @@
-# oneAPI Math Kernel Library (oneMKL) Interfaces Examples 
-oneAPI Math Kernel Library (oneMKL) Interfaces offers examples with the following routines: 
-- blas: level3/gemm_usm  
-- rng: uniform_usm  
+# oneMath Examples
+oneMath offers examples with the following routines:
+- blas: level3/gemm_usm
+- rng: uniform_usm
 - lapack: getrs_usm
 - dft: complex_fwd_usm, real_fwd_usm
 - sparse_blas: sparse_spmv_usm
 
 Each routine has one run-time dispatching example and one compile-time dispatching example (which uses both mklcpu and cuda backends), located in `example/<$domain>/run_time_dispatching` and `example/<$domain>/compile_time_dispatching` subfolders, respectively.
 
-To build examples, use cmake build option `-DBUILD_EXAMPLES=true`.  
+To build examples, use cmake build option `-DBUILD_EXAMPLES=true`.
 Compile_time_dispatching will be built if `-DBUILD_EXAMPLES=true` and cuda backend is enabled, because the compile-time dispatching example runs on both mklcpu and cuda backends.
 Run_time_dispatching will be built if `-DBUILD_EXAMPLES=true` and `-DBUILD_SHARED_LIBS=true`.
 
-The example executable naming convention follows `example_<$domain>_<$routine>_<$backend>` for compile-time dispatching examples 
-  or `example_<$domain>_<$routine>` for run-time dispatching examples. 
-  E.g. `example_blas_gemm_usm_mklcpu_cublas `  `example_blas_gemm_usm`
+The example executable naming convention follows `example_<$domain>_<$routine>_<$backend>` for compile-time dispatching examples or `example_<$domain>_<$routine>` for run-time dispatching examples. E.g. `example_blas_gemm_usm_mklcpu_cublas `  `example_blas_gemm_usm`
 
 ## Example outputs (blas, rng, lapack, dft, sparse_blas)
   
@@ -479,7 +477,7 @@ Device name is: Intel(R) UHD Graphics 750
 Running with single precision real data type:
 DFT example run_time dispatch
 Unsupported Configuration:
-	oneMKL: dft/backends/portfft/commit: function is not implemented portFFT only supports complex to complex transforms
+	oneMath: dft/backends/portfft/commit: function is not implemented REAL domain is unsupported
 ```
 
 ## sparse_blas

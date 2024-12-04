@@ -22,7 +22,7 @@
 #include <unordered_map>
 
 namespace oneapi {
-namespace mkl {
+namespace math {
 namespace lapack {
 namespace cusolver {
 
@@ -55,7 +55,7 @@ struct cusolver_handle {
 
 } // namespace cusolver
 } // namespace lapack
-} // namespace mkl
+} // namespace math
 } // namespace oneapi
 
 #endif // CUSOLVER_HANDLE_HPP

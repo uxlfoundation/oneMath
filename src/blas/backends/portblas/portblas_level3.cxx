@@ -19,7 +19,7 @@
 
 // Buffer APIs
 
-void gemm(sycl::queue& queue, oneapi::mkl::transpose transa, oneapi::mkl::transpose transb,
+void gemm(sycl::queue& queue, oneapi::math::transpose transa, oneapi::math::transpose transb,
           std::int64_t m, std::int64_t n, std::int64_t k, real_t alpha, sycl::buffer<real_t, 1>& a,
           std::int64_t lda, sycl::buffer<real_t, 1>& b, std::int64_t ldb, real_t beta,
           sycl::buffer<real_t, 1>& c, std::int64_t ldc) {
@@ -27,14 +27,14 @@ void gemm(sycl::queue& queue, oneapi::mkl::transpose transa, oneapi::mkl::transp
                      ldc);
 }
 
-void gemm(sycl::queue& queue, oneapi::mkl::transpose transa, oneapi::mkl::transpose transb,
+void gemm(sycl::queue& queue, oneapi::math::transpose transa, oneapi::math::transpose transb,
           std::int64_t m, std::int64_t n, std::int64_t k, std::complex<real_t> alpha,
           sycl::buffer<std::complex<real_t>, 1>& a, std::int64_t lda,
           sycl::buffer<std::complex<real_t>, 1>& b, std::int64_t ldb, std::complex<real_t> beta,
           sycl::buffer<std::complex<real_t>, 1>& c, std::int64_t ldc) {
     using sycl_complex_real_t = sycl::ext::oneapi::experimental::complex<real_t>;
-    if (transa == oneapi::mkl::transpose::conjtrans ||
-        transb == oneapi::mkl::transpose::conjtrans) {
+    if (transa == oneapi::math::transpose::conjtrans ||
+        transb == oneapi::math::transpose::conjtrans) {
         throw unimplemented("blas", "gemm", "Conjugate Transpose unsupported yet on portBLAS");
     }
     // Intermediate buffers for conversion purposes as portBLAS expects sycl::complex instead of std::complex
@@ -63,7 +63,7 @@ void gemm(sycl::queue& queue, oneapi::mkl::transpose transa, oneapi::mkl::transp
     queue.copy(out_pb_acc, out_acc);
 }
 
-void symm(sycl::queue& queue, oneapi::mkl::side left_right, oneapi::mkl::uplo upper_lower,
+void symm(sycl::queue& queue, oneapi::math::side left_right, oneapi::math::uplo upper_lower,
           std::int64_t m, std::int64_t n, real_t alpha, sycl::buffer<real_t, 1>& a,
           std::int64_t lda, sycl::buffer<real_t, 1>& b, std::int64_t ldb, real_t beta,
           sycl::buffer<real_t, 1>& c, std::int64_t ldc) {
@@ -71,7 +71,7 @@ void symm(sycl::queue& queue, oneapi::mkl::side left_right, oneapi::mkl::uplo up
                      beta, c, ldc);
 }
 
-void symm(sycl::queue& queue, oneapi::mkl::side left_right, oneapi::mkl::uplo upper_lower,
+void symm(sycl::queue& queue, oneapi::math::side left_right, oneapi::math::uplo upper_lower,
           std::int64_t m, std::int64_t n, std::complex<real_t> alpha,
           sycl::buffer<std::complex<real_t>, 1>& a, std::int64_t lda,
           sycl::buffer<std::complex<real_t>, 1>& b, std::int64_t ldb, std::complex<real_t> beta,
@@ -79,7 +79,7 @@ void symm(sycl::queue& queue, oneapi::mkl::side left_right, oneapi::mkl::uplo up
     throw unimplemented("blas", "symm", "");
 }
 
-void hemm(sycl::queue& queue, oneapi::mkl::side left_right, oneapi::mkl::uplo upper_lower,
+void hemm(sycl::queue& queue, oneapi::math::side left_right, oneapi::math::uplo upper_lower,
           std::int64_t m, std::int64_t n, std::complex<real_t> alpha,
           sycl::buffer<std::complex<real_t>, 1>& a, std::int64_t lda,
           sycl::buffer<std::complex<real_t>, 1>& b, std::int64_t ldb, std::complex<real_t> beta,
@@ -87,34 +87,34 @@ void hemm(sycl::queue& queue, oneapi::mkl::side left_right, oneapi::mkl::uplo up
     throw unimplemented("blas", "hemm", "");
 }
 
-void syrk(sycl::queue& queue, oneapi::mkl::uplo upper_lower, oneapi::mkl::transpose trans,
+void syrk(sycl::queue& queue, oneapi::math::uplo upper_lower, oneapi::math::transpose trans,
           std::int64_t n, std::int64_t k, real_t alpha, sycl::buffer<real_t, 1>& a,
           std::int64_t lda, real_t beta, sycl::buffer<real_t, 1>& c, std::int64_t ldc) {
     throw unimplemented("blas", "syrk", "");
 }
 
-void syrk(sycl::queue& queue, oneapi::mkl::uplo upper_lower, oneapi::mkl::transpose trans,
+void syrk(sycl::queue& queue, oneapi::math::uplo upper_lower, oneapi::math::transpose trans,
           std::int64_t n, std::int64_t k, std::complex<real_t> alpha,
           sycl::buffer<std::complex<real_t>, 1>& a, std::int64_t lda, std::complex<real_t> beta,
           sycl::buffer<std::complex<real_t>, 1>& c, std::int64_t ldc) {
     throw unimplemented("blas", "syrk", "");
 }
 
-void herk(sycl::queue& queue, oneapi::mkl::uplo upper_lower, oneapi::mkl::transpose trans,
+void herk(sycl::queue& queue, oneapi::math::uplo upper_lower, oneapi::math::transpose trans,
           std::int64_t n, std::int64_t k, real_t alpha, sycl::buffer<std::complex<real_t>, 1>& a,
           std::int64_t lda, real_t beta, sycl::buffer<std::complex<real_t>, 1>& c,
           std::int64_t ldc) {
     throw unimplemented("blas", "herk", "");
 }
 
-void syr2k(sycl::queue& queue, oneapi::mkl::uplo upper_lower, oneapi::mkl::transpose trans,
+void syr2k(sycl::queue& queue, oneapi::math::uplo upper_lower, oneapi::math::transpose trans,
            std::int64_t n, std::int64_t k, real_t alpha, sycl::buffer<real_t, 1>& a,
            std::int64_t lda, sycl::buffer<real_t, 1>& b, std::int64_t ldb, real_t beta,
            sycl::buffer<real_t, 1>& c, std::int64_t ldc) {
     throw unimplemented("blas", "syr2k", "");
 }
 
-void syr2k(sycl::queue& queue, oneapi::mkl::uplo upper_lower, oneapi::mkl::transpose trans,
+void syr2k(sycl::queue& queue, oneapi::math::uplo upper_lower, oneapi::math::transpose trans,
            std::int64_t n, std::int64_t k, std::complex<real_t> alpha,
            sycl::buffer<std::complex<real_t>, 1>& a, std::int64_t lda,
            sycl::buffer<std::complex<real_t>, 1>& b, std::int64_t ldb, std::complex<real_t> beta,
@@ -122,7 +122,7 @@ void syr2k(sycl::queue& queue, oneapi::mkl::uplo upper_lower, oneapi::mkl::trans
     throw unimplemented("blas", "syr2k", "");
 }
 
-void her2k(sycl::queue& queue, oneapi::mkl::uplo upper_lower, oneapi::mkl::transpose trans,
+void her2k(sycl::queue& queue, oneapi::math::uplo upper_lower, oneapi::math::transpose trans,
            std::int64_t n, std::int64_t k, std::complex<real_t> alpha,
            sycl::buffer<std::complex<real_t>, 1>& a, std::int64_t lda,
            sycl::buffer<std::complex<real_t>, 1>& b, std::int64_t ldb, real_t beta,
@@ -130,44 +130,44 @@ void her2k(sycl::queue& queue, oneapi::mkl::uplo upper_lower, oneapi::mkl::trans
     throw unimplemented("blas", "her2k", "");
 }
 
-void trmm(sycl::queue& queue, oneapi::mkl::side left_right, oneapi::mkl::uplo upper_lower,
-          oneapi::mkl::transpose trans, oneapi::mkl::diag unit_diag, std::int64_t m, std::int64_t n,
-          real_t alpha, sycl::buffer<real_t, 1>& a, std::int64_t lda, sycl::buffer<real_t, 1>& b,
-          std::int64_t ldb) {
+void trmm(sycl::queue& queue, oneapi::math::side left_right, oneapi::math::uplo upper_lower,
+          oneapi::math::transpose trans, oneapi::math::diag unit_diag, std::int64_t m,
+          std::int64_t n, real_t alpha, sycl::buffer<real_t, 1>& a, std::int64_t lda,
+          sycl::buffer<real_t, 1>& b, std::int64_t ldb) {
     throw unimplemented("blas", "trmm", "");
 }
 
-void trmm(sycl::queue& queue, oneapi::mkl::side left_right, oneapi::mkl::uplo upper_lower,
-          oneapi::mkl::transpose trans, oneapi::mkl::diag unit_diag, std::int64_t m, std::int64_t n,
-          std::complex<real_t> alpha, sycl::buffer<std::complex<real_t>, 1>& a, std::int64_t lda,
-          sycl::buffer<std::complex<real_t>, 1>& b, std::int64_t ldb) {
+void trmm(sycl::queue& queue, oneapi::math::side left_right, oneapi::math::uplo upper_lower,
+          oneapi::math::transpose trans, oneapi::math::diag unit_diag, std::int64_t m,
+          std::int64_t n, std::complex<real_t> alpha, sycl::buffer<std::complex<real_t>, 1>& a,
+          std::int64_t lda, sycl::buffer<std::complex<real_t>, 1>& b, std::int64_t ldb) {
     throw unimplemented("blas", "trmm", "");
 }
 
-void trsm(sycl::queue& queue, oneapi::mkl::side left_right, oneapi::mkl::uplo upper_lower,
-          oneapi::mkl::transpose trans, oneapi::mkl::diag unit_diag, std::int64_t m, std::int64_t n,
-          real_t alpha, sycl::buffer<real_t, 1>& a, std::int64_t lda, sycl::buffer<real_t, 1>& b,
-          std::int64_t ldb) {
+void trsm(sycl::queue& queue, oneapi::math::side left_right, oneapi::math::uplo upper_lower,
+          oneapi::math::transpose trans, oneapi::math::diag unit_diag, std::int64_t m,
+          std::int64_t n, real_t alpha, sycl::buffer<real_t, 1>& a, std::int64_t lda,
+          sycl::buffer<real_t, 1>& b, std::int64_t ldb) {
     CALL_PORTBLAS_FN(::blas::_trsm, queue, left_right, upper_lower, trans, unit_diag, m, n, alpha,
                      a, lda, b, ldb);
 }
 
-void trsm(sycl::queue& queue, oneapi::mkl::side left_right, oneapi::mkl::uplo upper_lower,
-          oneapi::mkl::transpose trans, oneapi::mkl::diag unit_diag, std::int64_t m, std::int64_t n,
-          std::complex<real_t> alpha, sycl::buffer<std::complex<real_t>, 1>& a, std::int64_t lda,
-          sycl::buffer<std::complex<real_t>, 1>& b, std::int64_t ldb) {
+void trsm(sycl::queue& queue, oneapi::math::side left_right, oneapi::math::uplo upper_lower,
+          oneapi::math::transpose trans, oneapi::math::diag unit_diag, std::int64_t m,
+          std::int64_t n, std::complex<real_t> alpha, sycl::buffer<std::complex<real_t>, 1>& a,
+          std::int64_t lda, sycl::buffer<std::complex<real_t>, 1>& b, std::int64_t ldb) {
     throw unimplemented("blas", "trsm", " for complex");
 }
 
-void gemmt(sycl::queue& queue, oneapi::mkl::uplo upper_lower, oneapi::mkl::transpose transa,
-           oneapi::mkl::transpose transb, std::int64_t n, std::int64_t k, real_t alpha,
+void gemmt(sycl::queue& queue, oneapi::math::uplo upper_lower, oneapi::math::transpose transa,
+           oneapi::math::transpose transb, std::int64_t n, std::int64_t k, real_t alpha,
            sycl::buffer<real_t, 1>& a, std::int64_t lda, sycl::buffer<real_t, 1>& b,
            std::int64_t ldb, real_t beta, sycl::buffer<real_t, 1>& c, std::int64_t ldc) {
     throw unimplemented("blas", "gemmt", "");
 }
 
-void gemmt(sycl::queue& queue, oneapi::mkl::uplo upper_lower, oneapi::mkl::transpose transa,
-           oneapi::mkl::transpose transb, std::int64_t n, std::int64_t k,
+void gemmt(sycl::queue& queue, oneapi::math::uplo upper_lower, oneapi::math::transpose transa,
+           oneapi::math::transpose transb, std::int64_t n, std::int64_t k,
            std::complex<real_t> alpha, sycl::buffer<std::complex<real_t>, 1>& a, std::int64_t lda,
            sycl::buffer<std::complex<real_t>, 1>& b, std::int64_t ldb, std::complex<real_t> beta,
            sycl::buffer<std::complex<real_t>, 1>& c, std::int64_t ldc) {
@@ -228,7 +228,7 @@ void omatadd(sycl::queue& queue, transpose transa, transpose transb, std::int64_
 
 // USM APIs
 
-sycl::event gemm(sycl::queue& queue, oneapi::mkl::transpose transa, oneapi::mkl::transpose transb,
+sycl::event gemm(sycl::queue& queue, oneapi::math::transpose transa, oneapi::math::transpose transb,
                  std::int64_t m, std::int64_t n, std::int64_t k, real_t alpha, const real_t* a,
                  std::int64_t lda, const real_t* b, std::int64_t ldb, real_t beta, real_t* c,
                  std::int64_t ldc, const std::vector<sycl::event>& dependencies) {
@@ -236,20 +236,20 @@ sycl::event gemm(sycl::queue& queue, oneapi::mkl::transpose transa, oneapi::mkl:
                          c, ldc, dependencies);
 }
 
-sycl::event gemm(sycl::queue& queue, oneapi::mkl::transpose transa, oneapi::mkl::transpose transb,
+sycl::event gemm(sycl::queue& queue, oneapi::math::transpose transa, oneapi::math::transpose transb,
                  std::int64_t m, std::int64_t n, std::int64_t k, std::complex<real_t> alpha,
                  const std::complex<real_t>* a, std::int64_t lda, const std::complex<real_t>* b,
                  std::int64_t ldb, std::complex<real_t> beta, std::complex<real_t>* c,
                  std::int64_t ldc, const std::vector<sycl::event>& dependencies) {
-    if (transa == oneapi::mkl::transpose::conjtrans ||
-        transb == oneapi::mkl::transpose::conjtrans) {
+    if (transa == oneapi::math::transpose::conjtrans ||
+        transb == oneapi::math::transpose::conjtrans) {
         throw unimplemented("blas", "gemm", "Conjugate Transpose unsupported yet on portBLAS");
     }
     CALL_PORTBLAS_USM_FN(::blas::_gemm, queue, transa, transb, m, n, k, alpha, a, lda, b, ldb, beta,
                          c, ldc, dependencies);
 }
 
-sycl::event symm(sycl::queue& queue, oneapi::mkl::side left_right, oneapi::mkl::uplo upper_lower,
+sycl::event symm(sycl::queue& queue, oneapi::math::side left_right, oneapi::math::uplo upper_lower,
                  std::int64_t m, std::int64_t n, real_t alpha, const real_t* a, std::int64_t lda,
                  const real_t* b, std::int64_t ldb, real_t beta, real_t* c, std::int64_t ldc,
                  const std::vector<sycl::event>& dependencies) {
@@ -257,7 +257,7 @@ sycl::event symm(sycl::queue& queue, oneapi::mkl::side left_right, oneapi::mkl::
                          beta, c, ldc, dependencies);
 }
 
-sycl::event symm(sycl::queue& queue, oneapi::mkl::side left_right, oneapi::mkl::uplo upper_lower,
+sycl::event symm(sycl::queue& queue, oneapi::math::side left_right, oneapi::math::uplo upper_lower,
                  std::int64_t m, std::int64_t n, std::complex<real_t> alpha,
                  const std::complex<real_t>* a, std::int64_t lda, const std::complex<real_t>* b,
                  std::int64_t ldb, std::complex<real_t> beta, std::complex<real_t>* c,
@@ -265,7 +265,7 @@ sycl::event symm(sycl::queue& queue, oneapi::mkl::side left_right, oneapi::mkl::
     throw unimplemented("blas", "symm", " for USM");
 }
 
-sycl::event hemm(sycl::queue& queue, oneapi::mkl::side left_right, oneapi::mkl::uplo upper_lower,
+sycl::event hemm(sycl::queue& queue, oneapi::math::side left_right, oneapi::math::uplo upper_lower,
                  std::int64_t m, std::int64_t n, std::complex<real_t> alpha,
                  const std::complex<real_t>* a, std::int64_t lda, const std::complex<real_t>* b,
                  std::int64_t ldb, std::complex<real_t> beta, std::complex<real_t>* c,
@@ -273,14 +273,14 @@ sycl::event hemm(sycl::queue& queue, oneapi::mkl::side left_right, oneapi::mkl::
     throw unimplemented("blas", "hemm", " for USM");
 }
 
-sycl::event syrk(sycl::queue& queue, oneapi::mkl::uplo upper_lower, oneapi::mkl::transpose trans,
+sycl::event syrk(sycl::queue& queue, oneapi::math::uplo upper_lower, oneapi::math::transpose trans,
                  std::int64_t n, std::int64_t k, real_t alpha, const real_t* a, std::int64_t lda,
                  real_t beta, real_t* c, std::int64_t ldc,
                  const std::vector<sycl::event>& dependencies) {
     throw unimplemented("blas", "syrk", " for USM");
 }
 
-sycl::event syrk(sycl::queue& queue, oneapi::mkl::uplo upper_lower, oneapi::mkl::transpose trans,
+sycl::event syrk(sycl::queue& queue, oneapi::math::uplo upper_lower, oneapi::math::transpose trans,
                  std::int64_t n, std::int64_t k, std::complex<real_t> alpha,
                  const std::complex<real_t>* a, std::int64_t lda, std::complex<real_t> beta,
                  std::complex<real_t>* c, std::int64_t ldc,
@@ -288,21 +288,21 @@ sycl::event syrk(sycl::queue& queue, oneapi::mkl::uplo upper_lower, oneapi::mkl:
     throw unimplemented("blas", "syrk", " for USM");
 }
 
-sycl::event herk(sycl::queue& queue, oneapi::mkl::uplo upper_lower, oneapi::mkl::transpose trans,
+sycl::event herk(sycl::queue& queue, oneapi::math::uplo upper_lower, oneapi::math::transpose trans,
                  std::int64_t n, std::int64_t k, real_t alpha, const std::complex<real_t>* a,
                  std::int64_t lda, real_t beta, std::complex<real_t>* c, std::int64_t ldc,
                  const std::vector<sycl::event>& dependencies) {
     throw unimplemented("blas", "herk", " for USM");
 }
 
-sycl::event syr2k(sycl::queue& queue, oneapi::mkl::uplo upper_lower, oneapi::mkl::transpose trans,
+sycl::event syr2k(sycl::queue& queue, oneapi::math::uplo upper_lower, oneapi::math::transpose trans,
                   std::int64_t n, std::int64_t k, real_t alpha, const real_t* a, std::int64_t lda,
                   const real_t* b, std::int64_t ldb, real_t beta, real_t* c, std::int64_t ldc,
                   const std::vector<sycl::event>& dependencies) {
     throw unimplemented("blas", "syr2k", " for USM");
 }
 
-sycl::event syr2k(sycl::queue& queue, oneapi::mkl::uplo upper_lower, oneapi::mkl::transpose trans,
+sycl::event syr2k(sycl::queue& queue, oneapi::math::uplo upper_lower, oneapi::math::transpose trans,
                   std::int64_t n, std::int64_t k, std::complex<real_t> alpha,
                   const std::complex<real_t>* a, std::int64_t lda, const std::complex<real_t>* b,
                   std::int64_t ldb, std::complex<real_t> beta, std::complex<real_t>* c,
@@ -310,7 +310,7 @@ sycl::event syr2k(sycl::queue& queue, oneapi::mkl::uplo upper_lower, oneapi::mkl
     throw unimplemented("blas", "syr2k", " for USM");
 }
 
-sycl::event her2k(sycl::queue& queue, oneapi::mkl::uplo upper_lower, oneapi::mkl::transpose trans,
+sycl::event her2k(sycl::queue& queue, oneapi::math::uplo upper_lower, oneapi::math::transpose trans,
                   std::int64_t n, std::int64_t k, std::complex<real_t> alpha,
                   const std::complex<real_t>* a, std::int64_t lda, const std::complex<real_t>* b,
                   std::int64_t ldb, real_t beta, std::complex<real_t>* c, std::int64_t ldc,
@@ -318,49 +318,50 @@ sycl::event her2k(sycl::queue& queue, oneapi::mkl::uplo upper_lower, oneapi::mkl
     throw unimplemented("blas", "her2k", " for USM");
 }
 
-sycl::event trmm(sycl::queue& queue, oneapi::mkl::side left_right, oneapi::mkl::uplo upper_lower,
-                 oneapi::mkl::transpose trans, oneapi::mkl::diag unit_diag, std::int64_t m,
+sycl::event trmm(sycl::queue& queue, oneapi::math::side left_right, oneapi::math::uplo upper_lower,
+                 oneapi::math::transpose trans, oneapi::math::diag unit_diag, std::int64_t m,
                  std::int64_t n, real_t alpha, const real_t* a, std::int64_t lda, real_t* b,
                  std::int64_t ldb, const std::vector<sycl::event>& dependencies) {
     throw unimplemented("blas", "trmm", " for USM");
 }
 
-sycl::event trmm(sycl::queue& queue, oneapi::mkl::side left_right, oneapi::mkl::uplo upper_lower,
-                 oneapi::mkl::transpose trans, oneapi::mkl::diag unit_diag, std::int64_t m,
+sycl::event trmm(sycl::queue& queue, oneapi::math::side left_right, oneapi::math::uplo upper_lower,
+                 oneapi::math::transpose trans, oneapi::math::diag unit_diag, std::int64_t m,
                  std::int64_t n, std::complex<real_t> alpha, const std::complex<real_t>* a,
                  std::int64_t lda, std::complex<real_t>* b, std::int64_t ldb,
                  const std::vector<sycl::event>& dependencies) {
     throw unimplemented("blas", "trmm", " for USM");
 }
 
-sycl::event trsm(sycl::queue& queue, oneapi::mkl::side left_right, oneapi::mkl::uplo upper_lower,
-                 oneapi::mkl::transpose trans, oneapi::mkl::diag unit_diag, std::int64_t m,
+sycl::event trsm(sycl::queue& queue, oneapi::math::side left_right, oneapi::math::uplo upper_lower,
+                 oneapi::math::transpose trans, oneapi::math::diag unit_diag, std::int64_t m,
                  std::int64_t n, real_t alpha, const real_t* a, std::int64_t lda, real_t* b,
                  std::int64_t ldb, const std::vector<sycl::event>& dependencies) {
     CALL_PORTBLAS_USM_FN(::blas::_trsm, queue, left_right, upper_lower, trans, unit_diag, m, n,
                          alpha, a, lda, b, ldb, dependencies);
 }
 
-sycl::event trsm(sycl::queue& queue, oneapi::mkl::side left_right, oneapi::mkl::uplo upper_lower,
-                 oneapi::mkl::transpose trans, oneapi::mkl::diag unit_diag, std::int64_t m,
+sycl::event trsm(sycl::queue& queue, oneapi::math::side left_right, oneapi::math::uplo upper_lower,
+                 oneapi::math::transpose trans, oneapi::math::diag unit_diag, std::int64_t m,
                  std::int64_t n, std::complex<real_t> alpha, const std::complex<real_t>* a,
                  std::int64_t lda, std::complex<real_t>* b, std::int64_t ldb,
                  const std::vector<sycl::event>& dependencies) {
     throw unimplemented("blas", "trsm", " for USM");
 }
 
-sycl::event gemmt(sycl::queue& queue, oneapi::mkl::uplo upper_lower, oneapi::mkl::transpose transa,
-                  oneapi::mkl::transpose transb, std::int64_t n, std::int64_t k, real_t alpha,
-                  const real_t* a, std::int64_t lda, const real_t* b, std::int64_t ldb, real_t beta,
-                  real_t* c, std::int64_t ldc, const std::vector<sycl::event>& dependencies) {
+sycl::event gemmt(sycl::queue& queue, oneapi::math::uplo upper_lower,
+                  oneapi::math::transpose transa, oneapi::math::transpose transb, std::int64_t n,
+                  std::int64_t k, real_t alpha, const real_t* a, std::int64_t lda, const real_t* b,
+                  std::int64_t ldb, real_t beta, real_t* c, std::int64_t ldc,
+                  const std::vector<sycl::event>& dependencies) {
     throw unimplemented("blas", "gemmt", " for USM");
 }
 
-sycl::event gemmt(sycl::queue& queue, oneapi::mkl::uplo upper_lower, oneapi::mkl::transpose transa,
-                  oneapi::mkl::transpose transb, std::int64_t n, std::int64_t k,
-                  std::complex<real_t> alpha, const std::complex<real_t>* a, std::int64_t lda,
-                  const std::complex<real_t>* b, std::int64_t ldb, std::complex<real_t> beta,
-                  std::complex<real_t>* c, std::int64_t ldc,
+sycl::event gemmt(sycl::queue& queue, oneapi::math::uplo upper_lower,
+                  oneapi::math::transpose transa, oneapi::math::transpose transb, std::int64_t n,
+                  std::int64_t k, std::complex<real_t> alpha, const std::complex<real_t>* a,
+                  std::int64_t lda, const std::complex<real_t>* b, std::int64_t ldb,
+                  std::complex<real_t> beta, std::complex<real_t>* c, std::int64_t ldc,
                   const std::vector<sycl::event>& dependencies) {
     throw unimplemented("blas", "gemmt", " for USM");
 }

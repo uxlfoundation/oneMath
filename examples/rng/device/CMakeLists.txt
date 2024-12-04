@@ -56,10 +56,12 @@ foreach(rng_device_source ${RNG_DEVICE_SOURCES})
   endif()
 
   target_link_libraries(example_${domain}_${rng_device_source} PUBLIC
-      ONEMKL::SYCL::SYCL
+      ONEMATH::SYCL::SYCL
   )
 
-  if(NOT ${ONEMKL_SYCL_IMPLEMENTATION} STREQUAL "hipsycl")
+  if(NOT ${ONEMATH_SYCL_IMPLEMENTATION} STREQUAL "hipsycl")
+    # set strict warning flags for rng device API examples
+    target_compile_options(example_${domain}_${rng_device_source} PUBLIC -Wall -Werror -Wextra -Wpedantic -Wunreachable-code -Wfloat-conversion -Wextra-semi -Wshadow)
     target_link_options(example_${domain}_${rng_device_source} PUBLIC -fsycl -fsycl-device-code-split=per_kernel)
   endif()
 

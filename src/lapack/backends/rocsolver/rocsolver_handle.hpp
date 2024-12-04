@@ -24,7 +24,7 @@
 #include <unordered_map>
 
 namespace oneapi {
-namespace mkl {
+namespace math {
 namespace lapack {
 namespace rocsolver {
 
@@ -57,7 +57,7 @@ struct rocsolver_handle {
 
 } // namespace rocsolver
 } // namespace lapack
-} // namespace mkl
+} // namespace math
 } // namespace oneapi
 
 #endif // ROCSOLVER_HANDLE_HPP

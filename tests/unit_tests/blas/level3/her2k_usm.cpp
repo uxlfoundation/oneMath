@@ -30,9 +30,9 @@
 #include <CL/sycl.hpp>
 #endif
 #include "cblas.h"
-#include "oneapi/mkl.hpp"
-#include "oneapi/mkl/detail/config.hpp"
-#include "onemkl_blas_helper.hpp"
+#include "oneapi/math.hpp"
+#include "oneapi/math/detail/config.hpp"
+#include "onemath_blas_helper.hpp"
 #include "reference_blas_templates.hpp"
 #include "test_common.hpp"
 #include "test_helper.hpp"
@@ -47,8 +47,8 @@ extern std::vector<sycl::device*> devices;
 namespace {
 
 template <typename fp, typename fp_scalar>
-int test(device* dev, oneapi::mkl::layout layout, oneapi::mkl::uplo upper_lower,
-         oneapi::mkl::transpose trans, int n, int k, int lda, int ldb, int ldc, fp alpha,
+int test(device* dev, oneapi::math::layout layout, oneapi::math::uplo upper_lower,
+         oneapi::math::transpose trans, int n, int k, int lda, int ldb, int ldc, fp alpha,
          fp_scalar beta) {
     // Catch asynchronous exceptions.
     auto exception_handler = [](exception_list exceptions) {
@@ -76,7 +76,7 @@ int test(device* dev, oneapi::mkl::layout layout, oneapi::mkl::uplo upper_lower,
     vector<fp, decltype(ua)> A(ua), B(ua), C(ua);
     rand_matrix(A, layout, trans, n, k, lda);
     rand_matrix(B, layout, trans, n, k, ldb);
-    rand_matrix(C, layout, oneapi::mkl::transpose::nontrans, n, n, ldc);
+    rand_matrix(C, layout, oneapi::math::transpose::nontrans, n, n, ldc);
 
     auto C_ref = C;
 
@@ -85,11 +85,11 @@ int test(device* dev, oneapi::mkl::layout layout, oneapi::mkl::uplo upper_lower,
     const int lda_ref = lda, ldb_ref = ldb, ldc_ref = ldc;
 
     using fp_ref = typename ref_type_info<fp>::type;
-    using fp_scalar_mkl = typename ref_type_info<fp_scalar>::type;
+    using fp_scalar_ref = typename ref_type_info<fp_scalar>::type;
 
     ::her2k(convert_to_cblas_layout(layout), convert_to_cblas_uplo(upper_lower),
             convert_to_cblas_trans(trans), &n_ref, &k_ref, (fp_ref*)&alpha, (fp_ref*)A.data(),
-            &lda_ref, (fp_ref*)B.data(), &ldb_ref, (fp_scalar_mkl*)&beta, (fp_ref*)C_ref.data(),
+            &lda_ref, (fp_ref*)B.data(), &ldb_ref, (fp_scalar_ref*)&beta, (fp_ref*)C_ref.data(),
             &ldc_ref);
 
     // Call DPC++ HER2K.
@@ -97,28 +97,28 @@ int test(device* dev, oneapi::mkl::layout layout, oneapi::mkl::uplo upper_lower,
     try {
 #ifdef CALL_RT_API
         switch (layout) {
-            case oneapi::mkl::layout::col_major:
-                done = oneapi::mkl::blas::column_major::her2k(main_queue, upper_lower, trans, n, k,
-                                                              alpha, A.data(), lda, B.data(), ldb,
-                                                              beta, C.data(), ldc, dependencies);
+            case oneapi::math::layout::col_major:
+                done = oneapi::math::blas::column_major::her2k(main_queue, upper_lower, trans, n, k,
+                                                               alpha, A.data(), lda, B.data(), ldb,
+                                                               beta, C.data(), ldc, dependencies);
                 break;
-            case oneapi::mkl::layout::row_major:
-                done = oneapi::mkl::blas::row_major::her2k(main_queue, upper_lower, trans, n, k,
-                                                           alpha, A.data(), lda, B.data(), ldb,
-                                                           beta, C.data(), ldc, dependencies);
+            case oneapi::math::layout::row_major:
+                done = oneapi::math::blas::row_major::her2k(main_queue, upper_lower, trans, n, k,
+                                                            alpha, A.data(), lda, B.data(), ldb,
+                                                            beta, C.data(), ldc, dependencies);
                 break;
             default: break;
         }
         done.wait();
 #else
         switch (layout) {
-            case oneapi::mkl::layout::col_major:
-                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::mkl::blas::column_major::her2k,
+            case oneapi::math::layout::col_major:
+                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::math::blas::column_major::her2k,
                                         upper_lower, trans, n, k, alpha, A.data(), lda, B.data(),
                                         ldb, beta, C.data(), ldc, dependencies);
                 break;
-            case oneapi::mkl::layout::row_major:
-                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::mkl::blas::row_major::her2k,
+            case oneapi::math::layout::row_major:
+                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::math::blas::row_major::her2k,
                                         upper_lower, trans, n, k, alpha, A.data(), lda, B.data(),
                                         ldb, beta, C.data(), ldc, dependencies);
                 break;
@@ -132,7 +132,7 @@ int test(device* dev, oneapi::mkl::layout layout, oneapi::mkl::uplo upper_lower,
         print_error_code(e);
     }
 
-    catch (const oneapi::mkl::unimplemented& e) {
+    catch (const oneapi::math::unimplemented& e) {
         return test_skipped;
     }
 
@@ -148,23 +148,23 @@ int test(device* dev, oneapi::mkl::layout layout, oneapi::mkl::uplo upper_lower,
 }
 
 class Her2kUsmTests
-        : public ::testing::TestWithParam<std::tuple<sycl::device*, oneapi::mkl::layout>> {};
+        : public ::testing::TestWithParam<std::tuple<sycl::device*, oneapi::math::layout>> {};
 
 TEST_P(Her2kUsmTests, ComplexSinglePrecision) {
     std::complex<float> alpha(2.0, -0.5);
     float beta(1.0);
     EXPECT_TRUEORSKIP((test<std::complex<float>, float>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::uplo::lower,
-        oneapi::mkl::transpose::nontrans, 72, 27, 101, 102, 103, alpha, beta)));
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::uplo::lower,
+        oneapi::math::transpose::nontrans, 72, 27, 101, 102, 103, alpha, beta)));
     EXPECT_TRUEORSKIP((test<std::complex<float>, float>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::uplo::upper,
-        oneapi::mkl::transpose::nontrans, 72, 27, 101, 102, 103, alpha, beta)));
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::uplo::upper,
+        oneapi::math::transpose::nontrans, 72, 27, 101, 102, 103, alpha, beta)));
     EXPECT_TRUEORSKIP((test<std::complex<float>, float>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::uplo::lower,
-        oneapi::mkl::transpose::conjtrans, 72, 27, 101, 102, 103, alpha, beta)));
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::uplo::lower,
+        oneapi::math::transpose::conjtrans, 72, 27, 101, 102, 103, alpha, beta)));
     EXPECT_TRUEORSKIP((test<std::complex<float>, float>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::uplo::upper,
-        oneapi::mkl::transpose::conjtrans, 72, 27, 101, 102, 103, alpha, beta)));
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::uplo::upper,
+        oneapi::math::transpose::conjtrans, 72, 27, 101, 102, 103, alpha, beta)));
 }
 TEST_P(Her2kUsmTests, ComplexDoublePrecision) {
     CHECK_DOUBLE_ON_DEVICE(std::get<0>(GetParam()));
@@ -172,23 +172,23 @@ TEST_P(Her2kUsmTests, ComplexDoublePrecision) {
     std::complex<double> alpha(2.0, -0.5);
     double beta(1.0);
     EXPECT_TRUEORSKIP((test<std::complex<double>, double>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::uplo::lower,
-        oneapi::mkl::transpose::nontrans, 72, 27, 101, 102, 103, alpha, beta)));
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::uplo::lower,
+        oneapi::math::transpose::nontrans, 72, 27, 101, 102, 103, alpha, beta)));
     EXPECT_TRUEORSKIP((test<std::complex<double>, double>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::uplo::upper,
-        oneapi::mkl::transpose::nontrans, 72, 27, 101, 102, 103, alpha, beta)));
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::uplo::upper,
+        oneapi::math::transpose::nontrans, 72, 27, 101, 102, 103, alpha, beta)));
     EXPECT_TRUEORSKIP((test<std::complex<double>, double>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::uplo::lower,
-        oneapi::mkl::transpose::conjtrans, 72, 27, 101, 102, 103, alpha, beta)));
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::uplo::lower,
+        oneapi::math::transpose::conjtrans, 72, 27, 101, 102, 103, alpha, beta)));
     EXPECT_TRUEORSKIP((test<std::complex<double>, double>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::uplo::upper,
-        oneapi::mkl::transpose::conjtrans, 72, 27, 101, 102, 103, alpha, beta)));
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::uplo::upper,
+        oneapi::math::transpose::conjtrans, 72, 27, 101, 102, 103, alpha, beta)));
 }
 
 INSTANTIATE_TEST_SUITE_P(Her2kUsmTestSuite, Her2kUsmTests,
                          ::testing::Combine(testing::ValuesIn(devices),
-                                            testing::Values(oneapi::mkl::layout::col_major,
-                                                            oneapi::mkl::layout::row_major)),
+                                            testing::Values(oneapi::math::layout::col_major,
+                                                            oneapi::math::layout::row_major)),
                          ::LayoutDeviceNamePrint());
 
 } // anonymous namespace

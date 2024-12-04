@@ -27,19 +27,19 @@
 #include <CL/sycl.hpp>
 #endif
 
-#include "oneapi/mkl/rng/detail/engine_impl.hpp"
+#include "oneapi/math/rng/detail/engine_impl.hpp"
 
 typedef struct {
     int version;
 
-    oneapi::mkl::rng::detail::engine_impl* (*create_philox4x32x10_sycl)(sycl::queue queue,
-                                                                        std::uint64_t seed);
-    oneapi::mkl::rng::detail::engine_impl* (*create_philox4x32x10_ex_sycl)(
+    oneapi::math::rng::detail::engine_impl* (*create_philox4x32x10_sycl)(sycl::queue queue,
+                                                                         std::uint64_t seed);
+    oneapi::math::rng::detail::engine_impl* (*create_philox4x32x10_ex_sycl)(
         sycl::queue queue, std::initializer_list<std::uint64_t> seed);
 
-    oneapi::mkl::rng::detail::engine_impl* (*create_mrg32k3a_sycl)(sycl::queue queue,
-                                                                   std::uint32_t seed);
-    oneapi::mkl::rng::detail::engine_impl* (*create_mrg32k3a_ex_sycl)(
+    oneapi::math::rng::detail::engine_impl* (*create_mrg32k3a_sycl)(sycl::queue queue,
+                                                                    std::uint32_t seed);
+    oneapi::math::rng::detail::engine_impl* (*create_mrg32k3a_ex_sycl)(
         sycl::queue queue, std::initializer_list<std::uint32_t> seed);
 } rng_function_table_t;
 

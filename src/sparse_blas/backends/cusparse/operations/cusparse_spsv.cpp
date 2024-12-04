@@ -17,7 +17,7 @@
 *
 **************************************************************************/
 
-#include "oneapi/mkl/sparse_blas/detail/cusparse/onemkl_sparse_blas_cusparse.hpp"
+#include "oneapi/math/sparse_blas/detail/cusparse/onemath_sparse_blas_cusparse.hpp"
 
 #include "sparse_blas/backends/cusparse/cusparse_error.hpp"
 #include "sparse_blas/backends/cusparse/cusparse_handles.hpp"
@@ -29,7 +29,7 @@
 #include "sparse_blas/matrix_view_comparison.hpp"
 #include "sparse_blas/sycl_helper.hpp"
 
-namespace oneapi::mkl::sparse {
+namespace oneapi::math::sparse {
 
 // Complete the definition of the incomplete type
 struct spsv_descr {
@@ -43,7 +43,7 @@ struct spsv_descr {
     detail::generic_container workspace;
     bool buffer_size_called = false;
     bool optimized_called = false;
-    oneapi::mkl::transpose last_optimized_opA;
+    transpose last_optimized_opA;
     matrix_view last_optimized_A_view;
     matrix_handle_t last_optimized_A_handle;
     dense_vector_handle_t last_optimized_x_handle;
@@ -51,9 +51,9 @@ struct spsv_descr {
     spsv_alg last_optimized_alg;
 };
 
-} // namespace oneapi::mkl::sparse
+} // namespace oneapi::math::sparse
 
-namespace oneapi::mkl::sparse::cusparse {
+namespace oneapi::math::sparse::cusparse {
 
 namespace detail {
 
@@ -69,15 +69,15 @@ void check_valid_spsv(const std::string& function_name, matrix_view A_view,
     check_valid_matrix_properties(function_name, A_handle);
 }
 
-inline void common_spsv_optimize(oneapi::mkl::transpose opA, bool is_alpha_host_accessible,
-                                 matrix_view A_view, matrix_handle_t A_handle,
-                                 dense_vector_handle_t x_handle, dense_vector_handle_t y_handle,
-                                 spsv_alg alg, spsv_descr_t spsv_descr) {
+inline void common_spsv_optimize(transpose opA, bool is_alpha_host_accessible, matrix_view A_view,
+                                 matrix_handle_t A_handle, dense_vector_handle_t x_handle,
+                                 dense_vector_handle_t y_handle, spsv_alg alg,
+                                 spsv_descr_t spsv_descr) {
     check_valid_spsv("spsv_optimize", A_view, A_handle, x_handle, y_handle,
                      is_alpha_host_accessible);
     if (!spsv_descr->buffer_size_called) {
-        throw mkl::uninitialized("sparse_blas", "spsv_optimize",
-                                 "spsv_buffer_size must be called before spsv_optimize.");
+        throw math::uninitialized("sparse_blas", "spsv_optimize",
+                                  "spsv_buffer_size must be called before spsv_optimize.");
     }
     spsv_descr->optimized_called = true;
     spsv_descr->last_optimized_opA = opA;
@@ -88,7 +88,7 @@ inline void common_spsv_optimize(oneapi::mkl::transpose opA, bool is_alpha_host_
     spsv_descr->last_optimized_alg = alg;
 }
 
-void spsv_optimize_impl(cusparseHandle_t cu_handle, oneapi::mkl::transpose opA, const void* alpha,
+void spsv_optimize_impl(cusparseHandle_t cu_handle, transpose opA, const void* alpha,
                         matrix_view A_view, matrix_handle_t A_handle,
                         dense_vector_handle_t x_handle, dense_vector_handle_t y_handle,
                         spsv_alg alg, spsv_descr_t spsv_descr, void* workspace_ptr,
@@ -154,8 +154,8 @@ sycl::event release_spsv_descr(sycl::queue& queue, spsv_descr_t spsv_descr,
     return event;
 }
 
-void spsv_buffer_size(sycl::queue& queue, oneapi::mkl::transpose opA, const void* alpha,
-                      matrix_view A_view, matrix_handle_t A_handle, dense_vector_handle_t x_handle,
+void spsv_buffer_size(sycl::queue& queue, transpose opA, const void* alpha, matrix_view A_view,
+                      matrix_handle_t A_handle, dense_vector_handle_t x_handle,
                       dense_vector_handle_t y_handle, spsv_alg alg, spsv_descr_t spsv_descr,
                       std::size_t& temp_buffer_size) {
     bool is_alpha_host_accessible = detail::is_ptr_accessible_on_host(queue, alpha);
@@ -185,8 +185,8 @@ void spsv_buffer_size(sycl::queue& queue, oneapi::mkl::transpose opA, const void
     spsv_descr->buffer_size_called = true;
 }
 
-void spsv_optimize(sycl::queue& queue, oneapi::mkl::transpose opA, const void* alpha,
-                   matrix_view A_view, matrix_handle_t A_handle, dense_vector_handle_t x_handle,
+void spsv_optimize(sycl::queue& queue, transpose opA, const void* alpha, matrix_view A_view,
+                   matrix_handle_t A_handle, dense_vector_handle_t x_handle,
                    dense_vector_handle_t y_handle, spsv_alg alg, spsv_descr_t spsv_descr,
                    sycl::buffer<std::uint8_t, 1> workspace) {
     bool is_alpha_host_accessible = detail::is_ptr_accessible_on_host(queue, alpha);
@@ -221,11 +221,10 @@ void spsv_optimize(sycl::queue& queue, oneapi::mkl::transpose opA, const void* a
     }
 }
 
-sycl::event spsv_optimize(sycl::queue& queue, oneapi::mkl::transpose opA, const void* alpha,
-                          matrix_view A_view, matrix_handle_t A_handle,
-                          dense_vector_handle_t x_handle, dense_vector_handle_t y_handle,
-                          spsv_alg alg, spsv_descr_t spsv_descr, void* workspace,
-                          const std::vector<sycl::event>& dependencies) {
+sycl::event spsv_optimize(sycl::queue& queue, transpose opA, const void* alpha, matrix_view A_view,
+                          matrix_handle_t A_handle, dense_vector_handle_t x_handle,
+                          dense_vector_handle_t y_handle, spsv_alg alg, spsv_descr_t spsv_descr,
+                          void* workspace, const std::vector<sycl::event>& dependencies) {
     bool is_alpha_host_accessible = detail::is_ptr_accessible_on_host(queue, alpha);
     if (A_handle->all_use_buffer()) {
         detail::throw_incompatible_container(__func__);
@@ -243,8 +242,8 @@ sycl::event spsv_optimize(sycl::queue& queue, oneapi::mkl::transpose opA, const 
                                    y_handle);
 }
 
-sycl::event spsv(sycl::queue& queue, oneapi::mkl::transpose opA, const void* alpha,
-                 matrix_view A_view, matrix_handle_t A_handle, dense_vector_handle_t x_handle,
+sycl::event spsv(sycl::queue& queue, transpose opA, const void* alpha, matrix_view A_view,
+                 matrix_handle_t A_handle, dense_vector_handle_t x_handle,
                  dense_vector_handle_t y_handle, spsv_alg alg, spsv_descr_t spsv_descr,
                  const std::vector<sycl::event>& dependencies) {
     bool is_alpha_host_accessible = detail::is_ptr_accessible_on_host(queue, alpha);
@@ -255,8 +254,8 @@ sycl::event spsv(sycl::queue& queue, oneapi::mkl::transpose opA, const void* alp
     }
 
     if (!spsv_descr->optimized_called) {
-        throw mkl::uninitialized("sparse_blas", __func__,
-                                 "spsv_optimize must be called before spsv.");
+        throw math::uninitialized("sparse_blas", __func__,
+                                  "spsv_optimize must be called before spsv.");
     }
     CHECK_DESCR_MATCH(spsv_descr, opA, "spsv_optimize");
     CHECK_DESCR_MATCH(spsv_descr, A_view, "spsv_optimize");
@@ -287,4 +286,4 @@ sycl::event spsv(sycl::queue& queue, oneapi::mkl::transpose opA, const void* alp
                                               x_handle, y_handle);
 }
 
-} // namespace oneapi::mkl::sparse::cusparse
+} // namespace oneapi::math::sparse::cusparse

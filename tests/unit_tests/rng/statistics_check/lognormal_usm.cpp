@@ -31,13 +31,13 @@ class LognormalIcdfUsmTest : public ::testing::TestWithParam<sycl::device*> {};
 
 TEST_P(LognormalIcdfUsmTest, RealSinglePrecision) {
     rng_test<statistics_usm_test<
-        oneapi::mkl::rng::lognormal<float, oneapi::mkl::rng::lognormal_method::icdf>,
-        oneapi::mkl::rng::philox4x32x10>>
+        oneapi::math::rng::lognormal<float, oneapi::math::rng::lognormal_method::icdf>,
+        oneapi::math::rng::philox4x32x10>>
         test1;
     EXPECT_TRUEORSKIP((test1(GetParam(), N_GEN, LOGNORMAL_ARGS_FLOAT)));
     rng_test<statistics_usm_test<
-        oneapi::mkl::rng::lognormal<float, oneapi::mkl::rng::lognormal_method::icdf>,
-        oneapi::mkl::rng::mrg32k3a>>
+        oneapi::math::rng::lognormal<float, oneapi::math::rng::lognormal_method::icdf>,
+        oneapi::math::rng::mrg32k3a>>
         test2;
     EXPECT_TRUEORSKIP((test2(GetParam(), N_GEN, LOGNORMAL_ARGS_FLOAT)));
 }
@@ -46,26 +46,26 @@ TEST_P(LognormalIcdfUsmTest, RealDoublePrecision) {
     CHECK_DOUBLE_ON_DEVICE(GetParam());
 
     rng_test<statistics_usm_test<
-        oneapi::mkl::rng::lognormal<double, oneapi::mkl::rng::lognormal_method::icdf>,
-        oneapi::mkl::rng::philox4x32x10>>
+        oneapi::math::rng::lognormal<double, oneapi::math::rng::lognormal_method::icdf>,
+        oneapi::math::rng::philox4x32x10>>
         test1;
     EXPECT_TRUEORSKIP((test1(GetParam(), N_GEN, LOGNORMAL_ARGS_DOUBLE)));
     rng_test<statistics_usm_test<
-        oneapi::mkl::rng::lognormal<double, oneapi::mkl::rng::lognormal_method::icdf>,
-        oneapi::mkl::rng::mrg32k3a>>
+        oneapi::math::rng::lognormal<double, oneapi::math::rng::lognormal_method::icdf>,
+        oneapi::math::rng::mrg32k3a>>
         test2;
     EXPECT_TRUEORSKIP((test2(GetParam(), N_GEN, LOGNORMAL_ARGS_DOUBLE)));
 }
 
 TEST_P(LognormalBoxmullerUsmTest, RealSinglePrecision) {
     rng_test<statistics_usm_test<
-        oneapi::mkl::rng::lognormal<float, oneapi::mkl::rng::lognormal_method::box_muller2>,
-        oneapi::mkl::rng::philox4x32x10>>
+        oneapi::math::rng::lognormal<float, oneapi::math::rng::lognormal_method::box_muller2>,
+        oneapi::math::rng::philox4x32x10>>
         test1;
     EXPECT_TRUEORSKIP((test1(GetParam(), N_GEN, LOGNORMAL_ARGS_FLOAT)));
     rng_test<statistics_usm_test<
-        oneapi::mkl::rng::lognormal<float, oneapi::mkl::rng::lognormal_method::box_muller2>,
-        oneapi::mkl::rng::mrg32k3a>>
+        oneapi::math::rng::lognormal<float, oneapi::math::rng::lognormal_method::box_muller2>,
+        oneapi::math::rng::mrg32k3a>>
         test2;
     EXPECT_TRUEORSKIP((test2(GetParam(), N_GEN, LOGNORMAL_ARGS_FLOAT)));
 }
@@ -74,13 +74,13 @@ TEST_P(LognormalBoxmullerUsmTest, RealDoublePrecision) {
     CHECK_DOUBLE_ON_DEVICE(GetParam());
 
     rng_test<statistics_usm_test<
-        oneapi::mkl::rng::lognormal<double, oneapi::mkl::rng::lognormal_method::box_muller2>,
-        oneapi::mkl::rng::philox4x32x10>>
+        oneapi::math::rng::lognormal<double, oneapi::math::rng::lognormal_method::box_muller2>,
+        oneapi::math::rng::philox4x32x10>>
         test1;
     EXPECT_TRUEORSKIP((test1(GetParam(), N_GEN, LOGNORMAL_ARGS_DOUBLE)));
     rng_test<statistics_usm_test<
-        oneapi::mkl::rng::lognormal<double, oneapi::mkl::rng::lognormal_method::box_muller2>,
-        oneapi::mkl::rng::mrg32k3a>>
+        oneapi::math::rng::lognormal<double, oneapi::math::rng::lognormal_method::box_muller2>,
+        oneapi::math::rng::mrg32k3a>>
         test2;
     EXPECT_TRUEORSKIP((test2(GetParam(), N_GEN, LOGNORMAL_ARGS_DOUBLE)));
 }

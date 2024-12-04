@@ -29,26 +29,26 @@ class BernoulliIcdfTests : public ::testing::TestWithParam<sycl::device*> {};
 
 TEST_P(BernoulliIcdfTests, IntegerPrecision) {
     rng_test<statistics_test<
-        oneapi::mkl::rng::bernoulli<std::int32_t, oneapi::mkl::rng::bernoulli_method::icdf>,
-        oneapi::mkl::rng::philox4x32x10>>
+        oneapi::math::rng::bernoulli<std::int32_t, oneapi::math::rng::bernoulli_method::icdf>,
+        oneapi::math::rng::philox4x32x10>>
         test1;
     EXPECT_TRUEORSKIP((test1(GetParam(), N_GEN, BERNOULLI_ARGS)));
     rng_test<statistics_test<
-        oneapi::mkl::rng::bernoulli<std::int32_t, oneapi::mkl::rng::bernoulli_method::icdf>,
-        oneapi::mkl::rng::mrg32k3a>>
+        oneapi::math::rng::bernoulli<std::int32_t, oneapi::math::rng::bernoulli_method::icdf>,
+        oneapi::math::rng::mrg32k3a>>
         test2;
     EXPECT_TRUEORSKIP((test2(GetParam(), N_GEN, BERNOULLI_ARGS)));
 }
 
 TEST_P(BernoulliIcdfTests, UnsignedIntegerPrecision) {
     rng_test<statistics_test<
-        oneapi::mkl::rng::bernoulli<std::uint32_t, oneapi::mkl::rng::bernoulli_method::icdf>,
-        oneapi::mkl::rng::philox4x32x10>>
+        oneapi::math::rng::bernoulli<std::uint32_t, oneapi::math::rng::bernoulli_method::icdf>,
+        oneapi::math::rng::philox4x32x10>>
         test1;
     EXPECT_TRUEORSKIP((test1(GetParam(), N_GEN, BERNOULLI_ARGS)));
     rng_test<statistics_test<
-        oneapi::mkl::rng::bernoulli<std::uint32_t, oneapi::mkl::rng::bernoulli_method::icdf>,
-        oneapi::mkl::rng::mrg32k3a>>
+        oneapi::math::rng::bernoulli<std::uint32_t, oneapi::math::rng::bernoulli_method::icdf>,
+        oneapi::math::rng::mrg32k3a>>
         test2;
     EXPECT_TRUEORSKIP((test2(GetParam(), N_GEN, BERNOULLI_ARGS)));
 }

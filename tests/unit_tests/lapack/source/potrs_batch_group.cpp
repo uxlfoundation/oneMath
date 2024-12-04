@@ -28,7 +28,7 @@
 #include <CL/sycl.hpp>
 #endif
 
-#include "oneapi/mkl.hpp"
+#include "oneapi/math.hpp"
 #include "lapack_common.hpp"
 #include "lapack_test_controller.hpp"
 #include "lapack_accuracy_checks.hpp"
@@ -46,8 +46,8 @@ bool accuracy(const sycl::device& dev, uint64_t seed) {
     using fp_real = typename complex_info<fp>::real_type;
 
     /* Test Parameters */
-    std::vector<oneapi::mkl::uplo> uplo_vec = { oneapi::mkl::uplo::upper,
-                                                oneapi::mkl::uplo::lower };
+    std::vector<oneapi::math::uplo> uplo_vec = { oneapi::math::uplo::upper,
+                                                 oneapi::math::uplo::lower };
     std::vector<int64_t> n_vec = { 4, 5 };
     std::vector<int64_t> nrhs_vec = { 9, 6 };
     std::vector<int64_t> lda_vec = { 6, 6 };
@@ -81,7 +81,7 @@ bool accuracy(const sycl::device& dev, uint64_t seed) {
 
             B_initial_list.emplace_back(ldb * nrhs);
             auto& B_initial = B_initial_list.back();
-            rand_matrix(seed, oneapi::mkl::transpose::nontrans, n, nrhs, B_initial, lda);
+            rand_matrix(seed, oneapi::math::transpose::nontrans, n, nrhs, B_initial, lda);
 
             B_list.emplace_back(B_initial);
             auto& B = B_list.back();
@@ -114,13 +114,13 @@ bool accuracy(const sycl::device& dev, uint64_t seed) {
         }
 
 #ifdef CALL_RT_API
-        const auto scratchpad_size = oneapi::mkl::lapack::potrs_batch_scratchpad_size<fp>(
+        const auto scratchpad_size = oneapi::math::lapack::potrs_batch_scratchpad_size<fp>(
             queue, uplo_vec.data(), n_vec.data(), nrhs_vec.data(), lda_vec.data(), ldb_vec.data(),
             group_count, group_sizes_vec.data());
 #else
         int64_t scratchpad_size;
         TEST_RUN_LAPACK_CT_SELECT(
-            queue, scratchpad_size = oneapi::mkl::lapack::potrs_batch_scratchpad_size<fp>,
+            queue, scratchpad_size = oneapi::math::lapack::potrs_batch_scratchpad_size<fp>,
             uplo_vec.data(), n_vec.data(), nrhs_vec.data(), lda_vec.data(), ldb_vec.data(),
             group_count, group_sizes_vec.data());
 #endif
@@ -143,12 +143,12 @@ bool accuracy(const sycl::device& dev, uint64_t seed) {
         queue.wait_and_throw();
 
 #ifdef CALL_RT_API
-        oneapi::mkl::lapack::potrs_batch(queue, uplo_vec.data(), n_vec.data(), nrhs_vec.data(),
-                                         A_dev_ptrs, lda_vec.data(), B_dev_ptrs, ldb_vec.data(),
-                                         group_count, group_sizes_vec.data(), scratchpad_dev,
-                                         scratchpad_size);
+        oneapi::math::lapack::potrs_batch(queue, uplo_vec.data(), n_vec.data(), nrhs_vec.data(),
+                                          A_dev_ptrs, lda_vec.data(), B_dev_ptrs, ldb_vec.data(),
+                                          group_count, group_sizes_vec.data(), scratchpad_dev,
+                                          scratchpad_size);
 #else
-        TEST_RUN_LAPACK_CT_SELECT(queue, oneapi::mkl::lapack::potrs_batch, uplo_vec.data(),
+        TEST_RUN_LAPACK_CT_SELECT(queue, oneapi::math::lapack::potrs_batch, uplo_vec.data(),
                                   n_vec.data(), nrhs_vec.data(), A_dev_ptrs, lda_vec.data(),
                                   B_dev_ptrs, ldb_vec.data(), group_count, group_sizes_vec.data(),
                                   scratchpad_dev, scratchpad_size);
@@ -209,7 +209,7 @@ bool usm_dependency(const sycl::device& dev, uint64_t seed) {
     using fp_real = typename complex_info<fp>::real_type;
 
     /* Test Parameters */
-    std::vector<oneapi::mkl::uplo> uplo_vec = { oneapi::mkl::uplo::upper };
+    std::vector<oneapi::math::uplo> uplo_vec = { oneapi::math::uplo::upper };
     std::vector<int64_t> n_vec = { 1 };
     std::vector<int64_t> nrhs_vec = { 1 };
     std::vector<int64_t> lda_vec = { 1 };
@@ -243,7 +243,7 @@ bool usm_dependency(const sycl::device& dev, uint64_t seed) {
 
             B_initial_list.emplace_back(ldb * nrhs);
             auto& B_initial = B_initial_list.back();
-            rand_matrix(seed, oneapi::mkl::transpose::nontrans, n, nrhs, B_initial, lda);
+            rand_matrix(seed, oneapi::math::transpose::nontrans, n, nrhs, B_initial, lda);
 
             B_list.emplace_back(B_initial);
             auto& B = B_list.back();
@@ -277,13 +277,13 @@ bool usm_dependency(const sycl::device& dev, uint64_t seed) {
         }
 
 #ifdef CALL_RT_API
-        const auto scratchpad_size = oneapi::mkl::lapack::potrs_batch_scratchpad_size<fp>(
+        const auto scratchpad_size = oneapi::math::lapack::potrs_batch_scratchpad_size<fp>(
             queue, uplo_vec.data(), n_vec.data(), nrhs_vec.data(), lda_vec.data(), ldb_vec.data(),
             group_count, group_sizes_vec.data());
 #else
         int64_t scratchpad_size;
         TEST_RUN_LAPACK_CT_SELECT(
-            queue, scratchpad_size = oneapi::mkl::lapack::potrs_batch_scratchpad_size<fp>,
+            queue, scratchpad_size = oneapi::math::lapack::potrs_batch_scratchpad_size<fp>,
             uplo_vec.data(), n_vec.data(), nrhs_vec.data(), lda_vec.data(), ldb_vec.data(),
             group_count, group_sizes_vec.data());
 #endif
@@ -308,13 +308,13 @@ bool usm_dependency(const sycl::device& dev, uint64_t seed) {
         /* Check dependency handling */
         auto in_event = create_dependency(queue);
 #ifdef CALL_RT_API
-        sycl::event func_event = oneapi::mkl::lapack::potrs_batch(
+        sycl::event func_event = oneapi::math::lapack::potrs_batch(
             queue, uplo_vec.data(), n_vec.data(), nrhs_vec.data(), A_dev_ptrs, lda_vec.data(),
             B_dev_ptrs, ldb_vec.data(), group_count, group_sizes_vec.data(), scratchpad_dev,
             scratchpad_size, std::vector<sycl::event>{ in_event });
 #else
         sycl::event func_event;
-        TEST_RUN_LAPACK_CT_SELECT(queue, func_event = oneapi::mkl::lapack::potrs_batch,
+        TEST_RUN_LAPACK_CT_SELECT(queue, func_event = oneapi::math::lapack::potrs_batch,
                                   uplo_vec.data(), n_vec.data(), nrhs_vec.data(), A_dev_ptrs,
                                   lda_vec.data(), B_dev_ptrs, ldb_vec.data(), group_count,
                                   group_sizes_vec.data(), scratchpad_dev, scratchpad_size,

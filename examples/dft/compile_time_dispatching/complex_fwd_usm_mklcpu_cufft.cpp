@@ -20,13 +20,13 @@
 // STL includes
 #include <iostream>
 
-// oneMKL/SYCL includes
+// oneMath/SYCL includes
 #if __has_include(<sycl/sycl.hpp>)
 #include <sycl/sycl.hpp>
 #else
 #include <CL/sycl.hpp>
 #endif
-#include "oneapi/mkl.hpp"
+#include "oneapi/math.hpp"
 #include <complex>
 
 void run_example(const sycl::device& cpu_device, const sycl::device& gpu_device) {
@@ -82,28 +82,28 @@ void run_example(const sycl::device& cpu_device, const sycl::device& gpu_device)
 
     // enabling
     // 1. create descriptors
-    oneapi::mkl::dft::descriptor<oneapi::mkl::dft::precision::SINGLE,
-                                 oneapi::mkl::dft::domain::COMPLEX>
+    oneapi::math::dft::descriptor<oneapi::math::dft::precision::SINGLE,
+                                  oneapi::math::dft::domain::COMPLEX>
         desc(static_cast<std::int64_t>(N));
 
     // 2. variadic set_value
-    desc.set_value(oneapi::mkl::dft::config_param::PLACEMENT,
-                   oneapi::mkl::dft::config_value::NOT_INPLACE);
-    desc.set_value(oneapi::mkl::dft::config_param::NUMBER_OF_TRANSFORMS,
+    desc.set_value(oneapi::math::dft::config_param::PLACEMENT,
+                   oneapi::math::dft::config_value::NOT_INPLACE);
+    desc.set_value(oneapi::math::dft::config_param::NUMBER_OF_TRANSFORMS,
                    static_cast<std::int64_t>(1));
 
     // 3a. commit_descriptor (compile_time MKLCPU)
-    desc.commit(oneapi::mkl::backend_selector<oneapi::mkl::backend::mklcpu>{ cpu_queue });
+    desc.commit(oneapi::math::backend_selector<oneapi::math::backend::mklcpu>{ cpu_queue });
 
     // 4a. compute_forward / compute_backward (MKLCPU)
-    oneapi::mkl::dft::compute_forward<decltype(desc), std::complex<float>, std::complex<float>>(
+    oneapi::math::dft::compute_forward<decltype(desc), std::complex<float>, std::complex<float>>(
         desc, cpu_input_data, cpu_output_data);
 
     // 3b. commit_descriptor (compile_time cuFFT)
-    desc.commit(oneapi::mkl::backend_selector<oneapi::mkl::backend::cufft>{ gpu_queue });
+    desc.commit(oneapi::math::backend_selector<oneapi::math::backend::cufft>{ gpu_queue });
 
     // 4b. compute_forward / compute_backward (cuFFT)
-    oneapi::mkl::dft::compute_forward<decltype(desc), std::complex<float>, std::complex<float>>(
+    oneapi::math::dft::compute_forward<decltype(desc), std::complex<float>, std::complex<float>>(
         desc, gpu_input_data, gpu_output_data);
 
     cpu_queue.wait_and_throw();

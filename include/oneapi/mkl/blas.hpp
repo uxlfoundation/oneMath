@@ -1,5 +1,5 @@
 /*******************************************************************************
-* Copyright 2020-2021 Intel Corporation
+* Copyright 2024 Intel Corporation
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -17,57 +17,15 @@
 * SPDX-License-Identifier: Apache-2.0
 *******************************************************************************/
 
-#ifndef _ONEMKL_BLAS_HPP_
-#define _ONEMKL_BLAS_HPP_
+#ifndef ONEMATH_MKL_BLAS_HPP
+#define ONEMATH_MKL_BLAS_HPP
 
-#if __has_include(<sycl/sycl.hpp>)
-#include <sycl/sycl.hpp>
-#else
-#include <CL/sycl.hpp>
-#endif
-#include <complex>
-#include <cstdint>
+// Deprecated header is planned to be removed late 2025.
+#pragma message( \
+    "Header `oneapi/mkl/blas.hpp` is deprecated, please use `oneapi/math/blas.hpp` instead")
 
-#include "oneapi/mkl/detail/config.hpp"
-#include "oneapi/mkl/types.hpp"
+#include "oneapi/math/blas.hpp"
 
-#include "oneapi/mkl/detail/get_device_id.hpp"
+#include "namespace_alias.hpp"
 
-#include "oneapi/mkl/blas/detail/blas_loader.hpp"
-#ifdef ONEMKL_ENABLE_CUBLAS_BACKEND
-#include "oneapi/mkl/blas/detail/cublas/blas_ct.hpp"
-#endif
-#ifdef ONEMKL_ENABLE_ROCBLAS_BACKEND
-#include "oneapi/mkl/blas/detail/rocblas/blas_ct.hpp"
-#endif
-#ifdef ONEMKL_ENABLE_MKLCPU_BACKEND
-#include "oneapi/mkl/blas/detail/mklcpu/blas_ct.hpp"
-#endif
-#ifdef ONEMKL_ENABLE_MKLGPU_BACKEND
-#include "oneapi/mkl/blas/detail/mklgpu/blas_ct.hpp"
-#endif
-#ifdef ONEMKL_ENABLE_NETLIB_BACKEND
-#include "oneapi/mkl/blas/detail/netlib/blas_ct.hpp"
-#endif
-#ifdef ONEMKL_ENABLE_PORTBLAS_BACKEND
-#include "oneapi/mkl/blas/detail/portblas/blas_ct.hpp"
-#endif
-
-namespace oneapi {
-namespace mkl {
-namespace blas {
-namespace column_major {
-
-#include "blas.hxx"
-
-} //namespace column_major
-namespace row_major {
-
-#include "blas.hxx"
-
-} //namespace row_major
-} //namespace blas
-} //namespace mkl
-} //namespace oneapi
-
-#endif //_ONEMKL_BLAS_LOADER_HPP_
+#endif // ONEMATH_MKL_BLAS_HPP

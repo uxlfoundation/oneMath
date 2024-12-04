@@ -31,9 +31,9 @@
 #endif
 #include "allocator_helper.hpp"
 #include "cblas.h"
-#include "oneapi/mkl/detail/config.hpp"
-#include "oneapi/mkl.hpp"
-#include "onemkl_blas_helper.hpp"
+#include "oneapi/math/detail/config.hpp"
+#include "oneapi/math.hpp"
+#include "onemath_blas_helper.hpp"
 #include "reference_blas_templates.hpp"
 #include "test_common.hpp"
 #include "test_helper.hpp"
@@ -48,8 +48,8 @@ extern std::vector<sycl::device*> devices;
 namespace {
 
 template <typename Ts, typename Ta, typename Tb, typename Tc>
-int test(device* dev, oneapi::mkl::layout layout, oneapi::mkl::transpose transa,
-         oneapi::mkl::transpose transb, oneapi::mkl::offset offsetc, int m, int n, int k, int lda,
+int test(device* dev, oneapi::math::layout layout, oneapi::math::transpose transa,
+         oneapi::math::transpose transb, oneapi::math::offset offsetc, int m, int n, int k, int lda,
          int ldb, int ldc, Ts alpha, Ts beta) {
     // Prepare data.
     vector<Ta, allocator_helper<Ta, 64>> A;
@@ -61,13 +61,16 @@ int test(device* dev, oneapi::mkl::layout layout, oneapi::mkl::transpose transa,
 
     rand_matrix(A, layout, transa, m, k, lda);
     rand_matrix(B, layout, transb, k, n, ldb);
-    rand_matrix(C, layout, oneapi::mkl::transpose::nontrans, m, n, ldc);
-    if (offsetc == oneapi::mkl::offset::fix)
-        rand_matrix(co, oneapi::mkl::layout::col_major, oneapi::mkl::transpose::nontrans, 1, 1, 1);
-    if (offsetc == oneapi::mkl::offset::column)
-        rand_matrix(co, oneapi::mkl::layout::col_major, oneapi::mkl::transpose::nontrans, m, 1, m);
-    if (offsetc == oneapi::mkl::offset::row)
-        rand_matrix(co, oneapi::mkl::layout::col_major, oneapi::mkl::transpose::nontrans, n, 1, n);
+    rand_matrix(C, layout, oneapi::math::transpose::nontrans, m, n, ldc);
+    if (offsetc == oneapi::math::offset::fix)
+        rand_matrix(co, oneapi::math::layout::col_major, oneapi::math::transpose::nontrans, 1, 1,
+                    1);
+    if (offsetc == oneapi::math::offset::column)
+        rand_matrix(co, oneapi::math::layout::col_major, oneapi::math::transpose::nontrans, m, 1,
+                    m);
+    if (offsetc == oneapi::math::offset::row)
+        rand_matrix(co, oneapi::math::layout::col_major, oneapi::math::transpose::nontrans, n, 1,
+                    n);
 
     C_ref = C;
 
@@ -112,28 +115,28 @@ int test(device* dev, oneapi::mkl::layout layout, oneapi::mkl::transpose transa,
     try {
 #ifdef CALL_RT_API
         switch (layout) {
-            case oneapi::mkl::layout::col_major:
-                oneapi::mkl::blas::column_major::gemm_bias(main_queue, transa, transb, offsetc, m,
-                                                           n, k, alpha, A_buffer, lda, ao, B_buffer,
-                                                           ldb, bo, beta, C_buffer, ldc, CO_buffer);
+            case oneapi::math::layout::col_major:
+                oneapi::math::blas::column_major::gemm_bias(
+                    main_queue, transa, transb, offsetc, m, n, k, alpha, A_buffer, lda, ao,
+                    B_buffer, ldb, bo, beta, C_buffer, ldc, CO_buffer);
                 break;
-            case oneapi::mkl::layout::row_major:
-                oneapi::mkl::blas::row_major::gemm_bias(main_queue, transa, transb, offsetc, m, n,
-                                                        k, alpha, A_buffer, lda, ao, B_buffer, ldb,
-                                                        bo, beta, C_buffer, ldc, CO_buffer);
+            case oneapi::math::layout::row_major:
+                oneapi::math::blas::row_major::gemm_bias(main_queue, transa, transb, offsetc, m, n,
+                                                         k, alpha, A_buffer, lda, ao, B_buffer, ldb,
+                                                         bo, beta, C_buffer, ldc, CO_buffer);
                 break;
             default: break;
         }
 #else
         switch (layout) {
-            case oneapi::mkl::layout::col_major:
-                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::mkl::blas::column_major::gemm_bias,
+            case oneapi::math::layout::col_major:
+                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::math::blas::column_major::gemm_bias,
                                         transa, transb, offsetc, m, n, k, alpha, A_buffer, lda, ao,
                                         B_buffer, ldb, bo, beta, C_buffer, ldc, CO_buffer);
                 break;
-            case oneapi::mkl::layout::row_major:
-                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::mkl::blas::row_major::gemm_bias, transa,
-                                        transb, offsetc, m, n, k, alpha, A_buffer, lda, ao,
+            case oneapi::math::layout::row_major:
+                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::math::blas::row_major::gemm_bias,
+                                        transa, transb, offsetc, m, n, k, alpha, A_buffer, lda, ao,
                                         B_buffer, ldb, bo, beta, C_buffer, ldc, CO_buffer);
                 break;
             default: break;
@@ -146,7 +149,7 @@ int test(device* dev, oneapi::mkl::layout layout, oneapi::mkl::transpose transa,
         print_error_code(e);
     }
 
-    catch (const oneapi::mkl::unimplemented& e) {
+    catch (const oneapi::math::unimplemented& e) {
         return test_skipped;
     }
 
@@ -162,58 +165,58 @@ int test(device* dev, oneapi::mkl::layout layout, oneapi::mkl::transpose transa,
 }
 
 class GemmBiasTests
-        : public ::testing::TestWithParam<std::tuple<sycl::device*, oneapi::mkl::layout>> {};
+        : public ::testing::TestWithParam<std::tuple<sycl::device*, oneapi::math::layout>> {};
 
 TEST_P(GemmBiasTests, Int8Int8Int32Precision) {
     float alpha(2.0);
     float beta(3.0);
     EXPECT_TRUEORSKIP((test<float, int8_t, int8_t, int32_t>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::transpose::nontrans,
-        oneapi::mkl::transpose::nontrans, oneapi::mkl::offset::fix, 79, 83, 91, 103, 105, 106,
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::transpose::nontrans,
+        oneapi::math::transpose::nontrans, oneapi::math::offset::fix, 79, 83, 91, 103, 105, 106,
         alpha, beta)));
     EXPECT_TRUEORSKIP((test<float, int8_t, int8_t, int32_t>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::transpose::nontrans,
-        oneapi::mkl::transpose::trans, oneapi::mkl::offset::fix, 79, 83, 91, 103, 105, 106, alpha,
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::transpose::nontrans,
+        oneapi::math::transpose::trans, oneapi::math::offset::fix, 79, 83, 91, 103, 105, 106, alpha,
         beta)));
     EXPECT_TRUEORSKIP((test<float, int8_t, int8_t, int32_t>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::transpose::trans,
-        oneapi::mkl::transpose::nontrans, oneapi::mkl::offset::fix, 79, 83, 91, 103, 105, 106,
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::transpose::trans,
+        oneapi::math::transpose::nontrans, oneapi::math::offset::fix, 79, 83, 91, 103, 105, 106,
         alpha, beta)));
     EXPECT_TRUEORSKIP((test<float, int8_t, int8_t, int32_t>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::transpose::trans,
-        oneapi::mkl::transpose::trans, oneapi::mkl::offset::fix, 79, 83, 91, 103, 105, 106, alpha,
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::transpose::trans,
+        oneapi::math::transpose::trans, oneapi::math::offset::fix, 79, 83, 91, 103, 105, 106, alpha,
         beta)));
     EXPECT_TRUEORSKIP((test<float, int8_t, int8_t, int32_t>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::transpose::nontrans,
-        oneapi::mkl::transpose::nontrans, oneapi::mkl::offset::column, 79, 83, 91, 103, 105, 106,
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::transpose::nontrans,
+        oneapi::math::transpose::nontrans, oneapi::math::offset::column, 79, 83, 91, 103, 105, 106,
         alpha, beta)));
     EXPECT_TRUEORSKIP((test<float, int8_t, int8_t, int32_t>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::transpose::nontrans,
-        oneapi::mkl::transpose::trans, oneapi::mkl::offset::column, 79, 83, 91, 103, 105, 106,
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::transpose::nontrans,
+        oneapi::math::transpose::trans, oneapi::math::offset::column, 79, 83, 91, 103, 105, 106,
         alpha, beta)));
     EXPECT_TRUEORSKIP((test<float, int8_t, int8_t, int32_t>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::transpose::trans,
-        oneapi::mkl::transpose::nontrans, oneapi::mkl::offset::column, 79, 83, 91, 103, 105, 106,
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::transpose::trans,
+        oneapi::math::transpose::nontrans, oneapi::math::offset::column, 79, 83, 91, 103, 105, 106,
         alpha, beta)));
     EXPECT_TRUEORSKIP((test<float, int8_t, int8_t, int32_t>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::transpose::trans,
-        oneapi::mkl::transpose::trans, oneapi::mkl::offset::column, 79, 83, 91, 103, 105, 106,
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::transpose::trans,
+        oneapi::math::transpose::trans, oneapi::math::offset::column, 79, 83, 91, 103, 105, 106,
         alpha, beta)));
     EXPECT_TRUEORSKIP((test<float, int8_t, int8_t, int32_t>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::transpose::nontrans,
-        oneapi::mkl::transpose::nontrans, oneapi::mkl::offset::row, 79, 83, 91, 103, 105, 106,
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::transpose::nontrans,
+        oneapi::math::transpose::nontrans, oneapi::math::offset::row, 79, 83, 91, 103, 105, 106,
         alpha, beta)));
     EXPECT_TRUEORSKIP((test<float, int8_t, int8_t, int32_t>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::transpose::nontrans,
-        oneapi::mkl::transpose::trans, oneapi::mkl::offset::row, 79, 83, 91, 103, 105, 106, alpha,
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::transpose::nontrans,
+        oneapi::math::transpose::trans, oneapi::math::offset::row, 79, 83, 91, 103, 105, 106, alpha,
         beta)));
     EXPECT_TRUEORSKIP((test<float, int8_t, int8_t, int32_t>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::transpose::trans,
-        oneapi::mkl::transpose::nontrans, oneapi::mkl::offset::row, 79, 83, 91, 103, 105, 106,
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::transpose::trans,
+        oneapi::math::transpose::nontrans, oneapi::math::offset::row, 79, 83, 91, 103, 105, 106,
         alpha, beta)));
     EXPECT_TRUEORSKIP((test<float, int8_t, int8_t, int32_t>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::transpose::trans,
-        oneapi::mkl::transpose::trans, oneapi::mkl::offset::row, 79, 83, 91, 103, 105, 106, alpha,
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::transpose::trans,
+        oneapi::math::transpose::trans, oneapi::math::offset::row, 79, 83, 91, 103, 105, 106, alpha,
         beta)));
 }
 
@@ -221,52 +224,52 @@ TEST_P(GemmBiasTests, Int8Uint8Int32Precision) {
     float alpha(2.0);
     float beta(3.0);
     EXPECT_TRUEORSKIP((test<float, int8_t, uint8_t, int32_t>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::transpose::nontrans,
-        oneapi::mkl::transpose::nontrans, oneapi::mkl::offset::fix, 79, 83, 91, 103, 105, 106,
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::transpose::nontrans,
+        oneapi::math::transpose::nontrans, oneapi::math::offset::fix, 79, 83, 91, 103, 105, 106,
         alpha, beta)));
     EXPECT_TRUEORSKIP((test<float, int8_t, uint8_t, int32_t>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::transpose::nontrans,
-        oneapi::mkl::transpose::trans, oneapi::mkl::offset::fix, 79, 83, 91, 103, 105, 106, alpha,
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::transpose::nontrans,
+        oneapi::math::transpose::trans, oneapi::math::offset::fix, 79, 83, 91, 103, 105, 106, alpha,
         beta)));
     EXPECT_TRUEORSKIP((test<float, int8_t, uint8_t, int32_t>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::transpose::trans,
-        oneapi::mkl::transpose::nontrans, oneapi::mkl::offset::fix, 79, 83, 91, 103, 105, 106,
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::transpose::trans,
+        oneapi::math::transpose::nontrans, oneapi::math::offset::fix, 79, 83, 91, 103, 105, 106,
         alpha, beta)));
     EXPECT_TRUEORSKIP((test<float, int8_t, uint8_t, int32_t>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::transpose::trans,
-        oneapi::mkl::transpose::trans, oneapi::mkl::offset::fix, 79, 83, 91, 103, 105, 106, alpha,
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::transpose::trans,
+        oneapi::math::transpose::trans, oneapi::math::offset::fix, 79, 83, 91, 103, 105, 106, alpha,
         beta)));
     EXPECT_TRUEORSKIP((test<float, int8_t, uint8_t, int32_t>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::transpose::nontrans,
-        oneapi::mkl::transpose::nontrans, oneapi::mkl::offset::column, 79, 83, 91, 103, 105, 106,
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::transpose::nontrans,
+        oneapi::math::transpose::nontrans, oneapi::math::offset::column, 79, 83, 91, 103, 105, 106,
         alpha, beta)));
     EXPECT_TRUEORSKIP((test<float, int8_t, uint8_t, int32_t>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::transpose::nontrans,
-        oneapi::mkl::transpose::trans, oneapi::mkl::offset::column, 79, 83, 91, 103, 105, 106,
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::transpose::nontrans,
+        oneapi::math::transpose::trans, oneapi::math::offset::column, 79, 83, 91, 103, 105, 106,
         alpha, beta)));
     EXPECT_TRUEORSKIP((test<float, int8_t, uint8_t, int32_t>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::transpose::trans,
-        oneapi::mkl::transpose::nontrans, oneapi::mkl::offset::column, 79, 83, 91, 103, 105, 106,
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::transpose::trans,
+        oneapi::math::transpose::nontrans, oneapi::math::offset::column, 79, 83, 91, 103, 105, 106,
         alpha, beta)));
     EXPECT_TRUEORSKIP((test<float, int8_t, uint8_t, int32_t>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::transpose::trans,
-        oneapi::mkl::transpose::trans, oneapi::mkl::offset::column, 79, 83, 91, 103, 105, 106,
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::transpose::trans,
+        oneapi::math::transpose::trans, oneapi::math::offset::column, 79, 83, 91, 103, 105, 106,
         alpha, beta)));
     EXPECT_TRUEORSKIP((test<float, int8_t, uint8_t, int32_t>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::transpose::nontrans,
-        oneapi::mkl::transpose::nontrans, oneapi::mkl::offset::row, 79, 83, 91, 103, 105, 106,
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::transpose::nontrans,
+        oneapi::math::transpose::nontrans, oneapi::math::offset::row, 79, 83, 91, 103, 105, 106,
         alpha, beta)));
     EXPECT_TRUEORSKIP((test<float, int8_t, uint8_t, int32_t>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::transpose::nontrans,
-        oneapi::mkl::transpose::trans, oneapi::mkl::offset::row, 79, 83, 91, 103, 105, 106, alpha,
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::transpose::nontrans,
+        oneapi::math::transpose::trans, oneapi::math::offset::row, 79, 83, 91, 103, 105, 106, alpha,
         beta)));
     EXPECT_TRUEORSKIP((test<float, int8_t, uint8_t, int32_t>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::transpose::trans,
-        oneapi::mkl::transpose::nontrans, oneapi::mkl::offset::row, 79, 83, 91, 103, 105, 106,
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::transpose::trans,
+        oneapi::math::transpose::nontrans, oneapi::math::offset::row, 79, 83, 91, 103, 105, 106,
         alpha, beta)));
     EXPECT_TRUEORSKIP((test<float, int8_t, uint8_t, int32_t>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::transpose::trans,
-        oneapi::mkl::transpose::trans, oneapi::mkl::offset::row, 79, 83, 91, 103, 105, 106, alpha,
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::transpose::trans,
+        oneapi::math::transpose::trans, oneapi::math::offset::row, 79, 83, 91, 103, 105, 106, alpha,
         beta)));
 }
 
@@ -274,52 +277,52 @@ TEST_P(GemmBiasTests, Uint8Int8Int32Precision) {
     float alpha(2.0);
     float beta(3.0);
     EXPECT_TRUEORSKIP((test<float, uint8_t, int8_t, int32_t>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::transpose::nontrans,
-        oneapi::mkl::transpose::nontrans, oneapi::mkl::offset::fix, 79, 83, 91, 103, 105, 106,
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::transpose::nontrans,
+        oneapi::math::transpose::nontrans, oneapi::math::offset::fix, 79, 83, 91, 103, 105, 106,
         alpha, beta)));
     EXPECT_TRUEORSKIP((test<float, uint8_t, int8_t, int32_t>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::transpose::nontrans,
-        oneapi::mkl::transpose::trans, oneapi::mkl::offset::fix, 79, 83, 91, 103, 105, 106, alpha,
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::transpose::nontrans,
+        oneapi::math::transpose::trans, oneapi::math::offset::fix, 79, 83, 91, 103, 105, 106, alpha,
         beta)));
     EXPECT_TRUEORSKIP((test<float, uint8_t, int8_t, int32_t>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::transpose::trans,
-        oneapi::mkl::transpose::nontrans, oneapi::mkl::offset::fix, 79, 83, 91, 103, 105, 106,
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::transpose::trans,
+        oneapi::math::transpose::nontrans, oneapi::math::offset::fix, 79, 83, 91, 103, 105, 106,
         alpha, beta)));
     EXPECT_TRUEORSKIP((test<float, uint8_t, int8_t, int32_t>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::transpose::trans,
-        oneapi::mkl::transpose::trans, oneapi::mkl::offset::fix, 79, 83, 91, 103, 105, 106, alpha,
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::transpose::trans,
+        oneapi::math::transpose::trans, oneapi::math::offset::fix, 79, 83, 91, 103, 105, 106, alpha,
         beta)));
     EXPECT_TRUEORSKIP((test<float, uint8_t, int8_t, int32_t>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::transpose::nontrans,
-        oneapi::mkl::transpose::nontrans, oneapi::mkl::offset::column, 79, 83, 91, 103, 105, 106,
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::transpose::nontrans,
+        oneapi::math::transpose::nontrans, oneapi::math::offset::column, 79, 83, 91, 103, 105, 106,
         alpha, beta)));
     EXPECT_TRUEORSKIP((test<float, uint8_t, int8_t, int32_t>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::transpose::nontrans,
-        oneapi::mkl::transpose::trans, oneapi::mkl::offset::column, 79, 83, 91, 103, 105, 106,
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::transpose::nontrans,
+        oneapi::math::transpose::trans, oneapi::math::offset::column, 79, 83, 91, 103, 105, 106,
         alpha, beta)));
     EXPECT_TRUEORSKIP((test<float, uint8_t, int8_t, int32_t>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::transpose::trans,
-        oneapi::mkl::transpose::nontrans, oneapi::mkl::offset::column, 79, 83, 91, 103, 105, 106,
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::transpose::trans,
+        oneapi::math::transpose::nontrans, oneapi::math::offset::column, 79, 83, 91, 103, 105, 106,
         alpha, beta)));
     EXPECT_TRUEORSKIP((test<float, uint8_t, int8_t, int32_t>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::transpose::trans,
-        oneapi::mkl::transpose::trans, oneapi::mkl::offset::column, 79, 83, 91, 103, 105, 106,
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::transpose::trans,
+        oneapi::math::transpose::trans, oneapi::math::offset::column, 79, 83, 91, 103, 105, 106,
         alpha, beta)));
     EXPECT_TRUEORSKIP((test<float, uint8_t, int8_t, int32_t>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::transpose::nontrans,
-        oneapi::mkl::transpose::nontrans, oneapi::mkl::offset::row, 79, 83, 91, 103, 105, 106,
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::transpose::nontrans,
+        oneapi::math::transpose::nontrans, oneapi::math::offset::row, 79, 83, 91, 103, 105, 106,
         alpha, beta)));
     EXPECT_TRUEORSKIP((test<float, uint8_t, int8_t, int32_t>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::transpose::nontrans,
-        oneapi::mkl::transpose::trans, oneapi::mkl::offset::row, 79, 83, 91, 103, 105, 106, alpha,
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::transpose::nontrans,
+        oneapi::math::transpose::trans, oneapi::math::offset::row, 79, 83, 91, 103, 105, 106, alpha,
         beta)));
     EXPECT_TRUEORSKIP((test<float, uint8_t, int8_t, int32_t>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::transpose::trans,
-        oneapi::mkl::transpose::nontrans, oneapi::mkl::offset::row, 79, 83, 91, 103, 105, 106,
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::transpose::trans,
+        oneapi::math::transpose::nontrans, oneapi::math::offset::row, 79, 83, 91, 103, 105, 106,
         alpha, beta)));
     EXPECT_TRUEORSKIP((test<float, uint8_t, int8_t, int32_t>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::transpose::trans,
-        oneapi::mkl::transpose::trans, oneapi::mkl::offset::row, 79, 83, 91, 103, 105, 106, alpha,
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::transpose::trans,
+        oneapi::math::transpose::trans, oneapi::math::offset::row, 79, 83, 91, 103, 105, 106, alpha,
         beta)));
 }
 
@@ -327,59 +330,59 @@ TEST_P(GemmBiasTests, Uint8Uint8Int32Precision) {
     float alpha(2.0);
     float beta(3.0);
     EXPECT_TRUEORSKIP((test<float, uint8_t, uint8_t, int32_t>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::transpose::nontrans,
-        oneapi::mkl::transpose::nontrans, oneapi::mkl::offset::fix, 79, 83, 91, 103, 105, 106,
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::transpose::nontrans,
+        oneapi::math::transpose::nontrans, oneapi::math::offset::fix, 79, 83, 91, 103, 105, 106,
         alpha, beta)));
     EXPECT_TRUEORSKIP((test<float, uint8_t, uint8_t, int32_t>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::transpose::nontrans,
-        oneapi::mkl::transpose::trans, oneapi::mkl::offset::fix, 79, 83, 91, 103, 105, 106, alpha,
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::transpose::nontrans,
+        oneapi::math::transpose::trans, oneapi::math::offset::fix, 79, 83, 91, 103, 105, 106, alpha,
         beta)));
     EXPECT_TRUEORSKIP((test<float, uint8_t, uint8_t, int32_t>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::transpose::trans,
-        oneapi::mkl::transpose::nontrans, oneapi::mkl::offset::fix, 79, 83, 91, 103, 105, 106,
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::transpose::trans,
+        oneapi::math::transpose::nontrans, oneapi::math::offset::fix, 79, 83, 91, 103, 105, 106,
         alpha, beta)));
     EXPECT_TRUEORSKIP((test<float, uint8_t, uint8_t, int32_t>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::transpose::trans,
-        oneapi::mkl::transpose::trans, oneapi::mkl::offset::fix, 79, 83, 91, 103, 105, 106, alpha,
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::transpose::trans,
+        oneapi::math::transpose::trans, oneapi::math::offset::fix, 79, 83, 91, 103, 105, 106, alpha,
         beta)));
     EXPECT_TRUEORSKIP((test<float, uint8_t, uint8_t, int32_t>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::transpose::nontrans,
-        oneapi::mkl::transpose::nontrans, oneapi::mkl::offset::column, 79, 83, 91, 103, 105, 106,
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::transpose::nontrans,
+        oneapi::math::transpose::nontrans, oneapi::math::offset::column, 79, 83, 91, 103, 105, 106,
         alpha, beta)));
     EXPECT_TRUEORSKIP((test<float, uint8_t, uint8_t, int32_t>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::transpose::nontrans,
-        oneapi::mkl::transpose::trans, oneapi::mkl::offset::column, 79, 83, 91, 103, 105, 106,
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::transpose::nontrans,
+        oneapi::math::transpose::trans, oneapi::math::offset::column, 79, 83, 91, 103, 105, 106,
         alpha, beta)));
     EXPECT_TRUEORSKIP((test<float, uint8_t, uint8_t, int32_t>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::transpose::trans,
-        oneapi::mkl::transpose::nontrans, oneapi::mkl::offset::column, 79, 83, 91, 103, 105, 106,
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::transpose::trans,
+        oneapi::math::transpose::nontrans, oneapi::math::offset::column, 79, 83, 91, 103, 105, 106,
         alpha, beta)));
     EXPECT_TRUEORSKIP((test<float, uint8_t, uint8_t, int32_t>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::transpose::trans,
-        oneapi::mkl::transpose::trans, oneapi::mkl::offset::column, 79, 83, 91, 103, 105, 106,
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::transpose::trans,
+        oneapi::math::transpose::trans, oneapi::math::offset::column, 79, 83, 91, 103, 105, 106,
         alpha, beta)));
     EXPECT_TRUEORSKIP((test<float, uint8_t, uint8_t, int32_t>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::transpose::nontrans,
-        oneapi::mkl::transpose::nontrans, oneapi::mkl::offset::row, 79, 83, 91, 103, 105, 106,
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::transpose::nontrans,
+        oneapi::math::transpose::nontrans, oneapi::math::offset::row, 79, 83, 91, 103, 105, 106,
         alpha, beta)));
     EXPECT_TRUEORSKIP((test<float, uint8_t, uint8_t, int32_t>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::transpose::nontrans,
-        oneapi::mkl::transpose::trans, oneapi::mkl::offset::row, 79, 83, 91, 103, 105, 106, alpha,
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::transpose::nontrans,
+        oneapi::math::transpose::trans, oneapi::math::offset::row, 79, 83, 91, 103, 105, 106, alpha,
         beta)));
     EXPECT_TRUEORSKIP((test<float, uint8_t, uint8_t, int32_t>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::transpose::trans,
-        oneapi::mkl::transpose::nontrans, oneapi::mkl::offset::row, 79, 83, 91, 103, 105, 106,
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::transpose::trans,
+        oneapi::math::transpose::nontrans, oneapi::math::offset::row, 79, 83, 91, 103, 105, 106,
         alpha, beta)));
     EXPECT_TRUEORSKIP((test<float, uint8_t, uint8_t, int32_t>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::mkl::transpose::trans,
-        oneapi::mkl::transpose::trans, oneapi::mkl::offset::row, 79, 83, 91, 103, 105, 106, alpha,
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::transpose::trans,
+        oneapi::math::transpose::trans, oneapi::math::offset::row, 79, 83, 91, 103, 105, 106, alpha,
         beta)));
 }
 
 INSTANTIATE_TEST_SUITE_P(GemmBiasTestSuite, GemmBiasTests,
                          ::testing::Combine(testing::ValuesIn(devices),
-                                            testing::Values(oneapi::mkl::layout::col_major,
-                                                            oneapi::mkl::layout::row_major)),
+                                            testing::Values(oneapi::math::layout::col_major,
+                                                            oneapi::math::layout::row_major)),
                          ::LayoutDeviceNamePrint());
 
 } // anonymous namespace

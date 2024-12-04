@@ -29,9 +29,9 @@
 #include <CL/sycl.hpp>
 #endif
 #include "cblas.h"
-#include "oneapi/mkl/detail/config.hpp"
-#include "oneapi/mkl.hpp"
-#include "onemkl_blas_helper.hpp"
+#include "oneapi/math/detail/config.hpp"
+#include "oneapi/math.hpp"
+#include "onemath_blas_helper.hpp"
 #include "reference_blas_templates.hpp"
 #include "test_common.hpp"
 #include "test_helper.hpp"
@@ -46,7 +46,7 @@ extern std::vector<sycl::device*> devices;
 namespace {
 
 template <typename fp, typename fp_scalar>
-int test(device* dev, oneapi::mkl::layout layout, int N, int incx, fp_scalar alpha) {
+int test(device* dev, oneapi::math::layout layout, int N, int incx, fp_scalar alpha) {
     // Prepare data.
     vector<fp> x, x_ref;
 
@@ -55,11 +55,11 @@ int test(device* dev, oneapi::mkl::layout layout, int N, int incx, fp_scalar alp
 
     // Call Reference SCAL.
     using fp_ref = typename ref_type_info<fp>::type;
-    using fp_scalar_mkl = typename ref_type_info<fp_scalar>::type;
+    using fp_scalar_ref = typename ref_type_info<fp_scalar>::type;
 
     const int N_ref = N, incx_ref = std::abs(incx);
 
-    ::scal(&N_ref, (fp_scalar_mkl*)&alpha, (fp_ref*)x_ref.data(), &incx_ref);
+    ::scal(&N_ref, (fp_scalar_ref*)&alpha, (fp_ref*)x_ref.data(), &incx_ref);
 
     // Call DPC++ SCAL.
 
@@ -84,22 +84,22 @@ int test(device* dev, oneapi::mkl::layout layout, int N, int incx, fp_scalar alp
     try {
 #ifdef CALL_RT_API
         switch (layout) {
-            case oneapi::mkl::layout::col_major:
-                oneapi::mkl::blas::column_major::scal(main_queue, N, alpha, x_buffer, incx);
+            case oneapi::math::layout::col_major:
+                oneapi::math::blas::column_major::scal(main_queue, N, alpha, x_buffer, incx);
                 break;
-            case oneapi::mkl::layout::row_major:
-                oneapi::mkl::blas::row_major::scal(main_queue, N, alpha, x_buffer, incx);
+            case oneapi::math::layout::row_major:
+                oneapi::math::blas::row_major::scal(main_queue, N, alpha, x_buffer, incx);
                 break;
             default: break;
         }
 #else
         switch (layout) {
-            case oneapi::mkl::layout::col_major:
-                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::mkl::blas::column_major::scal, N, alpha,
-                                        x_buffer, incx);
+            case oneapi::math::layout::col_major:
+                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::math::blas::column_major::scal, N,
+                                        alpha, x_buffer, incx);
                 break;
-            case oneapi::mkl::layout::row_major:
-                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::mkl::blas::row_major::scal, N, alpha,
+            case oneapi::math::layout::row_major:
+                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::math::blas::row_major::scal, N, alpha,
                                         x_buffer, incx);
                 break;
             default: break;
@@ -111,7 +111,7 @@ int test(device* dev, oneapi::mkl::layout layout, int N, int incx, fp_scalar alp
         print_error_code(e);
     }
 
-    catch (const oneapi::mkl::unimplemented& e) {
+    catch (const oneapi::math::unimplemented& e) {
         return test_skipped;
     }
 
@@ -126,7 +126,7 @@ int test(device* dev, oneapi::mkl::layout layout, int N, int incx, fp_scalar alp
     return (int)good;
 }
 
-class ScalTests : public ::testing::TestWithParam<std::tuple<sycl::device*, oneapi::mkl::layout>> {
+class ScalTests : public ::testing::TestWithParam<std::tuple<sycl::device*, oneapi::math::layout>> {
 };
 
 TEST_P(ScalTests, RealSinglePrecision) {
@@ -180,8 +180,8 @@ TEST_P(ScalTests, ComplexRealDoublePrecision) {
 
 INSTANTIATE_TEST_SUITE_P(ScalTestSuite, ScalTests,
                          ::testing::Combine(testing::ValuesIn(devices),
-                                            testing::Values(oneapi::mkl::layout::col_major,
-                                                            oneapi::mkl::layout::row_major)),
+                                            testing::Values(oneapi::math::layout::col_major,
+                                                            oneapi::math::layout::row_major)),
                          ::LayoutDeviceNamePrint());
 
 } // anonymous namespace

@@ -17,33 +17,34 @@
 # SPDX-License-Identifier: Apache-2.0
 #===============================================================================
 
-set(LIB_NAME onemkl_dft_cufft)
+set(LIB_NAME onemath_dft_cufft)
 set(LIB_OBJ ${LIB_NAME}_obj)
 
 
 add_library(${LIB_NAME})
+add_deprecated_library(${LIB_NAME})
 add_library(${LIB_OBJ} OBJECT
   descriptor.cpp
   commit.cpp
   forward.cpp
   backward.cpp
-  $<$<BOOL:${BUILD_SHARED_LIBS}>: mkl_dft_cufft_wrappers.cpp>
+  $<$<BOOL:${BUILD_SHARED_LIBS}>: cufft_wrappers.cpp>
 )
-add_dependencies(onemkl_backend_libs_dft ${LIB_NAME})
+add_dependencies(onemath_backend_libs_dft ${LIB_NAME})
 
 target_include_directories(${LIB_OBJ}
-  PUBLIC ${ONEMKL_INTERFACE_INCLUDE_DIRS}
+  PUBLIC ${ONEMATH_INCLUDE_DIRS}
 )
 target_include_directories(${LIB_NAME}
-  PUBLIC ${ONEMKL_INTERFACE_INCLUDE_DIRS}
+  PUBLIC ${ONEMATH_INCLUDE_DIRS}
 )
 target_include_directories(${LIB_OBJ}
   PRIVATE ${PROJECT_SOURCE_DIR}/src
           ${CMAKE_BINARY_DIR}/bin
-          ${ONEMKL_GENERATED_INCLUDE_PATH}
+          ${ONEMATH_GENERATED_INCLUDE_PATH}
 )
 
-target_compile_options(${LIB_OBJ} PRIVATE ${ONEMKL_BUILD_COPT})
+target_compile_options(${LIB_OBJ} PRIVATE ${ONEMATH_BUILD_COPT})
 
 if (${CMAKE_VERSION} VERSION_LESS "3.17.0")
   find_package(CUDA REQUIRED)
@@ -54,17 +55,17 @@ else()
   target_link_libraries(${LIB_OBJ} PRIVATE CUDA::cufft CUDA::cuda_driver)
 endif()
 
-target_link_libraries(${LIB_OBJ} PUBLIC ONEMKL::SYCL::SYCL)
+target_link_libraries(${LIB_OBJ} PUBLIC ONEMATH::SYCL::SYCL)
 
 set_target_properties(${LIB_OBJ} PROPERTIES
   POSITION_INDEPENDENT_CODE ON
 )
 target_link_libraries(${LIB_NAME} PUBLIC ${LIB_OBJ})
 
-#Set oneMKL libraries as not transitive for dynamic
+#Set oneMath libraries as not transitive for dynamic
 if(BUILD_SHARED_LIBS)
   set_target_properties(${LIB_NAME} PROPERTIES
-    INTERFACE_LINK_LIBRARIES ONEMKL::SYCL::SYCL
+    INTERFACE_LINK_LIBRARIES ONEMATH::SYCL::SYCL
   )
 endif()
 
@@ -77,8 +78,8 @@ set_target_properties(${LIB_NAME} PROPERTIES
 list(APPEND CMAKE_BUILD_RPATH $<TARGET_FILE_DIR:${LIB_NAME}>)
 
 # Add the library to install package
-install(TARGETS ${LIB_OBJ} EXPORT oneMKLTargets)
-install(TARGETS ${LIB_NAME} EXPORT oneMKLTargets
+install(TARGETS ${LIB_OBJ} EXPORT oneMathTargets)
+install(TARGETS ${LIB_NAME} EXPORT oneMathTargets
   RUNTIME DESTINATION bin
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib

@@ -17,26 +17,26 @@
 * SPDX-License-Identifier: Apache-2.0
 *******************************************************************************/
 
-#ifndef _ONEMKL_DFT_SRC_PORTFFT_HELPERS_HPP_
-#define _ONEMKL_DFT_SRC_PORTFFT_HELPERS_HPP_
+#ifndef _ONEMATH_DFT_SRC_PORTFFT_HELPERS_HPP_
+#define _ONEMATH_DFT_SRC_PORTFFT_HELPERS_HPP_
 
 #include <type_traits>
 
 #include <portfft/portfft.hpp>
 
-#include "oneapi/mkl/dft/detail/commit_impl.hpp"
-#include "oneapi/mkl/dft/detail/descriptor_impl.hpp"
+#include "oneapi/math/dft/detail/commit_impl.hpp"
+#include "oneapi/math/dft/detail/descriptor_impl.hpp"
 
 namespace pfft = portfft;
 
-namespace oneapi::mkl::dft::portfft::detail {
+namespace oneapi::math::dft::portfft::detail {
 template <dft::precision prec, dft::domain dom>
 inline dft::detail::commit_impl<prec, dom>* checked_get_commit(
     dft::detail::descriptor<prec, dom>& desc) {
     auto commit_handle = dft::detail::get_commit(desc);
     if (commit_handle == nullptr || commit_handle->get_backend() != backend::portfft) {
-        throw mkl::invalid_argument("dft/backends/portfft", "get_commit",
-                                    "DFT descriptor has not been commited for portFFT");
+        throw math::invalid_argument("dft/backends/portfft", "get_commit",
+                                     "DFT descriptor has not been commited for portFFT");
     }
     return commit_handle;
 }
@@ -57,6 +57,6 @@ auto get_descriptors(descriptor_type& desc) {
     auto commit = detail::checked_get_commit(desc);
     return reinterpret_cast<storage_type<descriptor_type>*>(commit->get_handle());
 }
-} // namespace oneapi::mkl::dft::portfft::detail
+} // namespace oneapi::math::dft::portfft::detail
 
 #endif

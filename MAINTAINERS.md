@@ -1,10 +1,10 @@
 # Introduction
 
-This document defines roles in oneMKL Interfaces project.
+This document defines roles in oneMath project.
 
 # Roles and responsibilities
 
-oneMKL Interfaces project defines three main roles:
+oneMath project defines three main roles:
  * [Contributor](#contributor)
  * [Domain maintainer](#domain-maintainer)
  * [Architecture maintainer](#architecture-maintainer)
@@ -14,7 +14,7 @@ requirements and the nomination process.
 
 ## Contributor
 
-A Contributor invests time and resources to improve oneMKL Interfaces project.
+A Contributor invests time and resources to improve oneMath project.
 Anyone can become a Contributor by bringing value in one of the following ways:
   * Answer questions from community members.
   * Submit feedback to design proposals.
@@ -72,12 +72,12 @@ The process of becoming a Domain maintainer is:
 
 | GitHub team name | Domain maintainers |
 :-----------|:------------|
-| @oneapi-src/onemkl-blas-write | oneMKL Interfaces BLAS maintainers |
-| @oneapi-src/onemkl-dft-write | oneMKL Interfaces DFT maintainers |
-| @oneapi-src/onemkl-lapack-write) | oneMKL Interfaces LAPACK maintainers |
-| @oneapi-src/onemkl-rng-write | oneMKL Interfaces RNG maintainers |
-| @oneapi-src/onemkl-sparse-write | oneMKL Interfaces Sparse Algebra maintainers |
-| @oneapi-src/onemkl-vm-write | oneMKL Interfaces Vector Math maintainers |
+| @uxlfoundation/onemath-blas-write | oneMath BLAS maintainers |
+| @uxlfoundation/onemath-dft-write | oneMath DFT maintainers |
+| @uxlfoundation/onemath-lapack-write | oneMath LAPACK maintainers |
+| @uxlfoundation/onemath-rng-write | oneMath RNG maintainers |
+| @uxlfoundation/onemath-sparse-write | oneMath Sparse Algebra maintainers |
+| @uxlfoundation/onemath-vm-write | oneMath Vector Math maintainers |
 
 ## Architecture Maintainer
 Architecture maintainers are the most established contributors who are responsible for the
@@ -107,7 +107,7 @@ Privileges:
   * Can recommend Contributor or Domain maintainer to become Architecture maintainers.
 
 Process of becoming a maintainer:
-1. A Contributor or Domain maintainer requests to join oneMKL Interfaces Architecture maintainers GitHub team
-(@oneapi-src/onemkl-arch-write).
+1. A Contributor or Domain maintainer requests to join oneMath Architecture maintainers GitHub team
+(@uxlfoundation/onemath-arch-write).
 2. At least one of Architecture maintainers approves the request.
 

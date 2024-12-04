@@ -33,7 +33,7 @@ foreach(sparse_ct_source ${SPARSE_CT_SOURCES})
       PUBLIC ${CMAKE_BINARY_DIR}/bin
   )
 
-  target_link_libraries(${sparse_ct_source} PRIVATE ONEMKL::SYCL::SYCL onemkl_sparse_blas_mklcpu onemkl_sparse_blas_cusparse)
+  target_link_libraries(${sparse_ct_source} PRIVATE ONEMATH::SYCL::SYCL onemath_sparse_blas_mklcpu onemath_sparse_blas_cusparse)
 
   # Register example as ctest
   add_test(NAME sparse_blas/EXAMPLE/CT/${sparse_ct_source} COMMAND ${sparse_ct_source})

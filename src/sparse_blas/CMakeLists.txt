@@ -20,29 +20,30 @@
 add_subdirectory(backends)
 
 if(BUILD_SHARED_LIBS)
-  add_library(onemkl_sparse_blas OBJECT)
-  target_sources(onemkl_sparse_blas PRIVATE sparse_blas_loader.cpp)
-  target_include_directories(onemkl_sparse_blas
+  add_library(onemath_sparse_blas OBJECT)
+  add_deprecated_library(onemath_sparse_blas)
+  target_sources(onemath_sparse_blas PRIVATE sparse_blas_loader.cpp)
+  target_include_directories(onemath_sparse_blas
     PRIVATE ${PROJECT_SOURCE_DIR}/include
             ${PROJECT_SOURCE_DIR}/src
             ${PROJECT_SOURCE_DIR}/src/include
             ${CMAKE_BINARY_DIR}/bin
-            ${ONEMKL_GENERATED_INCLUDE_PATH}
-            $<TARGET_FILE_DIR:onemkl>
+            ${ONEMATH_GENERATED_INCLUDE_PATH}
+            $<TARGET_FILE_DIR:onemath>
   )
 
-  target_compile_options(onemkl_sparse_blas PRIVATE ${ONEMKL_BUILD_COPT})
+  target_compile_options(onemath_sparse_blas PRIVATE ${ONEMATH_BUILD_COPT})
 
-  set_target_properties(onemkl_sparse_blas PROPERTIES
+  set_target_properties(onemath_sparse_blas PROPERTIES
     POSITION_INDEPENDENT_CODE ON
   )
   if (USE_ADD_SYCL_TO_TARGET_INTEGRATION)
-    add_sycl_to_target(TARGET onemkl_sparse_blas SOURCES sparse_blas_loader.cpp)
+    add_sycl_to_target(TARGET onemath_sparse_blas SOURCES sparse_blas_loader.cpp)
   else()
-    target_link_libraries(onemkl_sparse_blas PUBLIC ONEMKL::SYCL::SYCL)
+    target_link_libraries(onemath_sparse_blas PUBLIC ONEMATH::SYCL::SYCL)
   endif()
 
   include(WarningsUtils)
-  target_link_libraries(onemkl_sparse_blas PRIVATE onemkl_warnings)
+  target_link_libraries(onemath_sparse_blas PRIVATE onemath_warnings)
 
 endif()

@@ -29,17 +29,17 @@
 
 #include <rocblas/rocblas.h>
 #include <complex>
-#include "oneapi/mkl/types.hpp"
+#include "oneapi/math/types.hpp"
 #include <hip/hip_runtime.h>
 #include "dtype_string.hpp"
 
 namespace oneapi {
-namespace mkl {
+namespace math {
 namespace blas {
 namespace rocblas {
 
 // The static assert to make sure that all index types used in
-// src/oneMKL/backend/rocblas/blas.hpp interface are int64_t
+// src/oneMath/backend/rocblas/blas.hpp interface are int64_t
 template <typename... Next>
 struct is_int64 : std::false_type {};
 
@@ -71,7 +71,7 @@ struct Overflow<Index, T...> {
 
 template <typename Index, typename... Next>
 void overflow_check(Index index, Next... indices) {
-    static_assert(is_int64<Index, Next...>::value, "oneMKL index type must be 64 bit integer.");
+    static_assert(is_int64<Index, Next...>::value, "oneMath index type must be 64 bit integer.");
     Overflow<Index, Next...>::check(index, indices...);
 }
 
@@ -183,35 +183,35 @@ inline void rocblas_native_func(Func func, rocblas_status err, rocblas_handle ha
 #endif
 };
 
-inline rocblas_operation get_rocblas_operation(oneapi::mkl::transpose trn) {
+inline rocblas_operation get_rocblas_operation(oneapi::math::transpose trn) {
     switch (trn) {
-        case oneapi::mkl::transpose::nontrans: return rocblas_operation_none;
-        case oneapi::mkl::transpose::trans: return rocblas_operation_transpose;
-        case oneapi::mkl::transpose::conjtrans: return rocblas_operation_conjugate_transpose;
+        case oneapi::math::transpose::nontrans: return rocblas_operation_none;
+        case oneapi::math::transpose::trans: return rocblas_operation_transpose;
+        case oneapi::math::transpose::conjtrans: return rocblas_operation_conjugate_transpose;
         default: throw "Wrong transpose Operation.";
     }
 }
 
-inline rocblas_fill get_rocblas_fill_mode(oneapi::mkl::uplo ul) {
+inline rocblas_fill get_rocblas_fill_mode(oneapi::math::uplo ul) {
     switch (ul) {
-        case oneapi::mkl::uplo::upper: return rocblas_fill_upper;
-        case oneapi::mkl::uplo::lower: return rocblas_fill_lower;
+        case oneapi::math::uplo::upper: return rocblas_fill_upper;
+        case oneapi::math::uplo::lower: return rocblas_fill_lower;
         default: throw "Wrong fill mode.";
     }
 }
 
-inline rocblas_diagonal get_rocblas_diag_type(oneapi::mkl::diag un) {
+inline rocblas_diagonal get_rocblas_diag_type(oneapi::math::diag un) {
     switch (un) {
-        case oneapi::mkl::diag::unit: return rocblas_diagonal_unit;
-        case oneapi::mkl::diag::nonunit: return rocblas_diagonal_non_unit;
+        case oneapi::math::diag::unit: return rocblas_diagonal_unit;
+        case oneapi::math::diag::nonunit: return rocblas_diagonal_non_unit;
         default: throw "Wrong diag type.";
     }
 }
 
-inline rocblas_side get_rocblas_side_mode(oneapi::mkl::side lr) {
+inline rocblas_side get_rocblas_side_mode(oneapi::math::side lr) {
     switch (lr) {
-        case oneapi::mkl::side::left: return rocblas_side_left;
-        case oneapi::mkl::side::right: return rocblas_side_right;
+        case oneapi::math::side::left: return rocblas_side_left;
+        case oneapi::math::side::right: return rocblas_side_right;
         default: throw "Wrong side mode.";
     }
 }
@@ -298,6 +298,6 @@ struct RocEquivalentType<sycl::half> {
 
 } // namespace rocblas
 } // namespace blas
-} // namespace mkl
+} // namespace math
 } // namespace oneapi
 #endif // _ROCBLAS_HELPER_HPP_

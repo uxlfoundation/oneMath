@@ -18,12 +18,12 @@
 *******************************************************************************/
 
 #include "rng/function_table.hpp"
-#include "oneapi/mkl/rng/detail/mklgpu/onemkl_rng_mklgpu.hpp"
+#include "oneapi/math/rng/detail/mklgpu/onemath_rng_mklgpu.hpp"
 
 #define WRAPPER_VERSION 1
 
-extern "C" ONEMKL_EXPORT rng_function_table_t mkl_rng_table = {
-    WRAPPER_VERSION, oneapi::mkl::rng::mklgpu::create_philox4x32x10,
-    oneapi::mkl::rng::mklgpu::create_philox4x32x10, oneapi::mkl::rng::mklgpu::create_mrg32k3a,
-    oneapi::mkl::rng::mklgpu::create_mrg32k3a
+extern "C" ONEMATH_EXPORT rng_function_table_t onemath_rng_table = {
+    WRAPPER_VERSION, oneapi::math::rng::mklgpu::create_philox4x32x10,
+    oneapi::math::rng::mklgpu::create_philox4x32x10, oneapi::math::rng::mklgpu::create_mrg32k3a,
+    oneapi::math::rng::mklgpu::create_mrg32k3a
 };

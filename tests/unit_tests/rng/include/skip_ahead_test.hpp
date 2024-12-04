@@ -30,7 +30,7 @@
 #include <CL/sycl.hpp>
 #endif
 
-#include "oneapi/mkl.hpp"
+#include "oneapi/math.hpp"
 
 #include "rng_test_common.hpp"
 
@@ -48,12 +48,12 @@ public:
             Engine engine(queue);
             std::vector<Engine*> engines;
 
-            oneapi::mkl::rng::bits<std::uint32_t> distr;
+            oneapi::math::rng::bits<std::uint32_t> distr;
 
             // Perform skip
             for (int i = 0; i < N_ENGINES; i++) {
                 engines.push_back(new Engine(queue));
-                oneapi::mkl::rng::skip_ahead(*(engines[i]), i * N_PORTION);
+                oneapi::math::rng::skip_ahead(*(engines[i]), i * N_PORTION);
             }
 
             sycl::buffer<std::uint32_t, 1> r_buffer(r1.data(), r1.size());
@@ -63,9 +63,9 @@ public:
                     sycl::buffer<std::uint32_t, 1>(r2.data() + i * N_PORTION, N_PORTION));
             }
 
-            oneapi::mkl::rng::generate(distr, engine, N_GEN_SERVICE, r_buffer);
+            oneapi::math::rng::generate(distr, engine, N_GEN_SERVICE, r_buffer);
             for (int i = 0; i < N_ENGINES; i++) {
-                oneapi::mkl::rng::generate(distr, *(engines[i]), N_PORTION, r_buffers[i]);
+                oneapi::math::rng::generate(distr, *(engines[i]), N_PORTION, r_buffers[i]);
             }
             QUEUE_WAIT(queue);
 
@@ -74,7 +74,7 @@ public:
                 delete engines[i];
             }
         }
-        catch (const oneapi::mkl::unimplemented& e) {
+        catch (const oneapi::math::unimplemented& e) {
             status = test_skipped;
             return;
         }
@@ -106,22 +106,22 @@ public:
             Engine engine1(queue);
             Engine engine2(queue);
 
-            oneapi::mkl::rng::bits<std::uint32_t> distr;
+            oneapi::math::rng::bits<std::uint32_t> distr;
 
             // Perform skip
             for (int j = 0; j < SKIP_TIMES; j++) {
-                oneapi::mkl::rng::skip_ahead(engine1, N_SKIP);
+                oneapi::math::rng::skip_ahead(engine1, N_SKIP);
             }
-            oneapi::mkl::rng::skip_ahead(engine2, NUM_TO_SKIP);
+            oneapi::math::rng::skip_ahead(engine2, NUM_TO_SKIP);
 
             sycl::buffer<std::uint32_t, 1> r1_buffer(r1.data(), r1.size());
             sycl::buffer<std::uint32_t, 1> r2_buffer(r2.data(), r2.size());
 
-            oneapi::mkl::rng::generate(distr, engine1, N_GEN, r1_buffer);
-            oneapi::mkl::rng::generate(distr, engine2, N_GEN, r2_buffer);
+            oneapi::math::rng::generate(distr, engine1, N_GEN, r1_buffer);
+            oneapi::math::rng::generate(distr, engine2, N_GEN, r2_buffer);
             QUEUE_WAIT(queue);
         }
-        catch (const oneapi::mkl::unimplemented& e) {
+        catch (const oneapi::math::unimplemented& e) {
             status = test_skipped;
             return;
         }

@@ -17,12 +17,12 @@
 * SPDX-License-Identifier: Apache-2.0
 *******************************************************************************/
 
-#include "oneapi/mkl/dft/descriptor.hpp"
+#include "oneapi/math/dft/descriptor.hpp"
 #include "../../descriptor.cxx"
 
-#include "oneapi/mkl/dft/detail/rocfft/onemkl_dft_rocfft.hpp"
+#include "oneapi/math/dft/detail/rocfft/onemath_dft_rocfft.hpp"
 
-namespace oneapi::mkl::dft::detail {
+namespace oneapi::math::dft::detail {
 
 template <precision prec, domain dom>
 void descriptor<prec, dom>::commit(backend_selector<backend::rocfft> selector) {
@@ -44,4 +44,4 @@ template void descriptor<precision::DOUBLE, domain::COMPLEX>::commit(
 template void descriptor<precision::DOUBLE, domain::REAL>::commit(
     backend_selector<backend::rocfft>);
 
-} //namespace oneapi::mkl::dft::detail
+} //namespace oneapi::math::dft::detail

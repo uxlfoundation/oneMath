@@ -17,8 +17,8 @@
 * SPDX-License-Identifier: Apache-2.0
 *******************************************************************************/
 
-#ifndef _ONEMKL_DFT_SRC_EXECUTE_HELPER_CUFFT_HPP_
-#define _ONEMKL_DFT_SRC_EXECUTE_HELPER_CUFFT_HPP_
+#ifndef _ONEMATH_DFT_SRC_EXECUTE_HELPER_CUFFT_HPP_
+#define _ONEMATH_DFT_SRC_EXECUTE_HELPER_CUFFT_HPP_
 
 #if __has_include(<sycl/sycl.hpp>)
 #include <sycl/sycl.hpp>
@@ -26,35 +26,35 @@
 #include <CL/sycl.hpp>
 #endif
 
-#include "oneapi/mkl/dft/detail/commit_impl.hpp"
-#include "oneapi/mkl/dft/detail/descriptor_impl.hpp"
-#include "oneapi/mkl/dft/types.hpp"
-#include "oneapi/mkl/exceptions.hpp"
+#include "oneapi/math/dft/detail/commit_impl.hpp"
+#include "oneapi/math/dft/detail/descriptor_impl.hpp"
+#include "oneapi/math/dft/types.hpp"
+#include "oneapi/math/exceptions.hpp"
 
 #include <cuda.h>
 #include <cufft.h>
 
-namespace oneapi::mkl::dft::cufft::detail {
+namespace oneapi::math::dft::cufft::detail {
 
 template <dft::precision prec, dft::domain dom>
 inline dft::detail::commit_impl<prec, dom>* checked_get_commit(
     dft::detail::descriptor<prec, dom>& desc) {
     auto commit_handle = dft::detail::get_commit(desc);
     if (commit_handle == nullptr || commit_handle->get_backend() != backend::cufft) {
-        throw mkl::invalid_argument("dft/backends/cufft", "get_commit",
-                                    "DFT descriptor has not been commited for cuFFT");
+        throw math::invalid_argument("dft/backends/cufft", "get_commit",
+                                     "DFT descriptor has not been commited for cuFFT");
     }
     return commit_handle;
 }
 
-/// Throw an mkl::invalid_argument if the runtime param in the descriptor does not match
+/// Throw an math::invalid_argument if the runtime param in the descriptor does not match
 /// the expected value.
 template <dft::config_param Param, dft::config_value Expected, typename DescT>
 inline auto expect_config(DescT& desc, const char* message) {
     dft::config_value actual{ 0 };
     desc.get_value(Param, &actual);
     if (actual != Expected) {
-        throw mkl::invalid_argument("dft/backends/cufft", "expect_config", message);
+        throw math::invalid_argument("dft/backends/cufft", "expect_config", message);
     }
 }
 
@@ -73,16 +73,18 @@ void cufft_execute(const std::string& func, CUstream stream, cufftHandle plan, v
                 auto result = cufftExecR2C(plan, reinterpret_cast<cufftReal*>(input),
                                            reinterpret_cast<cufftComplex*>(output));
                 if (result != CUFFT_SUCCESS) {
-                    throw oneapi::mkl::exception("dft/backends/cufft", func,
-                                                 "cufftExecR2C returned " + std::to_string(result));
+                    throw oneapi::math::exception(
+                        "dft/backends/cufft", func,
+                        "cufftExecR2C returned " + std::to_string(result));
                 }
             }
             else {
                 auto result = cufftExecD2Z(plan, reinterpret_cast<cufftDoubleReal*>(input),
                                            reinterpret_cast<cufftDoubleComplex*>(output));
                 if (result != CUFFT_SUCCESS) {
-                    throw oneapi::mkl::exception("dft/backends/cufft", func,
-                                                 "cufftExecD2Z returned " + std::to_string(result));
+                    throw oneapi::math::exception(
+                        "dft/backends/cufft", func,
+                        "cufftExecD2Z returned " + std::to_string(result));
                 }
             }
         }
@@ -91,16 +93,18 @@ void cufft_execute(const std::string& func, CUstream stream, cufftHandle plan, v
                 auto result = cufftExecC2R(plan, reinterpret_cast<cufftComplex*>(input),
                                            reinterpret_cast<cufftReal*>(output));
                 if (result != CUFFT_SUCCESS) {
-                    throw oneapi::mkl::exception("dft/backends/cufft", func,
-                                                 "cufftExecC2R returned " + std::to_string(result));
+                    throw oneapi::math::exception(
+                        "dft/backends/cufft", func,
+                        "cufftExecC2R returned " + std::to_string(result));
                 }
             }
             else {
                 auto result = cufftExecZ2D(plan, reinterpret_cast<cufftDoubleComplex*>(input),
                                            reinterpret_cast<cufftDoubleReal*>(output));
                 if (result != CUFFT_SUCCESS) {
-                    throw oneapi::mkl::exception("dft/backends/cufft", func,
-                                                 "cufftExecZ2D returned " + std::to_string(result));
+                    throw oneapi::math::exception(
+                        "dft/backends/cufft", func,
+                        "cufftExecZ2D returned " + std::to_string(result));
                 }
             }
         }
@@ -111,8 +115,8 @@ void cufft_execute(const std::string& func, CUstream stream, cufftHandle plan, v
                 cufftExecC2C(plan, reinterpret_cast<cufftComplex*>(input),
                              reinterpret_cast<cufftComplex*>(output), static_cast<int>(dir));
             if (result != CUFFT_SUCCESS) {
-                throw oneapi::mkl::exception("dft/backends/cufft", func,
-                                             "cufftExecC2C returned " + std::to_string(result));
+                throw oneapi::math::exception("dft/backends/cufft", func,
+                                              "cufftExecC2C returned " + std::to_string(result));
             }
         }
         else {
@@ -120,8 +124,8 @@ void cufft_execute(const std::string& func, CUstream stream, cufftHandle plan, v
                 cufftExecZ2Z(plan, reinterpret_cast<cufftDoubleComplex*>(input),
                              reinterpret_cast<cufftDoubleComplex*>(output), static_cast<int>(dir));
             if (result != CUFFT_SUCCESS) {
-                throw oneapi::mkl::exception("dft/backends/cufft", func,
-                                             "cufftExecZ2Z returned " + std::to_string(result));
+                throw oneapi::math::exception("dft/backends/cufft", func,
+                                              "cufftExecZ2Z returned " + std::to_string(result));
             }
         }
     }
@@ -131,8 +135,8 @@ void cufft_execute(const std::string& func, CUstream stream, cufftHandle plan, v
     // as complete early.
     auto result = cuStreamSynchronize(stream);
     if (result != CUDA_SUCCESS) {
-        throw oneapi::mkl::exception("dft/backends/cufft", func,
-                                     "cuStreamSynchronize returned " + std::to_string(result));
+        throw oneapi::math::exception("dft/backends/cufft", func,
+                                      "cuStreamSynchronize returned " + std::to_string(result));
     }
 #endif
 }
@@ -141,12 +145,12 @@ inline CUstream setup_stream(const std::string& func, sycl::interop_handle ih, c
     auto stream = ih.get_native_queue<sycl::backend::ext_oneapi_cuda>();
     auto result = cufftSetStream(plan, stream);
     if (result != CUFFT_SUCCESS) {
-        throw oneapi::mkl::exception("dft/backends/cufft", func,
-                                     "cufftSetStream returned " + std::to_string(result));
+        throw oneapi::math::exception("dft/backends/cufft", func,
+                                      "cufftSetStream returned " + std::to_string(result));
     }
     return stream;
 }
 
-} // namespace oneapi::mkl::dft::cufft::detail
+} // namespace oneapi::math::dft::cufft::detail
 
-#endif // _ONEMKL_DFT_SRC_EXECUTE_HELPER_CUFFT_HPP_
+#endif // _ONEMATH_DFT_SRC_EXECUTE_HELPER_CUFFT_HPP_

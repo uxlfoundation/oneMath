@@ -20,8 +20,8 @@
 /*
 *
 *  Content:
-*       This example demonstrates use of DPC++ API oneapi::mkl::rng::uniform distribution
-*       with oneapi::mkl::rng::philox4x32x10 random number generator to produce
+*       This example demonstrates use of DPC++ API oneapi::math::rng::uniform distribution
+*       with oneapi::math::rng::philox4x32x10 random number generator to produce
 *       random numbers on a SYCL device (HOST, CPU, GPU) that is selected
 *       during runtime with Unified Shared Memory(USM) API.
 *
@@ -36,13 +36,13 @@
 #include <iostream>
 #include <vector>
 
-// oneMKL/SYCL includes
+// oneMath/SYCL includes
 #if __has_include(<sycl/sycl.hpp>)
 #include <sycl/sycl.hpp>
 #else
 #include <CL/sycl.hpp>
 #endif
-#include "oneapi/mkl.hpp"
+#include "oneapi/math.hpp"
 
 // local includes
 #include "example_helper.hpp"
@@ -83,8 +83,8 @@ void run_uniform_example(const sycl::device& dev) {
     float a(0.0);
     float b(10.0);
 
-    oneapi::mkl::rng::default_engine engine(queue, seed);
-    oneapi::mkl::rng::uniform<float> distribution(a, b);
+    oneapi::math::rng::default_engine engine(queue, seed);
+    oneapi::math::rng::uniform<float> distribution(a, b);
 
     //
     // Data preparation on host: prepare array for random numbers
@@ -101,7 +101,7 @@ void run_uniform_example(const sycl::device& dev) {
     // Perform generation on device
     //
     sycl::event event_out;
-    event_out = oneapi::mkl::rng::generate(distribution, engine, n, dev_r);
+    event_out = oneapi::math::rng::generate(distribution, engine, n, dev_r);
     event_out.wait_and_throw();
 
     //

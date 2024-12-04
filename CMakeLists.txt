@@ -38,7 +38,7 @@ option(BUILD_SHARED_LIBS "Build dynamic libraries" ON)
 option(ENABLE_MKLCPU_BACKEND "Enable the Intel oneMKL CPU backend for supported interfaces" ON)
 option(ENABLE_MKLGPU_BACKEND "Enable the Intel oneMKL GPU backend for supported interfaces" ON)
 if(ENABLE_MKLCPU_BACKEND)
-  option(ENABLE_MKLCPU_THREAD_TBB "Enable the use of Intel TBB with the oneMKL CPU backend" ON)
+  option(ENABLE_MKLCPU_THREAD_TBB "Enable the use of Intel TBB with the oneMath CPU backend" ON)
 endif()
 
 # blas
@@ -64,7 +64,7 @@ option(ENABLE_PORTFFT_BACKEND "Enable the portFFT DFT backend for the DFT interf
 option(ENABLE_CUSPARSE_BACKEND "Enable the cuSPARSE backend for the SPARSE_BLAS interface" OFF)
 option(ENABLE_ROCSPARSE_BACKEND "Enable the rocSPARSE backend for the SPARSE_BLAS interface" OFF)
 
-set(ONEMKL_SYCL_IMPLEMENTATION "dpc++" CACHE STRING "Name of the SYCL compiler")
+set(ONEMATH_SYCL_IMPLEMENTATION "dpc++" CACHE STRING "Name of the SYCL compiler")
 set(HIP_TARGETS "" CACHE STRING "Target HIP architectures")
 
 ## Testing
@@ -130,7 +130,7 @@ if (ENABLE_PORTFFT_BACKEND
 endif()
 
 # Define required CXX compilers before project
-if(CMAKE_CXX_COMPILER OR NOT ONEMKL_SYCL_IMPLEMENTATION STREQUAL "dpc++")
+if(CMAKE_CXX_COMPILER OR NOT ONEMATH_SYCL_IMPLEMENTATION STREQUAL "dpc++")
   if(WIN32)
     string(REPLACE "\\" "/" CMAKE_CXX_COMPILER ${CMAKE_CXX_COMPILER})
   endif()
@@ -171,7 +171,7 @@ else()
 endif()
 
 # Define required C compilers before project
-if(CMAKE_C_COMPILER OR NOT ONEMKL_SYCL_IMPLEMENTATION STREQUAL "dpc++")
+if(CMAKE_C_COMPILER OR NOT ONEMATH_SYCL_IMPLEMENTATION STREQUAL "dpc++")
   if(WIN32)
     string(REPLACE "\\" "/" CMAKE_C_COMPILER ${CMAKE_C_COMPILER})
   endif()
@@ -191,10 +191,10 @@ else()
   endif()
 endif()
 
-project(oneMKL VERSION 0.5.0 LANGUAGES CXX)
+project(oneMath VERSION 0.5.0 LANGUAGES CXX)
 
 # Override default CXX compile/link lines for Windows after project
-if(WIN32 AND ONEMKL_SYCL_IMPLEMENTATION STREQUAL "dpc++")
+if(WIN32 AND ONEMATH_SYCL_IMPLEMENTATION STREQUAL "dpc++")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-function -w")
   foreach (flag_var
            CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
@@ -210,7 +210,7 @@ if(WIN32 AND ONEMKL_SYCL_IMPLEMENTATION STREQUAL "dpc++")
 endif()
 
 # Temporary disable sycl 2020 deprecations warnings for cuSOLVER and rocSOLVER
-if(ONEMKL_SYCL_IMPLEMENTATION STREQUAL "dpc++" AND (ENABLE_ROCSOLVER_BACKEND))
+if(ONEMATH_SYCL_IMPLEMENTATION STREQUAL "dpc++" AND (ENABLE_ROCSOLVER_BACKEND))
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DSYCL2020_DISABLE_DEPRECATION_WARNINGS")
 endif()
 
@@ -235,7 +235,7 @@ else()
 endif()
 message(STATUS "TARGET_DOMAINS: ${TARGET_DOMAINS}")
 
-# Include Intel oneMKL
+# Include Intel(R) oneAPI Math Kernel Library (oneMKL)
 if(ENABLE_MKLGPU_BACKEND OR ENABLE_MKLCPU_BACKEND)
   set(MKL_ARCH intel64)
   set(MKL_INTERFACE ilp64)
@@ -274,23 +274,23 @@ list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 
 # Add DPC++ options for Linux
 if(WIN32)
-  add_library(ONEMKL::SYCL::SYCL INTERFACE IMPORTED)
+  add_library(ONEMATH::SYCL::SYCL INTERFACE IMPORTED)
 else()
   # Find necessary packages
-  if(ONEMKL_SYCL_IMPLEMENTATION)
-    string( TOLOWER "${ONEMKL_SYCL_IMPLEMENTATION}" ONEMKL_SYCL_IMPLEMENTATION)
-    if (ONEMKL_SYCL_IMPLEMENTATION STREQUAL "hipsycl")
+  if(ONEMATH_SYCL_IMPLEMENTATION)
+    string( TOLOWER "${ONEMATH_SYCL_IMPLEMENTATION}" ONEMATH_SYCL_IMPLEMENTATION)
+    if (ONEMATH_SYCL_IMPLEMENTATION STREQUAL "hipsycl")
       message(STATUS "Looking for hipSYCL")
       find_package(hipSYCL CONFIG REQUIRED)
       set(USE_ADD_SYCL_TO_TARGET_INTEGRATION true)
       set (CMAKE_CXX_STANDARD 17)
-      add_library(ONEMKL::SYCL::SYCL INTERFACE IMPORTED)
-    elseif(ONEMKL_SYCL_IMPLEMENTATION STREQUAL "dpc++")
+      add_library(ONEMATH::SYCL::SYCL INTERFACE IMPORTED)
+    elseif(ONEMATH_SYCL_IMPLEMENTATION STREQUAL "dpc++")
       message(STATUS "Looking for dpc++")
       set(USE_ADD_SYCL_TO_TARGET_INTEGRATION false)
       find_package(Compiler REQUIRED)
     else()
-      message(FATAL_ERROR "SYCL implementation ${ONEMKL_SYCL_IMPLEMENTATION} is not known")
+      message(FATAL_ERROR "SYCL implementation ${ONEMATH_SYCL_IMPLEMENTATION} is not known")
     endif()
   else()
     message(STATUS "Looking for dpc++")
@@ -300,8 +300,8 @@ else()
 endif()
 
 if(DEFINED REF_BLAS_ROOT)
-  find_file(ONEMKL_REF_BLAS_LIBNAME NAMES blas.dll libblas.so HINTS ${REF_BLAS_ROOT} PATH_SUFFIXES lib lib64)
-  find_file(ONEMKL_REF_CBLAS_LIBNAME NAMES cblas.dll libcblas.so HINTS ${REF_BLAS_ROOT} PATH_SUFFIXES lib lib64)
+  find_file(ONEMATH_REF_BLAS_LIBNAME NAMES blas.dll libblas.so HINTS ${REF_BLAS_ROOT} PATH_SUFFIXES lib lib64)
+  find_file(ONEMATH_REF_CBLAS_LIBNAME NAMES cblas.dll libcblas.so HINTS ${REF_BLAS_ROOT} PATH_SUFFIXES lib lib64)
 endif()
 
 # Add source directory and output to bin/
@@ -332,30 +332,30 @@ install(DIRECTORY include/
 
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file(
-  "${CMAKE_CURRENT_BINARY_DIR}/oneMKLConfigVersion.cmake"
+  "${CMAKE_CURRENT_BINARY_DIR}/oneMathConfigVersion.cmake"
   VERSION ${PROJECT_VERSION}
   COMPATIBILITY AnyNewerVersion
 )
 
-export(EXPORT oneMKLTargets
-  FILE "${CMAKE_CURRENT_BINARY_DIR}/oneMKLTargets.cmake"
-  NAMESPACE ONEMKL::
+export(EXPORT oneMathTargets
+  FILE "${CMAKE_CURRENT_BINARY_DIR}/oneMathTargets.cmake"
+  NAMESPACE ONEMATH::
 )
-configure_file("${PROJECT_SOURCE_DIR}/cmake/oneMKLConfig.cmake"
-  "${CMAKE_CURRENT_BINARY_DIR}/oneMKLConfig.cmake"
+configure_file("${PROJECT_SOURCE_DIR}/cmake/oneMathConfig.cmake"
+  "${CMAKE_CURRENT_BINARY_DIR}/oneMathConfig.cmake"
   COPYONLY
 )
 
 set(config_package_location "lib/cmake/${PROJECT_NAME}")
-install(EXPORT oneMKLTargets
-  FILE oneMKLTargets.cmake
-  NAMESPACE MKL::
+install(EXPORT oneMathTargets
+  FILE oneMathTargets.cmake
+  NAMESPACE ONEMATH::
   DESTINATION ${config_package_location}
 )
 install(
   FILES
-  "${PROJECT_SOURCE_DIR}/cmake/oneMKLConfig.cmake"
-  "${CMAKE_CURRENT_BINARY_DIR}/oneMKLConfigVersion.cmake"
+  "${PROJECT_SOURCE_DIR}/cmake/oneMathConfig.cmake"
+  "${CMAKE_CURRENT_BINARY_DIR}/oneMathConfigVersion.cmake"
   DESTINATION ${config_package_location}
   COMPONENT Devel
 )

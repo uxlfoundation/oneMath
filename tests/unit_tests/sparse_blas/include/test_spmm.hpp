@@ -26,8 +26,8 @@
 #include <CL/sycl.hpp>
 #endif
 
-#include "oneapi/mkl.hpp"
-#include "oneapi/mkl/detail/config.hpp"
+#include "oneapi/math.hpp"
+#include "oneapi/math/detail/config.hpp"
 
 #include "common_sparse_reference.hpp"
 #include "test_common.hpp"
@@ -55,17 +55,17 @@ template <typename fpType, typename testFunctorI32, typename testFunctorI64>
 void test_helper_with_format_with_transpose(
     testFunctorI32 test_functor_i32, testFunctorI64 test_functor_i64, sycl::device* dev,
     sparse_matrix_format_t format,
-    const std::vector<oneapi::mkl::sparse::spmm_alg>& non_default_algorithms,
-    oneapi::mkl::transpose transpose_A, oneapi::mkl::transpose transpose_B, int& num_passed,
+    const std::vector<oneapi::math::sparse::spmm_alg>& non_default_algorithms,
+    oneapi::math::transpose transpose_A, oneapi::math::transpose transpose_B, int& num_passed,
     int& num_skipped) {
     sycl::property_list queue_properties;
     double density_A_matrix = 0.8;
     fpType fp_zero = set_fp_value<fpType>()(0.f, 0.f);
     fpType fp_one = set_fp_value<fpType>()(1.f, 0.f);
-    oneapi::mkl::index_base index_zero = oneapi::mkl::index_base::zero;
-    oneapi::mkl::layout col_major = oneapi::mkl::layout::col_major;
-    oneapi::mkl::sparse::spmm_alg default_alg = oneapi::mkl::sparse::spmm_alg::default_alg;
-    oneapi::mkl::sparse::matrix_view default_A_view;
+    oneapi::math::index_base index_zero = oneapi::math::index_base::zero;
+    oneapi::math::layout col_major = oneapi::math::layout::col_major;
+    oneapi::math::sparse::spmm_alg default_alg = oneapi::math::sparse::spmm_alg::default_alg;
+    oneapi::math::sparse::matrix_view default_A_view;
     bool no_reset_data = false;
     bool no_scalars_on_device = false;
 
@@ -75,10 +75,10 @@ void test_helper_with_format_with_transpose(
 
     {
         int m = 4, k = 6, n = 5;
-        int nrows_A = (transpose_A != oneapi::mkl::transpose::nontrans) ? k : m;
-        int ncols_A = (transpose_A != oneapi::mkl::transpose::nontrans) ? m : k;
-        int nrows_B = (transpose_B != oneapi::mkl::transpose::nontrans) ? n : k;
-        int ncols_B = (transpose_B != oneapi::mkl::transpose::nontrans) ? k : n;
+        int nrows_A = (transpose_A != oneapi::math::transpose::nontrans) ? k : m;
+        int ncols_A = (transpose_A != oneapi::math::transpose::nontrans) ? m : k;
+        int nrows_B = (transpose_B != oneapi::math::transpose::nontrans) ? n : k;
+        int ncols_B = (transpose_B != oneapi::math::transpose::nontrans) ? k : n;
         int nrows_C = m;
         int ncols_C = n;
         int ldb = nrows_B;
@@ -108,9 +108,10 @@ void test_helper_with_format_with_transpose(
         // Test index_base 1
         EXPECT_TRUE_OR_FUTURE_SKIP(
             test_functor_i32(dev, queue_properties, format, nrows_A, ncols_A, ncols_C,
-                             density_A_matrix, oneapi::mkl::index_base::one, col_major, transpose_A,
-                             transpose_B, fp_one, fp_zero, ldb, ldc, default_alg, default_A_view,
-                             default_properties, no_reset_data, no_scalars_on_device),
+                             density_A_matrix, oneapi::math::index_base::one, col_major,
+                             transpose_A, transpose_B, fp_one, fp_zero, ldb, ldc, default_alg,
+                             default_A_view, default_properties, no_reset_data,
+                             no_scalars_on_device),
             num_passed, num_skipped);
         // Test non-default alpha
         EXPECT_TRUE_OR_FUTURE_SKIP(
@@ -159,7 +160,7 @@ void test_helper_with_format_with_transpose(
         // Test row major layout
         EXPECT_TRUE_OR_FUTURE_SKIP(
             test_functor_i32(dev, queue_properties, format, nrows_A, ncols_A, ncols_C,
-                             density_A_matrix, index_zero, oneapi::mkl::layout::row_major,
+                             density_A_matrix, index_zero, oneapi::math::layout::row_major,
                              transpose_A, transpose_B, fp_one, fp_zero, ncols_B, ncols_C,
                              default_alg, default_A_view, default_properties, no_reset_data,
                              no_scalars_on_device),
@@ -203,9 +204,9 @@ void test_helper_with_format_with_transpose(
     {
         // Test different sizes
         int m = 6, k = 2, n = 5;
-        int nrows_A = (transpose_A != oneapi::mkl::transpose::nontrans) ? k : m;
-        int ncols_A = (transpose_A != oneapi::mkl::transpose::nontrans) ? m : k;
-        int nrows_B = (transpose_B != oneapi::mkl::transpose::nontrans) ? n : k;
+        int nrows_A = (transpose_A != oneapi::math::transpose::nontrans) ? k : m;
+        int ncols_A = (transpose_A != oneapi::math::transpose::nontrans) ? m : k;
+        int nrows_B = (transpose_B != oneapi::math::transpose::nontrans) ? n : k;
         int nrows_C = m;
         int ncols_C = n;
         int ldb = nrows_B;
@@ -235,11 +236,11 @@ template <typename fpType, typename testFunctorI32, typename testFunctorI64>
 void test_helper_with_format(
     testFunctorI32 test_functor_i32, testFunctorI64 test_functor_i64, sycl::device* dev,
     sparse_matrix_format_t format,
-    const std::vector<oneapi::mkl::sparse::spmm_alg>& non_default_algorithms, int& num_passed,
+    const std::vector<oneapi::math::sparse::spmm_alg>& non_default_algorithms, int& num_passed,
     int& num_skipped) {
-    std::vector<oneapi::mkl::transpose> transpose_vals{ oneapi::mkl::transpose::nontrans,
-                                                        oneapi::mkl::transpose::trans,
-                                                        oneapi::mkl::transpose::conjtrans };
+    std::vector<oneapi::math::transpose> transpose_vals{ oneapi::math::transpose::nontrans,
+                                                         oneapi::math::transpose::trans,
+                                                         oneapi::math::transpose::conjtrans };
     for (auto transpose_A : transpose_vals) {
         for (auto transpose_B : transpose_vals) {
             test_helper_with_format_with_transpose<fpType>(
@@ -264,14 +265,14 @@ void test_helper(testFunctorI32 test_functor_i32, testFunctorI64 test_functor_i6
                  sycl::device* dev, int& num_passed, int& num_skipped) {
     test_helper_with_format<fpType>(
         test_functor_i32, test_functor_i64, dev, sparse_matrix_format_t::CSR,
-        { oneapi::mkl::sparse::spmm_alg::no_optimize_alg, oneapi::mkl::sparse::spmm_alg::csr_alg1,
-          oneapi::mkl::sparse::spmm_alg::csr_alg2, oneapi::mkl::sparse::spmm_alg::csr_alg3 },
+        { oneapi::math::sparse::spmm_alg::no_optimize_alg, oneapi::math::sparse::spmm_alg::csr_alg1,
+          oneapi::math::sparse::spmm_alg::csr_alg2, oneapi::math::sparse::spmm_alg::csr_alg3 },
         num_passed, num_skipped);
     test_helper_with_format<fpType>(
         test_functor_i32, test_functor_i64, dev, sparse_matrix_format_t::COO,
-        { oneapi::mkl::sparse::spmm_alg::no_optimize_alg, oneapi::mkl::sparse::spmm_alg::coo_alg1,
-          oneapi::mkl::sparse::spmm_alg::coo_alg2, oneapi::mkl::sparse::spmm_alg::coo_alg3,
-          oneapi::mkl::sparse::spmm_alg::coo_alg4 },
+        { oneapi::math::sparse::spmm_alg::no_optimize_alg, oneapi::math::sparse::spmm_alg::coo_alg1,
+          oneapi::math::sparse::spmm_alg::coo_alg2, oneapi::math::sparse::spmm_alg::coo_alg3,
+          oneapi::math::sparse::spmm_alg::coo_alg4 },
         num_passed, num_skipped);
 }
 
@@ -280,10 +281,10 @@ template <typename fpType, typename intType>
 void prepare_reference_spmm_data(sparse_matrix_format_t format, const intType* ia,
                                  const intType* ja, const fpType* a, intType a_nrows,
                                  intType a_ncols, intType c_ncols, intType a_nnz, intType indexing,
-                                 oneapi::mkl::layout dense_matrix_layout,
-                                 oneapi::mkl::transpose opA, oneapi::mkl::transpose opB,
+                                 oneapi::math::layout dense_matrix_layout,
+                                 oneapi::math::transpose opA, oneapi::math::transpose opB,
                                  fpType alpha, fpType beta, intType ldb, intType ldc,
-                                 const fpType* b, oneapi::mkl::sparse::matrix_view A_view,
+                                 const fpType* b, oneapi::math::sparse::matrix_view A_view,
                                  fpType* c_ref) {
     std::size_t a_nrows_u = static_cast<std::size_t>(a_nrows);
     std::size_t a_ncols_u = static_cast<std::size_t>(a_ncols);
@@ -301,8 +302,8 @@ void prepare_reference_spmm_data(sparse_matrix_format_t format, const intType* i
 
     // Return the linear index to access a dense matrix from
     auto dense_linear_idx = [=](std::size_t row, std::size_t col, std::size_t ld) {
-        return (dense_matrix_layout == oneapi::mkl::layout::row_major) ? row * ld + col
-                                                                       : col * ld + row;
+        return (dense_matrix_layout == oneapi::math::layout::row_major) ? row * ld + col
+                                                                        : col * ld + row;
     };
 
     //

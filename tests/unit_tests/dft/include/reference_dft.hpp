@@ -17,8 +17,8 @@
 *
 **************************************************************************/
 
-#ifndef ONEMKL_REFERENCE_DFT_HPP
-#define ONEMKL_REFERENCE_DFT_HPP
+#ifndef ONEMATH_REFERENCE_DFT_HPP
+#define ONEMATH_REFERENCE_DFT_HPP
 
 #include <algorithm>
 #include <cmath>
@@ -26,7 +26,7 @@
 #include <vector>
 #include <numeric>
 
-#include <oneapi/mkl/exceptions.hpp>
+#include <oneapi/math/exceptions.hpp>
 #include "test_common.hpp"
 
 namespace detail {
@@ -121,10 +121,10 @@ void reference_forward_dft(const std::vector<std::int64_t>& sizes, const TypeIn*
         case 2: detail::reference<TypeIn, TypeOut, 2>::forward_dft(unsigned_sizes, in, out); break;
         case 3: detail::reference<TypeIn, TypeOut, 3>::forward_dft(unsigned_sizes, in, out); break;
         default:
-            throw oneapi::mkl::unimplemented(
+            throw oneapi::math::unimplemented(
                 "reference_dft", "forward_dft",
                 "dft with size " + std::to_string(unsigned_sizes.size()));
     }
 }
 
-#endif //ONEMKL_REFERENCE_DFT_HPP
+#endif //ONEMATH_REFERENCE_DFT_HPP

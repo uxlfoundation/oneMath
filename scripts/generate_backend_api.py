@@ -40,10 +40,10 @@ Usage:
 
 Example:
 The command below will generate:
-"onemkl_blas_mklgpu.hpp" header with declaration of all backend library APIs.
-API from backend library will be called from "oneapi::mkl::mklgpu::blas" namespace.
+"onemath_blas_mklgpu.hpp" header with declaration of all backend library APIs.
+API from backend library will be called from "oneapi::math::mklgpu::blas" namespace.
 
-{script}  include/oneapi/mkl/blas.hpp include/oneapi/mkl/blas/detail/mklgpu/onemkl_blas_mklgpu.hpp oneapi::mkl::mklgpu::blas
+{script}  include/oneapi/math/blas.hpp include/oneapi/math/blas/detail/mklgpu/onemath_blas_mklgpu.hpp oneapi::math::mklgpu::blas
 '''.format(script = argv[0]))
 
 if len(argv) < 3:
@@ -95,7 +95,7 @@ out_file.write("""//
 #include <complex>
 #include <cstdint>
 
-#include "oneapi/mkl/types.hpp"
+#include "oneapi/math/types.hpp"
 """.format(in_filename=in_filename))
 
 for nmsp in namespace_list:

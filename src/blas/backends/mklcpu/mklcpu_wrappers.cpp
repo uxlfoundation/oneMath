@@ -18,11 +18,11 @@
 *******************************************************************************/
 
 #include "blas/function_table.hpp"
-#include "oneapi/mkl/blas/detail/mklcpu/onemkl_blas_mklcpu.hpp"
+#include "oneapi/math/blas/detail/mklcpu/onemath_blas_mklcpu.hpp"
 
 #define WRAPPER_VERSION 1
 
-extern "C" ONEMKL_EXPORT blas_function_table_t mkl_blas_table = {
+extern "C" ONEMATH_EXPORT blas_function_table_t onemath_blas_table = {
     WRAPPER_VERSION,
 #define BACKEND mklcpu
 #define MAJOR   column_major

@@ -17,15 +17,20 @@
 * SPDX-License-Identifier: Apache-2.0
 *******************************************************************************/
 
-#ifndef _ONEMKL_HPP_
-#define _ONEMKL_HPP_
+#ifndef ONEMATH_MKL_HPP
+#define ONEMATH_MKL_HPP
 
-#include "oneapi/mkl/types.hpp"
+// Deprecated header is planned to be removed late 2025.
+#pragma message("Header `oneapi/mkl.hpp` is deprecated, please use `oneapi/math.hpp` instead")
 
-#include "oneapi/mkl/blas.hpp"
-#include "oneapi/mkl/dft.hpp"
-#include "oneapi/mkl/lapack.hpp"
-#include "oneapi/mkl/rng.hpp"
-#include "oneapi/mkl/sparse_blas.hpp"
+#include "oneapi/math/types.hpp"
 
-#endif //_ONEMKL_HPP_
+#include "oneapi/math/blas.hpp"
+#include "oneapi/math/dft.hpp"
+#include "oneapi/math/lapack.hpp"
+#include "oneapi/math/rng.hpp"
+#include "oneapi/math/sparse_blas.hpp"
+
+#include "namespace_alias.hpp"
+
+#endif // ONEMATH_MKL_HPP

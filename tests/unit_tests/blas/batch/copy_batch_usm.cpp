@@ -31,9 +31,9 @@
 #endif
 #include "allocator_helper.hpp"
 #include "cblas.h"
-#include "oneapi/mkl/detail/config.hpp"
-#include "oneapi/mkl.hpp"
-#include "onemkl_blas_helper.hpp"
+#include "oneapi/math/detail/config.hpp"
+#include "oneapi/math.hpp"
+#include "onemath_blas_helper.hpp"
 #include "reference_blas_templates.hpp"
 #include "test_common.hpp"
 #include "test_helper.hpp"
@@ -48,7 +48,7 @@ extern std::vector<sycl::device*> devices;
 namespace {
 
 template <typename fp>
-int test(device* dev, oneapi::mkl::layout layout, int64_t group_count) {
+int test(device* dev, oneapi::math::layout layout, int64_t group_count) {
     // Catch asynchronous exceptions.
     auto exception_handler = [](exception_list exceptions) {
         for (std::exception_ptr const& e : exceptions) {
@@ -69,20 +69,21 @@ int test(device* dev, oneapi::mkl::layout layout, int64_t group_count) {
     std::vector<event> dependencies;
 
     // Prepare data.
-    int64_t* n = (int64_t*)oneapi::mkl::malloc_shared(64, sizeof(int64_t) * group_count, *dev, cxt);
+    int64_t* n =
+        (int64_t*)oneapi::math::malloc_shared(64, sizeof(int64_t) * group_count, *dev, cxt);
     int64_t* incx =
-        (int64_t*)oneapi::mkl::malloc_shared(64, sizeof(int64_t) * group_count, *dev, cxt);
+        (int64_t*)oneapi::math::malloc_shared(64, sizeof(int64_t) * group_count, *dev, cxt);
     int64_t* incy =
-        (int64_t*)oneapi::mkl::malloc_shared(64, sizeof(int64_t) * group_count, *dev, cxt);
+        (int64_t*)oneapi::math::malloc_shared(64, sizeof(int64_t) * group_count, *dev, cxt);
     int64_t* group_size =
-        (int64_t*)oneapi::mkl::malloc_shared(64, sizeof(int64_t) * group_count, *dev, cxt);
+        (int64_t*)oneapi::math::malloc_shared(64, sizeof(int64_t) * group_count, *dev, cxt);
 
     if ((n == NULL) || (incx == NULL) || (incy == NULL) || (group_size == NULL)) {
         std::cout << "Error cannot allocate input arrays\n";
-        oneapi::mkl::free_shared(n, cxt);
-        oneapi::mkl::free_shared(incx, cxt);
-        oneapi::mkl::free_shared(incy, cxt);
-        oneapi::mkl::free_shared(group_size, cxt);
+        oneapi::math::free_shared(n, cxt);
+        oneapi::math::free_shared(incx, cxt);
+        oneapi::math::free_shared(incy, cxt);
+        oneapi::math::free_shared(group_size, cxt);
         return false;
     }
 
@@ -99,16 +100,18 @@ int test(device* dev, oneapi::mkl::layout layout, int64_t group_count) {
         total_batch_count += group_size[i];
     }
 
-    fp** x_array = (fp**)oneapi::mkl::malloc_shared(64, sizeof(fp*) * total_batch_count, *dev, cxt);
-    fp** y_array = (fp**)oneapi::mkl::malloc_shared(64, sizeof(fp*) * total_batch_count, *dev, cxt);
+    fp** x_array =
+        (fp**)oneapi::math::malloc_shared(64, sizeof(fp*) * total_batch_count, *dev, cxt);
+    fp** y_array =
+        (fp**)oneapi::math::malloc_shared(64, sizeof(fp*) * total_batch_count, *dev, cxt);
     fp** y_ref_array =
-        (fp**)oneapi::mkl::malloc_shared(64, sizeof(fp*) * total_batch_count, *dev, cxt);
+        (fp**)oneapi::math::malloc_shared(64, sizeof(fp*) * total_batch_count, *dev, cxt);
 
     if ((x_array == NULL) || (y_array == NULL) || (y_ref_array == NULL)) {
         std::cout << "Error cannot allocate arrays of pointers\n";
-        oneapi::mkl::free_shared(x_array, cxt);
-        oneapi::mkl::free_shared(y_array, cxt);
-        oneapi::mkl::free_shared(y_ref_array, cxt);
+        oneapi::math::free_shared(x_array, cxt);
+        oneapi::math::free_shared(y_array, cxt);
+        oneapi::math::free_shared(y_ref_array, cxt);
         return false;
     }
     idx = 0;
@@ -117,11 +120,11 @@ int test(device* dev, oneapi::mkl::layout layout, int64_t group_count) {
             total_size_x = (1 + (n[i] - 1) * std::abs(incx[i]));
             total_size_y = (1 + (n[i] - 1) * std::abs(incy[i]));
             x_array[idx] =
-                (fp*)oneapi::mkl::malloc_shared(64, sizeof(fp) * total_size_x, *dev, cxt);
+                (fp*)oneapi::math::malloc_shared(64, sizeof(fp) * total_size_x, *dev, cxt);
             y_array[idx] =
-                (fp*)oneapi::mkl::malloc_shared(64, sizeof(fp) * total_size_y, *dev, cxt);
+                (fp*)oneapi::math::malloc_shared(64, sizeof(fp) * total_size_y, *dev, cxt);
             y_ref_array[idx] =
-                (fp*)oneapi::mkl::malloc_shared(64, sizeof(fp) * total_size_y, *dev, cxt);
+                (fp*)oneapi::math::malloc_shared(64, sizeof(fp) * total_size_y, *dev, cxt);
             rand_vector(x_array[idx], n[i], incx[i]);
             rand_vector(y_array[idx], n[i], incy[i]);
             copy_vector(y_array[idx], n[i], incy[i], y_ref_array[idx]);
@@ -150,28 +153,28 @@ int test(device* dev, oneapi::mkl::layout layout, int64_t group_count) {
     try {
 #ifdef CALL_RT_API
         switch (layout) {
-            case oneapi::mkl::layout::col_major:
-                done = oneapi::mkl::blas::column_major::copy_batch(
+            case oneapi::math::layout::col_major:
+                done = oneapi::math::blas::column_major::copy_batch(
                     main_queue, n, (const fp**)x_array, incx, y_array, incy, group_count,
                     group_size, dependencies);
                 break;
-            case oneapi::mkl::layout::row_major:
-                done = oneapi::mkl::blas::row_major::copy_batch(main_queue, n, (const fp**)x_array,
-                                                                incx, y_array, incy, group_count,
-                                                                group_size, dependencies);
+            case oneapi::math::layout::row_major:
+                done = oneapi::math::blas::row_major::copy_batch(main_queue, n, (const fp**)x_array,
+                                                                 incx, y_array, incy, group_count,
+                                                                 group_size, dependencies);
                 break;
             default: break;
         }
         done.wait();
 #else
         switch (layout) {
-            case oneapi::mkl::layout::col_major:
-                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::mkl::blas::column_major::copy_batch, n,
+            case oneapi::math::layout::col_major:
+                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::math::blas::column_major::copy_batch, n,
                                         (const fp**)x_array, incx, y_array, incy, group_count,
                                         group_size, dependencies);
                 break;
-            case oneapi::mkl::layout::row_major:
-                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::mkl::blas::row_major::copy_batch, n,
+            case oneapi::math::layout::row_major:
+                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::math::blas::row_major::copy_batch, n,
                                         (const fp**)x_array, incx, y_array, incy, group_count,
                                         group_size, dependencies);
                 break;
@@ -186,23 +189,23 @@ int test(device* dev, oneapi::mkl::layout layout, int64_t group_count) {
         print_error_code(e);
     }
 
-    catch (const oneapi::mkl::unimplemented& e) {
+    catch (const oneapi::math::unimplemented& e) {
         idx = 0;
         for (i = 0; i < group_count; i++) {
             for (j = 0; j < group_size[i]; j++) {
-                oneapi::mkl::free_shared(x_array[idx], cxt);
-                oneapi::mkl::free_shared(y_array[idx], cxt);
-                oneapi::mkl::free_shared(y_ref_array[idx], cxt);
+                oneapi::math::free_shared(x_array[idx], cxt);
+                oneapi::math::free_shared(y_array[idx], cxt);
+                oneapi::math::free_shared(y_ref_array[idx], cxt);
                 idx++;
             }
         }
-        oneapi::mkl::free_shared(n, cxt);
-        oneapi::mkl::free_shared(incx, cxt);
-        oneapi::mkl::free_shared(incy, cxt);
-        oneapi::mkl::free_shared(group_size, cxt);
-        oneapi::mkl::free_shared(x_array, cxt);
-        oneapi::mkl::free_shared(y_array, cxt);
-        oneapi::mkl::free_shared(y_ref_array, cxt);
+        oneapi::math::free_shared(n, cxt);
+        oneapi::math::free_shared(incx, cxt);
+        oneapi::math::free_shared(incy, cxt);
+        oneapi::math::free_shared(group_size, cxt);
+        oneapi::math::free_shared(x_array, cxt);
+        oneapi::math::free_shared(y_array, cxt);
+        oneapi::math::free_shared(y_ref_array, cxt);
         return test_skipped;
     }
 
@@ -225,25 +228,25 @@ int test(device* dev, oneapi::mkl::layout layout, int64_t group_count) {
     idx = 0;
     for (i = 0; i < group_count; i++) {
         for (j = 0; j < group_size[i]; j++) {
-            oneapi::mkl::free_shared(x_array[idx], cxt);
-            oneapi::mkl::free_shared(y_array[idx], cxt);
-            oneapi::mkl::free_shared(y_ref_array[idx], cxt);
+            oneapi::math::free_shared(x_array[idx], cxt);
+            oneapi::math::free_shared(y_array[idx], cxt);
+            oneapi::math::free_shared(y_ref_array[idx], cxt);
             idx++;
         }
     }
-    oneapi::mkl::free_shared(n, cxt);
-    oneapi::mkl::free_shared(incx, cxt);
-    oneapi::mkl::free_shared(incy, cxt);
-    oneapi::mkl::free_shared(group_size, cxt);
-    oneapi::mkl::free_shared(x_array, cxt);
-    oneapi::mkl::free_shared(y_array, cxt);
-    oneapi::mkl::free_shared(y_ref_array, cxt);
+    oneapi::math::free_shared(n, cxt);
+    oneapi::math::free_shared(incx, cxt);
+    oneapi::math::free_shared(incy, cxt);
+    oneapi::math::free_shared(group_size, cxt);
+    oneapi::math::free_shared(x_array, cxt);
+    oneapi::math::free_shared(y_array, cxt);
+    oneapi::math::free_shared(y_ref_array, cxt);
 
     return (int)good;
 }
 
 class CopyBatchUsmTests
-        : public ::testing::TestWithParam<std::tuple<sycl::device*, oneapi::mkl::layout>> {};
+        : public ::testing::TestWithParam<std::tuple<sycl::device*, oneapi::math::layout>> {};
 
 TEST_P(CopyBatchUsmTests, RealSinglePrecision) {
     EXPECT_TRUEORSKIP(test<float>(std::get<0>(GetParam()), std::get<1>(GetParam()), 5));
@@ -269,8 +272,8 @@ TEST_P(CopyBatchUsmTests, ComplexDoublePrecision) {
 
 INSTANTIATE_TEST_SUITE_P(CopyBatchUsmTestSuite, CopyBatchUsmTests,
                          ::testing::Combine(testing::ValuesIn(devices),
-                                            testing::Values(oneapi::mkl::layout::col_major,
-                                                            oneapi::mkl::layout::row_major)),
+                                            testing::Values(oneapi::math::layout::col_major,
+                                                            oneapi::math::layout::row_major)),
                          ::LayoutDeviceNamePrint());
 
 } // anonymous namespace

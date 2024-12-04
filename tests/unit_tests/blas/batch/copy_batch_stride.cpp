@@ -31,9 +31,9 @@
 #endif
 #include "allocator_helper.hpp"
 #include "cblas.h"
-#include "oneapi/mkl/detail/config.hpp"
-#include "oneapi/mkl.hpp"
-#include "onemkl_blas_helper.hpp"
+#include "oneapi/math/detail/config.hpp"
+#include "oneapi/math.hpp"
+#include "onemath_blas_helper.hpp"
 #include "reference_blas_templates.hpp"
 #include "test_common.hpp"
 #include "test_helper.hpp"
@@ -48,7 +48,7 @@ extern std::vector<sycl::device*> devices;
 namespace {
 
 template <typename fp>
-int test(device* dev, oneapi::mkl::layout layout, int64_t incx, int64_t incy, int64_t batch_size) {
+int test(device* dev, oneapi::math::layout layout, int64_t incx, int64_t incy, int64_t batch_size) {
     // Prepare data.
     int64_t n, i;
 
@@ -104,25 +104,25 @@ int test(device* dev, oneapi::mkl::layout layout, int64_t incx, int64_t incy, in
     try {
 #ifdef CALL_RT_API
         switch (layout) {
-            case oneapi::mkl::layout::col_major:
-                oneapi::mkl::blas::column_major::copy_batch(main_queue, n, x_buffer, incx, stride_x,
-                                                            y_buffer, incy, stride_y, batch_size);
+            case oneapi::math::layout::col_major:
+                oneapi::math::blas::column_major::copy_batch(
+                    main_queue, n, x_buffer, incx, stride_x, y_buffer, incy, stride_y, batch_size);
                 break;
-            case oneapi::mkl::layout::row_major:
-                oneapi::mkl::blas::row_major::copy_batch(main_queue, n, x_buffer, incx, stride_x,
-                                                         y_buffer, incy, stride_y, batch_size);
+            case oneapi::math::layout::row_major:
+                oneapi::math::blas::row_major::copy_batch(main_queue, n, x_buffer, incx, stride_x,
+                                                          y_buffer, incy, stride_y, batch_size);
                 break;
             default: break;
         }
 #else
         switch (layout) {
-            case oneapi::mkl::layout::col_major:
-                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::mkl::blas::column_major::copy_batch, n,
+            case oneapi::math::layout::col_major:
+                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::math::blas::column_major::copy_batch, n,
                                         x_buffer, incx, stride_x, y_buffer, incy, stride_y,
                                         batch_size);
                 break;
-            case oneapi::mkl::layout::row_major:
-                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::mkl::blas::row_major::copy_batch, n,
+            case oneapi::math::layout::row_major:
+                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::math::blas::row_major::copy_batch, n,
                                         x_buffer, incx, stride_x, y_buffer, incy, stride_y,
                                         batch_size);
                 break;
@@ -136,7 +136,7 @@ int test(device* dev, oneapi::mkl::layout layout, int64_t incx, int64_t incy, in
         print_error_code(e);
     }
 
-    catch (const oneapi::mkl::unimplemented& e) {
+    catch (const oneapi::math::unimplemented& e) {
         return test_skipped;
     }
 
@@ -157,7 +157,7 @@ int test(device* dev, oneapi::mkl::layout layout, int64_t incx, int64_t incy, in
 }
 
 class CopyBatchStrideTests
-        : public ::testing::TestWithParam<std::tuple<sycl::device*, oneapi::mkl::layout>> {};
+        : public ::testing::TestWithParam<std::tuple<sycl::device*, oneapi::math::layout>> {};
 
 TEST_P(CopyBatchStrideTests, RealSinglePrecision) {
     EXPECT_TRUEORSKIP(test<float>(std::get<0>(GetParam()), std::get<1>(GetParam()), 2, 3, 15));
@@ -195,8 +195,8 @@ TEST_P(CopyBatchStrideTests, ComplexDoublePrecision) {
 
 INSTANTIATE_TEST_SUITE_P(CopyBatchStrideTestSuite, CopyBatchStrideTests,
                          ::testing::Combine(testing::ValuesIn(devices),
-                                            testing::Values(oneapi::mkl::layout::col_major,
-                                                            oneapi::mkl::layout::row_major)),
+                                            testing::Values(oneapi::math::layout::col_major,
+                                                            oneapi::math::layout::row_major)),
                          ::LayoutDeviceNamePrint());
 
 } // anonymous namespace

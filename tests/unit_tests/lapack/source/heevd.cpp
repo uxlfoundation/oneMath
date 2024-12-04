@@ -26,7 +26,7 @@
 #include <CL/sycl.hpp>
 #endif
 
-#include "oneapi/mkl.hpp"
+#include "oneapi/math.hpp"
 #include "lapack_common.hpp"
 #include "lapack_test_controller.hpp"
 #include "lapack_accuracy_checks.hpp"
@@ -40,7 +40,7 @@ const char* accuracy_input = R"(
 )";
 
 template <typename data_T>
-bool accuracy(const sycl::device& dev, oneapi::mkl::job jobz, oneapi::mkl::uplo uplo, int64_t n,
+bool accuracy(const sycl::device& dev, oneapi::math::job jobz, oneapi::math::uplo uplo, int64_t n,
               int64_t lda, uint64_t seed) {
     using fp = typename data_T_info<data_T>::value_type;
     using fp_real = typename complex_info<fp>::real_type;
@@ -59,11 +59,11 @@ bool accuracy(const sycl::device& dev, oneapi::mkl::job jobz, oneapi::mkl::uplo 
         auto w_dev = device_alloc<data_T, fp_real>(queue, w.size());
 #ifdef CALL_RT_API
         const auto scratchpad_size =
-            oneapi::mkl::lapack::heevd_scratchpad_size<fp>(queue, jobz, uplo, n, lda);
+            oneapi::math::lapack::heevd_scratchpad_size<fp>(queue, jobz, uplo, n, lda);
 #else
         int64_t scratchpad_size;
         TEST_RUN_LAPACK_CT_SELECT(queue,
-                                  scratchpad_size = oneapi::mkl::lapack::heevd_scratchpad_size<fp>,
+                                  scratchpad_size = oneapi::math::lapack::heevd_scratchpad_size<fp>,
                                   jobz, uplo, n, lda);
 #endif
         auto scratchpad_dev = device_alloc<data_T>(queue, scratchpad_size);
@@ -72,10 +72,10 @@ bool accuracy(const sycl::device& dev, oneapi::mkl::job jobz, oneapi::mkl::uplo 
         queue.wait_and_throw();
 
 #ifdef CALL_RT_API
-        oneapi::mkl::lapack::heevd(queue, jobz, uplo, n, A_dev, lda, w_dev, scratchpad_dev,
-                                   scratchpad_size);
+        oneapi::math::lapack::heevd(queue, jobz, uplo, n, A_dev, lda, w_dev, scratchpad_dev,
+                                    scratchpad_size);
 #else
-        TEST_RUN_LAPACK_CT_SELECT(queue, oneapi::mkl::lapack::heevd, jobz, uplo, n, A_dev, lda,
+        TEST_RUN_LAPACK_CT_SELECT(queue, oneapi::math::lapack::heevd, jobz, uplo, n, A_dev, lda,
                                   w_dev, scratchpad_dev, scratchpad_size);
 #endif
         queue.wait_and_throw();
@@ -97,7 +97,7 @@ const char* dependency_input = R"(
 )";
 
 template <typename data_T>
-bool usm_dependency(const sycl::device& dev, oneapi::mkl::job jobz, oneapi::mkl::uplo uplo,
+bool usm_dependency(const sycl::device& dev, oneapi::math::job jobz, oneapi::math::uplo uplo,
                     int64_t n, int64_t lda, uint64_t seed) {
     using fp = typename data_T_info<data_T>::value_type;
     using fp_real = typename complex_info<fp>::real_type;
@@ -117,11 +117,11 @@ bool usm_dependency(const sycl::device& dev, oneapi::mkl::job jobz, oneapi::mkl:
         auto w_dev = device_alloc<data_T, fp_real>(queue, w.size());
 #ifdef CALL_RT_API
         const auto scratchpad_size =
-            oneapi::mkl::lapack::heevd_scratchpad_size<fp>(queue, jobz, uplo, n, lda);
+            oneapi::math::lapack::heevd_scratchpad_size<fp>(queue, jobz, uplo, n, lda);
 #else
         int64_t scratchpad_size;
         TEST_RUN_LAPACK_CT_SELECT(queue,
-                                  scratchpad_size = oneapi::mkl::lapack::heevd_scratchpad_size<fp>,
+                                  scratchpad_size = oneapi::math::lapack::heevd_scratchpad_size<fp>,
                                   jobz, uplo, n, lda);
 #endif
         auto scratchpad_dev = device_alloc<data_T>(queue, scratchpad_size);
@@ -133,11 +133,11 @@ bool usm_dependency(const sycl::device& dev, oneapi::mkl::job jobz, oneapi::mkl:
         auto in_event = create_dependency(queue);
 #ifdef CALL_RT_API
         sycl::event func_event =
-            oneapi::mkl::lapack::heevd(queue, jobz, uplo, n, A_dev, lda, w_dev, scratchpad_dev,
-                                       scratchpad_size, std::vector<sycl::event>{ in_event });
+            oneapi::math::lapack::heevd(queue, jobz, uplo, n, A_dev, lda, w_dev, scratchpad_dev,
+                                        scratchpad_size, std::vector<sycl::event>{ in_event });
 #else
         sycl::event func_event;
-        TEST_RUN_LAPACK_CT_SELECT(queue, func_event = oneapi::mkl::lapack::heevd, jobz, uplo, n,
+        TEST_RUN_LAPACK_CT_SELECT(queue, func_event = oneapi::math::lapack::heevd, jobz, uplo, n,
                                   A_dev, lda, w_dev, scratchpad_dev, scratchpad_size,
                                   std::vector<sycl::event>{ in_event });
 #endif

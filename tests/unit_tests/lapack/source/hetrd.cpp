@@ -26,7 +26,7 @@
 #include <CL/sycl.hpp>
 #endif
 
-#include "oneapi/mkl.hpp"
+#include "oneapi/math.hpp"
 #include "lapack_common.hpp"
 #include "lapack_test_controller.hpp"
 #include "lapack_accuracy_checks.hpp"
@@ -40,7 +40,7 @@ const char* accuracy_input = R"(
 )";
 
 template <typename data_T>
-bool accuracy(const sycl::device& dev, oneapi::mkl::uplo uplo, int64_t n, int64_t lda,
+bool accuracy(const sycl::device& dev, oneapi::math::uplo uplo, int64_t n, int64_t lda,
               uint64_t seed) {
     using fp = typename data_T_info<data_T>::value_type;
     using fp_real = typename complex_info<fp>::real_type;
@@ -50,7 +50,7 @@ bool accuracy(const sycl::device& dev, oneapi::mkl::uplo uplo, int64_t n, int64_
     std::vector<fp_real> d(n);
     std::vector<fp_real> e(n);
     std::vector<fp> tau(n);
-    rand_matrix(seed, oneapi::mkl::transpose::nontrans, n, n, A, lda);
+    rand_matrix(seed, oneapi::math::transpose::nontrans, n, n, A, lda);
     std::vector<fp> A_initial = A;
 
     /* Compute on device */
@@ -63,11 +63,11 @@ bool accuracy(const sycl::device& dev, oneapi::mkl::uplo uplo, int64_t n, int64_
         auto tau_dev = device_alloc<data_T>(queue, tau.size());
 #ifdef CALL_RT_API
         const auto scratchpad_size =
-            oneapi::mkl::lapack::hetrd_scratchpad_size<fp>(queue, uplo, n, lda);
+            oneapi::math::lapack::hetrd_scratchpad_size<fp>(queue, uplo, n, lda);
 #else
         int64_t scratchpad_size;
         TEST_RUN_LAPACK_CT_SELECT(
-            queue, scratchpad_size = oneapi::mkl::lapack::hetrd_scratchpad_size<fp>, uplo, n, lda);
+            queue, scratchpad_size = oneapi::math::lapack::hetrd_scratchpad_size<fp>, uplo, n, lda);
 #endif
         auto scratchpad_dev = device_alloc<data_T>(queue, scratchpad_size);
 
@@ -78,10 +78,10 @@ bool accuracy(const sycl::device& dev, oneapi::mkl::uplo uplo, int64_t n, int64_
         queue.wait_and_throw();
 
 #ifdef CALL_RT_API
-        oneapi::mkl::lapack::hetrd(queue, uplo, n, A_dev, lda, d_dev, e_dev, tau_dev,
-                                   scratchpad_dev, scratchpad_size);
+        oneapi::math::lapack::hetrd(queue, uplo, n, A_dev, lda, d_dev, e_dev, tau_dev,
+                                    scratchpad_dev, scratchpad_size);
 #else
-        TEST_RUN_LAPACK_CT_SELECT(queue, oneapi::mkl::lapack::hetrd, uplo, n, A_dev, lda, d_dev,
+        TEST_RUN_LAPACK_CT_SELECT(queue, oneapi::math::lapack::hetrd, uplo, n, A_dev, lda, d_dev,
                                   e_dev, tau_dev, scratchpad_dev, scratchpad_size);
 #endif
         queue.wait_and_throw();
@@ -114,9 +114,9 @@ bool accuracy(const sycl::device& dev, oneapi::mkl::uplo uplo, int64_t n, int64_
 
     std::vector<fp> QTQ{ T };
     int64_t ldqtq = n;
-    reference::or_un_mtr(oneapi::mkl::side::left, uplo, oneapi::mkl::transpose::nontrans, n, n,
+    reference::or_un_mtr(oneapi::math::side::left, uplo, oneapi::math::transpose::nontrans, n, n,
                          A.data(), lda, tau.data(), QTQ.data(), ldqtq);
-    reference::or_un_mtr(oneapi::mkl::side::right, uplo, oneapi::mkl::transpose::conjtrans, n, n,
+    reference::or_un_mtr(oneapi::math::side::right, uplo, oneapi::math::transpose::conjtrans, n, n,
                          A.data(), lda, tau.data(), QTQ.data(), ldqtq);
 
     if (!rel_mat_err_check(n, n, QTQ, ldqtq, A_initial, lda)) {
@@ -127,7 +127,7 @@ bool accuracy(const sycl::device& dev, oneapi::mkl::uplo uplo, int64_t n, int64_
     /* A[i, i] = d[i] */
     for (int64_t diag = 0; diag < n; diag++)
         d[diag] -= A[diag + diag * lda].real();
-    if (uplo == oneapi::mkl::uplo::upper)
+    if (uplo == oneapi::math::uplo::upper)
         for (int64_t diag = 0; diag < n - 1; diag++)
             e[diag] -= A[diag + (diag + 1) * lda].real();
     else
@@ -152,7 +152,7 @@ const char* dependency_input = R"(
 )";
 
 template <typename data_T>
-bool usm_dependency(const sycl::device& dev, oneapi::mkl::uplo uplo, int64_t n, int64_t lda,
+bool usm_dependency(const sycl::device& dev, oneapi::math::uplo uplo, int64_t n, int64_t lda,
                     uint64_t seed) {
     using fp = typename data_T_info<data_T>::value_type;
     using fp_real = typename complex_info<fp>::real_type;
@@ -162,7 +162,7 @@ bool usm_dependency(const sycl::device& dev, oneapi::mkl::uplo uplo, int64_t n, 
     std::vector<fp_real> d(n);
     std::vector<fp_real> e(n);
     std::vector<fp> tau(n);
-    rand_matrix(seed, oneapi::mkl::transpose::nontrans, n, n, A, lda);
+    rand_matrix(seed, oneapi::math::transpose::nontrans, n, n, A, lda);
     std::vector<fp> A_initial = A;
 
     /* Compute on device */
@@ -176,11 +176,11 @@ bool usm_dependency(const sycl::device& dev, oneapi::mkl::uplo uplo, int64_t n, 
         auto tau_dev = device_alloc<data_T>(queue, tau.size());
 #ifdef CALL_RT_API
         const auto scratchpad_size =
-            oneapi::mkl::lapack::hetrd_scratchpad_size<fp>(queue, uplo, n, lda);
+            oneapi::math::lapack::hetrd_scratchpad_size<fp>(queue, uplo, n, lda);
 #else
         int64_t scratchpad_size;
         TEST_RUN_LAPACK_CT_SELECT(
-            queue, scratchpad_size = oneapi::mkl::lapack::hetrd_scratchpad_size<fp>, uplo, n, lda);
+            queue, scratchpad_size = oneapi::math::lapack::hetrd_scratchpad_size<fp>, uplo, n, lda);
 #endif
         auto scratchpad_dev = device_alloc<data_T>(queue, scratchpad_size);
 
@@ -193,12 +193,12 @@ bool usm_dependency(const sycl::device& dev, oneapi::mkl::uplo uplo, int64_t n, 
         /* Check dependency handling */
         auto in_event = create_dependency(queue);
 #ifdef CALL_RT_API
-        sycl::event func_event = oneapi::mkl::lapack::hetrd(
+        sycl::event func_event = oneapi::math::lapack::hetrd(
             queue, uplo, n, A_dev, lda, d_dev, e_dev, tau_dev, scratchpad_dev, scratchpad_size,
             std::vector<sycl::event>{ in_event });
 #else
         sycl::event func_event;
-        TEST_RUN_LAPACK_CT_SELECT(queue, func_event = oneapi::mkl::lapack::hetrd, uplo, n, A_dev,
+        TEST_RUN_LAPACK_CT_SELECT(queue, func_event = oneapi::math::lapack::hetrd, uplo, n, A_dev,
                                   lda, d_dev, e_dev, tau_dev, scratchpad_dev, scratchpad_size,
                                   std::vector<sycl::event>{ in_event });
 #endif

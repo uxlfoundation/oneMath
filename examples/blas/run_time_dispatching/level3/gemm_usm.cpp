@@ -20,14 +20,14 @@
 /*
 *
 *  Content:
-*       This example demonstrates use of DPCPP API oneapi::mkl::blas::gemm
+*       This example demonstrates use of DPCPP API oneapi::math::blas::gemm
 *       using unified shared memory to perform General Matrix-Matrix
 *       Multiplication on a SYCL device (HOST, CPU, GPU) that is selected
 *       during runtime.
 *
 *       C = alpha * op(A) * op(B) + beta * C
 *
-*       where op() is defined by one of oneapi::mkl::transpose::{nontrans,trans,conjtrans}
+*       where op() is defined by one of oneapi::math::transpose::{nontrans,trans,conjtrans}
 *
 *
 *       This example demonstrates only single precision (float) data type for
@@ -47,7 +47,7 @@
 #else
 #include <CL/sycl.hpp>
 #endif
-#include "oneapi/mkl.hpp"
+#include "oneapi/math.hpp"
 
 #include "example_helper.hpp"
 
@@ -67,8 +67,8 @@ void run_gemm_example(const sycl::device& dev) {
     // C = alpha * op(A) * op(B)  + beta * C
     //
 
-    oneapi::mkl::transpose transA = oneapi::mkl::transpose::trans;
-    oneapi::mkl::transpose transB = oneapi::mkl::transpose::nontrans;
+    oneapi::math::transpose transA = oneapi::math::transpose::trans;
+    oneapi::math::transpose transB = oneapi::math::transpose::nontrans;
 
     // matrix data sizes
     int m = 45;
@@ -79,8 +79,8 @@ void run_gemm_example(const sycl::device& dev) {
     int ldA = 103;
     int ldB = 105;
     int ldC = 106;
-    int sizea = (transA == oneapi::mkl::transpose::nontrans) ? ldA * k : ldA * m;
-    int sizeb = (transB == oneapi::mkl::transpose::nontrans) ? ldB * n : ldB * k;
+    int sizea = (transA == oneapi::math::transpose::nontrans) ? ldA * k : ldA * m;
+    int sizeb = (transB == oneapi::math::transpose::nontrans) ? ldB * n : ldB * k;
     int sizec = ldC * n;
 
     // set scalar fp values
@@ -116,7 +116,7 @@ void run_gemm_example(const sycl::device& dev) {
 
     rand_matrix(A, transA, m, k, ldA);
     rand_matrix(B, transB, k, n, ldB);
-    rand_matrix(C, oneapi::mkl::transpose::nontrans, m, n, ldC);
+    rand_matrix(C, oneapi::math::transpose::nontrans, m, n, ldC);
 
     // allocate memory on device
     auto dev_A = sycl::malloc_device<float>(sizea * sizeof(float), main_queue);
@@ -134,9 +134,9 @@ void run_gemm_example(const sycl::device& dev) {
     //
     // Execute Gemm
     //
-    // add oneapi::mkl::blas::gemm to execution queue
-    gemm_done = oneapi::mkl::blas::column_major::gemm(main_queue, transA, transB, m, n, k, alpha,
-                                                      dev_A, ldA, dev_B, ldB, beta, dev_C, ldC);
+    // add oneapi::math::blas::gemm to execution queue
+    gemm_done = oneapi::math::blas::column_major::gemm(main_queue, transA, transB, m, n, k, alpha,
+                                                       dev_A, ldA, dev_B, ldB, beta, dev_C, ldC);
 
     // Wait until calculations are done
     main_queue.wait_and_throw();
@@ -149,13 +149,13 @@ void run_gemm_example(const sycl::device& dev) {
 
     std::cout << "\n\t\tGEMM parameters:" << std::endl;
     std::cout << "\t\t\ttransA = "
-              << (transA == oneapi::mkl::transpose::nontrans
+              << (transA == oneapi::math::transpose::nontrans
                       ? "nontrans"
-                      : (transA == oneapi::mkl::transpose::trans ? "trans" : "conjtrans"))
+                      : (transA == oneapi::math::transpose::trans ? "trans" : "conjtrans"))
               << ", transB = "
-              << (transB == oneapi::mkl::transpose::nontrans
+              << (transB == oneapi::math::transpose::nontrans
                       ? "nontrans"
-                      : (transB == oneapi::mkl::transpose::trans ? "trans" : "conjtrans"))
+                      : (transB == oneapi::math::transpose::trans ? "trans" : "conjtrans"))
               << std::endl;
     std::cout << "\t\t\tm = " << m << ", n = " << n << ", k = " << k << std::endl;
     std::cout << "\t\t\tlda = " << ldA << ", ldB = " << ldB << ", ldC = " << ldC << std::endl;

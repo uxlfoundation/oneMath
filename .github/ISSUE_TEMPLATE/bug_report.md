@@ -11,11 +11,11 @@ Provide a short summary of the issue. Sections below provide guidance on what
 factors are considered important to reproduce an issue.
 
 # Version
-Report oneMKL version and githash.
+Report oneMath version and githash.
 If it is a regression, report githash for the last known good revision.
 
 # Environment
-oneMKL works with multiple HW and backend libraries and also depends on the
+oneMath works with multiple HW and backend libraries and also depends on the
 compiler and build environment. Include
 the following information to help reproduce the issue:
 * HW you use

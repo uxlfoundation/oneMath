@@ -33,16 +33,16 @@ foreach(rng_ct_source ${RNG_CT_SOURCES})
 
   if(domain STREQUAL "rng" AND ENABLE_MKLCPU_BACKEND AND ENABLE_CURAND_BACKEND)
     add_dependencies(example_${domain}_${rng_ct_source}
-        onemkl_${domain}_mklcpu
-        onemkl_${domain}_curand)
-    list(APPEND ONEMKL_LIBRARIES_${domain}
-        onemkl_${domain}_mklcpu
-        onemkl_${domain}_curand)
+        onemath_${domain}_mklcpu
+        onemath_${domain}_curand)
+    list(APPEND ONEMATH_LIBRARIES_${domain}
+        onemath_${domain}_mklcpu
+        onemath_${domain}_curand)
   endif()
 
   target_link_libraries(example_${domain}_${rng_ct_source} PUBLIC
-      ${ONEMKL_LIBRARIES_${domain}}
-      ONEMKL::SYCL::SYCL
+      ${ONEMATH_LIBRARIES_${domain}}
+      ONEMATH::SYCL::SYCL
   )
 
   # Register example as ctest

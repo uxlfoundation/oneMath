@@ -30,20 +30,20 @@ class Philox4x32x10DeviceSkipAheadTests : public ::testing::TestWithParam<sycl::
 class Philox4x32x10DeviceSkipAheadExTests : public ::testing::TestWithParam<sycl::device*> {};
 
 TEST_P(Philox4x32x10DeviceSkipAheadTests, BinaryPrecision) {
-    rng_device_test<skip_ahead_test<oneapi::mkl::rng::device::philox4x32x10<1>>> test1;
+    rng_device_test<skip_ahead_test<oneapi::math::rng::device::philox4x32x10<1>>> test1;
     EXPECT_TRUEORSKIP((test1(GetParam())));
-    rng_device_test<skip_ahead_test<oneapi::mkl::rng::device::philox4x32x10<4>>> test2;
+    rng_device_test<skip_ahead_test<oneapi::math::rng::device::philox4x32x10<4>>> test2;
     EXPECT_TRUEORSKIP((test2(GetParam())));
-    rng_device_test<skip_ahead_test<oneapi::mkl::rng::device::philox4x32x10<16>>> test3;
+    rng_device_test<skip_ahead_test<oneapi::math::rng::device::philox4x32x10<16>>> test3;
     EXPECT_TRUEORSKIP((test3(GetParam())));
 }
 
 TEST_P(Philox4x32x10DeviceSkipAheadExTests, BinaryPrecision) {
-    rng_device_test<skip_ahead_ex_test<oneapi::mkl::rng::device::philox4x32x10<1>>> test1;
+    rng_device_test<skip_ahead_ex_test<oneapi::math::rng::device::philox4x32x10<1>>> test1;
     EXPECT_TRUEORSKIP((test1(GetParam())));
-    rng_device_test<skip_ahead_ex_test<oneapi::mkl::rng::device::philox4x32x10<4>>> test2;
+    rng_device_test<skip_ahead_ex_test<oneapi::math::rng::device::philox4x32x10<4>>> test2;
     EXPECT_TRUEORSKIP((test2(GetParam())));
-    rng_device_test<skip_ahead_ex_test<oneapi::mkl::rng::device::philox4x32x10<16>>> test3;
+    rng_device_test<skip_ahead_ex_test<oneapi::math::rng::device::philox4x32x10<16>>> test3;
     EXPECT_TRUEORSKIP((test3(GetParam())));
 }
 
@@ -59,20 +59,20 @@ class Mrg32k3aDeviceSkipAheadTests : public ::testing::TestWithParam<sycl::devic
 class Mrg32k3aDeviceSkipAheadExTests : public ::testing::TestWithParam<sycl::device*> {};
 
 TEST_P(Mrg32k3aDeviceSkipAheadTests, BinaryPrecision) {
-    rng_device_test<skip_ahead_test<oneapi::mkl::rng::device::mrg32k3a<1>>> test1;
+    rng_device_test<skip_ahead_test<oneapi::math::rng::device::mrg32k3a<1>>> test1;
     EXPECT_TRUEORSKIP((test1(GetParam())));
-    rng_device_test<skip_ahead_test<oneapi::mkl::rng::device::mrg32k3a<4>>> test2;
+    rng_device_test<skip_ahead_test<oneapi::math::rng::device::mrg32k3a<4>>> test2;
     EXPECT_TRUEORSKIP((test2(GetParam())));
-    rng_device_test<skip_ahead_test<oneapi::mkl::rng::device::mrg32k3a<16>>> test3;
+    rng_device_test<skip_ahead_test<oneapi::math::rng::device::mrg32k3a<16>>> test3;
     EXPECT_TRUEORSKIP((test3(GetParam())));
 }
 
 TEST_P(Mrg32k3aDeviceSkipAheadExTests, BinaryPrecision) {
-    rng_device_test<skip_ahead_ex_test<oneapi::mkl::rng::device::mrg32k3a<1>>> test1;
+    rng_device_test<skip_ahead_ex_test<oneapi::math::rng::device::mrg32k3a<1>>> test1;
     EXPECT_TRUEORSKIP((test1(GetParam())));
-    rng_device_test<skip_ahead_ex_test<oneapi::mkl::rng::device::mrg32k3a<4>>> test2;
+    rng_device_test<skip_ahead_ex_test<oneapi::math::rng::device::mrg32k3a<4>>> test2;
     EXPECT_TRUEORSKIP((test2(GetParam())));
-    rng_device_test<skip_ahead_ex_test<oneapi::mkl::rng::device::mrg32k3a<16>>> test3;
+    rng_device_test<skip_ahead_ex_test<oneapi::math::rng::device::mrg32k3a<16>>> test3;
     EXPECT_TRUEORSKIP((test3(GetParam())));
 }
 
@@ -85,11 +85,11 @@ INSTANTIATE_TEST_SUITE_P(Mrg32k3aDeviceSkipAheadExTestsSuite, Mrg32k3aDeviceSkip
 class Mcg31m1DeviceSkipAheadTests : public ::testing::TestWithParam<sycl::device*> {};
 
 TEST_P(Mcg31m1DeviceSkipAheadTests, BinaryPrecision) {
-    rng_device_test<skip_ahead_test<oneapi::mkl::rng::device::mcg31m1<1>>> test1;
+    rng_device_test<skip_ahead_test<oneapi::math::rng::device::mcg31m1<1>>> test1;
     EXPECT_TRUEORSKIP((test1(GetParam())));
-    rng_device_test<skip_ahead_test<oneapi::mkl::rng::device::mcg31m1<4>>> test2;
+    rng_device_test<skip_ahead_test<oneapi::math::rng::device::mcg31m1<4>>> test2;
     EXPECT_TRUEORSKIP((test2(GetParam())));
-    rng_device_test<skip_ahead_test<oneapi::mkl::rng::device::mcg31m1<16>>> test3;
+    rng_device_test<skip_ahead_test<oneapi::math::rng::device::mcg31m1<16>>> test3;
     EXPECT_TRUEORSKIP((test3(GetParam())));
 }
 
@@ -99,11 +99,11 @@ INSTANTIATE_TEST_SUITE_P(Mcg31m1DeviceSkipAheadTestsSuite, Mcg31m1DeviceSkipAhea
 class Mcg59DeviceSkipAheadTests : public ::testing::TestWithParam<sycl::device*> {};
 
 TEST_P(Mcg59DeviceSkipAheadTests, BinaryPrecision) {
-    rng_device_test<skip_ahead_test<oneapi::mkl::rng::device::mcg59<1>>> test1;
+    rng_device_test<skip_ahead_test<oneapi::math::rng::device::mcg59<1>>> test1;
     EXPECT_TRUEORSKIP((test1(GetParam())));
-    rng_device_test<skip_ahead_test<oneapi::mkl::rng::device::mcg59<4>>> test2;
+    rng_device_test<skip_ahead_test<oneapi::math::rng::device::mcg59<4>>> test2;
     EXPECT_TRUEORSKIP((test2(GetParam())));
-    rng_device_test<skip_ahead_test<oneapi::mkl::rng::device::mcg59<16>>> test3;
+    rng_device_test<skip_ahead_test<oneapi::math::rng::device::mcg59<16>>> test3;
     EXPECT_TRUEORSKIP((test3(GetParam())));
 }
 

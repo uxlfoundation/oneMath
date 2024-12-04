@@ -17,38 +17,38 @@
 * SPDX-License-Identifier: Apache-2.0
 *******************************************************************************/
 
-#include "oneapi/mkl/rng/detail/rng_loader.hpp"
+#include "oneapi/math/rng/detail/rng_loader.hpp"
 
 #include "function_table_initializer.hpp"
 #include "rng/function_table.hpp"
 
 namespace oneapi {
-namespace mkl {
+namespace math {
 namespace rng {
 namespace detail {
 
-static oneapi::mkl::detail::table_initializer<domain::rng, rng_function_table_t> function_tables;
+static oneapi::math::detail::table_initializer<domain::rng, rng_function_table_t> function_tables;
 
-engine_impl* create_philox4x32x10(oneapi::mkl::device libkey, sycl::queue queue,
+engine_impl* create_philox4x32x10(oneapi::math::device libkey, sycl::queue queue,
                                   std::uint64_t seed) {
     return function_tables[{ libkey, queue }].create_philox4x32x10_sycl(queue, seed);
 }
 
-engine_impl* create_philox4x32x10(oneapi::mkl::device libkey, sycl::queue queue,
+engine_impl* create_philox4x32x10(oneapi::math::device libkey, sycl::queue queue,
                                   std::initializer_list<std::uint64_t> seed) {
     return function_tables[{ libkey, queue }].create_philox4x32x10_ex_sycl(queue, seed);
 }
 
-engine_impl* create_mrg32k3a(oneapi::mkl::device libkey, sycl::queue queue, std::uint32_t seed) {
+engine_impl* create_mrg32k3a(oneapi::math::device libkey, sycl::queue queue, std::uint32_t seed) {
     return function_tables[{ libkey, queue }].create_mrg32k3a_sycl(queue, seed);
 }
 
-engine_impl* create_mrg32k3a(oneapi::mkl::device libkey, sycl::queue queue,
+engine_impl* create_mrg32k3a(oneapi::math::device libkey, sycl::queue queue,
                              std::initializer_list<std::uint32_t> seed) {
     return function_tables[{ libkey, queue }].create_mrg32k3a_ex_sycl(queue, seed);
 }
 
 } // namespace detail
 } // namespace rng
-} // namespace mkl
+} // namespace math
 } // namespace oneapi

@@ -24,7 +24,7 @@
 #include "rocblas_helper.hpp"
 
 namespace oneapi {
-namespace mkl {
+namespace math {
 namespace blas {
 namespace rocblas {
 
@@ -57,7 +57,7 @@ struct rocblas_handle_ {
 
 } // namespace rocblas
 } // namespace blas
-} // namespace mkl
+} // namespace math
 } // namespace oneapi
 
 #endif // _ROCBLAS_HANDLE_HPP_

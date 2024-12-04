@@ -31,9 +31,9 @@
 #endif
 #include "allocator_helper.hpp"
 #include "cblas.h"
-#include "oneapi/mkl/detail/config.hpp"
-#include "oneapi/mkl.hpp"
-#include "onemkl_blas_helper.hpp"
+#include "oneapi/math/detail/config.hpp"
+#include "oneapi/math.hpp"
+#include "onemath_blas_helper.hpp"
 #include "reference_blas_templates.hpp"
 #include "test_common.hpp"
 #include "test_helper.hpp"
@@ -48,11 +48,11 @@ extern std::vector<sycl::device*> devices;
 namespace {
 
 template <typename fp>
-int test(device* dev, oneapi::mkl::layout layout) {
+int test(device* dev, oneapi::math::layout layout) {
     // Prepare data.
     int64_t m, n;
     int64_t lda, ldb;
-    oneapi::mkl::transpose trans;
+    oneapi::math::transpose trans;
     fp alpha;
     int64_t i, tmp;
 
@@ -65,13 +65,13 @@ int test(device* dev, oneapi::mkl::layout layout) {
 
     int64_t size_a, size_b, size;
     switch (layout) {
-        case oneapi::mkl::layout::col_major:
+        case oneapi::math::layout::col_major:
             size_a = lda * n;
-            size_b = (trans == oneapi::mkl::transpose::nontrans) ? ldb * n : ldb * m;
+            size_b = (trans == oneapi::math::transpose::nontrans) ? ldb * n : ldb * m;
             break;
-        case oneapi::mkl::layout::row_major:
+        case oneapi::math::layout::row_major:
             size_a = lda * m;
-            size_b = (trans == oneapi::mkl::transpose::nontrans) ? ldb * m : ldb * n;
+            size_b = (trans == oneapi::math::transpose::nontrans) ? ldb * m : ldb * n;
             break;
         default: break;
     }
@@ -79,10 +79,10 @@ int test(device* dev, oneapi::mkl::layout layout) {
 
     vector<fp, allocator_helper<fp, 64>> AB(size), AB_ref(size);
 
-    rand_matrix(AB, oneapi::mkl::layout::col_major, oneapi::mkl::transpose::nontrans, size, 1,
+    rand_matrix(AB, oneapi::math::layout::col_major, oneapi::math::transpose::nontrans, size, 1,
                 size);
-    copy_matrix(AB, oneapi::mkl::layout::col_major, oneapi::mkl::transpose::nontrans, size, 1, size,
-                AB_ref);
+    copy_matrix(AB, oneapi::math::layout::col_major, oneapi::math::transpose::nontrans, size, 1,
+                size, AB_ref);
 
     // Call reference IMATCOPY.
     int m_ref = (int)m;
@@ -114,24 +114,24 @@ int test(device* dev, oneapi::mkl::layout layout) {
     try {
 #ifdef CALL_RT_API
         switch (layout) {
-            case oneapi::mkl::layout::col_major:
-                oneapi::mkl::blas::column_major::imatcopy(main_queue, trans, m, n, alpha, AB_buffer,
-                                                          lda, ldb);
+            case oneapi::math::layout::col_major:
+                oneapi::math::blas::column_major::imatcopy(main_queue, trans, m, n, alpha,
+                                                           AB_buffer, lda, ldb);
                 break;
-            case oneapi::mkl::layout::row_major:
-                oneapi::mkl::blas::row_major::imatcopy(main_queue, trans, m, n, alpha, AB_buffer,
-                                                       lda, ldb);
+            case oneapi::math::layout::row_major:
+                oneapi::math::blas::row_major::imatcopy(main_queue, trans, m, n, alpha, AB_buffer,
+                                                        lda, ldb);
                 break;
             default: break;
         }
 #else
         switch (layout) {
-            case oneapi::mkl::layout::col_major:
-                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::mkl::blas::column_major::imatcopy,
+            case oneapi::math::layout::col_major:
+                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::math::blas::column_major::imatcopy,
                                         trans, m, n, alpha, AB_buffer, lda, ldb);
                 break;
-            case oneapi::mkl::layout::row_major:
-                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::mkl::blas::row_major::imatcopy, trans,
+            case oneapi::math::layout::row_major:
+                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::math::blas::row_major::imatcopy, trans,
                                         m, n, alpha, AB_buffer, lda, ldb);
                 break;
             default: break;
@@ -144,7 +144,7 @@ int test(device* dev, oneapi::mkl::layout layout) {
         print_error_code(e);
     }
 
-    catch (const oneapi::mkl::unimplemented& e) {
+    catch (const oneapi::math::unimplemented& e) {
         return test_skipped;
     }
 
@@ -155,14 +155,14 @@ int test(device* dev, oneapi::mkl::layout layout) {
     // Compare the results of reference implementation and DPC++ implementation.
 
     auto AB_accessor = AB_buffer.get_host_access(read_only);
-    bool good = check_equal_matrix(AB_accessor, AB_ref, oneapi::mkl::layout::col_major, size, 1,
+    bool good = check_equal_matrix(AB_accessor, AB_ref, oneapi::math::layout::col_major, size, 1,
                                    size, 10, std::cout);
 
     return (int)good;
 }
 
 class ImatcopyTests
-        : public ::testing::TestWithParam<std::tuple<sycl::device*, oneapi::mkl::layout>> {};
+        : public ::testing::TestWithParam<std::tuple<sycl::device*, oneapi::math::layout>> {};
 
 TEST_P(ImatcopyTests, RealSinglePrecision) {
     EXPECT_TRUEORSKIP(test<float>(std::get<0>(GetParam()), std::get<1>(GetParam())));
@@ -186,8 +186,8 @@ TEST_P(ImatcopyTests, ComplexDoublePrecision) {
 
 INSTANTIATE_TEST_SUITE_P(ImatcopyTestSuite, ImatcopyTests,
                          ::testing::Combine(testing::ValuesIn(devices),
-                                            testing::Values(oneapi::mkl::layout::col_major,
-                                                            oneapi::mkl::layout::row_major)),
+                                            testing::Values(oneapi::math::layout::col_major,
+                                                            oneapi::math::layout::row_major)),
                          ::LayoutDeviceNamePrint());
 
 } // anonymous namespace

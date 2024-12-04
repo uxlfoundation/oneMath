@@ -31,9 +31,9 @@
 #endif
 #include "allocator_helper.hpp"
 #include "cblas.h"
-#include "oneapi/mkl/detail/config.hpp"
-#include "oneapi/mkl.hpp"
-#include "onemkl_blas_helper.hpp"
+#include "oneapi/math/detail/config.hpp"
+#include "oneapi/math.hpp"
+#include "onemath_blas_helper.hpp"
 #include "reference_blas_templates.hpp"
 #include "test_common.hpp"
 #include "test_helper.hpp"
@@ -48,7 +48,7 @@ extern std::vector<sycl::device*> devices;
 namespace {
 
 template <typename fp>
-int test(device* dev, oneapi::mkl::layout layout, oneapi::mkl::side left_right, int64_t incx,
+int test(device* dev, oneapi::math::layout layout, oneapi::math::side left_right, int64_t incx,
          int64_t batch_size) {
     // Catch asynchronous exceptions.
     auto exception_handler = [](exception_list exceptions) {
@@ -80,7 +80,7 @@ int test(device* dev, oneapi::mkl::layout layout, oneapi::mkl::side left_right, 
     lda = 38;
     ldc = 42;
 
-    int x_len = (left_right == oneapi::mkl::side::right) ? n : m;
+    int x_len = (left_right == oneapi::math::side::right) ? n : m;
 
     int64_t stride_a, stride_x, stride_c;
     stride_x = x_len * std::abs(incx);
@@ -96,8 +96,8 @@ int test(device* dev, oneapi::mkl::layout layout, oneapi::mkl::side left_right, 
 
     for (i = 0; i < batch_size; i++) {
         rand_vector(&x[stride_x * i], x_len, incx);
-        rand_matrix(&A[stride_a * i], layout, oneapi::mkl::transpose::nontrans, m, n, lda);
-        rand_matrix(&C[stride_c * i], layout, oneapi::mkl::transpose::nontrans, m, n, ldc);
+        rand_matrix(&A[stride_a * i], layout, oneapi::math::transpose::nontrans, m, n, lda);
+        rand_matrix(&C[stride_c * i], layout, oneapi::math::transpose::nontrans, m, n, ldc);
     }
 
     C_ref.resize(C.size());
@@ -125,13 +125,13 @@ int test(device* dev, oneapi::mkl::layout layout, oneapi::mkl::side left_right, 
     try {
 #ifdef CALL_RT_API
         switch (layout) {
-            case oneapi::mkl::layout::col_major:
-                done = oneapi::mkl::blas::column_major::dgmm_batch(
+            case oneapi::math::layout::col_major:
+                done = oneapi::math::blas::column_major::dgmm_batch(
                     main_queue, left_right, m, n, &A[0], lda, stride_a, &x[0], incx, stride_x,
                     &C[0], ldc, stride_c, batch_size, dependencies);
                 break;
-            case oneapi::mkl::layout::row_major:
-                done = oneapi::mkl::blas::row_major::dgmm_batch(
+            case oneapi::math::layout::row_major:
+                done = oneapi::math::blas::row_major::dgmm_batch(
                     main_queue, left_right, m, n, &A[0], lda, stride_a, &x[0], incx, stride_x,
                     &C[0], ldc, stride_c, batch_size, dependencies);
                 break;
@@ -140,13 +140,13 @@ int test(device* dev, oneapi::mkl::layout layout, oneapi::mkl::side left_right, 
         done.wait();
 #else
         switch (layout) {
-            case oneapi::mkl::layout::col_major:
-                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::mkl::blas::column_major::dgmm_batch,
+            case oneapi::math::layout::col_major:
+                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::math::blas::column_major::dgmm_batch,
                                         left_right, m, n, &A[0], lda, stride_a, &x[0], incx,
                                         stride_x, &C[0], ldc, stride_c, batch_size, dependencies);
                 break;
-            case oneapi::mkl::layout::row_major:
-                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::mkl::blas::row_major::dgmm_batch,
+            case oneapi::math::layout::row_major:
+                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::math::blas::row_major::dgmm_batch,
                                         left_right, m, n, &A[0], lda, stride_a, &x[0], incx,
                                         stride_x, &C[0], ldc, stride_c, batch_size, dependencies);
                 break;
@@ -161,7 +161,7 @@ int test(device* dev, oneapi::mkl::layout layout, oneapi::mkl::side left_right, 
         print_error_code(e);
     }
 
-    catch (const oneapi::mkl::unimplemented& e) {
+    catch (const oneapi::math::unimplemented& e) {
         return test_skipped;
     }
 
@@ -181,76 +181,76 @@ int test(device* dev, oneapi::mkl::layout layout, oneapi::mkl::side left_right, 
 }
 
 class DgmmBatchStrideUsmTests
-        : public ::testing::TestWithParam<std::tuple<sycl::device*, oneapi::mkl::layout>> {};
+        : public ::testing::TestWithParam<std::tuple<sycl::device*, oneapi::math::layout>> {};
 
 TEST_P(DgmmBatchStrideUsmTests, RealSinglePrecision) {
     EXPECT_TRUEORSKIP(test<float>(std::get<0>(GetParam()), std::get<1>(GetParam()),
-                                  oneapi::mkl::side::right, 2, 5));
+                                  oneapi::math::side::right, 2, 5));
     EXPECT_TRUEORSKIP(test<float>(std::get<0>(GetParam()), std::get<1>(GetParam()),
-                                  oneapi::mkl::side::right, -2, 5));
+                                  oneapi::math::side::right, -2, 5));
     EXPECT_TRUEORSKIP(test<float>(std::get<0>(GetParam()), std::get<1>(GetParam()),
-                                  oneapi::mkl::side::right, 1, 5));
+                                  oneapi::math::side::right, 1, 5));
     EXPECT_TRUEORSKIP(test<float>(std::get<0>(GetParam()), std::get<1>(GetParam()),
-                                  oneapi::mkl::side::left, 2, 5));
+                                  oneapi::math::side::left, 2, 5));
     EXPECT_TRUEORSKIP(test<float>(std::get<0>(GetParam()), std::get<1>(GetParam()),
-                                  oneapi::mkl::side::left, -2, 5));
+                                  oneapi::math::side::left, -2, 5));
     EXPECT_TRUEORSKIP(test<float>(std::get<0>(GetParam()), std::get<1>(GetParam()),
-                                  oneapi::mkl::side::left, 1, 5));
+                                  oneapi::math::side::left, 1, 5));
 }
 
 TEST_P(DgmmBatchStrideUsmTests, RealDoublePrecision) {
     CHECK_DOUBLE_ON_DEVICE(std::get<0>(GetParam()));
 
     EXPECT_TRUEORSKIP(test<double>(std::get<0>(GetParam()), std::get<1>(GetParam()),
-                                   oneapi::mkl::side::right, 2, 5));
+                                   oneapi::math::side::right, 2, 5));
     EXPECT_TRUEORSKIP(test<double>(std::get<0>(GetParam()), std::get<1>(GetParam()),
-                                   oneapi::mkl::side::right, -2, 5));
+                                   oneapi::math::side::right, -2, 5));
     EXPECT_TRUEORSKIP(test<double>(std::get<0>(GetParam()), std::get<1>(GetParam()),
-                                   oneapi::mkl::side::right, 1, 5));
+                                   oneapi::math::side::right, 1, 5));
     EXPECT_TRUEORSKIP(test<double>(std::get<0>(GetParam()), std::get<1>(GetParam()),
-                                   oneapi::mkl::side::left, 2, 5));
+                                   oneapi::math::side::left, 2, 5));
     EXPECT_TRUEORSKIP(test<double>(std::get<0>(GetParam()), std::get<1>(GetParam()),
-                                   oneapi::mkl::side::left, -2, 5));
+                                   oneapi::math::side::left, -2, 5));
     EXPECT_TRUEORSKIP(test<double>(std::get<0>(GetParam()), std::get<1>(GetParam()),
-                                   oneapi::mkl::side::left, 1, 5));
+                                   oneapi::math::side::left, 1, 5));
 }
 
 TEST_P(DgmmBatchStrideUsmTests, ComplexSinglePrecision) {
     EXPECT_TRUEORSKIP(test<std::complex<float>>(std::get<0>(GetParam()), std::get<1>(GetParam()),
-                                                oneapi::mkl::side::right, 2, 5));
+                                                oneapi::math::side::right, 2, 5));
     EXPECT_TRUEORSKIP(test<std::complex<float>>(std::get<0>(GetParam()), std::get<1>(GetParam()),
-                                                oneapi::mkl::side::right, -2, 5));
+                                                oneapi::math::side::right, -2, 5));
     EXPECT_TRUEORSKIP(test<std::complex<float>>(std::get<0>(GetParam()), std::get<1>(GetParam()),
-                                                oneapi::mkl::side::right, 1, 5));
+                                                oneapi::math::side::right, 1, 5));
     EXPECT_TRUEORSKIP(test<std::complex<float>>(std::get<0>(GetParam()), std::get<1>(GetParam()),
-                                                oneapi::mkl::side::left, 2, 5));
+                                                oneapi::math::side::left, 2, 5));
     EXPECT_TRUEORSKIP(test<std::complex<float>>(std::get<0>(GetParam()), std::get<1>(GetParam()),
-                                                oneapi::mkl::side::left, -2, 5));
+                                                oneapi::math::side::left, -2, 5));
     EXPECT_TRUEORSKIP(test<std::complex<float>>(std::get<0>(GetParam()), std::get<1>(GetParam()),
-                                                oneapi::mkl::side::left, 1, 5));
+                                                oneapi::math::side::left, 1, 5));
 }
 
 TEST_P(DgmmBatchStrideUsmTests, ComplexDoublePrecision) {
     CHECK_DOUBLE_ON_DEVICE(std::get<0>(GetParam()));
 
     EXPECT_TRUEORSKIP(test<std::complex<double>>(std::get<0>(GetParam()), std::get<1>(GetParam()),
-                                                 oneapi::mkl::side::right, 2, 5));
+                                                 oneapi::math::side::right, 2, 5));
     EXPECT_TRUEORSKIP(test<std::complex<double>>(std::get<0>(GetParam()), std::get<1>(GetParam()),
-                                                 oneapi::mkl::side::right, -2, 5));
+                                                 oneapi::math::side::right, -2, 5));
     EXPECT_TRUEORSKIP(test<std::complex<double>>(std::get<0>(GetParam()), std::get<1>(GetParam()),
-                                                 oneapi::mkl::side::right, 1, 5));
+                                                 oneapi::math::side::right, 1, 5));
     EXPECT_TRUEORSKIP(test<std::complex<double>>(std::get<0>(GetParam()), std::get<1>(GetParam()),
-                                                 oneapi::mkl::side::left, 2, 5));
+                                                 oneapi::math::side::left, 2, 5));
     EXPECT_TRUEORSKIP(test<std::complex<double>>(std::get<0>(GetParam()), std::get<1>(GetParam()),
-                                                 oneapi::mkl::side::left, -2, 5));
+                                                 oneapi::math::side::left, -2, 5));
     EXPECT_TRUEORSKIP(test<std::complex<double>>(std::get<0>(GetParam()), std::get<1>(GetParam()),
-                                                 oneapi::mkl::side::left, 1, 5));
+                                                 oneapi::math::side::left, 1, 5));
 }
 
 INSTANTIATE_TEST_SUITE_P(DgmmBatchStrideUsmTestSuite, DgmmBatchStrideUsmTests,
                          ::testing::Combine(testing::ValuesIn(devices),
-                                            testing::Values(oneapi::mkl::layout::col_major,
-                                                            oneapi::mkl::layout::row_major)),
+                                            testing::Values(oneapi::math::layout::col_major,
+                                                            oneapi::math::layout::row_major)),
                          ::LayoutDeviceNamePrint());
 
 } // anonymous namespace

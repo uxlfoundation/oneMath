@@ -17,8 +17,8 @@
 *
 **************************************************************************/
 
-#ifndef _MKL_LAPACK_CUSOLVER_TASK_HPP_
-#define _MKL_LAPACK_CUSOLVER_TASK_HPP_
+#ifndef ONEMATH_LAPACK_CUSOLVER_TASK_HPP_
+#define ONEMATH_LAPACK_CUSOLVER_TASK_HPP_
 #include <cuda.h>
 #include <cublas_v2.h>
 #include <cusolverDn.h>
@@ -28,14 +28,14 @@
 #else
 #include <CL/sycl.hpp>
 #endif
-#include "oneapi/mkl/types.hpp"
+#include "oneapi/math/types.hpp"
 #include "cusolver_scope_handle.hpp"
 
 // After Plugin Interface removal in DPC++ ur.hpp is the new include
 #if __has_include(<sycl/detail/ur.hpp>)
 #include <sycl/detail/ur.hpp>
-#ifndef ONEMKL_PI_INTERFACE_REMOVED
-#define ONEMKL_PI_INTERFACE_REMOVED
+#ifndef ONEMATH_PI_INTERFACE_REMOVED
+#define ONEMATH_PI_INTERFACE_REMOVED
 #endif
 #elif __has_include(<sycl/detail/pi.hpp>)
 #include <sycl/detail/pi.hpp>
@@ -44,7 +44,7 @@
 #endif
 
 namespace oneapi {
-namespace mkl {
+namespace math {
 namespace lapack {
 namespace cusolver {
 
@@ -61,12 +61,12 @@ static inline void host_task_internal(H& cgh, sycl::queue queue, F f) {
 }
 
 template <typename H, typename F>
-static inline void onemkl_cusolver_host_task(H& cgh, sycl::queue queue, F f) {
+static inline void onemath_cusolver_host_task(H& cgh, sycl::queue queue, F f) {
     (void)host_task_internal(cgh, queue, f);
 }
 
 } // namespace cusolver
 } // namespace lapack
-} // namespace mkl
+} // namespace math
 } // namespace oneapi
-#endif // _MKL_LAPACK_CUSOLVER_TASK_HPP_
+#endif // ONEMATH_LAPACK_CUSOLVER_TASK_HPP_

@@ -26,7 +26,7 @@
 #include <CL/sycl.hpp>
 #endif
 
-#include "oneapi/mkl.hpp"
+#include "oneapi/math.hpp"
 
 #include "rng_test_common.hpp"
 
@@ -68,10 +68,10 @@ template <typename Distribution>
 struct statistics {};
 
 template <typename Type, typename Method>
-struct statistics<oneapi::mkl::rng::uniform<Type, Method>> {
+struct statistics<oneapi::math::rng::uniform<Type, Method>> {
     template <typename AllocType>
     bool check(std::vector<Type, AllocType>& r,
-               const oneapi::mkl::rng::uniform<Type, Method>& distr) {
+               const oneapi::math::rng::uniform<Type, Method>& distr) {
         double tM, tD, tQ;
         Type a = distr.a();
         Type b = distr.b();
@@ -86,10 +86,10 @@ struct statistics<oneapi::mkl::rng::uniform<Type, Method>> {
 };
 
 template <typename Method>
-struct statistics<oneapi::mkl::rng::uniform<std::int32_t, Method>> {
+struct statistics<oneapi::math::rng::uniform<std::int32_t, Method>> {
     template <typename AllocType>
     bool check(std::vector<int32_t, AllocType>& r,
-               const oneapi::mkl::rng::uniform<int32_t, Method>& distr) {
+               const oneapi::math::rng::uniform<int32_t, Method>& distr) {
         double tM, tD, tQ;
         int32_t a = distr.a();
         int32_t b = distr.b();
@@ -105,10 +105,10 @@ struct statistics<oneapi::mkl::rng::uniform<std::int32_t, Method>> {
 };
 
 template <typename Type, typename Method>
-struct statistics<oneapi::mkl::rng::gaussian<Type, Method>> {
+struct statistics<oneapi::math::rng::gaussian<Type, Method>> {
     template <typename AllocType>
     bool check(std::vector<Type, AllocType>& r,
-               const oneapi::mkl::rng::gaussian<Type, Method>& distr) {
+               const oneapi::math::rng::gaussian<Type, Method>& distr) {
         double tM, tD, tQ;
         Type a = distr.mean();
         Type sigma = distr.stddev();
@@ -123,10 +123,10 @@ struct statistics<oneapi::mkl::rng::gaussian<Type, Method>> {
 };
 
 template <typename Type, typename Method>
-struct statistics<oneapi::mkl::rng::lognormal<Type, Method>> {
+struct statistics<oneapi::math::rng::lognormal<Type, Method>> {
     template <typename AllocType>
     bool check(std::vector<Type, AllocType>& r,
-               const oneapi::mkl::rng::lognormal<Type, Method>& distr) {
+               const oneapi::math::rng::lognormal<Type, Method>& distr) {
         double tM, tD, tQ;
         Type a = distr.m();
         Type b = distr.displ();
@@ -145,10 +145,10 @@ struct statistics<oneapi::mkl::rng::lognormal<Type, Method>> {
 };
 
 template <typename Type, typename Method>
-struct statistics<oneapi::mkl::rng::bernoulli<Type, Method>> {
+struct statistics<oneapi::math::rng::bernoulli<Type, Method>> {
     template <typename AllocType>
     bool check(std::vector<Type, AllocType>& r,
-               const oneapi::mkl::rng::bernoulli<Type, Method>& distr) {
+               const oneapi::math::rng::bernoulli<Type, Method>& distr) {
         double tM, tD, tQ;
         double p = distr.p();
 
@@ -161,10 +161,10 @@ struct statistics<oneapi::mkl::rng::bernoulli<Type, Method>> {
 };
 
 template <typename Type, typename Method>
-struct statistics<oneapi::mkl::rng::poisson<Type, Method>> {
+struct statistics<oneapi::math::rng::poisson<Type, Method>> {
     template <typename AllocType>
     bool check(std::vector<Type, AllocType>& r,
-               const oneapi::mkl::rng::poisson<Type, Method>& distr) {
+               const oneapi::math::rng::poisson<Type, Method>& distr) {
         double tM, tD, tQ;
         double lambda = distr.lambda();
 

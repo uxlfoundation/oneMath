@@ -25,11 +25,10 @@
 #endif
 #include <memory>
 #include <thread>
-#include <unordered_map>
 #include "cublas_helper.hpp"
 #include "cublas_handle.hpp"
 namespace oneapi {
-namespace mkl {
+namespace math {
 namespace blas {
 namespace cublas {
 
@@ -60,7 +59,7 @@ the handle must be destroyed when the context goes out of scope. This will bind 
 
 class CublasScopedContextHandler {
     sycl::interop_handle interop_h;
-    static thread_local cublas_handle<int> handle_helper;
+    static thread_local cublas_handle handle_helper;
     sycl::context get_context(const sycl::queue& queue);
     CUstream get_stream(const sycl::queue& queue);
 
@@ -79,6 +78,6 @@ public:
 
 } // namespace cublas
 } // namespace blas
-} // namespace mkl
+} // namespace math
 } // namespace oneapi
 #endif //CUBLAS_SCOPED_HANDLE_HIPSYCL_HPP

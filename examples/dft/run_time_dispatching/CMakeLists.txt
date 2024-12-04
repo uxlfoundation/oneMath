@@ -57,17 +57,17 @@ foreach(dft_rt_sources ${DFT_RT_SOURCES})
       PUBLIC ${CMAKE_BINARY_DIR}/bin
   )
 
-  add_dependencies(example_${domain}_${dft_rt_sources} onemkl)
+  add_dependencies(example_${domain}_${dft_rt_sources} onemath)
 
   if (USE_ADD_SYCL_TO_TARGET_INTEGRATION)
     add_sycl_to_target(TARGET example_${domain}_${dft_rt_sources} SOURCES ${DFT_RT_SOURCES})
   endif()
 
   target_link_libraries(example_${domain}_${dft_rt_sources}
-      PUBLIC onemkl
-      PUBLIC ONEMKL::SYCL::SYCL
+      PUBLIC onemath
+      PUBLIC ONEMATH::SYCL::SYCL
       PUBLIC ${CMAKE_DL_LIBS}
-      PRIVATE onemkl_warnings
+      PRIVATE onemath_warnings
   )
 
   # Register example as ctest

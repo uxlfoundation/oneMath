@@ -56,27 +56,27 @@
 # so.
 #=================================================================================
 
-set(LIB_NAME onemkl_rng_curand)
+set(LIB_NAME onemath_rng_curand)
 set(LIB_OBJ ${LIB_NAME}_obj)
 find_package(cuRAND REQUIRED)
 
 set(SOURCES philox4x32x10.cpp
   mrg32k3a.cpp
-  $<$<BOOL:${BUILD_SHARED_LIBS}>: mkl_rng_curand_wrappers.cpp>)
+  $<$<BOOL:${BUILD_SHARED_LIBS}>: curand_wrappers.cpp>)
 
 add_library(${LIB_NAME})
+add_deprecated_library(${LIB_NAME})
 add_library(${LIB_OBJ} OBJECT ${SOURCES})
-add_dependencies(onemkl_backend_libs_rng ${LIB_NAME})
+add_dependencies(onemath_backend_libs_rng ${LIB_NAME})
 
 target_include_directories(${LIB_OBJ}
   PRIVATE ${PROJECT_SOURCE_DIR}/include
           ${PROJECT_SOURCE_DIR}/src
           ${CMAKE_BINARY_DIR}/bin
-          ${MKL_INCLUDE}
-          ${ONEMKL_GENERATED_INCLUDE_PATH}
+          ${ONEMATH_GENERATED_INCLUDE_PATH}
 )
 
-target_link_libraries(${LIB_OBJ} PUBLIC ONEMKL::SYCL::SYCL ONEMKL::cuRAND::cuRAND)
+target_link_libraries(${LIB_OBJ} PUBLIC ONEMATH::SYCL::SYCL ONEMATH::cuRAND::cuRAND)
 target_compile_features(${LIB_OBJ} PUBLIC cxx_std_11)
 set_target_properties(${LIB_OBJ} PROPERTIES
   POSITION_INDEPENDENT_CODE ON
@@ -95,8 +95,8 @@ set_target_properties(${LIB_NAME} PROPERTIES
 list(APPEND CMAKE_BUILD_RPATH $<TARGET_FILE_DIR:${LIB_NAME}>)
 
 # Add the library to install package
-install(TARGETS ${LIB_OBJ} EXPORT oneMKLTargets)
-install(TARGETS ${LIB_NAME} EXPORT oneMKLTargets
+install(TARGETS ${LIB_OBJ} EXPORT oneMathTargets)
+install(TARGETS ${LIB_NAME} EXPORT oneMathTargets
   RUNTIME DESTINATION bin
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib

@@ -17,7 +17,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #===============================================================================
 
-set(LIB_NAME onemkl_rng_mklcpu)
+set(LIB_NAME onemath_rng_mklcpu)
 set(LIB_OBJ ${LIB_NAME}_obj)
 
 set(SOURCES cpu_common.hpp
@@ -27,30 +27,32 @@ set(SOURCES cpu_common.hpp
 )
 
 add_library(${LIB_NAME})
+add_deprecated_library(${LIB_NAME})
 add_library(${LIB_OBJ} OBJECT ${SOURCES})
-add_dependencies(onemkl_backend_libs_rng ${LIB_NAME})
+add_dependencies(onemath_backend_libs_rng ${LIB_NAME})
 target_include_directories(${LIB_OBJ}
   PRIVATE ${PROJECT_SOURCE_DIR}/include
           ${PROJECT_SOURCE_DIR}/src
           ${CMAKE_BINARY_DIR}/bin
-          ${ONEMKL_GENERATED_INCLUDE_PATH}
+          ${ONEMATH_GENERATED_INCLUDE_PATH}
 )
 
-target_compile_options(${LIB_OBJ} PRIVATE ${ONEMKL_BUILD_COPT})
+target_compile_options(${LIB_OBJ} PRIVATE ${ONEMATH_BUILD_COPT})
 if (USE_ADD_SYCL_TO_TARGET_INTEGRATION)
   add_sycl_to_target(TARGET ${LIB_OBJ} SOURCES ${SOURCES})
 endif()
-target_link_libraries(${LIB_OBJ} PUBLIC ONEMKL::SYCL::SYCL MKL::MKL)
+target_link_libraries(${LIB_OBJ} PUBLIC ONEMATH::SYCL::SYCL MKL::MKL)
+target_add_intel_onemkl_include(${LIB_OBJ})
 
 set_target_properties(${LIB_OBJ} PROPERTIES
   POSITION_INDEPENDENT_CODE ON
 )
 target_link_libraries(${LIB_NAME} PUBLIC ${LIB_OBJ})
 
-# Set oneMKL libraries as not transitive for dynamic
+# Set oneMath libraries as not transitive for dynamic
 if(BUILD_SHARED_LIBS)
   set_target_properties(${LIB_NAME} PROPERTIES
-    INTERFACE_LINK_LIBRARIES ONEMKL::SYCL::SYCL
+    INTERFACE_LINK_LIBRARIES ONEMATH::SYCL::SYCL
   )
 endif()
 
@@ -63,8 +65,8 @@ set_target_properties(${LIB_NAME} PROPERTIES
 list(APPEND CMAKE_BUILD_RPATH $<TARGET_FILE_DIR:${LIB_NAME}>)
 
 # Add the library to install package
-install(TARGETS ${LIB_OBJ} EXPORT oneMKLTargets)
-install(TARGETS ${LIB_NAME} EXPORT oneMKLTargets
+install(TARGETS ${LIB_OBJ} EXPORT oneMathTargets)
+install(TARGETS ${LIB_NAME} EXPORT oneMathTargets
   RUNTIME DESTINATION bin
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib

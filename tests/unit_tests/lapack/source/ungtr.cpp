@@ -26,7 +26,7 @@
 #include <CL/sycl.hpp>
 #endif
 
-#include "oneapi/mkl.hpp"
+#include "oneapi/math.hpp"
 #include "lapack_common.hpp"
 #include "lapack_test_controller.hpp"
 #include "lapack_accuracy_checks.hpp"
@@ -40,7 +40,7 @@ const char* accuracy_input = R"(
 )";
 
 template <typename data_T>
-bool accuracy(const sycl::device& dev, oneapi::mkl::uplo uplo, int64_t n, int64_t lda,
+bool accuracy(const sycl::device& dev, oneapi::math::uplo uplo, int64_t n, int64_t lda,
               uint64_t seed) {
     using fp = typename data_T_info<data_T>::value_type;
     using fp_real = typename complex_info<fp>::real_type;
@@ -51,7 +51,7 @@ bool accuracy(const sycl::device& dev, oneapi::mkl::uplo uplo, int64_t n, int64_
     std::vector<fp_real> e(n);
     std::vector<fp> tau(n);
 
-    rand_matrix(seed, oneapi::mkl::transpose::nontrans, n, n, A, lda);
+    rand_matrix(seed, oneapi::math::transpose::nontrans, n, n, A, lda);
     auto info = reference::hetrd(uplo, n, A.data(), lda, d.data(), e.data(), tau.data());
     if (0 != info) {
         test_log::lout << "reference hetrd failed with info = " << info << std::endl;
@@ -66,11 +66,11 @@ bool accuracy(const sycl::device& dev, oneapi::mkl::uplo uplo, int64_t n, int64_
         auto tau_dev = device_alloc<data_T>(queue, tau.size());
 #ifdef CALL_RT_API
         const auto scratchpad_size =
-            oneapi::mkl::lapack::ungtr_scratchpad_size<fp>(queue, uplo, n, lda);
+            oneapi::math::lapack::ungtr_scratchpad_size<fp>(queue, uplo, n, lda);
 #else
         int64_t scratchpad_size;
         TEST_RUN_LAPACK_CT_SELECT(
-            queue, scratchpad_size = oneapi::mkl::lapack::ungtr_scratchpad_size<fp>, uplo, n, lda);
+            queue, scratchpad_size = oneapi::math::lapack::ungtr_scratchpad_size<fp>, uplo, n, lda);
 #endif
         auto scratchpad_dev = device_alloc<data_T>(queue, scratchpad_size);
 
@@ -79,10 +79,10 @@ bool accuracy(const sycl::device& dev, oneapi::mkl::uplo uplo, int64_t n, int64_
         queue.wait_and_throw();
 
 #ifdef CALL_RT_API
-        oneapi::mkl::lapack::ungtr(queue, uplo, n, A_dev, lda, tau_dev, scratchpad_dev,
-                                   scratchpad_size);
+        oneapi::math::lapack::ungtr(queue, uplo, n, A_dev, lda, tau_dev, scratchpad_dev,
+                                    scratchpad_size);
 #else
-        TEST_RUN_LAPACK_CT_SELECT(queue, oneapi::mkl::lapack::ungtr, uplo, n, A_dev, lda, tau_dev,
+        TEST_RUN_LAPACK_CT_SELECT(queue, oneapi::math::lapack::ungtr, uplo, n, A_dev, lda, tau_dev,
                                   scratchpad_dev, scratchpad_size);
 #endif
         queue.wait_and_throw();
@@ -103,7 +103,7 @@ const char* dependency_input = R"(
 )";
 
 template <typename data_T>
-bool usm_dependency(const sycl::device& dev, oneapi::mkl::uplo uplo, int64_t n, int64_t lda,
+bool usm_dependency(const sycl::device& dev, oneapi::math::uplo uplo, int64_t n, int64_t lda,
                     uint64_t seed) {
     using fp = typename data_T_info<data_T>::value_type;
     using fp_real = typename complex_info<fp>::real_type;
@@ -114,7 +114,7 @@ bool usm_dependency(const sycl::device& dev, oneapi::mkl::uplo uplo, int64_t n, 
     std::vector<fp_real> e(n);
     std::vector<fp> tau(n);
 
-    rand_matrix(seed, oneapi::mkl::transpose::nontrans, n, n, A, lda);
+    rand_matrix(seed, oneapi::math::transpose::nontrans, n, n, A, lda);
     auto info = reference::hetrd(uplo, n, A.data(), lda, d.data(), e.data(), tau.data());
     if (0 != info) {
         test_log::lout << "reference hetrd failed with info = " << info << std::endl;
@@ -130,11 +130,11 @@ bool usm_dependency(const sycl::device& dev, oneapi::mkl::uplo uplo, int64_t n, 
         auto tau_dev = device_alloc<data_T>(queue, tau.size());
 #ifdef CALL_RT_API
         const auto scratchpad_size =
-            oneapi::mkl::lapack::ungtr_scratchpad_size<fp>(queue, uplo, n, lda);
+            oneapi::math::lapack::ungtr_scratchpad_size<fp>(queue, uplo, n, lda);
 #else
         int64_t scratchpad_size;
         TEST_RUN_LAPACK_CT_SELECT(
-            queue, scratchpad_size = oneapi::mkl::lapack::ungtr_scratchpad_size<fp>, uplo, n, lda);
+            queue, scratchpad_size = oneapi::math::lapack::ungtr_scratchpad_size<fp>, uplo, n, lda);
 #endif
         auto scratchpad_dev = device_alloc<data_T>(queue, scratchpad_size);
 
@@ -146,11 +146,11 @@ bool usm_dependency(const sycl::device& dev, oneapi::mkl::uplo uplo, int64_t n, 
         auto in_event = create_dependency(queue);
 #ifdef CALL_RT_API
         sycl::event func_event =
-            oneapi::mkl::lapack::ungtr(queue, uplo, n, A_dev, lda, tau_dev, scratchpad_dev,
-                                       scratchpad_size, std::vector<sycl::event>{ in_event });
+            oneapi::math::lapack::ungtr(queue, uplo, n, A_dev, lda, tau_dev, scratchpad_dev,
+                                        scratchpad_size, std::vector<sycl::event>{ in_event });
 #else
         sycl::event func_event;
-        TEST_RUN_LAPACK_CT_SELECT(queue, func_event = oneapi::mkl::lapack::ungtr, uplo, n, A_dev,
+        TEST_RUN_LAPACK_CT_SELECT(queue, func_event = oneapi::math::lapack::ungtr, uplo, n, A_dev,
                                   lda, tau_dev, scratchpad_dev, scratchpad_size,
                                   std::vector<sycl::event>{ in_event });
 #endif

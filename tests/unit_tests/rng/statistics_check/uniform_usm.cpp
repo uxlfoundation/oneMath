@@ -31,13 +31,13 @@ class UniformAccurateUsmTests : public ::testing::TestWithParam<sycl::device*> {
 
 TEST_P(UniformStdUsmTests, RealSinglePrecision) {
     rng_test<statistics_usm_test<
-        oneapi::mkl::rng::uniform<float, oneapi::mkl::rng::uniform_method::standard>,
-        oneapi::mkl::rng::philox4x32x10>>
+        oneapi::math::rng::uniform<float, oneapi::math::rng::uniform_method::standard>,
+        oneapi::math::rng::philox4x32x10>>
         test1;
     EXPECT_TRUEORSKIP((test1(GetParam(), N_GEN, UNIFORM_ARGS_FLOAT)));
     rng_test<statistics_usm_test<
-        oneapi::mkl::rng::uniform<float, oneapi::mkl::rng::uniform_method::standard>,
-        oneapi::mkl::rng::mrg32k3a>>
+        oneapi::math::rng::uniform<float, oneapi::math::rng::uniform_method::standard>,
+        oneapi::math::rng::mrg32k3a>>
         test2;
     EXPECT_TRUEORSKIP((test2(GetParam(), N_GEN, UNIFORM_ARGS_FLOAT)));
 }
@@ -46,39 +46,39 @@ TEST_P(UniformStdUsmTests, RealDoublePrecision) {
     CHECK_DOUBLE_ON_DEVICE(GetParam());
 
     rng_test<statistics_usm_test<
-        oneapi::mkl::rng::uniform<double, oneapi::mkl::rng::uniform_method::standard>,
-        oneapi::mkl::rng::philox4x32x10>>
+        oneapi::math::rng::uniform<double, oneapi::math::rng::uniform_method::standard>,
+        oneapi::math::rng::philox4x32x10>>
         test1;
     EXPECT_TRUEORSKIP((test1(GetParam(), N_GEN, UNIFORM_ARGS_DOUBLE)));
     rng_test<statistics_usm_test<
-        oneapi::mkl::rng::uniform<double, oneapi::mkl::rng::uniform_method::standard>,
-        oneapi::mkl::rng::mrg32k3a>>
+        oneapi::math::rng::uniform<double, oneapi::math::rng::uniform_method::standard>,
+        oneapi::math::rng::mrg32k3a>>
         test2;
     EXPECT_TRUEORSKIP((test2(GetParam(), N_GEN, UNIFORM_ARGS_DOUBLE)));
 }
 
 TEST_P(UniformStdUsmTests, IntegerPrecision) {
     rng_test<statistics_usm_test<
-        oneapi::mkl::rng::uniform<std::int32_t, oneapi::mkl::rng::uniform_method::standard>,
-        oneapi::mkl::rng::philox4x32x10>>
+        oneapi::math::rng::uniform<std::int32_t, oneapi::math::rng::uniform_method::standard>,
+        oneapi::math::rng::philox4x32x10>>
         test1;
     EXPECT_TRUEORSKIP((test1(GetParam(), N_GEN, UNIFORM_ARGS_INT)));
     rng_test<statistics_usm_test<
-        oneapi::mkl::rng::uniform<std::int32_t, oneapi::mkl::rng::uniform_method::standard>,
-        oneapi::mkl::rng::mrg32k3a>>
+        oneapi::math::rng::uniform<std::int32_t, oneapi::math::rng::uniform_method::standard>,
+        oneapi::math::rng::mrg32k3a>>
         test2;
     EXPECT_TRUEORSKIP((test2(GetParam(), N_GEN, UNIFORM_ARGS_INT)));
 }
 
 TEST_P(UniformAccurateUsmTests, RealSinglePrecision) {
     rng_test<statistics_usm_test<
-        oneapi::mkl::rng::uniform<float, oneapi::mkl::rng::uniform_method::accurate>,
-        oneapi::mkl::rng::philox4x32x10>>
+        oneapi::math::rng::uniform<float, oneapi::math::rng::uniform_method::accurate>,
+        oneapi::math::rng::philox4x32x10>>
         test1;
     EXPECT_TRUEORSKIP((test1(GetParam(), N_GEN, UNIFORM_ARGS_FLOAT)));
     rng_test<statistics_usm_test<
-        oneapi::mkl::rng::uniform<float, oneapi::mkl::rng::uniform_method::accurate>,
-        oneapi::mkl::rng::mrg32k3a>>
+        oneapi::math::rng::uniform<float, oneapi::math::rng::uniform_method::accurate>,
+        oneapi::math::rng::mrg32k3a>>
         test2;
     EXPECT_TRUEORSKIP((test2(GetParam(), N_GEN, UNIFORM_ARGS_FLOAT)));
 }
@@ -87,13 +87,13 @@ TEST_P(UniformAccurateUsmTests, RealDoublePrecision) {
     CHECK_DOUBLE_ON_DEVICE(GetParam());
 
     rng_test<statistics_usm_test<
-        oneapi::mkl::rng::uniform<double, oneapi::mkl::rng::uniform_method::accurate>,
-        oneapi::mkl::rng::philox4x32x10>>
+        oneapi::math::rng::uniform<double, oneapi::math::rng::uniform_method::accurate>,
+        oneapi::math::rng::philox4x32x10>>
         test1;
     EXPECT_TRUEORSKIP((test1(GetParam(), N_GEN, UNIFORM_ARGS_DOUBLE)));
     rng_test<statistics_usm_test<
-        oneapi::mkl::rng::uniform<double, oneapi::mkl::rng::uniform_method::accurate>,
-        oneapi::mkl::rng::mrg32k3a>>
+        oneapi::math::rng::uniform<double, oneapi::math::rng::uniform_method::accurate>,
+        oneapi::math::rng::mrg32k3a>>
         test2;
     EXPECT_TRUEORSKIP((test2(GetParam(), N_GEN, UNIFORM_ARGS_DOUBLE)));
 }

@@ -18,11 +18,11 @@
 *******************************************************************************/
 
 #include "lapack/function_table.hpp"
-#include "oneapi/mkl/lapack/detail/mklcpu/onemkl_lapack_mklcpu.hpp"
+#include "oneapi/math/lapack/detail/mklcpu/onemath_lapack_mklcpu.hpp"
 
 #define WRAPPER_VERSION 1
 
-extern "C" ONEMKL_EXPORT lapack_function_table_t mkl_lapack_table = {
+extern "C" ONEMATH_EXPORT lapack_function_table_t onemath_lapack_table = {
     WRAPPER_VERSION,
 #define LAPACK_BACKEND mklcpu
 #include "../mkl_common/lapack_wrappers.cxx"
