@@ -149,5 +149,5 @@ if(BUILD_SHARED_LIBS)
     LIBRARY DESTINATION lib
   )
 
-  add_deprecated_library(onemkl onemath)
+  add_deprecated_library(onemkl)
 endif()
