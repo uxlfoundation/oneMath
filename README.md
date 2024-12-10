@@ -65,7 +65,7 @@ oneMath is part of the [UXL Foundation](http://www.uxlfoundation.org).
             <td align="center">AMD GPU</td>
         </tr>
         <tr>
-            <td align="center"><a href="https://github.com/codeplaysoftware/portBLAS"> portBLAS </a></td>
+            <td align="center"><a href="https://github.com/codeplaysoftware/portBLAS"> generic SYCL BLAS </a></td>
             <td align="center">x86 CPU, Intel GPU, NVIDIA GPU, AMD GPU, Other SYCL devices (unsupported)</td>
         </tr>
         <tr>
@@ -188,7 +188,7 @@ Supported compilers include:
             <td align="center">Dynamic, Static</td>
         </tr>
         <tr>
-            <td align="center">portBLAS</td>
+            <td align="center">generic SYCL BLAS</td>
             <td align="center">Intel DPC++</br>Open DPC++</td>
             <td align="center">Dynamic, Static</td>
         </tr>
@@ -199,7 +199,7 @@ Supported compilers include:
             <td align="center">Dynamic, Static</td>
         </tr>
         <tr>
-            <td align="center">portBLAS</td>
+            <td align="center">generic SYCL BLAS</td>
             <td align="center">Intel DPC++</br>Open DPC++</td>
             <td align="center">Dynamic, Static</td>
         </tr>
@@ -210,7 +210,7 @@ Supported compilers include:
             <td align="center">Dynamic, Static</td>
         </tr>
         <tr>
-            <td align="center">portBLAS</td>
+            <td align="center">generic SYCL BLAS</td>
             <td align="center">Open DPC++</td>
             <td align="center">Dynamic, Static</td>
         </tr>
@@ -221,13 +221,13 @@ Supported compilers include:
             <td align="center">Dynamic, Static</td>
         </tr>
         <tr>
-            <td align="center">portBLAS</td>
+            <td align="center">generic SYCL BLAS</td>
             <td align="center">Open DPC++</td>
             <td align="center">Dynamic, Static</td>
         </tr>
         <tr>
             <td rowspan=1 align="center">Other SYCL devices (unsupported)</td>
-            <td align="center">portBLAS</td>
+            <td align="center">generic SYCL BLAS</td>
             <td align="center">Intel DPC++</br>Open DPC++</td>
             <td align="center">Dynamic, Static</td>
         </tr>
