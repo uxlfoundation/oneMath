@@ -54,9 +54,9 @@ template <typename InputT>
 struct generic_type;
 
 #define DEF_GENERIC_BLAS_TYPE(onemath_t, generic_t) \
-    template <>                                  \
-    struct generic_type<onemath_t> {            \
-        using type = generic_t;                 \
+    template <>                                     \
+    struct generic_type<onemath_t> {                \
+        using type = generic_t;                     \
     };
 
 DEF_GENERIC_BLAS_TYPE(sycl::queue, handle_t)
@@ -210,7 +210,7 @@ struct throw_if_unsupported_by_device {
         throw unimplemented("blas", "onemath_sycl_blas function");                              \
     }
 
-#define CALL_GENERIC_BLAS_USM_FN(genericFunc, ...)                                   \
+#define CALL_GENERIC_BLAS_USM_FN(genericFunc, ...)                                \
     if constexpr (is_column_major()) {                                            \
         detail::throw_if_unsupported_by_device<double, sycl::aspect::fp64>{}(     \
             " generic BLAS function requiring fp64 support", __VA_ARGS__);        \
@@ -218,7 +218,7 @@ struct throw_if_unsupported_by_device {
             " generic BLAS function requiring fp16 support", __VA_ARGS__);        \
         auto args = detail::convert_to_generic_type(__VA_ARGS__);                 \
         auto fn = [](auto&&... targs) {                                           \
-            return genericFunc(std::forward<decltype(targs)>(targs)...).back();  \
+            return genericFunc(std::forward<decltype(targs)>(targs)...).back();   \
         };                                                                        \
         try {                                                                     \
             return std::apply(fn, args);                                          \

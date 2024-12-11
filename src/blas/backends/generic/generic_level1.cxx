@@ -319,7 +319,8 @@ sycl::event sdsdot(sycl::queue& queue, std::int64_t n, real_t sb, const real_t* 
         [&](sycl::handler& cgh) { cgh.single_task([=]() { result[0] = real_t(0); }); });
     std::vector<sycl::event> new_dependencies = dependencies;
     new_dependencies.emplace_back(init_res_val);
-    CALL_GENERIC_BLAS_USM_FN(::blas::_sdsdot, queue, n, sb, x, incx, y, incy, result, new_dependencies);
+    CALL_GENERIC_BLAS_USM_FN(::blas::_sdsdot, queue, n, sb, x, incx, y, incy, result,
+                             new_dependencies);
 }
 
 sycl::event nrm2(sycl::queue& queue, std::int64_t n, const std::complex<real_t>* x,

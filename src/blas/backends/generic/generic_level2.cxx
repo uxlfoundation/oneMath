@@ -37,7 +37,7 @@ void gbmv(sycl::queue& queue, oneapi::math::transpose trans, std::int64_t m, std
           std::int64_t lda, sycl::buffer<real_t, 1>& x, std::int64_t incx, real_t beta,
           sycl::buffer<real_t, 1>& y, std::int64_t incy) {
     CALL_GENERIC_BLAS_FN(::blas::_gbmv, queue, trans, m, n, kl, ku, alpha, a, lda, x, incx, beta, y,
-                     incy);
+                         incy);
 }
 
 void gbmv(sycl::queue& queue, oneapi::math::transpose trans, std::int64_t m, std::int64_t n,
@@ -119,13 +119,14 @@ void sbmv(sycl::queue& queue, oneapi::math::uplo upper_lower, std::int64_t n, st
           real_t alpha, sycl::buffer<real_t, 1>& a, std::int64_t lda, sycl::buffer<real_t, 1>& x,
           std::int64_t incx, real_t beta, sycl::buffer<real_t, 1>& y, std::int64_t incy) {
     CALL_GENERIC_BLAS_FN(::blas::_sbmv, queue, upper_lower, n, k, alpha, a, lda, x, incx, beta, y,
-                     incy);
+                         incy);
 }
 
 void symv(sycl::queue& queue, oneapi::math::uplo upper_lower, std::int64_t n, real_t alpha,
           sycl::buffer<real_t, 1>& a, std::int64_t lda, sycl::buffer<real_t, 1>& x,
           std::int64_t incx, real_t beta, sycl::buffer<real_t, 1>& y, std::int64_t incy) {
-    CALL_GENERIC_BLAS_FN(::blas::_symv, queue, upper_lower, n, alpha, a, lda, x, incx, beta, y, incy);
+    CALL_GENERIC_BLAS_FN(::blas::_symv, queue, upper_lower, n, alpha, a, lda, x, incx, beta, y,
+                         incy);
 }
 
 void syr(sycl::queue& queue, oneapi::math::uplo upper_lower, std::int64_t n, real_t alpha,
@@ -160,7 +161,8 @@ void spr2(sycl::queue& queue, oneapi::math::uplo upper_lower, std::int64_t n, re
 void tbmv(sycl::queue& queue, oneapi::math::uplo upper_lower, oneapi::math::transpose trans,
           oneapi::math::diag unit_diag, std::int64_t n, std::int64_t k, sycl::buffer<real_t, 1>& a,
           std::int64_t lda, sycl::buffer<real_t, 1>& x, std::int64_t incx) {
-    CALL_GENERIC_BLAS_FN(::blas::_tbmv, queue, upper_lower, trans, unit_diag, n, k, a, lda, x, incx);
+    CALL_GENERIC_BLAS_FN(::blas::_tbmv, queue, upper_lower, trans, unit_diag, n, k, a, lda, x,
+                         incx);
 }
 
 void tbmv(sycl::queue& queue, oneapi::math::uplo upper_lower, oneapi::math::transpose trans,
@@ -173,7 +175,8 @@ void tbmv(sycl::queue& queue, oneapi::math::uplo upper_lower, oneapi::math::tran
 void tbsv(sycl::queue& queue, oneapi::math::uplo upper_lower, oneapi::math::transpose trans,
           oneapi::math::diag unit_diag, std::int64_t n, std::int64_t k, sycl::buffer<real_t, 1>& a,
           std::int64_t lda, sycl::buffer<real_t, 1>& x, std::int64_t incx) {
-    CALL_GENERIC_BLAS_FN(::blas::_tbsv, queue, upper_lower, trans, unit_diag, n, k, a, lda, x, incx);
+    CALL_GENERIC_BLAS_FN(::blas::_tbsv, queue, upper_lower, trans, unit_diag, n, k, a, lda, x,
+                         incx);
 }
 
 void tbsv(sycl::queue& queue, oneapi::math::uplo upper_lower, oneapi::math::transpose trans,
@@ -237,8 +240,8 @@ sycl::event gemv(sycl::queue& queue, oneapi::math::transpose trans, std::int64_t
                  real_t alpha, const real_t* a, std::int64_t lda, const real_t* x,
                  std::int64_t incx, real_t beta, real_t* y, std::int64_t incy,
                  const std::vector<sycl::event>& dependencies) {
-    CALL_GENERIC_BLAS_USM_FN(::blas::_gemv, queue, trans, m, n, alpha, a, lda, x, incx, beta, y, incy,
-                         dependencies);
+    CALL_GENERIC_BLAS_USM_FN(::blas::_gemv, queue, trans, m, n, alpha, a, lda, x, incx, beta, y,
+                             incy, dependencies);
 }
 
 sycl::event gemv(sycl::queue& queue, oneapi::math::transpose trans, std::int64_t m, std::int64_t n,
@@ -253,8 +256,8 @@ sycl::event gbmv(sycl::queue& queue, oneapi::math::transpose trans, std::int64_t
                  std::int64_t kl, std::int64_t ku, real_t alpha, const real_t* a, std::int64_t lda,
                  const real_t* x, std::int64_t incx, real_t beta, real_t* y, std::int64_t incy,
                  const std::vector<sycl::event>& dependencies) {
-    CALL_GENERIC_BLAS_USM_FN(::blas::_gbmv, queue, trans, m, n, kl, ku, alpha, a, lda, x, incx, beta, y,
-                         incy, dependencies);
+    CALL_GENERIC_BLAS_USM_FN(::blas::_gbmv, queue, trans, m, n, kl, ku, alpha, a, lda, x, incx,
+                             beta, y, incy, dependencies);
 }
 
 sycl::event gbmv(sycl::queue& queue, oneapi::math::transpose trans, std::int64_t m, std::int64_t n,
@@ -268,7 +271,8 @@ sycl::event gbmv(sycl::queue& queue, oneapi::math::transpose trans, std::int64_t
 sycl::event ger(sycl::queue& queue, std::int64_t m, std::int64_t n, real_t alpha, const real_t* x,
                 std::int64_t incx, const real_t* y, std::int64_t incy, real_t* a, std::int64_t lda,
                 const std::vector<sycl::event>& dependencies) {
-    CALL_GENERIC_BLAS_USM_FN(::blas::_ger, queue, m, n, alpha, x, incx, y, incy, a, lda, dependencies);
+    CALL_GENERIC_BLAS_USM_FN(::blas::_ger, queue, m, n, alpha, x, incx, y, incy, a, lda,
+                             dependencies);
 }
 
 sycl::event gerc(sycl::queue& queue, std::int64_t m, std::int64_t n, std::complex<real_t> alpha,
@@ -339,35 +343,36 @@ sycl::event sbmv(sycl::queue& queue, oneapi::math::uplo upper_lower, std::int64_
                  real_t alpha, const real_t* a, std::int64_t lda, const real_t* x,
                  std::int64_t incx, real_t beta, real_t* y, std::int64_t incy,
                  const std::vector<sycl::event>& dependencies) {
-    CALL_GENERIC_BLAS_USM_FN(::blas::_sbmv, queue, upper_lower, n, k, alpha, a, lda, x, incx, beta, y,
-                         incy, dependencies);
+    CALL_GENERIC_BLAS_USM_FN(::blas::_sbmv, queue, upper_lower, n, k, alpha, a, lda, x, incx, beta,
+                             y, incy, dependencies);
 }
 
 sycl::event symv(sycl::queue& queue, oneapi::math::uplo upper_lower, std::int64_t n, real_t alpha,
                  const real_t* a, std::int64_t lda, const real_t* x, std::int64_t incx, real_t beta,
                  real_t* y, std::int64_t incy, const std::vector<sycl::event>& dependencies) {
     CALL_GENERIC_BLAS_USM_FN(::blas::_symv, queue, upper_lower, n, alpha, a, lda, x, incx, beta, y,
-                         incy, dependencies);
+                             incy, dependencies);
 }
 
 sycl::event syr(sycl::queue& queue, oneapi::math::uplo upper_lower, std::int64_t n, real_t alpha,
                 const real_t* x, std::int64_t incx, real_t* a, std::int64_t lda,
                 const std::vector<sycl::event>& dependencies) {
-    CALL_GENERIC_BLAS_USM_FN(::blas::_syr, queue, upper_lower, n, alpha, x, incx, a, lda, dependencies);
+    CALL_GENERIC_BLAS_USM_FN(::blas::_syr, queue, upper_lower, n, alpha, x, incx, a, lda,
+                             dependencies);
 }
 
 sycl::event syr2(sycl::queue& queue, oneapi::math::uplo upper_lower, std::int64_t n, real_t alpha,
                  const real_t* x, std::int64_t incx, const real_t* y, std::int64_t incy, real_t* a,
                  std::int64_t lda, const std::vector<sycl::event>& dependencies) {
     CALL_GENERIC_BLAS_USM_FN(::blas::_syr2, queue, upper_lower, n, alpha, x, incx, y, incy, a, lda,
-                         dependencies);
+                             dependencies);
 }
 
 sycl::event spmv(sycl::queue& queue, oneapi::math::uplo upper_lower, std::int64_t n, real_t alpha,
                  const real_t* a, const real_t* x, std::int64_t incx, real_t beta, real_t* y,
                  std::int64_t incy, const std::vector<sycl::event>& dependencies) {
     CALL_GENERIC_BLAS_USM_FN(::blas::_spmv, queue, upper_lower, n, alpha, a, x, incx, beta, y, incy,
-                         dependencies);
+                             dependencies);
 }
 
 sycl::event spr(sycl::queue& queue, oneapi::math::uplo upper_lower, std::int64_t n, real_t alpha,
@@ -380,15 +385,15 @@ sycl::event spr2(sycl::queue& queue, oneapi::math::uplo upper_lower, std::int64_
                  const real_t* x, std::int64_t incx, const real_t* y, std::int64_t incy, real_t* a,
                  const std::vector<sycl::event>& dependencies) {
     CALL_GENERIC_BLAS_USM_FN(::blas::_spr2, queue, upper_lower, n, alpha, x, incx, y, incy, a,
-                         dependencies);
+                             dependencies);
 }
 
 sycl::event tbmv(sycl::queue& queue, oneapi::math::uplo upper_lower, oneapi::math::transpose trans,
                  oneapi::math::diag unit_diag, std::int64_t n, std::int64_t k, const real_t* a,
                  std::int64_t lda, real_t* x, std::int64_t incx,
                  const std::vector<sycl::event>& dependencies) {
-    CALL_GENERIC_BLAS_USM_FN(::blas::_tbmv, queue, upper_lower, trans, unit_diag, n, k, a, lda, x, incx,
-                         dependencies);
+    CALL_GENERIC_BLAS_USM_FN(::blas::_tbmv, queue, upper_lower, trans, unit_diag, n, k, a, lda, x,
+                             incx, dependencies);
 }
 
 sycl::event tbmv(sycl::queue& queue, oneapi::math::uplo upper_lower, oneapi::math::transpose trans,
@@ -402,8 +407,8 @@ sycl::event tbsv(sycl::queue& queue, oneapi::math::uplo upper_lower, oneapi::mat
                  oneapi::math::diag unit_diag, std::int64_t n, std::int64_t k, const real_t* a,
                  std::int64_t lda, real_t* x, std::int64_t incx,
                  const std::vector<sycl::event>& dependencies) {
-    CALL_GENERIC_BLAS_USM_FN(::blas::_tbsv, queue, upper_lower, trans, unit_diag, n, k, a, lda, x, incx,
-                         dependencies);
+    CALL_GENERIC_BLAS_USM_FN(::blas::_tbsv, queue, upper_lower, trans, unit_diag, n, k, a, lda, x,
+                             incx, dependencies);
 }
 
 sycl::event tbsv(sycl::queue& queue, oneapi::math::uplo upper_lower, oneapi::math::transpose trans,
@@ -417,7 +422,7 @@ sycl::event tpmv(sycl::queue& queue, oneapi::math::uplo upper_lower, oneapi::mat
                  oneapi::math::diag unit_diag, std::int64_t n, const real_t* a, real_t* x,
                  std::int64_t incx, const std::vector<sycl::event>& dependencies) {
     CALL_GENERIC_BLAS_USM_FN(::blas::_tpmv, queue, upper_lower, trans, unit_diag, n, a, x, incx,
-                         dependencies);
+                             dependencies);
 }
 
 sycl::event tpmv(sycl::queue& queue, oneapi::math::uplo upper_lower, oneapi::math::transpose trans,
@@ -431,7 +436,7 @@ sycl::event tpsv(sycl::queue& queue, oneapi::math::uplo upper_lower, oneapi::mat
                  oneapi::math::diag unit_diag, std::int64_t n, const real_t* a, real_t* x,
                  std::int64_t incx, const std::vector<sycl::event>& dependencies) {
     CALL_GENERIC_BLAS_USM_FN(::blas::_tpsv, queue, upper_lower, trans, unit_diag, n, a, x, incx,
-                         dependencies);
+                             dependencies);
 }
 
 sycl::event tpsv(sycl::queue& queue, oneapi::math::uplo upper_lower, oneapi::math::transpose trans,
@@ -444,8 +449,8 @@ sycl::event tpsv(sycl::queue& queue, oneapi::math::uplo upper_lower, oneapi::mat
 sycl::event trmv(sycl::queue& queue, oneapi::math::uplo upper_lower, oneapi::math::transpose trans,
                  oneapi::math::diag unit_diag, std::int64_t n, const real_t* a, std::int64_t lda,
                  real_t* x, std::int64_t incx, const std::vector<sycl::event>& dependencies) {
-    CALL_GENERIC_BLAS_USM_FN(::blas::_trmv, queue, upper_lower, trans, unit_diag, n, a, lda, x, incx,
-                         dependencies);
+    CALL_GENERIC_BLAS_USM_FN(::blas::_trmv, queue, upper_lower, trans, unit_diag, n, a, lda, x,
+                             incx, dependencies);
 }
 
 sycl::event trmv(sycl::queue& queue, oneapi::math::uplo upper_lower, oneapi::math::transpose trans,
@@ -458,8 +463,8 @@ sycl::event trmv(sycl::queue& queue, oneapi::math::uplo upper_lower, oneapi::mat
 sycl::event trsv(sycl::queue& queue, oneapi::math::uplo upper_lower, oneapi::math::transpose trans,
                  oneapi::math::diag unit_diag, std::int64_t n, const real_t* a, std::int64_t lda,
                  real_t* x, std::int64_t incx, const std::vector<sycl::event>& dependencies) {
-    CALL_GENERIC_BLAS_USM_FN(::blas::_trsv, queue, upper_lower, trans, unit_diag, n, a, lda, x, incx,
-                         dependencies);
+    CALL_GENERIC_BLAS_USM_FN(::blas::_trsv, queue, upper_lower, trans, unit_diag, n, a, lda, x,
+                             incx, dependencies);
 }
 
 sycl::event trsv(sycl::queue& queue, oneapi::math::uplo upper_lower, oneapi::math::transpose trans,

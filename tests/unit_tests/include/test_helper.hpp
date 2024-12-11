@@ -226,7 +226,7 @@
                 TEST_RUN_AMDGPU_ROCBLAS_SELECT(q, func, __VA_ARGS__);      \
             }                                                              \
         }                                                                  \
-        TEST_RUN_GENERIC_BLAS_SELECT(q, func, __VA_ARGS__);                    \
+        TEST_RUN_GENERIC_BLAS_SELECT(q, func, __VA_ARGS__);                \
     } while (0);
 
 #define TEST_RUN_RNG_CT_SELECT(q, func, ...)                               \

@@ -23,8 +23,8 @@ void gemm(sycl::queue& queue, oneapi::math::transpose transa, oneapi::math::tran
           std::int64_t m, std::int64_t n, std::int64_t k, real_t alpha, sycl::buffer<real_t, 1>& a,
           std::int64_t lda, sycl::buffer<real_t, 1>& b, std::int64_t ldb, real_t beta,
           sycl::buffer<real_t, 1>& c, std::int64_t ldc) {
-    CALL_GENERIC_BLAS_FN(::blas::_gemm, queue, transa, transb, m, n, k, alpha, a, lda, b, ldb, beta, c,
-                     ldc);
+    CALL_GENERIC_BLAS_FN(::blas::_gemm, queue, transa, transb, m, n, k, alpha, a, lda, b, ldb, beta,
+                         c, ldc);
 }
 
 void gemm(sycl::queue& queue, oneapi::math::transpose transa, oneapi::math::transpose transb,
@@ -35,7 +35,8 @@ void gemm(sycl::queue& queue, oneapi::math::transpose transa, oneapi::math::tran
     using sycl_complex_real_t = sycl::ext::oneapi::experimental::complex<real_t>;
     if (transa == oneapi::math::transpose::conjtrans ||
         transb == oneapi::math::transpose::conjtrans) {
-        throw unimplemented("blas", "gemm", "Conjugate Transpose unsupported yet on onemath_sycl_blas");
+        throw unimplemented("blas", "gemm",
+                            "Conjugate Transpose unsupported yet on onemath_sycl_blas");
     }
     // Intermediate buffers for conversion purposes as onemath_sycl_blas expects sycl::complex instead of std::complex
     sycl::buffer<sycl_complex_real_t, 1> a_pb{ sycl::range<1>(a.size()) };
@@ -55,7 +56,7 @@ void gemm(sycl::queue& queue, oneapi::math::transpose transa, oneapi::math::tran
     queue.copy(c_acc, c_pb_acc);
 
     CALL_GENERIC_BLAS_FN(::blas::_gemm, queue, transa, transb, m, n, k, alpha, a_pb, lda, b_pb, ldb,
-                     beta, c_pb, ldc);
+                         beta, c_pb, ldc);
 
     // Copy c_pb back to c
     sycl::accessor<std::complex<real_t>, 1, sycl::access::mode::write> out_acc(c);
@@ -68,7 +69,7 @@ void symm(sycl::queue& queue, oneapi::math::side left_right, oneapi::math::uplo 
           std::int64_t lda, sycl::buffer<real_t, 1>& b, std::int64_t ldb, real_t beta,
           sycl::buffer<real_t, 1>& c, std::int64_t ldc) {
     CALL_GENERIC_BLAS_FN(::blas::_symm, queue, left_right, upper_lower, m, n, alpha, a, lda, b, ldb,
-                     beta, c, ldc);
+                         beta, c, ldc);
 }
 
 void symm(sycl::queue& queue, oneapi::math::side left_right, oneapi::math::uplo upper_lower,
@@ -148,8 +149,8 @@ void trsm(sycl::queue& queue, oneapi::math::side left_right, oneapi::math::uplo 
           oneapi::math::transpose trans, oneapi::math::diag unit_diag, std::int64_t m,
           std::int64_t n, real_t alpha, sycl::buffer<real_t, 1>& a, std::int64_t lda,
           sycl::buffer<real_t, 1>& b, std::int64_t ldb) {
-    CALL_GENERIC_BLAS_FN(::blas::_trsm, queue, left_right, upper_lower, trans, unit_diag, m, n, alpha,
-                     a, lda, b, ldb);
+    CALL_GENERIC_BLAS_FN(::blas::_trsm, queue, left_right, upper_lower, trans, unit_diag, m, n,
+                         alpha, a, lda, b, ldb);
 }
 
 void trsm(sycl::queue& queue, oneapi::math::side left_right, oneapi::math::uplo upper_lower,
@@ -190,7 +191,7 @@ void omatcopy2(sycl::queue& queue, transpose trans, std::int64_t m, std::int64_t
                sycl::buffer<real_t, 1>& a, std::int64_t lda, std::int64_t stridea,
                sycl::buffer<real_t, 1>& b, std::int64_t ldb, std::int64_t strideb) {
     CALL_GENERIC_BLAS_FN(::blas::_omatcopy2, queue, trans, m, n, alpha, a, lda, stridea, b, ldb,
-                     strideb);
+                         strideb);
 }
 
 void omatcopy2(sycl::queue& queue, transpose trans, std::int64_t m, std::int64_t n,
@@ -215,8 +216,8 @@ void omatadd(sycl::queue& queue, transpose transa, transpose transb, std::int64_
              real_t alpha, sycl::buffer<real_t, 1>& a, std::int64_t lda, real_t beta,
              sycl::buffer<real_t, 1>& b, std::int64_t ldb, sycl::buffer<real_t, 1>& c,
              std::int64_t ldc) {
-    CALL_GENERIC_BLAS_FN(::blas::_omatadd, queue, transa, transb, m, n, alpha, a, lda, beta, b, ldb, c,
-                     ldc);
+    CALL_GENERIC_BLAS_FN(::blas::_omatadd, queue, transa, transb, m, n, alpha, a, lda, beta, b, ldb,
+                         c, ldc);
 }
 
 void omatadd(sycl::queue& queue, transpose transa, transpose transb, std::int64_t m, std::int64_t n,
@@ -232,8 +233,8 @@ sycl::event gemm(sycl::queue& queue, oneapi::math::transpose transa, oneapi::mat
                  std::int64_t m, std::int64_t n, std::int64_t k, real_t alpha, const real_t* a,
                  std::int64_t lda, const real_t* b, std::int64_t ldb, real_t beta, real_t* c,
                  std::int64_t ldc, const std::vector<sycl::event>& dependencies) {
-    CALL_GENERIC_BLAS_USM_FN(::blas::_gemm, queue, transa, transb, m, n, k, alpha, a, lda, b, ldb, beta,
-                         c, ldc, dependencies);
+    CALL_GENERIC_BLAS_USM_FN(::blas::_gemm, queue, transa, transb, m, n, k, alpha, a, lda, b, ldb,
+                             beta, c, ldc, dependencies);
 }
 
 sycl::event gemm(sycl::queue& queue, oneapi::math::transpose transa, oneapi::math::transpose transb,
@@ -243,18 +244,19 @@ sycl::event gemm(sycl::queue& queue, oneapi::math::transpose transa, oneapi::mat
                  std::int64_t ldc, const std::vector<sycl::event>& dependencies) {
     if (transa == oneapi::math::transpose::conjtrans ||
         transb == oneapi::math::transpose::conjtrans) {
-        throw unimplemented("blas", "gemm", "Conjugate Transpose unsupported yet on onemath_sycl_blas");
+        throw unimplemented("blas", "gemm",
+                            "Conjugate Transpose unsupported yet on onemath_sycl_blas");
     }
-    CALL_GENERIC_BLAS_USM_FN(::blas::_gemm, queue, transa, transb, m, n, k, alpha, a, lda, b, ldb, beta,
-                         c, ldc, dependencies);
+    CALL_GENERIC_BLAS_USM_FN(::blas::_gemm, queue, transa, transb, m, n, k, alpha, a, lda, b, ldb,
+                             beta, c, ldc, dependencies);
 }
 
 sycl::event symm(sycl::queue& queue, oneapi::math::side left_right, oneapi::math::uplo upper_lower,
                  std::int64_t m, std::int64_t n, real_t alpha, const real_t* a, std::int64_t lda,
                  const real_t* b, std::int64_t ldb, real_t beta, real_t* c, std::int64_t ldc,
                  const std::vector<sycl::event>& dependencies) {
-    CALL_GENERIC_BLAS_USM_FN(::blas::_symm, queue, left_right, upper_lower, m, n, alpha, a, lda, b, ldb,
-                         beta, c, ldc, dependencies);
+    CALL_GENERIC_BLAS_USM_FN(::blas::_symm, queue, left_right, upper_lower, m, n, alpha, a, lda, b,
+                             ldb, beta, c, ldc, dependencies);
 }
 
 sycl::event symm(sycl::queue& queue, oneapi::math::side left_right, oneapi::math::uplo upper_lower,
@@ -338,7 +340,7 @@ sycl::event trsm(sycl::queue& queue, oneapi::math::side left_right, oneapi::math
                  std::int64_t n, real_t alpha, const real_t* a, std::int64_t lda, real_t* b,
                  std::int64_t ldb, const std::vector<sycl::event>& dependencies) {
     CALL_GENERIC_BLAS_USM_FN(::blas::_trsm, queue, left_right, upper_lower, trans, unit_diag, m, n,
-                         alpha, a, lda, b, ldb, dependencies);
+                             alpha, a, lda, b, ldb, dependencies);
 }
 
 sycl::event trsm(sycl::queue& queue, oneapi::math::side left_right, oneapi::math::uplo upper_lower,
@@ -370,7 +372,7 @@ sycl::event omatcopy(sycl::queue& queue, transpose trans, std::int64_t m, std::i
                      real_t alpha, const real_t* a, std::int64_t lda, real_t* b, std::int64_t ldb,
                      const std::vector<sycl::event>& dependencies) {
     CALL_GENERIC_BLAS_USM_FN(::blas::_omatcopy, queue, trans, m, n, alpha, a, lda, b, ldb,
-                         dependencies);
+                             dependencies);
 }
 
 sycl::event omatcopy(sycl::queue& queue, transpose trans, std::int64_t m, std::int64_t n,
@@ -385,7 +387,7 @@ sycl::event omatcopy2(sycl::queue& queue, transpose trans, std::int64_t m, std::
                       real_t* b, std::int64_t ldb, std::int64_t strideb,
                       const std::vector<sycl::event>& dependencies) {
     CALL_GENERIC_BLAS_USM_FN(::blas::_omatcopy2, queue, trans, m, n, alpha, a, lda, stridea, b, ldb,
-                         strideb, dependencies);
+                             strideb, dependencies);
 }
 
 sycl::event omatcopy2(sycl::queue& queue, transpose trans, std::int64_t m, std::int64_t n,
@@ -411,8 +413,8 @@ sycl::event omatadd(sycl::queue& queue, transpose transa, transpose transb, std:
                     std::int64_t n, real_t alpha, const real_t* a, std::int64_t lda, real_t beta,
                     const real_t* b, std::int64_t ldb, real_t* c, std::int64_t ldc,
                     const std::vector<sycl::event>& dependencies) {
-    CALL_GENERIC_BLAS_USM_FN(::blas::_omatadd, queue, transa, transb, m, n, alpha, a, lda, beta, b, ldb,
-                         c, ldc, dependencies);
+    CALL_GENERIC_BLAS_USM_FN(::blas::_omatadd, queue, transa, transb, m, n, alpha, a, lda, beta, b,
+                             ldb, c, ldc, dependencies);
 }
 
 sycl::event omatadd(sycl::queue& queue, transpose transa, transpose transb, std::int64_t m,
