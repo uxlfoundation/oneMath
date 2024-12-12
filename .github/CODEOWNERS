@@ -11,7 +11,6 @@
 /include/oneapi/math/detail/ @uxlfoundation/onemath-arch-write
 /include/oneapi/mkl.hpp @uxlfoundation/onemath-arch-write
 /include/oneapi/mkl/namespace_alias.hpp @uxlfoundation/onemath-arch-write
-/scripts/ @uxlfoundation/onemath-arch-write
 /src/include/ @uxlfoundation/onemath-arch-write
 /src/CMakeLists.txt @uxlfoundation/onemath-arch-write
 /src/config.hpp.in @uxlfoundation/onemath-arch-write
