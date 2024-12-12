@@ -44,7 +44,9 @@ function(add_deprecated_library target_name)
   # The INTERFACE IMPORTED target works like an alias which can have different properties
   add_library(deprecated_name INTERFACE IMPORTED)
   target_link_libraries(deprecated_name INTERFACE target_name)
-  set_target_properties(deprecated_name PROPERTIES DEPRECATION "${deprecated_name} target is deprecated, please use ${target_name} instead")
+  if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.22.1")
+    set_target_properties(deprecated_name PROPERTIES DEPRECATION "${deprecated_name} target is deprecated, please use ${target_name} instead")
+  endif()
 endfunction()
 
 
