@@ -30,7 +30,7 @@ If there is no need for multiple wrappers only ``<domain>`` and ``<3rd-party lib
 
 `5. Update the Test System`_
 
-.. _generate_header_files:
+.. _create_header_files:
 
 1. Create Header Files
 ----------------------
@@ -40,15 +40,7 @@ For each new backend library, you should create the following two header files:
 * Header file with a declaration of entry points to the new third-party library wrappers
 * Compiler-time dispatching interface (see `oneMath Usage Models <../README.md#supported-usage-models>`_) for new third-party libraries
 
-**Header File Example**: command to generate the header file with a declaration of BLAS entry points in the oneapi::math::newlib namespace 
-
-.. code-block:: bash
-
-    python scripts/generate_backend_api.py include/oneapi/math/blas.hpp \                                  # Base header file
-                                           include/oneapi/math/blas/detail/newlib/onemath_blas_newlib.hpp \ # Output header file
-                                           oneapi::math::newlib                                            # Wrappers namespace
-
-Code snippet of the generated header file ``include/oneapi/math/blas/detail/newlib/onemath_blas_newlib.hpp``
+Example header file ``include/oneapi/math/blas/detail/newlib/onemath_blas_newlib.hpp``
 
 .. code-block:: cpp
 
@@ -61,18 +53,9 @@ Code snippet of the generated header file ``include/oneapi/math/blas/detail/newl
 
 
 
-**Compile-time Dispatching Interface Example**: command to generate the compile-time dispatching interface template instantiations for ``newlib`` and supported device ``newdevice``
+**Compile-time Dispatching Interface Example**:
 
-.. code-block:: bash
-
-    python scripts/generate_ct_instant.py   include/oneapi/math/blas/detail/blas_ct_templates.hpp \         # Base header file
-                                            include/oneapi/math/blas/detail/newlib/blas_ct.hpp \            # Output header file
-                                            include/oneapi/math/blas/detail/newlib/onemath_blas_newlib.hpp \ # Header file with declaration of entry points to wrappers
-                                            newlib \                                                       # Library name
-                                            newdevice \                                                    # Backend name
-                                            oneapi::math::newlib                                            # Wrappers namespace
-
-Code snippet of the generated header file ``include/oneapi/math/blas/detail/newlib/blas_ct.hpp``
+Example of the compile-time dispatching interface template instantiations for ``newlib`` and supported device ``newdevice`` in ``include/oneapi/math/blas/detail/newlib/blas_ct.hpp``.
 
 .. code-block:: cpp
 
@@ -179,9 +162,9 @@ To integrate the new third-party library to a oneMath header-based part, followi
      +      if (queue.is_host())
      +          device_id=device::newdevice;
 
-* ``include/oneapi/math/blas.hpp``: include the generated header file for the compile-time dispatching interface (see `oneMath Usage Models <../README.md#supported-usage-models>`_)
+* ``include/oneapi/math/blas.hpp``: include the created header file for the compile-time dispatching interface (see `oneMath Usage Models <../README.md#supported-usage-models>`_)
 
-  **Example**: add ``include/oneapi/math/blas/detail/newlib/blas_ct.hpp`` generated at the `1. Create Header Files`_ step
+  **Example**: add ``include/oneapi/math/blas/detail/newlib/blas_ct.hpp`` created at the `1. Create Header Files`_ step
     
   .. code-block:: diff
     
@@ -190,7 +173,7 @@ To integrate the new third-party library to a oneMath header-based part, followi
      +  #include "oneapi/math/blas/detail/newlib/blas_ct.hpp"
 
 
-The new files generated at the `1. Create Header Files`_ step result in the following updated structure of the BLAS domain header files.
+The new files created at the `1. Create Header Files`_ step result in the following updated structure of the BLAS domain header files.
 
 .. code-block:: diff
 
@@ -215,7 +198,7 @@ The new files generated at the `1. Create Header Files`_ step result in the foll
                         <other backends>/
                 <other domains>/
 
-.. _generate_wrappers_and_cmake:
+.. _create_wrappers_and_cmake:
 
 3. Create Wrappers
 ------------------
@@ -240,23 +223,12 @@ All wrappers and dispatcher library implementations are in the ``src`` directory
 
 Each backend library should contain a table of all functions from the chosen domain.
 
-``scripts/generate_wrappers.py`` can help to generate wrappers with the "Not implemented" exception for all functions based on the provided header file.
+**Example**: Create wrappers for ``newlib`` based on the header files created and integrated previously, and enable only one ``asum`` function
 
-You can modify wrappers generated with this script to enable third-party library functionality.
-
-**Example**: generate wrappers for ``newlib`` based on the header files generated and integrated previously, and enable only one ``asum`` function
-
-The command below generates two new files:
+Create two new files:
 
 * ``src/blas/backends/newlib/newlib_wrappers.cpp`` - DPC++ wrappers for all functions from ``include/oneapi/math/blas/detail/newlib/onemath_blas_newlib.hpp``
 * ``src/blas/backends/newlib/newlib_wrappers_table_dyn.cpp`` - structure of symbols for run-time dispatcher (in the same location as wrappers), suffix ``_dyn`` indicates that this file is required for dynamic library only.
-
-.. code-block:: bash
-
-    python scripts/generate_wrappers.py include/oneapi/math/blas/detail/newlib/onemath_blas_newlib.hpp \ # Base header file
-                                        src/blas/function_table.hpp \                                  # Declaration for structure of symbols
-                                        src/blas/backends/newlib/newlib_wrappers.cpp \                 # Output wrappers
-                                        newlib                                                         # Library name
 
 You can then modify ``src/blas/backends/newlib/newlib_wrappers.cpp`` to enable the C function ``newlib_sasum`` from the third-party library ``libnewlib.so``.
 
@@ -374,19 +346,11 @@ Here is the list of files that should be created/updated to integrate the new wr
 
 * Create the ``src/<domain>/backends/<new_directory>/CMakeList.txt`` cmake config file to specify how to build the backend layer for the new third-party library.
 
-  ``scripts/generate_cmake.py`` can help to generate the initial ``src/<domain>/backends/<new_directory>/CMakeList.txt`` config file automatically for all files in the directory.
-  Note: all source files with the ``_dyn`` suffix are added to build if the target is a dynamic library only.
-  
-  **Example**: command to generate the cmake config file for the ``src/blas/backends/newlib`` directory
+  Check existing backends as a reference to create ``cmake/FindXXX.cmake`` file.
 
-  .. code-block:: bash
+  You should update the config file with information about the new ``cmake/FindXXX.cmake`` file and instructions about how to link with the third-party library.
 
-    python scripts/generate_cmake.py src/blas/backends/newlib \ # Full path to the directory
-                                     newlib                     # Library name
-
-  You should manually update the generated config file with information about the new ``cmake/FindXXX.cmake`` file and instructions about how to link with the third-party library.
-  
-  **Example**: update the generated ``src/blas/backends/newlib/CMakeLists.txt`` file
+  **Example**: update the ``src/blas/backends/newlib/CMakeLists.txt`` file
 
   .. code-block:: diff
 

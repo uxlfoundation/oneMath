@@ -388,25 +388,19 @@ document.write(`
 </div>
 <p>Where <code class="docutils literal notranslate"><span class="pre">&lt;wrapper</span> <span class="pre">for</span> <span class="pre">specific</span> <span class="pre">target&gt;</span></code> is required only if multiple wrappers are provided from the same 3rd-party library, e.g., wrappers with Intel oneMKL C API for CPU target <code class="docutils literal notranslate"><span class="pre">onemath_blas_mklcpu.so</span></code> and wrappers with Intel oneMKL DPC++ API for GPU target <code class="docutils literal notranslate"><span class="pre">onemath_blas_mklgpu.so</span></code>.</p>
 <p>If there is no need for multiple wrappers only <code class="docutils literal notranslate"><span class="pre">&lt;domain&gt;</span></code> and <code class="docutils literal notranslate"><span class="pre">&lt;3rd-party</span> <span class="pre">library</span> <span class="pre">short</span> <span class="pre">name&gt;</span></code> are required, e.g. <code class="docutils literal notranslate"><span class="pre">onemath_rng_curand.so</span></code></p>
-<p><a class="reference internal" href="#create-header-files">1. Create Header Files</a></p>
-<p><a class="reference internal" href="#id1">2. Integrate Header Files</a></p>
+<p><a class="reference internal" href="#id1">1. Create Header Files</a></p>
+<p><a class="reference internal" href="#id2">2. Integrate Header Files</a></p>
 <p><a class="reference internal" href="#create-wrappers">3. Create Wrappers</a></p>
 <p><a class="reference internal" href="#integrate-wrappers-to-the-build-system">4. Integrate Wrappers To the Build System</a></p>
 <p><a class="reference internal" href="#update-the-test-system">5. Update the Test System</a></p>
 <section id="create-header-files">
-<span id="generate-header-files"></span><h2>1. Create Header Files<a class="headerlink" href="#create-header-files" title="Link to this heading">#</a></h2>
+<span id="id1"></span><h2>1. Create Header Files<a class="headerlink" href="#create-header-files" title="Link to this heading">#</a></h2>
 <p>For each new backend library, you should create the following two header files:</p>
 <ul class="simple">
 <li><p>Header file with a declaration of entry points to the new third-party library wrappers</p></li>
 <li><p>Compiler-time dispatching interface (see <a class="reference external" href="../README.md#supported-usage-models">oneMath Usage Models</a>) for new third-party libraries</p></li>
 </ul>
-<p><strong>Header File Example</strong>: command to generate the header file with a declaration of BLAS entry points in the oneapi::math::newlib namespace</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>scripts/generate_backend_api.py<span class="w"> </span>include/oneapi/math/blas.hpp<span class="w"> </span><span class="se">\ </span><span class="w">                                 </span><span class="c1"># Base header file</span>
-<span class="w">                                       </span>include/oneapi/math/blas/detail/newlib/onemath_blas_newlib.hpp<span class="w"> </span><span class="se">\ </span><span class="c1"># Output header file</span>
-<span class="w">                                       </span>oneapi::math::newlib<span class="w">                                            </span><span class="c1"># Wrappers namespace</span>
-</pre></div>
-</div>
-<p>Code snippet of the generated header file <code class="docutils literal notranslate"><span class="pre">include/oneapi/math/blas/detail/newlib/onemath_blas_newlib.hpp</span></code></p>
+<p>Example header file <code class="docutils literal notranslate"><span class="pre">include/oneapi/math/blas/detail/newlib/onemath_blas_newlib.hpp</span></code></p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">namespace</span><span class="w"> </span><span class="nn">oneapi</span><span class="w"> </span><span class="p">{</span>
 <span class="k">namespace</span><span class="w"> </span><span class="nn">math</span><span class="w"> </span><span class="p">{</span>
 <span class="k">namespace</span><span class="w"> </span><span class="nn">newlib</span><span class="w"> </span><span class="p">{</span>
@@ -415,16 +409,8 @@ document.write(`
 <span class="w">          </span><span class="n">sycl</span><span class="o">::</span><span class="n">buffer</span><span class="o">&lt;</span><span class="kt">float</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="o">&gt;</span><span class="w"> </span><span class="o">&amp;</span><span class="n">result</span><span class="p">);</span>
 </pre></div>
 </div>
-<p><strong>Compile-time Dispatching Interface Example</strong>: command to generate the compile-time dispatching interface template instantiations for <code class="docutils literal notranslate"><span class="pre">newlib</span></code> and supported device <code class="docutils literal notranslate"><span class="pre">newdevice</span></code></p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>scripts/generate_ct_instant.py<span class="w">   </span>include/oneapi/math/blas/detail/blas_ct_templates.hpp<span class="w"> </span><span class="se">\ </span><span class="w">        </span><span class="c1"># Base header file</span>
-<span class="w">                                        </span>include/oneapi/math/blas/detail/newlib/blas_ct.hpp<span class="w"> </span><span class="se">\ </span><span class="w">           </span><span class="c1"># Output header file</span>
-<span class="w">                                        </span>include/oneapi/math/blas/detail/newlib/onemath_blas_newlib.hpp<span class="w"> </span><span class="se">\ </span><span class="c1"># Header file with declaration of entry points to wrappers</span>
-<span class="w">                                        </span>newlib<span class="w"> </span><span class="se">\ </span><span class="w">                                                      </span><span class="c1"># Library name</span>
-<span class="w">                                        </span>newdevice<span class="w"> </span><span class="se">\ </span><span class="w">                                                   </span><span class="c1"># Backend name</span>
-<span class="w">                                        </span>oneapi::math::newlib<span class="w">                                            </span><span class="c1"># Wrappers namespace</span>
-</pre></div>
-</div>
-<p>Code snippet of the generated header file <code class="docutils literal notranslate"><span class="pre">include/oneapi/math/blas/detail/newlib/blas_ct.hpp</span></code></p>
+<p><strong>Compile-time Dispatching Interface Example</strong>:</p>
+<p>Example of the compile-time dispatching interface template instantiations for <code class="docutils literal notranslate"><span class="pre">newlib</span></code> and supported device <code class="docutils literal notranslate"><span class="pre">newdevice</span></code> in <code class="docutils literal notranslate"><span class="pre">include/oneapi/math/blas/detail/newlib/blas_ct.hpp</span></code>.</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">namespace</span><span class="w"> </span><span class="nn">oneapi</span><span class="w"> </span><span class="p">{</span>
 <span class="k">namespace</span><span class="w"> </span><span class="nn">math</span><span class="w"> </span><span class="p">{</span>
 <span class="k">namespace</span><span class="w"> </span><span class="nn">blas</span><span class="w"> </span><span class="p">{</span>
@@ -441,7 +427,7 @@ document.write(`
 </div>
 </section>
 <section id="integrate-header-files">
-<span id="id1"></span><h2>2. Integrate Header Files<a class="headerlink" href="#integrate-header-files" title="Link to this heading">#</a></h2>
+<span id="id2"></span><h2>2. Integrate Header Files<a class="headerlink" href="#integrate-header-files" title="Link to this heading">#</a></h2>
 <p>Below you can see structure of oneMath top-level include directory:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">include</span><span class="o">/</span>
     <span class="n">oneapi</span><span class="o">/</span>
@@ -515,8 +501,8 @@ document.write(`
 </pre></div>
 </div>
 </li>
-<li><p><code class="docutils literal notranslate"><span class="pre">include/oneapi/math/blas.hpp</span></code>: include the generated header file for the compile-time dispatching interface (see <a class="reference external" href="../README.md#supported-usage-models">oneMath Usage Models</a>)</p>
-<p><strong>Example</strong>: add <code class="docutils literal notranslate"><span class="pre">include/oneapi/math/blas/detail/newlib/blas_ct.hpp</span></code> generated at the <a class="reference internal" href="#create-header-files">1. Create Header Files</a> step</p>
+<li><p><code class="docutils literal notranslate"><span class="pre">include/oneapi/math/blas.hpp</span></code>: include the created header file for the compile-time dispatching interface (see <a class="reference external" href="../README.md#supported-usage-models">oneMath Usage Models</a>)</p>
+<p><strong>Example</strong>: add <code class="docutils literal notranslate"><span class="pre">include/oneapi/math/blas/detail/newlib/blas_ct.hpp</span></code> created at the <a class="reference internal" href="#id1">1. Create Header Files</a> step</p>
 <div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="w"> </span>  #include &quot;oneapi/math/blas/detail/mklcpu/blas_ct.hpp&quot;
 <span class="w"> </span>  #include &quot;oneapi/math/blas/detail/mklgpu/blas_ct.hpp&quot;
 <span class="gi">+  #include &quot;oneapi/math/blas/detail/newlib/blas_ct.hpp&quot;</span>
@@ -524,7 +510,7 @@ document.write(`
 </div>
 </li>
 </ul>
-<p>The new files generated at the <a class="reference internal" href="#create-header-files">1. Create Header Files</a> step result in the following updated structure of the BLAS domain header files.</p>
+<p>The new files created at the <a class="reference internal" href="#id1">1. Create Header Files</a> step result in the following updated structure of the BLAS domain header files.</p>
 <div class="highlight-diff notranslate"><div class="highlight"><pre><span></span>include/
 <span class="w"> </span>   oneapi/
 <span class="w"> </span>       math/
@@ -549,7 +535,7 @@ document.write(`
 </div>
 </section>
 <section id="create-wrappers">
-<span id="generate-wrappers-and-cmake"></span><h2>3. Create Wrappers<a class="headerlink" href="#create-wrappers" title="Link to this heading">#</a></h2>
+<span id="create-wrappers-and-cmake"></span><h2>3. Create Wrappers<a class="headerlink" href="#create-wrappers" title="Link to this heading">#</a></h2>
 <p>Wrappers convert Data Parallel C++ (DPC++) input data types to third-party library data types and call corresponding implementation from the third-party library. Wrappers for each third-party library are built to separate oneMath backend libraries. The <code class="docutils literal notranslate"><span class="pre">libonemath.so</span></code> dispatcher library loads the wrappers at run-time if you are using the interface for run-time dispatching, or you will link with them directly in case you are using the interface for compile-time dispatching (for more information see <a class="reference external" href="../README.md#supported-usage-models">oneMath Usage Models</a>).</p>
 <p>All wrappers and dispatcher library implementations are in the <code class="docutils literal notranslate"><span class="pre">src</span></code> directory:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">src</span><span class="o">/</span>
@@ -567,20 +553,12 @@ document.write(`
 </pre></div>
 </div>
 <p>Each backend library should contain a table of all functions from the chosen domain.</p>
-<p><code class="docutils literal notranslate"><span class="pre">scripts/generate_wrappers.py</span></code> can help to generate wrappers with the “Not implemented” exception for all functions based on the provided header file.</p>
-<p>You can modify wrappers generated with this script to enable third-party library functionality.</p>
-<p><strong>Example</strong>: generate wrappers for <code class="docutils literal notranslate"><span class="pre">newlib</span></code> based on the header files generated and integrated previously, and enable only one <code class="docutils literal notranslate"><span class="pre">asum</span></code> function</p>
-<p>The command below generates two new files:</p>
+<p><strong>Example</strong>: Create wrappers for <code class="docutils literal notranslate"><span class="pre">newlib</span></code> based on the header files created and integrated previously, and enable only one <code class="docutils literal notranslate"><span class="pre">asum</span></code> function</p>
+<p>Create two new files:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">src/blas/backends/newlib/newlib_wrappers.cpp</span></code> - DPC++ wrappers for all functions from <code class="docutils literal notranslate"><span class="pre">include/oneapi/math/blas/detail/newlib/onemath_blas_newlib.hpp</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">src/blas/backends/newlib/newlib_wrappers_table_dyn.cpp</span></code> - structure of symbols for run-time dispatcher (in the same location as wrappers), suffix <code class="docutils literal notranslate"><span class="pre">_dyn</span></code> indicates that this file is required for dynamic library only.</p></li>
 </ul>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>scripts/generate_wrappers.py<span class="w"> </span>include/oneapi/math/blas/detail/newlib/onemath_blas_newlib.hpp<span class="w"> </span><span class="se">\ </span><span class="c1"># Base header file</span>
-<span class="w">                                    </span>src/blas/function_table.hpp<span class="w"> </span><span class="se">\ </span><span class="w">                                 </span><span class="c1"># Declaration for structure of symbols</span>
-<span class="w">                                    </span>src/blas/backends/newlib/newlib_wrappers.cpp<span class="w"> </span><span class="se">\ </span><span class="w">                </span><span class="c1"># Output wrappers</span>
-<span class="w">                                    </span>newlib<span class="w">                                                         </span><span class="c1"># Library name</span>
-</pre></div>
-</div>
 <p>You can then modify <code class="docutils literal notranslate"><span class="pre">src/blas/backends/newlib/newlib_wrappers.cpp</span></code> to enable the C function <code class="docutils literal notranslate"><span class="pre">newlib_sasum</span></code> from the third-party library <code class="docutils literal notranslate"><span class="pre">libnewlib.so</span></code>.</p>
 <p>To enable this function:</p>
 <ul class="simple">
@@ -684,15 +662,9 @@ document.write(`
 </div>
 </li>
 <li><p>Create the <code class="docutils literal notranslate"><span class="pre">src/&lt;domain&gt;/backends/&lt;new_directory&gt;/CMakeList.txt</span></code> cmake config file to specify how to build the backend layer for the new third-party library.</p>
-<p><code class="docutils literal notranslate"><span class="pre">scripts/generate_cmake.py</span></code> can help to generate the initial <code class="docutils literal notranslate"><span class="pre">src/&lt;domain&gt;/backends/&lt;new_directory&gt;/CMakeList.txt</span></code> config file automatically for all files in the directory.
-Note: all source files with the <code class="docutils literal notranslate"><span class="pre">_dyn</span></code> suffix are added to build if the target is a dynamic library only.</p>
-<p><strong>Example</strong>: command to generate the cmake config file for the <code class="docutils literal notranslate"><span class="pre">src/blas/backends/newlib</span></code> directory</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>scripts/generate_cmake.py<span class="w"> </span>src/blas/backends/newlib<span class="w"> </span><span class="se">\ </span><span class="c1"># Full path to the directory</span>
-<span class="w">                                 </span>newlib<span class="w">                     </span><span class="c1"># Library name</span>
-</pre></div>
-</div>
-<p>You should manually update the generated config file with information about the new <code class="docutils literal notranslate"><span class="pre">cmake/FindXXX.cmake</span></code> file and instructions about how to link with the third-party library.</p>
-<p><strong>Example</strong>: update the generated <code class="docutils literal notranslate"><span class="pre">src/blas/backends/newlib/CMakeLists.txt</span></code> file</p>
+<p>Check existing backends as a reference to create <code class="docutils literal notranslate"><span class="pre">cmake/FindXXX.cmake</span></code> file.</p>
+<p>You should update the config file with information about the new <code class="docutils literal notranslate"><span class="pre">cmake/FindXXX.cmake</span></code> file and instructions about how to link with the third-party library.</p>
+<p><strong>Example</strong>: update the <code class="docutils literal notranslate"><span class="pre">src/blas/backends/newlib/CMakeLists.txt</span></code> file</p>
 <div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="w"> </span>   # Add third-party library
 <span class="gd">-   # find_package(XXX REQUIRED)</span>
 <span class="gi">+   find_package(NEWLIB REQUIRED)</span>
