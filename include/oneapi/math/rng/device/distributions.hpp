@@ -686,7 +686,6 @@ public:
     friend auto generate(Distr& distr, Engine& engine) ->
         typename std::conditional<Engine::vec_size == 1, typename Distr::result_type,
                                   sycl::vec<typename Distr::result_type, Engine::vec_size>>::type;
-    
     template <typename Distr, typename Engine>
     friend typename Distr::result_type generate_single(Distr& distr, Engine& engine);
 };
