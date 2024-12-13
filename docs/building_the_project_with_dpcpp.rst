@@ -59,7 +59,7 @@ or ``clang++`` and ``clang`` respectively when using the Open DPC++ Compiler.
 Backends should be enabled by setting ``-DENABLE_<BACKEND_NAME>_BACKEND=True``
 for each desired backend. By default, only the ``MKLGPU`` and ``MKLCPU``
 backends are enabled. Multiple backends for multiple device vendors can be
-enabled at once (albeit with limitations when using onemath_sycl_blas and portFFT). The
+enabled at once (albeit with limitations when using oneMath SYCL BLAS and portFFT). The
 supported backends for the compilers are given in the table at `oneMath
 supported configurations table
 <https://github.com/uxlfoundation/oneMath?tab=readme-ov-file#supported-configurations>`_,
@@ -245,7 +245,7 @@ unsupported configurations.
 .. _build_for_portlibs_dpcpp:
 
 Pure SYCL backends: generic BLAS and portFFT
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 `Generic BLAS <https://github.com/codeplaysoftware/portBLAS>`_ and `portFFT
 <https://github.com/codeplaysoftware/portFFT>`_ are experimental pure-SYCL
@@ -257,20 +257,20 @@ experimental and currently only support a subset of operations and features.
 For best performance, both libraries must be tuned. See the individual sections
 for more details.
 
-Both onemath_sycl_blas and portFFT are used as header-only libraries, and will be
+Both oneMath SYCL BLAS and portFFT are used as header-only libraries, and will be
 downloaded automatically if not found.
 
 .. _build_for_generic_blas_dpcpp:
 
 Building for oneMath generic SYCL BLAS
----------------------
+--------------------------------------
 
 `onemath_sycl_blas generic BLAS <https://github.com/codeplaysoftware/portBLAS>`_ is
 enabled by setting ``-DENABLE_GENERIC_BLAS_BACKEND=True``.
 
 By default, the generic BLAS backend is not tuned for any specific device.
 This tuning is required to achieve best performance.
-OneMath_sycl_blas can be tuned for a specific hardware target by adding compiler
+OneMath SYCL BLAS can be tuned for a specific hardware target by adding compiler
 definitions in 2 ways:
 
 #.
