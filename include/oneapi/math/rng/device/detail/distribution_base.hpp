@@ -65,6 +65,9 @@ class poisson;
 template <typename IntType = std::uint32_t, typename Method = bernoulli_method::by_default>
 class bernoulli;
 
+template <typename IntType = std::uint32_t, typename Method = geometric_method::by_default>
+class geometric;
+
 } // namespace oneapi::math::rng::device
 
 #include "oneapi/math/rng/device/detail/uniform_impl.hpp"
@@ -75,6 +78,7 @@ class bernoulli;
 #include "oneapi/math/rng/device/detail/exponential_impl.hpp"
 #include "oneapi/math/rng/device/detail/poisson_impl.hpp"
 #include "oneapi/math/rng/device/detail/bernoulli_impl.hpp"
+#include "oneapi/math/rng/device/detail/geometric_impl.hpp"
 #include "oneapi/math/rng/device/detail/beta_impl.hpp"
 #include "oneapi/math/rng/device/detail/gamma_impl.hpp"
 

@@ -57,6 +57,11 @@ struct icdf {};
 using by_default = icdf;
 } // namespace bernoulli_method
 
+namespace geometric_method {
+struct icdf {};
+using by_default = icdf;
+} // namespace geometric_method
+
 namespace beta_method {
 struct cja {};
 struct cja_accurate {};

@@ -632,6 +632,65 @@ public:
     friend typename Distr::result_type generate_single(Distr& distr, Engine& engine);
 };
 
+// Class template oneapi::mkl::rng::device::geometric
+//
+// Represents discrete geometric random number distribution
+//
+// Supported types:
+//      std::uint32_t
+//      std::int32_t
+//      std::uint64_t
+//      std::int64_t
+//
+// Supported methods:
+//      oneapi::mkl::rng::geometric_method::icdf;
+//
+// Input arguments:
+//      p - success probablity of a trial. 0.5 by default
+//
+template <typename IntType, typename Method>
+class geometric : detail::distribution_base<geometric<IntType, Method>> {
+public:
+    static_assert(std::is_same<Method, geometric_method::icdf>::value,
+                  "oneMKL: rng/geometric: method is incorrect");
+
+    static_assert(std::is_same<IntType, std::int32_t>::value ||
+                      std::is_same<IntType, std::uint32_t>::value ||
+                      std::is_same<IntType, std::int64_t>::value  ||
+                      std::is_same<IntType, std::uint64_t>::value,
+                  "oneMKL: rng/geometric: type is not supported");
+
+    using method_type = Method;
+    using result_type = IntType;
+    using param_type = typename detail::distribution_base<geometric<IntType, Method>>::param_type;
+
+    geometric() : detail::distribution_base<geometric<IntType, Method>>(0.5f) {}
+
+    explicit geometric(float p) : detail::distribution_base<geometric<IntType, Method>>(p) {}
+    explicit geometric(const param_type& pt)
+            : detail::distribution_base<geometric<IntType, Method>>(pt.p_) {}
+
+    float p() const {
+        return detail::distribution_base<geometric<IntType, Method>>::p();
+    }
+
+    param_type param() const {
+        return detail::distribution_base<geometric<IntType, Method>>::param();
+    }
+
+    void param(const param_type& pt) {
+        detail::distribution_base<geometric<IntType, Method>>::param(pt);
+    }
+
+    template <typename Distr, typename Engine>
+    friend auto generate(Distr& distr, Engine& engine) ->
+        typename std::conditional<Engine::vec_size == 1, typename Distr::result_type,
+                                  sycl::vec<typename Distr::result_type, Engine::vec_size>>::type;
+    
+    template <typename Distr, typename Engine>
+    friend typename Distr::result_type generate_single(Distr& distr, Engine& engine);
+};
+
 } // namespace oneapi::math::rng::device
 
 #endif // ONEMATH_RNG_DEVICE_DISTRIBUTIONS_HPP_
