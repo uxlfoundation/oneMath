@@ -656,7 +656,7 @@ public:
 
     static_assert(std::is_same<IntType, std::int32_t>::value ||
                       std::is_same<IntType, std::uint32_t>::value ||
-                      std::is_same<IntType, std::int64_t>::value  ||
+                      std::is_same<IntType, std::int64_t>::value ||
                       std::is_same<IntType, std::uint64_t>::value,
                   "oneMath: rng/geometric: type is not supported");
 

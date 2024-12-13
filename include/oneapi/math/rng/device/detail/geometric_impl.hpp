@@ -60,10 +60,9 @@ protected:
     auto generate(EngineType& engine) ->
         typename std::conditional<EngineType::vec_size == 1, IntType,
                                   sycl::vec<IntType, EngineType::vec_size>>::type {
-        using FpType =
-            typename std::conditional<std::is_same_v<IntType, std::uint64_t> || 
-                                      std::is_same_v<IntType, std::int64_t>, 
-                                      double, float>::type;
+        using FpType = typename std::conditional<std::is_same_v<IntType, std::uint64_t> ||
+                                                     std::is_same_v<IntType, std::int64_t>,
+                                                 double, float>::type;
         
         auto uni_res = engine.generate(FpType(0.0), FpType(1.0));
         FpType inv_ln = ln_wrapper(FpType(1.0) - p_);
@@ -81,6 +80,10 @@ protected:
 
     template <typename EngineType>
     IntType generate_single(EngineType& engine) {
+        using FpType = typename std::conditional<std::is_same_v<IntType, std::uint64_t> ||
+                                                     std::is_same_v<IntType, std::int64_t>,
+                                                 double, float>::type;
+
         auto uni_res = engine.generate_single(FpType(0.0), FpType(1.0));
         float inv_ln = ln_wrapper(FpType(1.0) - p_);
         inv_ln = FpType(1.0) / inv_ln;
