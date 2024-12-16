@@ -1486,7 +1486,7 @@ TEST_P(Philox4x32x10GeometricIcdfDeviceMomentsTests, Integer16Precision) {
 
 TEST_P(Philox4x32x10GeometricIcdfDeviceMomentsTests, UnsignedInteger16Precision) {
     CHECK_DOUBLE_ON_DEVICE(GetParam());
-    
+
     rng_device_test<
         moments_test<oneapi::math::rng::device::philox4x32x10<1>,
                      oneapi::math::rng::device::geometric<
