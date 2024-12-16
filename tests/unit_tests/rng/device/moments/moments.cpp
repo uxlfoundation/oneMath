@@ -1416,4 +1416,99 @@ INSTANTIATE_TEST_SUITE_P(Philox4x32x10BernoulliIcdfDeviceMomentsTestsSuite,
                          Philox4x32x10BernoulliIcdfDeviceMomentsTests, ::testing::ValuesIn(devices),
                          ::DeviceNamePrint());
 
+class Philox4x32x10GeometricIcdfDeviceMomentsTests
+        : public ::testing::TestWithParam<sycl::device*> {};
+
+TEST_P(Philox4x32x10GeometricIcdfDeviceMomentsTests, IntegerPrecision) {
+    rng_device_test<
+        moments_test<oneapi::math::rng::device::philox4x32x10<1>,
+                     oneapi::math::rng::device::geometric<
+                         std::int32_t, oneapi::math::rng::device::geometric_method::icdf>>>
+        test1;
+    EXPECT_TRUEORSKIP((test1(GetParam())));
+    rng_device_test<
+        moments_test<oneapi::math::rng::device::philox4x32x10<4>,
+                     oneapi::math::rng::device::geometric<
+                         std::int32_t, oneapi::math::rng::device::geometric_method::icdf>>>
+        test2;
+    EXPECT_TRUEORSKIP((test2(GetParam())));
+    rng_device_test<
+        moments_test<oneapi::math::rng::device::philox4x32x10<16>,
+                     oneapi::math::rng::device::geometric<
+                         std::int32_t, oneapi::math::rng::device::geometric_method::icdf>>>
+        test3;
+    EXPECT_TRUEORSKIP((test3(GetParam())));
+}
+
+TEST_P(Philox4x32x10GeometricIcdfDeviceMomentsTests, UnsignedIntegerPrecision) {
+    rng_device_test<
+        moments_test<oneapi::math::rng::device::philox4x32x10<1>,
+                     oneapi::math::rng::device::geometric<
+                         std::uint32_t, oneapi::math::rng::device::geometric_method::icdf>>>
+        test1;
+    EXPECT_TRUEORSKIP((test1(GetParam())));
+    rng_device_test<
+        moments_test<oneapi::math::rng::device::philox4x32x10<4>,
+                     oneapi::math::rng::device::geometric<
+                         std::uint32_t, oneapi::math::rng::device::geometric_method::icdf>>>
+        test2;
+    EXPECT_TRUEORSKIP((test2(GetParam())));
+    rng_device_test<
+        moments_test<oneapi::math::rng::device::philox4x32x10<16>,
+                     oneapi::math::rng::device::geometric<
+                         std::uint32_t, oneapi::math::rng::device::geometric_method::icdf>>>
+        test3;
+    EXPECT_TRUEORSKIP((test3(GetParam())));
+}
+
+TEST_P(Philox4x32x10GeometricIcdfDeviceMomentsTests, Integer16Precision) {
+    CHECK_DOUBLE_ON_DEVICE(GetParam());
+
+    rng_device_test<
+        moments_test<oneapi::math::rng::device::philox4x32x10<1>,
+                     oneapi::math::rng::device::geometric<
+                         std::int64_t, oneapi::math::rng::device::geometric_method::icdf>>>
+        test1;
+    EXPECT_TRUEORSKIP((test1(GetParam())));
+    rng_device_test<
+        moments_test<oneapi::math::rng::device::philox4x32x10<4>,
+                     oneapi::math::rng::device::geometric<
+                         std::int64_t, oneapi::math::rng::device::geometric_method::icdf>>>
+        test2;
+    EXPECT_TRUEORSKIP((test2(GetParam())));
+    rng_device_test<
+        moments_test<oneapi::math::rng::device::philox4x32x10<16>,
+                     oneapi::math::rng::device::geometric<
+                         std::int64_t, oneapi::math::rng::device::geometric_method::icdf>>>
+        test3;
+    EXPECT_TRUEORSKIP((test3(GetParam())));
+}
+
+TEST_P(Philox4x32x10GeometricIcdfDeviceMomentsTests, UnsignedInteger16Precision) {
+    CHECK_DOUBLE_ON_DEVICE(GetParam());
+    
+    rng_device_test<
+        moments_test<oneapi::math::rng::device::philox4x32x10<1>,
+                     oneapi::math::rng::device::geometric<
+                         std::uint64_t, oneapi::math::rng::device::geometric_method::icdf>>>
+        test1;
+    EXPECT_TRUEORSKIP((test1(GetParam())));
+    rng_device_test<
+        moments_test<oneapi::math::rng::device::philox4x32x10<4>,
+                     oneapi::math::rng::device::geometric<
+                         std::uint64_t, oneapi::math::rng::device::geometric_method::icdf>>>
+        test2;
+    EXPECT_TRUEORSKIP((test2(GetParam())));
+    rng_device_test<
+        moments_test<oneapi::math::rng::device::philox4x32x10<16>,
+                     oneapi::math::rng::device::geometric<
+                         std::uint64_t, oneapi::math::rng::device::geometric_method::icdf>>>
+        test3;
+    EXPECT_TRUEORSKIP((test3(GetParam())));
+}
+
+INSTANTIATE_TEST_SUITE_P(Philox4x32x10GeometricIcdfDeviceMomentsTestsSuite,
+                         Philox4x32x10GeometricIcdfDeviceMomentsTests, ::testing::ValuesIn(devices),
+                         ::DeviceNamePrint());
+
 } // anonymous namespace

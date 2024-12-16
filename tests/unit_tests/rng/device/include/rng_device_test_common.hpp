@@ -353,6 +353,22 @@ struct statistics_device<oneapi::math::rng::device::bernoulli<Fp, Method>> {
 };
 
 template <typename Fp, typename Method>
+struct statistics_device<oneapi::math::rng::device::geometric<Fp, Method>> {
+    template <typename AllocType>
+    bool check(const std::vector<Fp, AllocType>& r,
+               const oneapi::math::rng::device::geometric<Fp, Method>& distr) {
+        double tM, tD, tQ;
+        double p = static_cast<double>(distr.p());
+
+        tM = (1.0 - p) / p;
+        tD = (1.0 - p) / (p * p);
+        tQ = (1.0 - p) * (p * p - 9.0 * p + 9.0) / (p * p * p * p);
+
+        return compare_moments(r, tM, tD, tQ);
+    }
+};
+
+template <typename Fp, typename Method>
 struct statistics_device<oneapi::math::rng::device::beta<Fp, Method>> {
     template <typename AllocType>
     bool check(const std::vector<Fp, AllocType>& r,
