@@ -1461,7 +1461,7 @@ TEST_P(Philox4x32x10GeometricIcdfDeviceMomentsTests, UnsignedIntegerPrecision) {
     EXPECT_TRUEORSKIP((test3(GetParam())));
 }
 
-TEST_P(Philox4x32x10GeometricIcdfDeviceMomentsTests, Integer16Precision) {
+TEST_P(Philox4x32x10GeometricIcdfDeviceMomentsTests, Integer64Precision) {
     CHECK_DOUBLE_ON_DEVICE(GetParam());
 
     rng_device_test<
@@ -1484,7 +1484,7 @@ TEST_P(Philox4x32x10GeometricIcdfDeviceMomentsTests, Integer16Precision) {
     EXPECT_TRUEORSKIP((test3(GetParam())));
 }
 
-TEST_P(Philox4x32x10GeometricIcdfDeviceMomentsTests, UnsignedInteger16Precision) {
+TEST_P(Philox4x32x10GeometricIcdfDeviceMomentsTests, UnsignedInteger64Precision) {
     CHECK_DOUBLE_ON_DEVICE(GetParam());
 
     rng_device_test<
