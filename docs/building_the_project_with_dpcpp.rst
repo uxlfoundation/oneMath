@@ -247,8 +247,8 @@ unsupported configurations.
 Pure SYCL backends: generic BLAS and portFFT
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-`Generic SYCL BLAS <https://github.com/codeplaysoftware/portBLAS>`_ and `portFFT
-<https://github.com/codeplaysoftware/portFFT>`_ are experimental pure-SYCL
+`Generic SYCL BLAS <https://github.com/uxlfoundation/generic-sycl-components/tree/main/onemath/sycl/blas>`_
+and `portFFT <https://github.com/codeplaysoftware/portFFT>`_ are experimental pure-SYCL
 backends that work on all SYCL targets supported by the DPC++ compiler. Since
 they support multiple targets, they cannot be enabled with other backends in the
 same domain, or the ``MKLCPU`` or ``MKLGPU`` backends. Both libraries are
@@ -265,8 +265,8 @@ downloaded automatically if not found.
 Building for oneMath generic SYCL BLAS
 --------------------------------------
 
-`onemath_sycl_blas generic BLAS <https://github.com/codeplaysoftware/portBLAS>`_ is
-enabled by setting ``-DENABLE_GENERIC_BLAS_BACKEND=True``.
+`onemath generic SYCL BLAS <https://github.com/uxlfoundation/generic-sycl-components/tree/main/onemath/sycl/blas>`_
+is enabled by setting ``-DENABLE_GENERIC_BLAS_BACKEND=True``.
 
 By default, the generic BLAS backend is not tuned for any specific device.
 This tuning is required to achieve best performance.
@@ -276,7 +276,7 @@ definitions in 2 ways:
 #.
   Manually specify a tuning target with ``-DGENERIC_BLAS_TUNING_TARGET=<target>``.
   The list of oneMath SYCL BLAS targets can be found
-  `here <https://github.com/codeplaysoftware/portBLAS#cmake-options>`_.
+  `here <https://github.com/uxlfoundation/generic-sycl-components/tree/main/onemath/sycl/blas#cmake-options>`_.
   This will automatically set ``-fsycl-targets`` if needed.
 #.
   If one target is set via ``-fsycl-targets`` the configuration step will

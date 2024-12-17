@@ -65,7 +65,7 @@ oneMath is part of the [UXL Foundation](http://www.uxlfoundation.org).
             <td align="center">AMD GPU</td>
         </tr>
         <tr>
-            <td align="center"><a href="https://github.com/codeplaysoftware/portBLAS"> generic SYCL BLAS </a></td>
+            <td align="center"><a href="https://github.com/uxlfoundation/generic-sycl-components/tree/main/onemath/sycl/blas"> generic SYCL BLAS </a></td>
             <td align="center">x86 CPU, Intel GPU, NVIDIA GPU, AMD GPU, Other SYCL devices (unsupported)</td>
         </tr>
         <tr>
@@ -538,7 +538,7 @@ Product | Supported Version | License
 [AMD rocSOLVER](https://github.com/ROCm/rocSOLVER) | 5.0.0 | [AMD License](https://github.com/ROCm/rocSOLVER/blob/develop/LICENSE.md)
 [AMD rocFFT](https://github.com/ROCm/rocFFT) | rocm-5.4.3 | [AMD License](https://github.com/ROCm/rocFFT/blob/rocm-5.4.3/LICENSE.md)
 [NETLIB LAPACK](https://www.netlib.org/) | [5d4180c](https://github.com/Reference-LAPACK/lapack/commit/5d4180cf8288ae6ad9a771d18793d15bd0c5643c) | [BSD like license](http://www.netlib.org/lapack/LICENSE.txt)
-[portBLAS](https://github.com/codeplaysoftware/portBLAS) | 0.1 | [Apache License v2.0](https://github.com/codeplaysoftware/portBLAS/blob/main/LICENSE)
+[Generic SYCL BLAS](https://github.com/uxlfoundation/generic-sycl-components/tree/main/onemath/sycl/blas) | 0.1 | [Apache License v2.0](https://github.com/uxlfoundation/generic-sycl-components/blob/main/LICENSE)
 [portFFT](https://github.com/codeplaysoftware/portFFT) | 0.1 | [Apache License v2.0](https://github.com/codeplaysoftware/portFFT/blob/main/LICENSE)
 
 ---
