@@ -43,7 +43,7 @@ target_include_directories(${LIB_OBJ}
 target_compile_options(${LIB_OBJ} PRIVATE ${ONEMATH_BUILD_COPT})
 
 find_package(HIP REQUIRED)
-find_package(rocsparse REQUIRED)
+find_package(rocsparse 3.1.2 REQUIRED)  # ROCm 6.1.0 or above
 
 target_link_libraries(${LIB_OBJ} PRIVATE hip::host roc::rocsparse)
 
