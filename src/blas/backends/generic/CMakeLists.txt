@@ -141,11 +141,6 @@ find_package(ONEMATH_SYCL_BLAS QUIET)
 if (NOT ONEMATH_SYCL_BLAS_FOUND)
   message(STATUS "Looking for onemath_sycl_blas for generic backend - could not find onemath_sycl_blas with ONEMATH_SYCL_BLAS_DIR")
   include(FetchContent)
-  set(INSTALL_HEADER_ONLY ON)
-  set(BLAS_BUILD_SAMPLES OFF)
-  set(BLAS_ENABLE_BENCHMARK OFF)
-  set(BLAS_ENABLE_TESTING OFF)
-  set(ENABLE_EXPRESSION_TESTS OFF)
   if(NOT GENERIC_BLAS_TUNING_TARGET)
     set(GENERIC_BLAS_TUNING_TARGET "DEFAULT")
   endif()
@@ -156,9 +151,10 @@ if (NOT ONEMATH_SYCL_BLAS_FOUND)
   set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
   set(FETCHCONTENT_BASE_DIR "${CMAKE_BINARY_DIR}/deps")
   FetchContent_Declare(
-    portBLAS
-    GIT_REPOSITORY https://github.com/codeplaysoftware/portBLAS
+    onemath_sycl_blas
+    GIT_REPOSITORY https://github.com/uxlfoundation/generic-sycl-components
     GIT_TAG        main
+    SOURCE_SUBDIR onemath/sycl/blas
   )
   FetchContent_MakeAvailable(onemath_sycl_blas)
   message(STATUS "Looking for onemath_sycl_blas - downloaded")
