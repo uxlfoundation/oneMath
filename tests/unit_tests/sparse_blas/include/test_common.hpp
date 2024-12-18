@@ -65,6 +65,10 @@ inline std::set<oneapi::math::sparse::matrix_property> get_default_matrix_proper
     if (vendor_id == oneapi::math::device::nvidiagpu && format == sparse_matrix_format_t::COO) {
         return { oneapi::math::sparse::matrix_property::sorted_by_rows };
     }
+    if (vendor_id == oneapi::math::device::amdgpu &&
+        (format == sparse_matrix_format_t::COO || format == sparse_matrix_format_t::CSR)) {
+        return { oneapi::math::sparse::matrix_property::sorted };
+    }
     return {};
 }
 
@@ -72,15 +76,6 @@ inline std::set<oneapi::math::sparse::matrix_property> get_default_matrix_proper
 inline std::vector<std::set<oneapi::math::sparse::matrix_property>>
 get_all_matrix_properties_combinations(sycl::queue queue, sparse_matrix_format_t format) {
     auto vendor_id = oneapi::math::get_device_id(queue);
-    if (vendor_id == oneapi::math::device::nvidiagpu && format == sparse_matrix_format_t::COO) {
-        // Ensure all the sets have the sorted or sorted_by_rows properties
-        return { { oneapi::math::sparse::matrix_property::sorted },
-                 { oneapi::math::sparse::matrix_property::sorted_by_rows,
-                   oneapi::math::sparse::matrix_property::symmetric },
-                 { oneapi::math::sparse::matrix_property::sorted,
-                   oneapi::math::sparse::matrix_property::symmetric } };
-    }
-
     std::vector<std::set<oneapi::math::sparse::matrix_property>> properties_combinations{
         { oneapi::math::sparse::matrix_property::sorted },
         { oneapi::math::sparse::matrix_property::symmetric },
@@ -90,6 +85,10 @@ get_all_matrix_properties_combinations(sycl::queue queue, sparse_matrix_format_t
     if (format == sparse_matrix_format_t::COO) {
         properties_combinations.push_back(
             { oneapi::math::sparse::matrix_property::sorted_by_rows });
+    }
+    if (vendor_id == oneapi::math::device::nvidiagpu || vendor_id == oneapi::math::device::amdgpu) {
+        // Test without any properties set since for backends for which this is not the default behavior
+        properties_combinations.push_back({});
     }
     return properties_combinations;
 }
@@ -230,7 +229,7 @@ void rand_matrix(std::vector<fpType>& m, oneapi::math::layout layout_val, std::s
 }
 
 /// Generate random value in the range [-0.5, 0.5]
-/// The amplitude is guaranteed to be >= 0.1 if is_diag is true
+/// The amplitude is guaranteed to be >= 10 if is_diag is true
 template <typename fpType>
 fpType generate_data(bool is_diag) {
     rand_scalar<fpType> rand_data;

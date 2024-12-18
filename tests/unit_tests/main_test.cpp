@@ -135,7 +135,8 @@ int main(int argc, char** argv) {
 #if !defined(ONEMATH_ENABLE_ROCBLAS_BACKEND) && !defined(ONEMATH_ENABLE_ROCRAND_BACKEND) && \
     !defined(ONEMATH_ENABLE_ROCSOLVER_BACKEND) &&                                           \
     !defined(ONEMATH_ENABLE_GENERIC_BLAS_BACKEND_AMD_GPU) &&                                \
-    !defined(ONEMATH_ENABLE_ROCFFT_BACKEND) && !defined(ONEMATH_ENABLE_PORTFFT_BACKEND)
+    !defined(ONEMATH_ENABLE_ROCFFT_BACKEND) && !defined(ONEMATH_ENABLE_PORTFFT_BACKEND) &&  \
+    !defined(ONEMATH_ENABLE_ROCSPARSE_BACKEND)
                         if (dev.is_gpu() && vendor_id == AMD_ID)
                             continue;
 #endif

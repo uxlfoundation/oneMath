@@ -17,28 +17,28 @@
 *
 **************************************************************************/
 
-#ifndef _ONEMATH_SPARSE_BLAS_BACKENDS_CUSPARSE_TASK_HPP_
-#define _ONEMATH_SPARSE_BLAS_BACKENDS_CUSPARSE_TASK_HPP_
+#ifndef _ONEMATH_SPARSE_BLAS_BACKENDS_ROCSPARSE_TASK_HPP_
+#define _ONEMATH_SPARSE_BLAS_BACKENDS_ROCSPARSE_TASK_HPP_
 
-#include "cusparse_error.hpp"
+#include "rocsparse_error.hpp"
 #include "sparse_blas/backends/common_launch_task.hpp"
 
-namespace oneapi::math::sparse::cusparse::detail {
+namespace oneapi::math::sparse::rocsparse::detail {
 
 // Helper function for functors submitted to host_task or native_command.
 // When the extension is disabled, host_task are used and the synchronization is needed to ensure the sycl::event corresponds to the end of the whole functor.
 // When the extension is enabled, host_task are still used for out-of-order queues, see description of dispatch_submit_impl_fp_int.
-inline void synchronize_if_needed(bool is_in_order_queue, CUstream cu_stream) {
+inline void synchronize_if_needed(bool is_in_order_queue, hipStream_t hip_stream) {
 #ifndef SYCL_EXT_ONEAPI_ENQUEUE_NATIVE_COMMAND
     (void)is_in_order_queue;
-    CUDA_ERROR_FUNC(cuStreamSynchronize, cu_stream);
+    HIP_ERROR_FUNC(hipStreamSynchronize, hip_stream);
 #else
     if (!is_in_order_queue) {
-        CUDA_ERROR_FUNC(cuStreamSynchronize, cu_stream);
+        HIP_ERROR_FUNC(hipStreamSynchronize, hip_stream);
     }
 #endif
 }
 
-} // namespace oneapi::math::sparse::cusparse::detail
+} // namespace oneapi::math::sparse::rocsparse::detail
 
-#endif // _ONEMATH_SPARSE_BLAS_BACKENDS_CUSPARSE_TASK_HPP_
+#endif // _ONEMATH_SPARSE_BLAS_BACKENDS_ROCSPARSE_TASK_HPP_

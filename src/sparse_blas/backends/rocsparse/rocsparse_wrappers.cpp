@@ -17,30 +17,16 @@
 *
 **************************************************************************/
 
-#ifndef _ONEMATH_SPARSE_BLAS_HPP_
-#define _ONEMATH_SPARSE_BLAS_HPP_
+#include "oneapi/math/sparse_blas/types.hpp"
 
-#if __has_include(<sycl/sycl.hpp>)
-#include <sycl/sycl.hpp>
-#else
-#include <CL/sycl.hpp>
-#endif
+#include "oneapi/math/sparse_blas/detail/rocsparse/onemath_sparse_blas_rocsparse.hpp"
 
-#include "oneapi/math/detail/config.hpp"
+#include "sparse_blas/function_table.hpp"
 
-#ifdef ONEMATH_ENABLE_MKLCPU_BACKEND
-#include "sparse_blas/detail/mklcpu/sparse_blas_ct.hpp"
-#endif
-#ifdef ONEMATH_ENABLE_MKLGPU_BACKEND
-#include "sparse_blas/detail/mklgpu/sparse_blas_ct.hpp"
-#endif
-#ifdef ONEMATH_ENABLE_CUSPARSE_BACKEND
-#include "sparse_blas/detail/cusparse/sparse_blas_ct.hpp"
-#endif
-#ifdef ONEMATH_ENABLE_ROCSPARSE_BACKEND
-#include "sparse_blas/detail/rocsparse/sparse_blas_ct.hpp"
-#endif
+#define WRAPPER_VERSION 1
+#define BACKEND         rocsparse
 
-#include "sparse_blas/detail/sparse_blas_rt.hpp"
-
-#endif // _ONEMATH_SPARSE_BLAS_HPP_
+extern "C" sparse_blas_function_table_t onemath_sparse_blas_table = {
+    WRAPPER_VERSION,
+#include "sparse_blas/backends/backend_wrappers.cxx"
+};

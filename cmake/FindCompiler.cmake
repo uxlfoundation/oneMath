@@ -43,7 +43,7 @@ if(is_dpcpp)
       list(APPEND UNIX_INTERFACE_LINK_OPTIONS
         -fsycl-targets=nvptx64-nvidia-cuda)
     elseif(ENABLE_ROCBLAS_BACKEND OR ENABLE_ROCRAND_BACKEND
-                OR ENABLE_ROCSOLVER_BACKEND)
+                OR ENABLE_ROCSOLVER_BACKEND OR ENABLE_ROCSPARSE_BACKEND)
       list(APPEND UNIX_INTERFACE_COMPILE_OPTIONS
         -fsycl-targets=amdgcn-amd-amdhsa -fsycl-unnamed-lambda 
 	-Xsycl-target-backend --offload-arch=${HIP_TARGETS})
@@ -52,7 +52,7 @@ if(is_dpcpp)
 	--offload-arch=${HIP_TARGETS})
     endif()
     if(ENABLE_CURAND_BACKEND OR ENABLE_CUSOLVER_BACKEND OR ENABLE_CUSPARSE_BACKEND OR ENABLE_ROCBLAS_BACKEND
-	    OR ENABLE_ROCRAND_BACKEND OR ENABLE_ROCSOLVER_BACKEND)
+	    OR ENABLE_ROCRAND_BACKEND OR ENABLE_ROCSOLVER_BACKEND OR ENABLE_ROCSPARSE_BACKEND)
       set_target_properties(ONEMATH::SYCL::SYCL PROPERTIES
         INTERFACE_COMPILE_OPTIONS "${UNIX_INTERFACE_COMPILE_OPTIONS}"
         INTERFACE_LINK_OPTIONS "${UNIX_INTERFACE_LINK_OPTIONS}"
@@ -69,7 +69,7 @@ if(is_dpcpp)
       INTERFACE_LINK_LIBRARIES ${SYCL_LIBRARY})
   endif()
 
-  if(ENABLE_ROCBLAS_BACKEND OR ENABLE_ROCRAND_BACKEND OR ENABLE_ROCSOLVER_BACKEND)
+  if(ENABLE_ROCBLAS_BACKEND OR ENABLE_ROCRAND_BACKEND OR ENABLE_ROCSOLVER_BACKEND OR ENABLE_ROCSPARSE_BACKEND)
     # Allow find_package(HIP) to find the correct path to libclang_rt.builtins.a
     # HIP's CMake uses the command `${HIP_CXX_COMPILER} -print-libgcc-file-name --rtlib=compiler-rt` to find this path.
     # This can print a non-existing file if the compiler used is icpx.
