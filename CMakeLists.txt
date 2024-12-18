@@ -75,6 +75,11 @@ option(BUILD_EXAMPLES "" ON)
 ## Documentation
 option(BUILD_DOC "" OFF)
 
+if(DEFINED ENABLE_PORTBLAS_BACKEND)
+  message(WARNING "PORTBLAS_BACKEND is deprecated, please use ENABLE_GENERIC_BLAS_BACKEND.")
+  set(ENABLE_GENERIC_BLAS_BACKEND ${ENABLE_PORTBLAS_BACKEND})
+endif()
+
 ## Supported domains
 set(DOMAINS_LIST "")
 if(ENABLE_MKLCPU_BACKEND

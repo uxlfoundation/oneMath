@@ -24,6 +24,10 @@ if(NOT DEFINED GENERIC_BLAS_TUNING_TARGET)
   option(GENERIC_BLAS_TUNING_TARGET "Set a TUNING_TARGET for generic backend" "")
 endif()
 
+if(DEFINED PORTBLAS_TUNING_TARGET)
+  message(WARNING "PORTBLAS_TUNING_TARGET is deprecated, please use GENERIC_BLAS_TUNING_TARGET.")
+  set(GENERIC_BLAS_TUNING_TARGET ${PORTBLAS_TUNING_TARGET})
+endif()
 # Parse compiler flags and return a list of SYCL targets
 # The list is empty if no targets are set
 function(get_sycl_targets FLAGS)
