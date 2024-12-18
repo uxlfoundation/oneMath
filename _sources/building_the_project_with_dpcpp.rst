@@ -121,6 +121,9 @@ The most important supported build options are:
    * - ENABLE_ROCRAND_BACKEND
      - True, False
      - False     
+   * - ENABLE_ROCSPARSE_BACKEND
+     - True, False
+     - False     
    * - ENABLE_MKLCPU_THREAD_TBB
      - True, False
      - True      
@@ -197,14 +200,14 @@ Building for ROCm
 ^^^^^^^^^^^^^^^^^
 
 The ROCm backends can be enabled with ``ENABLE_ROCBLAS_BACKEND``,
-``ENABLE_ROCFFT_BACKEND``, ``ENABLE_ROCSOLVER_BACKEND`` and
-``ENABLE_ROCRAND_BACKEND``.
+``ENABLE_ROCFFT_BACKEND``, ``ENABLE_ROCSOLVER_BACKEND``,
+``ENABLE_ROCRAND_BACKEND``, and ``ENABLE_ROCSPARSE_BACKEND``.
 
-For *RocBLAS*, *RocSOLVER* and *RocRAND*, the target device architecture must be
-set. This can be set with using the ``HIP_TARGETS`` parameter. For example, to
-enable a build for MI200 series GPUs, ``-DHIP_TARGETS=gfx90a`` should be set.
-Currently, DPC++ can only build for a single HIP target at a time. This may
-change in future versions.
+For *RocBLAS*, *RocSOLVER*, *RocRAND*, and *RocSPARSE*, the target device
+architecture must be set. This can be set with using the ``HIP_TARGETS``
+parameter. For example, to enable a build for MI200 series GPUs,
+``-DHIP_TARGETS=gfx90a`` should be set. Currently, DPC++ can only build for a
+single HIP target at a time. This may change in future versions.
 
 A few often-used architectures are listed below:
 
@@ -393,7 +396,8 @@ disabled:
       -DENABLE_MKLGPU_BACKEND=False \
       -DENABLE_ROCFFT_BACKEND=True  \
       -DENABLE_ROCBLAS_BACKEND=True \
-      -DENABLE_ROCSOLVER_BACKEND=True \
+      -DENABLE_ROCSOLVER_BACKEND=True \ 
+      -DENABLE_ROCSPARSE_BACKEND=True \ 
       -DHIP_TARGETS=gfx90a \
       -DBUILD_FUNCTIONAL_TESTS=False
 

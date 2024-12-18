@@ -510,27 +510,31 @@ additional external libraries for the BLAS and LAPACK domains. See the section
 <td><p>True, False</p></td>
 <td><p>False</p></td>
 </tr>
-<tr class="row-even"><td><p>ENABLE_MKLCPU_THREAD_TBB</p></td>
-<td><p>True, False</p></td>
-<td><p>True</p></td>
-</tr>
-<tr class="row-odd"><td><p>ENABLE_PORTBLAS_BACKEND</p></td>
+<tr class="row-even"><td><p>ENABLE_ROCSPARSE_BACKEND</p></td>
 <td><p>True, False</p></td>
 <td><p>False</p></td>
 </tr>
-<tr class="row-even"><td><p>ENABLE_PORTFFT_BACKEND</p></td>
+<tr class="row-odd"><td><p>ENABLE_MKLCPU_THREAD_TBB</p></td>
+<td><p>True, False</p></td>
+<td><p>True</p></td>
+</tr>
+<tr class="row-even"><td><p>ENABLE_PORTBLAS_BACKEND</p></td>
 <td><p>True, False</p></td>
 <td><p>False</p></td>
 </tr>
-<tr class="row-odd"><td><p>BUILD_FUNCTIONAL_TESTS</p></td>
+<tr class="row-odd"><td><p>ENABLE_PORTFFT_BACKEND</p></td>
+<td><p>True, False</p></td>
+<td><p>False</p></td>
+</tr>
+<tr class="row-even"><td><p>BUILD_FUNCTIONAL_TESTS</p></td>
 <td><p>True, False</p></td>
 <td><p>True</p></td>
 </tr>
-<tr class="row-even"><td><p>BUILD_EXAMPLES</p></td>
+<tr class="row-odd"><td><p>BUILD_EXAMPLES</p></td>
 <td><p>True, False</p></td>
 <td><p>True</p></td>
 </tr>
-<tr class="row-odd"><td><p>TARGET_DOMAINS (list)</p></td>
+<tr class="row-even"><td><p>TARGET_DOMAINS (list)</p></td>
 <td><p>blas, lapack, rng, dft, sparse_blas</p></td>
 <td><p>All domains</p></td>
 </tr>
@@ -576,13 +580,13 @@ the CUDA libraries should be found automatically by CMake.</p>
 <section id="building-for-rocm">
 <span id="build-for-rocm-dpcpp"></span><h3>Building for ROCm<a class="headerlink" href="#building-for-rocm" title="Link to this heading">#</a></h3>
 <p>The ROCm backends can be enabled with <code class="docutils literal notranslate"><span class="pre">ENABLE_ROCBLAS_BACKEND</span></code>,
-<code class="docutils literal notranslate"><span class="pre">ENABLE_ROCFFT_BACKEND</span></code>, <code class="docutils literal notranslate"><span class="pre">ENABLE_ROCSOLVER_BACKEND</span></code> and
-<code class="docutils literal notranslate"><span class="pre">ENABLE_ROCRAND_BACKEND</span></code>.</p>
-<p>For <em>RocBLAS</em>, <em>RocSOLVER</em> and <em>RocRAND</em>, the target device architecture must be
-set. This can be set with using the <code class="docutils literal notranslate"><span class="pre">HIP_TARGETS</span></code> parameter. For example, to
-enable a build for MI200 series GPUs, <code class="docutils literal notranslate"><span class="pre">-DHIP_TARGETS=gfx90a</span></code> should be set.
-Currently, DPC++ can only build for a single HIP target at a time. This may
-change in future versions.</p>
+<code class="docutils literal notranslate"><span class="pre">ENABLE_ROCFFT_BACKEND</span></code>, <code class="docutils literal notranslate"><span class="pre">ENABLE_ROCSOLVER_BACKEND</span></code>,
+<code class="docutils literal notranslate"><span class="pre">ENABLE_ROCRAND_BACKEND</span></code>, and <code class="docutils literal notranslate"><span class="pre">ENABLE_ROCSPARSE_BACKEND</span></code>.</p>
+<p>For <em>RocBLAS</em>, <em>RocSOLVER</em>, <em>RocRAND</em>, and <em>RocSPARSE</em>, the target device
+architecture must be set. This can be set with using the <code class="docutils literal notranslate"><span class="pre">HIP_TARGETS</span></code>
+parameter. For example, to enable a build for MI200 series GPUs,
+<code class="docutils literal notranslate"><span class="pre">-DHIP_TARGETS=gfx90a</span></code> should be set. Currently, DPC++ can only build for a
+single HIP target at a time. This may change in future versions.</p>
 <p>A few often-used architectures are listed below:</p>
 <table class="table">
 <thead>
@@ -753,6 +757,7 @@ disabled:</p>
 <span class="w">    </span>-DENABLE_ROCFFT_BACKEND<span class="o">=</span>True<span class="w">  </span><span class="se">\</span>
 <span class="w">    </span>-DENABLE_ROCBLAS_BACKEND<span class="o">=</span>True<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>-DENABLE_ROCSOLVER_BACKEND<span class="o">=</span>True<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-DENABLE_ROCSPARSE_BACKEND<span class="o">=</span>True<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>-DHIP_TARGETS<span class="o">=</span>gfx90a<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>-DBUILD_FUNCTIONAL_TESTS<span class="o">=</span>False
 </pre></div>
