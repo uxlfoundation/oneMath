@@ -34,9 +34,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
-        - config: portBLAS
+        - config: generic SYCL BLAS
           domain: blas
-          build_options: -DREF_BLAS_ROOT=${PWD}/lapack/install -DENABLE_PORTBLAS_BACKEND=ON -DENABLE_MKLCPU_BACKEND=OFF -DPORTBLAS_TUNING_TARGET=INTEL_CPU
+          build_options: -DREF_BLAS_ROOT=${PWD}/lapack/install -DENABLE_GENERIC_BLAS_BACKEND=ON -DENABLE_MKLCPU_BACKEND=OFF -DGENERIC_BLAS_TUNING_TARGET=INTEL_CPU
         - config: portFFT
           domain: dft
           build_options: -DENABLE_PORTFFT_BACKEND=ON -DENABLE_MKLCPU_BACKEND=OFF
