@@ -373,8 +373,8 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#building-for-cuda">Building for CUDA</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#building-for-rocm">Building for ROCm</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#building-for-other-sycl-devices">Building for other SYCL devices</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pure-sycl-backends-portblas-and-portfft">Pure SYCL backends: portBLAS and portFFT</a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#building-for-portblas">Building for portBLAS</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pure-sycl-backends-generic-blas-and-portfft">Pure SYCL backends: generic BLAS and portFFT</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#building-for-onemath-generic-sycl-blas">Building for oneMath generic SYCL BLAS</a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#building-for-portfft">Building for portFFT</a></li>
 </ul>
 </li>
@@ -439,8 +439,8 @@ or <code class="docutils literal notranslate"><span class="pre">clang++</span></
 <p>Backends should be enabled by setting <code class="docutils literal notranslate"><span class="pre">-DENABLE_&lt;BACKEND_NAME&gt;_BACKEND=True</span></code>
 for each desired backend. By default, only the <code class="docutils literal notranslate"><span class="pre">MKLGPU</span></code> and <code class="docutils literal notranslate"><span class="pre">MKLCPU</span></code>
 backends are enabled. Multiple backends for multiple device vendors can be
-enabled at once (albeit with limitations when using portBLAS and portFFT). The
-supported backends for the compilers are given in the table at <a class="reference external" href="https://github.com/uxlfoundation/oneMath?tab=readme-ov-file#supported-configurations">oneMath
+enabled at once (albeit with limitations when using oneMath generic SYCL BLAS and portFFT).
+The supported backends for the compilers are given in the table at <a class="reference external" href="https://github.com/uxlfoundation/oneMath?tab=readme-ov-file#supported-configurations">oneMath
 supported configurations table</a>,
 and the CMake option names are given in the table below. Some backends may
 require additional parameters to be set. See the relevant section below for
@@ -518,7 +518,7 @@ additional external libraries for the BLAS and LAPACK domains. See the section
 <td><p>True, False</p></td>
 <td><p>True</p></td>
 </tr>
-<tr class="row-even"><td><p>ENABLE_PORTBLAS_BACKEND</p></td>
+<tr class="row-even"><td><p>ENABLE_GENERIC_BLAS_BACKEND</p></td>
 <td><p>True, False</p></td>
 <td><p>False</p></td>
 </tr>
@@ -625,43 +625,44 @@ single HIP target at a time. This may change in future versions.</p>
 <p>SYCL enables portable heterogeneous computing on a wide range of accelerators.
 Consequently, it is possible to use oneMath with accelerators not anticipated by
 the project.</p>
-<p>For generic SYCL devices, only portBLAS and portFFT backend are enabled.
+<p>For generic SYCL devices, only generic BLAS and portFFT backend are enabled.
 The user must set the appropriate <code class="docutils literal notranslate"><span class="pre">-fsycl-targets</span></code> for their device, and also
-any other option required for performance. See <a class="reference internal" href="#building-for-portblas">Building for portBLAS</a> and
+any other option required for performance. See <a class="reference internal" href="#building-for-onemath-generic-sycl-blas">Building for oneMath generic SYCL BLAS</a> and
 <a class="reference internal" href="#building-for-portfft">Building for portFFT</a>. Extensive testing is strongly advised for these
 unsupported configurations.</p>
 </section>
-<section id="pure-sycl-backends-portblas-and-portfft">
-<span id="build-for-portlibs-dpcpp"></span><h3>Pure SYCL backends: portBLAS and portFFT<a class="headerlink" href="#pure-sycl-backends-portblas-and-portfft" title="Link to this heading">#</a></h3>
-<p><a class="reference external" href="https://github.com/codeplaysoftware/portBLAS">portBLAS</a> and <a class="reference external" href="https://github.com/codeplaysoftware/portFFT">portFFT</a> are experimental pure-SYCL
+<section id="pure-sycl-backends-generic-blas-and-portfft">
+<span id="build-for-portlibs-dpcpp"></span><h3>Pure SYCL backends: generic BLAS and portFFT<a class="headerlink" href="#pure-sycl-backends-generic-blas-and-portfft" title="Link to this heading">#</a></h3>
+<p><a class="reference external" href="https://github.com/uxlfoundation/generic-sycl-components/tree/main/onemath/sycl/blas">Generic SYCL BLAS</a>
+and <a class="reference external" href="https://github.com/codeplaysoftware/portFFT">portFFT</a> are experimental pure-SYCL
 backends that work on all SYCL targets supported by the DPC++ compiler. Since
 they support multiple targets, they cannot be enabled with other backends in the
 same domain, or the <code class="docutils literal notranslate"><span class="pre">MKLCPU</span></code> or <code class="docutils literal notranslate"><span class="pre">MKLGPU</span></code> backends. Both libraries are
 experimental and currently only support a subset of operations and features.</p>
 <p>For best performance, both libraries must be tuned. See the individual sections
 for more details.</p>
-<p>Both portBLAS and portFFT are used as header-only libraries, and will be
+<p>Both generic SYCL BLAS and portFFT are used as header-only libraries, and will be
 downloaded automatically if not found.</p>
-<section id="building-for-portblas">
-<span id="build-for-portblas-dpcpp"></span><h4>Building for portBLAS<a class="headerlink" href="#building-for-portblas" title="Link to this heading">#</a></h4>
-<p><a class="reference external" href="https://github.com/codeplaysoftware/portBLAS">portBLAS</a> is
-enabled by setting <code class="docutils literal notranslate"><span class="pre">-DENABLE_PORTBLAS_BACKEND=True</span></code>.</p>
-<p>By default, the portBLAS backend is not tuned for any specific device.
+<section id="building-for-onemath-generic-sycl-blas">
+<span id="build-for-generic-blas-dpcpp"></span><h4>Building for oneMath generic SYCL BLAS<a class="headerlink" href="#building-for-onemath-generic-sycl-blas" title="Link to this heading">#</a></h4>
+<p><a class="reference external" href="https://github.com/uxlfoundation/generic-sycl-components/tree/main/onemath/sycl/blas">onemath generic SYCL BLAS</a>
+is enabled by setting <code class="docutils literal notranslate"><span class="pre">-DENABLE_GENERIC_BLAS_BACKEND=True</span></code>.</p>
+<p>By default, the generic BLAS backend is not tuned for any specific device.
 This tuning is required to achieve best performance.
-portBLAS can be tuned for a specific hardware target by adding compiler
+The generic SYCL BLAS backend can be tuned for a specific hardware target by adding compiler
 definitions in 2 ways:</p>
 <ol class="arabic simple">
-<li><p>Manually specify a tuning target with <code class="docutils literal notranslate"><span class="pre">-DPORTBLAS_TUNING_TARGET=&lt;target&gt;</span></code>.
-The list of portBLAS targets can be found
-<a class="reference external" href="https://github.com/codeplaysoftware/portBLAS#cmake-options">here</a>.
+<li><p>Manually specify a tuning target with <code class="docutils literal notranslate"><span class="pre">-DGENERIC_BLAS_TUNING_TARGET=&lt;target&gt;</span></code>.
+The list of oneMath SYCL BLAS targets can be found
+<a class="reference external" href="https://github.com/uxlfoundation/generic-sycl-components/tree/main/onemath/sycl/blas#cmake-options">here</a>.
 This will automatically set <code class="docutils literal notranslate"><span class="pre">-fsycl-targets</span></code> if needed.</p></li>
 <li><p>If one target is set via <code class="docutils literal notranslate"><span class="pre">-fsycl-targets</span></code> the configuration step will
-try to automatically detect the portBLAS tuning target. One can manually
+try to automatically detect the oneMath SYCL BLAS tuning target. One can manually
 specify <code class="docutils literal notranslate"><span class="pre">-fsycl-targets</span></code> via <code class="docutils literal notranslate"><span class="pre">CMAKE_CXX_FLAGS</span></code>. See
 <a class="reference external" href="https://intel.github.io/llvm-docs/UsersManual.html">DPC++ User Manual</a>
 for more information on <code class="docutils literal notranslate"><span class="pre">-fsycl-targets</span></code>.</p></li>
 </ol>
-<p>portBLAS relies heavily on JIT compilation. This may cause time-outs on some
+<p>OneMath SYCL BLAS relies heavily on JIT compilation. This may cause time-outs on some
 systems. To avoid this issue, use ahead-of-time compilation through tuning
 targets or <code class="docutils literal notranslate"><span class="pre">sycl-targets</span></code>.</p>
 </section>
@@ -792,12 +793,11 @@ functional testing was not disabled, tests would be built.</p>
 <span class="w">    </span>-DCMAKE_C_COMPILER<span class="o">=</span>clang<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>-DENABLE_MKLCPU_BACKEND<span class="o">=</span>False<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>-DENABLE_MKLGPU_BACKEND<span class="o">=</span>False<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>-DENABLE_PORTBLAS_BACKEND<span class="o">=</span>True
+<span class="w">    </span>-DENABLE_GENERIC_BLAS_BACKEND<span class="o">=</span>True
 </pre></div>
 </div>
 <p>Note that this is not a tested configuration. This builds oneMath with the
-portBLAS backend only, for a generic SYCL device supported by the Open DPC++
-project.</p>
+generic SYCL BLAS backend only, for a generic SYCL device.</p>
 <p>Build oneMath for the DFT domain on a generic SYCL device:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake<span class="w"> </span><span class="nv">$ONEMATH_DIR</span><span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>-DCMAKE_CXX_COMPILER<span class="o">=</span>clang++<span class="w"> </span><span class="se">\</span>
@@ -812,7 +812,7 @@ portFFT backend only, for a generic SYCL device supported by the Open DPC++
 project.</p>
 </section>
 <section id="project-cleanup">
-<span id="id6"></span><h2>Project Cleanup<a class="headerlink" href="#project-cleanup" title="Link to this heading">#</a></h2>
+<span id="id5"></span><h2>Project Cleanup<a class="headerlink" href="#project-cleanup" title="Link to this heading">#</a></h2>
 <p>Most use-cases involve building the project without the need to clean up the
 build directory. However, if you wish to clean up the build directory, you can
 delete the <code class="docutils literal notranslate"><span class="pre">build</span></code> folder and create a new one. If you wish to clean up the
@@ -925,8 +925,8 @@ setting <code class="docutils literal notranslate"><span class="pre">-DBUILD_FUN
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#building-for-cuda">Building for CUDA</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#building-for-rocm">Building for ROCm</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#building-for-other-sycl-devices">Building for other SYCL devices</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pure-sycl-backends-portblas-and-portfft">Pure SYCL backends: portBLAS and portFFT</a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#building-for-portblas">Building for portBLAS</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pure-sycl-backends-generic-blas-and-portfft">Pure SYCL backends: generic BLAS and portFFT</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#building-for-onemath-generic-sycl-blas">Building for oneMath generic SYCL BLAS</a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#building-for-portfft">Building for portFFT</a></li>
 </ul>
 </li>

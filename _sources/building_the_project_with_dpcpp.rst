@@ -59,8 +59,8 @@ or ``clang++`` and ``clang`` respectively when using the Open DPC++ Compiler.
 Backends should be enabled by setting ``-DENABLE_<BACKEND_NAME>_BACKEND=True``
 for each desired backend. By default, only the ``MKLGPU`` and ``MKLCPU``
 backends are enabled. Multiple backends for multiple device vendors can be
-enabled at once (albeit with limitations when using portBLAS and portFFT). The
-supported backends for the compilers are given in the table at `oneMath
+enabled at once (albeit with limitations when using oneMath generic SYCL BLAS and portFFT).
+The supported backends for the compilers are given in the table at `oneMath
 supported configurations table
 <https://github.com/uxlfoundation/oneMath?tab=readme-ov-file#supported-configurations>`_,
 and the CMake option names are given in the table below. Some backends may
@@ -127,7 +127,7 @@ The most important supported build options are:
    * - ENABLE_MKLCPU_THREAD_TBB
      - True, False
      - True      
-   * - ENABLE_PORTBLAS_BACKEND
+   * - ENABLE_GENERIC_BLAS_BACKEND
      - True, False
      - False      
    * - ENABLE_PORTFFT_BACKEND
@@ -239,19 +239,19 @@ SYCL enables portable heterogeneous computing on a wide range of accelerators.
 Consequently, it is possible to use oneMath with accelerators not anticipated by
 the project.
 
-For generic SYCL devices, only portBLAS and portFFT backend are enabled.
+For generic SYCL devices, only generic BLAS and portFFT backend are enabled.
 The user must set the appropriate ``-fsycl-targets`` for their device, and also
-any other option required for performance. See `Building for portBLAS`_ and
+any other option required for performance. See `Building for oneMath generic SYCL BLAS`_ and
 `Building for portFFT`_. Extensive testing is strongly advised for these
 unsupported configurations.
 
 .. _build_for_portlibs_dpcpp:
 
-Pure SYCL backends: portBLAS and portFFT
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Pure SYCL backends: generic BLAS and portFFT
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-`portBLAS <https://github.com/codeplaysoftware/portBLAS>`_ and `portFFT
-<https://github.com/codeplaysoftware/portFFT>`_ are experimental pure-SYCL
+`Generic SYCL BLAS <https://github.com/uxlfoundation/generic-sycl-components/tree/main/onemath/sycl/blas>`_
+and `portFFT <https://github.com/codeplaysoftware/portFFT>`_ are experimental pure-SYCL
 backends that work on all SYCL targets supported by the DPC++ compiler. Since
 they support multiple targets, they cannot be enabled with other backends in the
 same domain, or the ``MKLCPU`` or ``MKLGPU`` backends. Both libraries are
@@ -260,35 +260,35 @@ experimental and currently only support a subset of operations and features.
 For best performance, both libraries must be tuned. See the individual sections
 for more details.
 
-Both portBLAS and portFFT are used as header-only libraries, and will be
+Both generic SYCL BLAS and portFFT are used as header-only libraries, and will be
 downloaded automatically if not found.
 
-.. _build_for_portblas_dpcpp:
+.. _build_for_generic_blas_dpcpp:
 
-Building for portBLAS
----------------------
+Building for oneMath generic SYCL BLAS
+--------------------------------------
 
-`portBLAS <https://github.com/codeplaysoftware/portBLAS>`_ is
-enabled by setting ``-DENABLE_PORTBLAS_BACKEND=True``.
+`onemath generic SYCL BLAS <https://github.com/uxlfoundation/generic-sycl-components/tree/main/onemath/sycl/blas>`_
+is enabled by setting ``-DENABLE_GENERIC_BLAS_BACKEND=True``.
 
-By default, the portBLAS backend is not tuned for any specific device.
+By default, the generic BLAS backend is not tuned for any specific device.
 This tuning is required to achieve best performance.
-portBLAS can be tuned for a specific hardware target by adding compiler
+The generic SYCL BLAS backend can be tuned for a specific hardware target by adding compiler
 definitions in 2 ways:
 
 #.
-  Manually specify a tuning target with ``-DPORTBLAS_TUNING_TARGET=<target>``.
-  The list of portBLAS targets can be found
-  `here <https://github.com/codeplaysoftware/portBLAS#cmake-options>`_.
+  Manually specify a tuning target with ``-DGENERIC_BLAS_TUNING_TARGET=<target>``.
+  The list of oneMath SYCL BLAS targets can be found
+  `here <https://github.com/uxlfoundation/generic-sycl-components/tree/main/onemath/sycl/blas#cmake-options>`_.
   This will automatically set ``-fsycl-targets`` if needed.
 #.
   If one target is set via ``-fsycl-targets`` the configuration step will
-  try to automatically detect the portBLAS tuning target. One can manually
+  try to automatically detect the oneMath SYCL BLAS tuning target. One can manually
   specify ``-fsycl-targets`` via ``CMAKE_CXX_FLAGS``. See
   `DPC++ User Manual <https://intel.github.io/llvm-docs/UsersManual.html>`_
   for more information on ``-fsycl-targets``.
 
-portBLAS relies heavily on JIT compilation. This may cause time-outs on some
+OneMath SYCL BLAS relies heavily on JIT compilation. This may cause time-outs on some
 systems. To avoid this issue, use ahead-of-time compilation through tuning
 targets or ``sycl-targets``.
 
@@ -439,11 +439,10 @@ Build oneMath for the BLAS domain on a generic SYCL device:
       -DCMAKE_C_COMPILER=clang \ 
       -DENABLE_MKLCPU_BACKEND=False \ 
       -DENABLE_MKLGPU_BACKEND=False \
-      -DENABLE_PORTBLAS_BACKEND=True
+      -DENABLE_GENERIC_BLAS_BACKEND=True
 
 Note that this is not a tested configuration. This builds oneMath with the
-portBLAS backend only, for a generic SYCL device supported by the Open DPC++
-project.
+generic SYCL BLAS backend only, for a generic SYCL device.
 
 Build oneMath for the DFT domain on a generic SYCL device:
 
