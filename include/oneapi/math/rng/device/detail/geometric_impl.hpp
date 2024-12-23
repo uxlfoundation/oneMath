@@ -64,7 +64,7 @@ protected:
                                                      std::is_same_v<IntType, std::int64_t>,
                                                  double, float>::type;
 
-        auto uni_res = engine.generate(FpType(0.0), FpType(1.0));
+        FpType uni_res = engine.generate(FpType(0.0), FpType(1.0));
         FpType inv_ln = ln_wrapper(FpType(1.0) - p_);
         inv_ln = FpType(1.0) / inv_ln;
         if constexpr (EngineType::vec_size == 1) {
@@ -72,8 +72,9 @@ protected:
         }
         else {
             sycl::vec<IntType, EngineType::vec_size> vec_out;
-            for (int i = 0; i < EngineType::vec_size; i++)
+            for (int i = 0; i < EngineType::vec_size; i++) {
                 vec_out[i] = static_cast<IntType>(sycl::floor(ln_wrapper(uni_res[i]) * inv_ln));
+            }
             return vec_out;
         }
     }
@@ -84,8 +85,8 @@ protected:
                                                      std::is_same_v<IntType, std::int64_t>,
                                                  double, float>::type;
 
-        auto uni_res = engine.generate_single(FpType(0.0), FpType(1.0));
-        float inv_ln = ln_wrapper(FpType(1.0) - p_);
+        FpType uni_res = engine.generate_single(FpType(0.0), FpType(1.0));
+        FpType inv_ln = ln_wrapper(FpType(1.0) - p_);
         inv_ln = FpType(1.0) / inv_ln;
         return static_cast<IntType>(sycl::floor(ln_wrapper(uni_res) * inv_ln));
     }
