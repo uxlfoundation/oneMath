@@ -64,7 +64,7 @@ protected:
                                                      std::is_same_v<IntType, std::int64_t>,
                                                  double, float>::type;
 
-        FpType uni_res = engine.generate(FpType(0.0), FpType(1.0));
+        auto uni_res = engine.generate(FpType(0.0), FpType(1.0));
         FpType inv_ln = ln_wrapper(FpType(1.0) - p_);
         inv_ln = FpType(1.0) / inv_ln;
         if constexpr (EngineType::vec_size == 1) {
