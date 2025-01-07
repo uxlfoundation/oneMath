@@ -31,6 +31,6 @@
 #include "oneapi/math/rng.hpp"
 #include "oneapi/math/sparse_blas.hpp"
 
-#include "namespace_alias.hpp"
+#include "mkl/namespace_alias.hpp"
 
 #endif // ONEMATH_MKL_HPP
