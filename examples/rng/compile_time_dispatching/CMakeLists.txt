@@ -17,34 +17,31 @@
 # SPDX-License-Identifier: Apache-2.0
 #===============================================================================
 
-#Build object from all sources
-set(RNG_CT_SOURCES "")
-if(ENABLE_MKLCPU_BACKEND AND ENABLE_CURAND_BACKEND)
-  list(APPEND RNG_CT_SOURCES "uniform_usm_mklcpu_curand")
+# The example is written for the MKLCPU and CURAND backends
+if(NOT (ENABLE_MKLCPU_BACKEND AND ENABLE_CURAND_BACKEND))
+  return()
 endif()
 
-foreach(rng_ct_source ${RNG_CT_SOURCES})
-  add_executable(example_${domain}_${rng_ct_source} ${rng_ct_source}.cpp)
-  target_include_directories(example_${domain}_${rng_ct_source}
-      PUBLIC ${PROJECT_SOURCE_DIR}/examples/include
-      PUBLIC ${PROJECT_SOURCE_DIR}/include
-      PUBLIC ${CMAKE_BINARY_DIR}/bin
-  )
+set(EXAMPLE_TARGET example_rng_uniform_usm_mklcpu_curand)
 
-  if(domain STREQUAL "rng" AND ENABLE_MKLCPU_BACKEND AND ENABLE_CURAND_BACKEND)
-    add_dependencies(example_${domain}_${rng_ct_source}
-        onemath_${domain}_mklcpu
-        onemath_${domain}_curand)
-    list(APPEND ONEMATH_LIBRARIES_${domain}
-        onemath_${domain}_mklcpu
-        onemath_${domain}_curand)
-  endif()
+# External applications should use find_package or FetchContent to include oneMath first.
+# See https://github.com/uxlfoundation/oneMath/blob/develop/docs/using_onemath_with_cmake.rst
 
-  target_link_libraries(example_${domain}_${rng_ct_source} PUBLIC
-      ${ONEMATH_LIBRARIES_${domain}}
-      ONEMATH::SYCL::SYCL
-  )
+# Create a CMake target with one source file
+add_executable(${EXAMPLE_TARGET} uniform_usm_mklcpu_curand.cpp)
 
-  # Register example as ctest
-  add_test(NAME ${domain}/EXAMPLE/CT/${rng_ct_source} COMMAND example_${domain}_${rng_ct_source})
-endforeach(rng_ct_source)
+# Linking against onemath_rng_mklcpu and onemath_rng_curand in CMake will add the required include directories and dependencies.
+# One can also link against `onemath_rng` to link against all the rng backends built.
+# These targets should only be used for compile-time dispatching.
+target_link_libraries(${EXAMPLE_TARGET} PUBLIC
+  onemath_rng_mklcpu
+  onemath_rng_curand
+)
+
+# Include directories specific to the examples
+target_include_directories(${EXAMPLE_TARGET} PUBLIC
+  ${PROJECT_SOURCE_DIR}/examples/include
+)
+
+# Register example as ctest
+add_test(NAME rng/EXAMPLE/CT/uniform_usm_mklcpu_curand COMMAND ${EXAMPLE_TARGET})

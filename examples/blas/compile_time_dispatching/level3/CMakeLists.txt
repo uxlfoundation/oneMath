@@ -17,31 +17,31 @@
 # SPDX-License-Identifier: Apache-2.0
 #===============================================================================
 
-#Build object from all sources
-set(BLAS_CT_SOURCES "")
-if(ENABLE_MKLCPU_BACKEND AND ENABLE_CUBLAS_BACKEND)
-  list(APPEND BLAS_CT_SOURCES "gemm_usm_mklcpu_cublas")
+# The example is written for the MKLCPU and CUBLAS backends
+if(NOT (ENABLE_MKLCPU_BACKEND AND ENABLE_CUBLAS_BACKEND))
+  return()
 endif()
 
-foreach(blas_ct_source ${BLAS_CT_SOURCES})
-  add_executable(example_${domain}_${blas_ct_source} ${blas_ct_source}.cpp)
-  target_include_directories(example_${domain}_${blas_ct_source}
-      PUBLIC ${PROJECT_SOURCE_DIR}/examples/include
-      PUBLIC ${PROJECT_SOURCE_DIR}/include
-      PUBLIC ${CMAKE_BINARY_DIR}/bin
-  )
+set(EXAMPLE_TARGET example_blas_gemm_usm_mklcpu_cublas)
 
-  if(domain STREQUAL "blas" AND ENABLE_MKLCPU_BACKEND AND ENABLE_CUBLAS_BACKEND)
-    add_dependencies(example_${domain}_${blas_ct_source} onemath_${domain}_mklcpu onemath_${domain}_cublas)
-    list(APPEND ONEMATH_LIBRARIES_${domain} onemath_${domain}_mklcpu onemath_${domain}_cublas)
-  endif()
+# External applications should use find_package or FetchContent to include oneMath first.
+# See https://github.com/uxlfoundation/oneMath/blob/develop/docs/using_onemath_with_cmake.rst
 
-  target_link_libraries(example_${domain}_${blas_ct_source} PUBLIC
-      ${ONEMATH_LIBRARIES_${domain}}
-      ONEMATH::SYCL::SYCL
-  )
+# Create a CMake target with one source file
+add_executable(${EXAMPLE_TARGET} gemm_usm_mklcpu_cublas.cpp)
 
-  # Register example as ctest
-  add_test(NAME ${domain}/EXAMPLE/CT/${blas_ct_source} COMMAND example_${domain}_${blas_ct_source})
+# Linking against onemath_blas_mklcpu and onemath_blas_cublas in CMake will add the required include directories and dependencies.
+# One can also link against `onemath_blas` to link against all the blas backends built.
+# These targets should only be used for compile-time dispatching.
+target_link_libraries(${EXAMPLE_TARGET} PUBLIC
+  onemath_blas_mklcpu
+  onemath_blas_cublas
+)
 
-endforeach(blas_ct_source)
+# Include directories specific to the examples
+target_include_directories(${EXAMPLE_TARGET} PUBLIC
+  ${PROJECT_SOURCE_DIR}/examples/include
+)
+
+# Register example as ctest
+add_test(NAME blas/EXAMPLE/CT/gemm_usm_mklcpu_cublas COMMAND ${EXAMPLE_TARGET})

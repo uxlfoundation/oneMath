@@ -136,7 +136,7 @@ if(BUILD_SHARED_LIBS)
   # Build dispatcher library
   set (ONEMATH_LIBS ${TARGET_DOMAINS})
   list(TRANSFORM ONEMATH_LIBS PREPEND onemath_)
-  target_link_libraries(onemath PUBLIC ${ONEMATH_LIBS})
+  target_link_libraries(onemath PUBLIC ${ONEMATH_LIBS} ${CMAKE_DL_LIBS})
   set_target_properties(onemath PROPERTIES
       INSTALL_RPATH "\$ORIGIN"
       BUILD_WITH_INSTALL_RPATH TRUE

@@ -19,9 +19,6 @@
 
 # NOTE: user needs to set env var ONEAPI_DEVICE_SELECTOR to use runtime example without specifying backend in CMake
 
-# Build object from all example sources
-set(LAPACK_RT_SOURCES "getrs_usm")
-
 # Set up for the right backend for run-time dispatching examples
 # If users build more than one backend (i.e. mklcpu and mklgpu, or mklcpu and CUDA), they may need to
 # overwrite ONEAPI_DEVICE_SELECTOR in their environment to run on the desired backend
@@ -41,32 +38,27 @@ endif()
 
 message(STATUS "ONEAPI_DEVICE_SELECTOR will be set to the following value(s): [${DEVICE_FILTERS}] for run-time dispatching examples")
 
-foreach(lapack_rt_source ${LAPACK_RT_SOURCES})
-  add_executable(example_${domain}_${lapack_rt_source} ${lapack_rt_source}.cpp)
-  target_include_directories(example_${domain}_${lapack_rt_source}
-      PUBLIC ${PROJECT_SOURCE_DIR}/examples/include
-      PUBLIC ${PROJECT_SOURCE_DIR}/include
-      PUBLIC ${CMAKE_BINARY_DIR}/bin
-  )
+set(EXAMPLE_TARGET example_lapack_getrs_usm)
 
-  add_dependencies(example_${domain}_${lapack_rt_source} onemath)
+# External applications should use find_package or FetchContent to include oneMath first.
+# See https://github.com/uxlfoundation/oneMath/blob/develop/docs/using_onemath_with_cmake.rst
 
-  if (USE_ADD_SYCL_TO_TARGET_INTEGRATION)
-    add_sycl_to_target(TARGET example_${domain}_${lapack_rt_source} SOURCES ${LAPACK_RT_SOURCES})
-  endif()
+# Create a CMake target with one source file
+add_executable(${EXAMPLE_TARGET} getrs_usm.cpp)
 
-  target_link_libraries(example_${domain}_${lapack_rt_source} PUBLIC
-      onemath
-      ONEMATH::SYCL::SYCL
-      ${CMAKE_DL_LIBS}
-  )
+# Linking against onemath in CMake will add the required include directories and dependencies.
+# This target should only be used for runtime dispatching.
+target_link_libraries(${EXAMPLE_TARGET} PUBLIC onemath)
 
-  foreach(device_filter ${DEVICE_FILTERS})
-    # Register example as ctest
-    add_test(NAME ${domain}/EXAMPLE/RT/${lapack_rt_source}/${device_filter} COMMAND example_${domain}_${lapack_rt_source})
-    set_property(TEST ${domain}/EXAMPLE/RT/${lapack_rt_source}/${device_filter} PROPERTY
-      ENVIRONMENT LD_LIBRARY_PATH=${CMAKE_BINARY_DIR}/lib:$ENV{LD_LIBRARY_PATH}
-      ENVIRONMENT ONEAPI_DEVICE_SELECTOR=${device_filter})
-  endforeach(device_filter)
+# Include directories specific to the examples
+target_include_directories(${EXAMPLE_TARGET} PUBLIC
+  ${PROJECT_SOURCE_DIR}/examples/include
+)
 
-endforeach(lapack_rt_source)
+# Register example as ctest
+foreach(device_filter ${DEVICE_FILTERS})
+  add_test(NAME lapack/EXAMPLE/RT/getrs_usm/${device_filter} COMMAND ${EXAMPLE_TARGET})
+  # Set ONEAPI_DEVICE_SELECTOR environment variable to select a device at runtime
+  set_property(TEST lapack/EXAMPLE/RT/getrs_usm/${device_filter} PROPERTY
+    ENVIRONMENT ONEAPI_DEVICE_SELECTOR=${device_filter})
+endforeach(device_filter)

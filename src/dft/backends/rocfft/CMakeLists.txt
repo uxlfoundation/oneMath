@@ -33,13 +33,9 @@ add_library(${LIB_OBJ} OBJECT
 add_dependencies(onemath_backend_libs_dft ${LIB_NAME})
 
 target_include_directories(${LIB_OBJ}
-  PUBLIC ${ONEMATH_INCLUDE_DIRS}
-)
-target_include_directories(${LIB_NAME}
-  PUBLIC ${ONEMATH_INCLUDE_DIRS}
-)
-target_include_directories(${LIB_OBJ}
-  PRIVATE ${PROJECT_SOURCE_DIR}/src
+  PUBLIC  ${ONEMATH_INCLUDE_DIRS}
+  PRIVATE ${PROJECT_SOURCE_DIR}/src/include
+          ${PROJECT_SOURCE_DIR}/src
           ${CMAKE_BINARY_DIR}/bin
           ${ONEMATH_GENERATED_INCLUDE_PATH}
 )
@@ -70,7 +66,8 @@ target_link_libraries(${LIB_OBJ} PUBLIC ONEMATH::SYCL::SYCL)
 set_target_properties(${LIB_OBJ} PROPERTIES
   POSITION_INDEPENDENT_CODE ON
 )
-target_link_libraries(${LIB_NAME} PUBLIC ${LIB_OBJ})
+target_link_libraries(${LIB_NAME} PRIVATE ${LIB_OBJ})
+target_include_directories(${LIB_NAME} PUBLIC ${ONEMATH_INCLUDE_DIRS})
 
 # Set oneMath libraries as not transitive for dynamic
 if(BUILD_SHARED_LIBS)
@@ -88,7 +85,6 @@ set_target_properties(${LIB_NAME} PROPERTIES
 list(APPEND CMAKE_BUILD_RPATH $<TARGET_FILE_DIR:${LIB_NAME}>)
 
 # Add the library to install package
-install(TARGETS ${LIB_OBJ} EXPORT oneMathTargets)
 install(TARGETS ${LIB_NAME} EXPORT oneMathTargets
   RUNTIME DESTINATION bin
   ARCHIVE DESTINATION lib
