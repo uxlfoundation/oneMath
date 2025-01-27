@@ -109,6 +109,12 @@ The most important supported build options are:
    * - ENABLE_NETLIB_BACKEND
      - True, False
      - False     
+   * - ENABLE_ARMPL_BACKEND
+     - True, False
+     - False
+   * - ENABLE_ARMPL_OMP
+     - True, False
+     - True
    * - ENABLE_ROCBLAS_BACKEND
      - True, False
      - False     
@@ -313,6 +319,20 @@ by the ``CMAKE_CXX_FLAGS``. If none are found, it will compile for
 specified. See `DPC++ User Manual
 <https://intel.github.io/llvm-docs/UsersManual.html>`_ for more information on
 ``-fsycl-targets``.
+
+.. _build_for_armpl_dpcpp:
+
+Building for Arm Performance Libraries
+--------------------------------------
+
+`Arm Performance Libraries <https://developer.arm.com/Tools%20and%20Software/Arm%20Performance%20Libraries>`_
+backend is enabled on aarch64 platform by setting ``-DENABLE_ARMPL_BACKEND=True``.
+
+By default, it will look for the ``ARMPLROOT`` environment variable. If another
+ArmPL is to be used, ``-DARMPL_ROOT=<armpl_install_prefix>`` can be used.
+
+Default behaviour is to used the OpenMP flavour of ArmPL libraries, this can be
+changed using the ``-DENABLE_ARMPL_OMP=True/False`` flag.
 
 .. _build_additional_options_dpcpp:
 

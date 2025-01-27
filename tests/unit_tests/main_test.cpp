@@ -92,7 +92,6 @@ void print_error_code(sycl::exception const& e) {
 int main(int argc, char** argv) {
     std::set<std::string> unique_devices;
     std::vector<sycl::device> local_devices;
-
     auto platforms = sycl::platform::get_platforms();
     for (auto plat : platforms) {
 #ifdef __HIPSYCL__
@@ -114,7 +113,8 @@ int main(int argc, char** argv) {
                         unique_devices.insert(dev.get_info<sycl::info::device::name>());
 #if !defined(ONEMATH_ENABLE_MKLCPU_BACKEND) &&                 \
     !defined(ONEMATH_ENABLE_GENERIC_BLAS_BACKEND_INTEL_CPU) && \
-    !defined(ONEMATH_ENABLE_PORTFFT_BACKEND) && !defined(ONEMATH_ENABLE_NETLIB_BACKEND)
+    !defined(ONEMATH_ENABLE_PORTFFT_BACKEND) && !defined(ONEMATH_ENABLE_NETLIB_BACKEND) &&\
+    !defined(ONEMATH_ENABLE_ARMPL_BACKEND)
                         if (dev.is_cpu())
                             continue;
 #endif
@@ -167,7 +167,6 @@ int main(int argc, char** argv) {
             }) == devices.end())
             devices.push_back(&local_dev);
     }
-
     // start Google Test pickup and output
     testing::InitGoogleTest(&argc, argv);
 

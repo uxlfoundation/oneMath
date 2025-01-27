@@ -40,7 +40,7 @@
 namespace oneapi {
 namespace math {
 
-enum class device : uint16_t { x86cpu, intelgpu, nvidiagpu, amdgpu, generic_device };
+enum class device : uint16_t { x86cpu, aarch64cpu, intelgpu, nvidiagpu, amdgpu, generic_device };
 enum class domain : uint16_t { blas, dft, lapack, rng, sparse_blas };
 
 static std::map<domain, std::map<device, std::vector<const char*>>> libraries = {
@@ -55,6 +55,15 @@ static std::map<domain, std::map<device, std::vector<const char*>>> libraries = 
 #endif
 #ifdef ONEMATH_ENABLE_GENERIC_BLAS_BACKEND_INTEL_CPU
               LIB_NAME("blas_generic"),
+#endif
+          } },
+        { device::aarch64cpu,
+          {
+#ifdef ONEMATH_ENABLE_ARMPL_BACKEND
+              LIB_NAME("blas_armpl"),
+#endif
+#ifdef ONEMATH_ENABLE_NETLIB_BACKEND
+              LIB_NAME("blas_netlib")
 #endif
           } },
         { device::intelgpu,

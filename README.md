@@ -45,8 +45,12 @@ oneMath is part of the [UXL Foundation](http://www.uxlfoundation.org).
             <td align="center">NVIDIA GPU</td>
         </tr>
         <tr>
-            <td align="center"><a href="https://ww.netlib.org"> NETLIB LAPACK</a> </td>
-            <td align="center">x86 CPU</td>
+            <td align="center"><a href="https://www.netlib.org"> NETLIB LAPACK</a> </td>
+            <td align="center">x86 and aarch64 CPU</td>
+        </tr>
+        <tr>
+            <td align="center"><a href="https://www.arm.com/products/development-tools/server-and-hpc/allinea-studio/performance-libraries">Arm Performance Libraries</a></td>
+            <td align="center">aarch64 CPU</td>
         </tr>
         <tr>
             <td align="center"><a href="https://rocblas.readthedocs.io/en/rocm-4.5.2/"> AMD rocBLAS</a></td>
@@ -180,7 +184,7 @@ Supported compilers include:
     </thead>
     <tbody>
         <tr>
-            <td rowspan=10 align="center">BLAS</td>
+            <td rowspan=11 align="center">BLAS</td>
             <td rowspan=3 align="center">x86 CPU</td>
             <td align="center">Intel(R) oneMKL</td>
             <td align="center">Intel DPC++</br>AdaptiveCpp</td>
@@ -194,6 +198,17 @@ Supported compilers include:
         <tr>
             <td align="center">generic SYCL BLAS</td>
             <td align="center">Intel DPC++</br>Open DPC++</td>
+            <td align="center">Dynamic, Static</td>
+        </tr>
+        <tr>
+            <td rowspan=2 align="center">aarch64 CPU</td>
+            <td align="center">Arm Performance Libraries</td>
+            <td align="center">Intel DPC++</br>AdaptiveCpp</td>
+            <td align="center">Dynamic, Static</td>
+        </tr>
+        <tr>
+            <td align="center">NETLIB LAPACK</td>
+            <td align="center">Intel DPC++</br>Open DPC++</br>AdaptiveCpp</td>
             <td align="center">Dynamic, Static</td>
         </tr>
         <tr>
@@ -432,6 +447,7 @@ Supported compilers include:
     - Intel Atom(R) Processors
     - Intel(R) Core(TM) Processor Family
     - Intel(R) Xeon(R) Processor Family
+    - Arm Neoverse Processor Family (tested on N1, V1, V2)
 - Accelerators
     - Intel(R) Arc(TM) A-Series Graphics
     - Intel(R) Data Center GPU Max Series
@@ -447,6 +463,7 @@ Supported compilers include:
 Backend | Supported Operating System
 :--- | :---
 x86 CPU    | Red Hat Enterprise Linux* 9 (RHEL* 9)
+aarch64 CPU| Red Hat Enterprise Linux* 9 (RHEL* 9)
 Intel GPU  | Ubuntu 24.04 LTS
 NVIDIA GPU | Ubuntu 22.04 LTS
 
@@ -551,6 +568,7 @@ Product | Supported Version | License
 [NETLIB LAPACK](https://www.netlib.org/) | [5d4180c](https://github.com/Reference-LAPACK/lapack/commit/5d4180cf8288ae6ad9a771d18793d15bd0c5643c) | [BSD like license](http://www.netlib.org/lapack/LICENSE.txt)
 [Generic SYCL BLAS](https://github.com/uxlfoundation/generic-sycl-components/tree/main/onemath/sycl/blas) | 0.1 | [Apache License v2.0](https://github.com/uxlfoundation/generic-sycl-components/blob/main/LICENSE)
 [portFFT](https://github.com/codeplaysoftware/portFFT) | 0.1 | [Apache License v2.0](https://github.com/codeplaysoftware/portFFT/blob/main/LICENSE)
+[Arm Performance Libraries](https://developer.arm.com/downloads/-/arm-performance-libraries) | 22.0.1 or higher | [EULA](https://developer.arm.com/downloads/-/arm-performance-libraries/eula)
 
 ---
 

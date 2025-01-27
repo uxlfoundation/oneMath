@@ -67,6 +67,21 @@ inline void backend_selector_precondition<backend::mklcpu>(sycl::queue& queue) {
 #endif
 }
 
+template<>
+inline void backend_selector_precondition<backend::armpl>(sycl::queue& queue) {
+#ifndef ONEMKL_DISABLE_PREDICATES
+#ifdef __HIPSYCL__
+    if (!(queue.is_host() || queue.get_device().is_cpu())) {
+#else
+    if (!queue.get_device().is_cpu()) {
+#endif
+        throw unsupported_device("",
+                                 "backend_selector<backend::" + backend_map[backend::armpl] + ">",
+                                 queue.get_device());
+    }
+#endif
+}
+
 template <>
 inline void backend_selector_precondition<backend::mklgpu>(sycl::queue& queue) {
 #ifndef ONEMATH_DISABLE_PREDICATES

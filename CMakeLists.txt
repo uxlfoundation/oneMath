@@ -41,6 +41,11 @@ if(ENABLE_MKLCPU_BACKEND)
   option(ENABLE_MKLCPU_THREAD_TBB "Enable the use of Intel TBB with the oneMath CPU backend" ON)
 endif()
 
+option(ENABLE_ARMPL_BACKEND "Enable the ArmPl backend for BLAS/LAPACK interface" OFF)
+if(ENABLE_ARMPL_BACKEND)
+  option(ENABLE_ARMPL_OMP "Enable OpenMP for the ArmPl backend" ON)
+endif()
+
 # blas
 option(ENABLE_CUBLAS_BACKEND "Enable the cuBLAS backend for the BLAS interface" OFF)
 option(ENABLE_ROCBLAS_BACKEND "Enable the rocBLAS backend for the BLAS interface" OFF)
@@ -88,7 +93,8 @@ if(ENABLE_MKLCPU_BACKEND
         OR ENABLE_CUBLAS_BACKEND
         OR ENABLE_ROCBLAS_BACKEND
         OR ENABLE_NETLIB_BACKEND
-        OR ENABLE_GENERIC_BLAS_BACKEND)
+        OR ENABLE_GENERIC_BLAS_BACKEND
+        OR ENABLE_ARMPL_BACKEND)
   list(APPEND DOMAINS_LIST "blas")
 endif()
 if(ENABLE_MKLCPU_BACKEND

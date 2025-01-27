@@ -32,6 +32,10 @@ if(ENABLE_MKLGPU_BACKEND)
   add_subdirectory(mklgpu)
 endif()
 
+if(ENABLE_ARMPL_BACKEND AND UNIX)
+  add_subdirectory(armpl)
+endif()
+
 if(ENABLE_CUBLAS_BACKEND AND UNIX)
   add_subdirectory(cublas)
 endif()
