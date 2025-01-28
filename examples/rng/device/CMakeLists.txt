@@ -47,20 +47,21 @@ set(EXAMPLE_TARGET example_rng_uniform)
 # Create a CMake target with one source file
 add_executable(${EXAMPLE_TARGET} uniform.cpp)
 
-# Linking against onemath in CMake will add the required include directories and dependencies.
-# This target should only be used for runtime dispatching.
-target_link_libraries(${EXAMPLE_TARGET} PUBLIC onemath)
-
 # Include directories specific to the examples
+# The device example is header only
 target_include_directories(${EXAMPLE_TARGET} PUBLIC
   ${PROJECT_SOURCE_DIR}/examples/rng/device/include
   ${PROJECT_SOURCE_DIR}/examples/include
+  ${PROJECT_SOURCE_DIR}/include
+  ${PROJECT_SOURCE_DIR}/bin
 )
 
 # May be needed to compile source files with SYCL kernels
 if (USE_ADD_SYCL_TO_TARGET_INTEGRATION)
   add_sycl_to_target(TARGET ${EXAMPLE_TARGET} SOURCES uniform.cpp)
 endif()
+
+target_link_libraries(${EXAMPLE_TARGET} PUBLIC ONEMATH::SYCL::SYCL)
 
 if(NOT ${ONEMATH_SYCL_IMPLEMENTATION} STREQUAL "hipsycl")
   # set strict warning flags for rng device API examples
