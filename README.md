@@ -203,12 +203,12 @@ Supported compilers include:
         <tr>
             <td rowspan=2 align="center">aarch64 CPU</td>
             <td align="center">Arm Performance Libraries</td>
-            <td align="center">Intel DPC++</br>AdaptiveCpp</td>
+            <td align="center">Open DPC++</br>AdaptiveCpp</td>
             <td align="center">Dynamic, Static</td>
         </tr>
         <tr>
             <td align="center">NETLIB LAPACK</td>
-            <td align="center">Intel DPC++</br>Open DPC++</br>AdaptiveCpp</td>
+            <td align="center">Open DPC++</br>Open DPC++</br>AdaptiveCpp</td>
             <td align="center">Dynamic, Static</td>
         </tr>
         <tr>
