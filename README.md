@@ -208,7 +208,7 @@ Supported compilers include:
         </tr>
         <tr>
             <td align="center">NETLIB LAPACK</td>
-            <td align="center">Open DPC++</br>Open DPC++</br>AdaptiveCpp</td>
+            <td align="center">Open DPC++</br>AdaptiveCpp</td>
             <td align="center">Dynamic, Static</td>
         </tr>
         <tr>
