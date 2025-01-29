@@ -67,7 +67,7 @@ inline void backend_selector_precondition<backend::mklcpu>(sycl::queue& queue) {
 #endif
 }
 
-template<>
+template <>
 inline void backend_selector_precondition<backend::armpl>(sycl::queue& queue) {
 #ifndef ONEMKL_DISABLE_PREDICATES
 #ifdef __HIPSYCL__
