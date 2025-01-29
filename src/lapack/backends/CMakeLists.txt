@@ -35,3 +35,8 @@ endif()
 if(ENABLE_ROCSOLVER_BACKEND)
   add_subdirectory(rocsolver)
 endif()
+
+if(ENABLE_ARMPL_BACKEND)
+  add_subdirectory(armpl)
+endif()
+

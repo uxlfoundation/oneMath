@@ -151,6 +151,13 @@ static std::map<domain, std::map<device, std::vector<const char*>>> libraries = 
               LIB_NAME("lapack_mklcpu")
 #endif
           } },
+        { device::aarch64cpu,
+          {
+#ifdef ONEMATH_ENABLE_ARMPL_BACKEND
+              LIB_NAME("lapack_armpl"),
+#endif
+          } },
+
         { device::intelgpu,
           {
 #ifdef ONEMATH_ENABLE_MKLGPU_BACKEND
