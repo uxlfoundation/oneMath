@@ -331,7 +331,7 @@ backend is enabled on aarch64 platform by setting ``-DENABLE_ARMPL_BACKEND=True`
 By default, it will look for the ``ARMPLROOT`` environment variable. If another
 ArmPL is to be used, ``-DARMPL_ROOT=<armpl_install_prefix>`` can be used.
 
-Default behaviour is to used the OpenMP flavour of ArmPL libraries, this can be
+Default behavior is to used the OpenMP flavor of ArmPL libraries, this can be
 changed using the ``-DENABLE_ARMPL_OMP=True/False`` flag.
 
 .. _build_additional_options_dpcpp:
