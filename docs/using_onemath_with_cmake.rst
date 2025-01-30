@@ -6,7 +6,7 @@ Using oneMath in your project with CMake
 The CMake build tool can help you use oneMath in your own project. Instead of
 manually linking and including directories, you can use the CMake targets
 exported by the oneMath project. You can use oneMath in one of two forms, with
-the target names depending on the approach taken: 
+the target names depending on the approach taken:
 
 * you can use a previously installed copy, either from a binary distribution or
   built from source. This can be imported using CMake's ``find_package``
@@ -33,14 +33,16 @@ For example:
     find_package(oneMath REQUIRED)
     target_link_libraries(myTarget PRIVATE ONEMATH::onemath)
 
-Different targets can be used depending on the requirements of oneMath. 
-To link against the entire library, the ``ONEMATH::onemath`` target should be used.
-For specific domains, ``ONEMATH::onemath_<domain>`` should be used.
-And for specific backends, ``ONEMATH::onemath_<domain>_<backend>`` should be used.
+Different targets can be used depending on the requirements of oneMath.
+To link against the entire library with run-time dispatching, the
+``ONEMATH::onemath`` target should be used.
+For specific backends with compile-time dispatching,
+``ONEMATH::onemath_<domain>_<backend>`` should be used.
 
 When using a binary, it may be useful to know the backends that were enabled
-during the build. To check for the existence of backends, CMake's ``if(TARGET
-<target>)`` construct can be used. For example, with the ``cufft`` backend:
+during the build. To check for the existence of backends, CMake's
+``if(TARGET <target>)`` construct can be used. For example, with the ``cufft``
+backend:
 
 .. code-block:: cmake
 
@@ -81,10 +83,8 @@ The build parameters should be appropriately set before
 :ref:`building_the_project_with_adaptivecpp`.
 
 To link against the main library with run-time dispatching, use the target
-``onemath``. To link against particular domains, use the target
-``onemath_<domain>``. For example, ``onemath_blas`` or ``onemath_dft``. To link
-against particular backends (as required for static dispatch of oneAPI calls to
-a particular backend), use the target ``onemath_<domain>_<backend>``. For
-example, ``onemath_dft_cufft``.
+``onemath``. To link against particular backends with compile-time dispatching,
+use the target ``onemath_<domain>_<backend>``. For example,
+``onemath_dft_cufft``.
 
 .. _FetchContent: https://cmake.org/cmake/help/latest/module/FetchContent.html

@@ -17,25 +17,35 @@
 # SPDX-License-Identifier: Apache-2.0
 #===============================================================================
 
-#Build object from all sources
-set(SPARSE_CT_SOURCES "")
-if(ENABLE_MKLCPU_BACKEND AND ENABLE_CUSPARSE_BACKEND)
-  list(APPEND SPARSE_CT_SOURCES "sparse_blas_spmv_usm_mklcpu_cusparse")
+# The example is written for the MKLCPU and CUSPARSE backends
+if(NOT (ENABLE_MKLCPU_BACKEND AND ENABLE_CUSPARSE_BACKEND))
+  return()
 endif()
 
+set(EXAMPLE_TARGET example_sparse_blas_spmv_usm_mklcpu_cusparse)
+
+# External applications should use find_package or FetchContent to include oneMath first.
+# See https://github.com/uxlfoundation/oneMath/blob/develop/docs/using_onemath_with_cmake.rst
+
+# Create a CMake target with one source file
+add_executable(${EXAMPLE_TARGET} spmv_usm_mklcpu_cusparse.cpp)
+
+# Linking against onemath_sparse_blas_mklcpu and onemath_sparse_blas_cusparse in CMake will add the required include directories and dependencies.
+# One can also link against `onemath_sparse_blas` to link against all the sparse_blas backends built.
+# These targets should only be used for compile-time dispatching.
+target_link_libraries(${EXAMPLE_TARGET} PUBLIC
+  onemath_sparse_blas_mklcpu
+  onemath_sparse_blas_cusparse
+)
+
+# Include directories specific to the examples
+target_include_directories(${EXAMPLE_TARGET} PUBLIC
+  ${PROJECT_SOURCE_DIR}/examples/include
+)
+
+# Enable warnings
 include(WarningsUtils)
+target_link_libraries(${EXAMPLE_TARGET} PRIVATE onemath_warnings)
 
-foreach(sparse_ct_source ${SPARSE_CT_SOURCES})
-  add_executable(${sparse_ct_source} ${sparse_ct_source}.cpp)
-  target_include_directories(${sparse_ct_source}
-      PUBLIC ${PROJECT_SOURCE_DIR}/examples/include
-      PUBLIC ${PROJECT_SOURCE_DIR}/include
-      PUBLIC ${CMAKE_BINARY_DIR}/bin
-  )
-
-  target_link_libraries(${sparse_ct_source} PRIVATE ONEMATH::SYCL::SYCL onemath_sparse_blas_mklcpu onemath_sparse_blas_cusparse)
-
-  # Register example as ctest
-  add_test(NAME sparse_blas/EXAMPLE/CT/${sparse_ct_source} COMMAND ${sparse_ct_source})
-endforeach(sparse_ct_source)
-
+# Register example as ctest
+add_test(NAME sparse_blas/EXAMPLE/CT/spmv_usm_mklcpu_cusparse COMMAND ${EXAMPLE_TARGET})

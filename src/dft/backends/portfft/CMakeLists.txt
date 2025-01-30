@@ -48,7 +48,7 @@ if (IS_DPCPP AND UNIX AND NOT FOUND_TARGETS)
   else()
     message(WARNING "Can't enable hip backend, HIP_TARGETS has not been set.")
   endif()
-  
+
   message(STATUS "portFFT target triple set to ${TARGETS_TRIPLES}")
 
   list(APPEND TARGETS_COMPILE_OPTIONS -fsycl-targets=${TARGETS_TRIPLES})
@@ -92,14 +92,11 @@ endif()
 target_link_libraries(${LIB_OBJ} PRIVATE onemath_warnings)
 
 target_include_directories(${LIB_OBJ}
-  PUBLIC ${ONEMATH_INCLUDE_DIRS}
-)
-target_include_directories(${LIB_NAME}
-  PUBLIC ${ONEMATH_INCLUDE_DIRS}
-)
-target_include_directories(${LIB_OBJ}
-  PRIVATE ${PROJECT_SOURCE_DIR}/src
+  PUBLIC  ${ONEMATH_INCLUDE_DIRS}
+  PRIVATE ${PROJECT_SOURCE_DIR}/src/include
+          ${PROJECT_SOURCE_DIR}/src
           ${CMAKE_BINARY_DIR}/bin
+          ${ONEMATH_GENERATED_INCLUDE_PATH}
 )
 
 target_compile_options(${LIB_OBJ} PRIVATE ${ONEMATH_BUILD_COPT})
@@ -109,7 +106,8 @@ target_link_libraries(${LIB_OBJ} PUBLIC ONEMATH::SYCL::SYCL)
 set_target_properties(${LIB_OBJ} PROPERTIES
   POSITION_INDEPENDENT_CODE ON
 )
-target_link_libraries(${LIB_NAME} PUBLIC ${LIB_OBJ})
+target_link_libraries(${LIB_NAME} PRIVATE ${LIB_OBJ})
+target_include_directories(${LIB_NAME} PUBLIC ${ONEMATH_INCLUDE_DIRS})
 
 #Set oneMath libraries as not transitive for dynamic
 if(BUILD_SHARED_LIBS)

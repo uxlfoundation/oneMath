@@ -17,33 +17,31 @@
 # SPDX-License-Identifier: Apache-2.0
 #===============================================================================
 
-#Build object from all sources
-set(LAPACK_CT_SOURCES "")
-if(ENABLE_MKLCPU_BACKEND AND ENABLE_CUSOLVER_BACKEND)
-  list(APPEND LAPACK_CT_SOURCES "getrs_usm_mklcpu_cusolver")
+# The example is written for the MKLCPU and CUSOLVER backends
+if(NOT (ENABLE_MKLCPU_BACKEND AND ENABLE_CUSOLVER_BACKEND))
+  return()
 endif()
 
-if(domain STREQUAL "lapack" AND ENABLE_MKLCPU_BACKEND)
-  find_library(OPENCL_LIBRARY NAMES OpenCL)
-  message(STATUS "Found OpenCL: ${OPENCL_LIBRARY}")
-endif()
+set(EXAMPLE_TARGET example_lapack_getrs_usm_mklcpu_cusolver)
 
-foreach(lapack_ct_source ${LAPACK_CT_SOURCES})
-  add_executable(example_${domain}_${lapack_ct_source} ${lapack_ct_source}.cpp)
-  target_include_directories(example_${domain}_${lapack_ct_source}
-      PUBLIC ${PROJECT_SOURCE_DIR}/examples/include
-      PUBLIC ${PROJECT_SOURCE_DIR}/include
-      PUBLIC ${CMAKE_BINARY_DIR}/bin
-  )
-  if(domain STREQUAL "lapack" AND ENABLE_MKLCPU_BACKEND AND ENABLE_CUSOLVER_BACKEND)
-    add_dependencies(example_${domain}_${lapack_ct_source} onemath_${domain}_mklcpu onemath_${domain}_cusolver)
-    list(APPEND ONEMATH_LIBRARIES_${domain} onemath_${domain}_mklcpu onemath_${domain}_cusolver)
-    target_link_libraries(example_${domain}_${lapack_ct_source} PUBLIC ${OPENCL_LIBRARY})
-  endif()
-  target_link_libraries(example_${domain}_${lapack_ct_source} PUBLIC
-      ${ONEMATH_LIBRARIES_${domain}}
-      ONEMATH::SYCL::SYCL
-  )
-  # Register example as ctest
- add_test(NAME ${domain}/EXAMPLE/CT/${lapack_ct_source} COMMAND example_${domain}_${lapack_ct_source})
-endforeach(lapack_ct_source)
+# External applications should use find_package or FetchContent to include oneMath first.
+# See https://github.com/uxlfoundation/oneMath/blob/develop/docs/using_onemath_with_cmake.rst
+
+# Create a CMake target with one source file
+add_executable(${EXAMPLE_TARGET} getrs_usm_mklcpu_cusolver.cpp)
+
+# Linking against onemath_lapack_mklcpu and onemath_lapack_cusolver in CMake will add the required include directories and dependencies.
+# One can also link against `onemath_lapack` to link against all the lapack backends built.
+# These targets should only be used for compile-time dispatching.
+target_link_libraries(${EXAMPLE_TARGET} PUBLIC
+  onemath_lapack_mklcpu
+  onemath_lapack_cusolver
+)
+
+# Include directories specific to the examples
+target_include_directories(${EXAMPLE_TARGET} PUBLIC
+  ${PROJECT_SOURCE_DIR}/examples/include
+)
+
+# Register example as ctest
+add_test(NAME lapack/EXAMPLE/CT/getrs_usm_mklcpu_cusolver COMMAND ${EXAMPLE_TARGET})
