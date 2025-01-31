@@ -1,4 +1,5 @@
 /*******************************************************************************
+* Copyright 2025 SiPearl
 * Copyright 2020-2021 Intel Corporation
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,8 +18,8 @@
 * SPDX-License-Identifier: Apache-2.0
 *******************************************************************************/
 
-#ifndef _BLAS_CT_BACKENDS_HPP__
-#define _BLAS_CT_BACKENDS_HPP__
+#ifndef _DETAIL_ARMPL_BLAS_CT_HPP__
+#define _DETAIL_ARMPL_BLAS_CT_HPP__
 
 #if __has_include(<sycl/sycl.hpp>)
 #include <sycl/sycl.hpp>
@@ -31,61 +32,28 @@
 #include "oneapi/math/types.hpp"
 #include "oneapi/math/detail/backend_selector.hpp"
 
+#include "oneapi/math/blas/detail/blas_ct_backends.hpp"
+#include "oneapi/math/blas/detail/armpl/onemath_blas_armpl.hpp"
+
 namespace oneapi {
 namespace math {
 namespace blas {
 namespace column_major {
 
-#define BACKEND mklcpu
-#include "blas_ct_backends.hxx"
-#undef BACKEND
-#define BACKEND mklgpu
-#include "blas_ct_backends.hxx"
-#undef BACKEND
-#define BACKEND cublas
-#include "blas_ct_backends.hxx"
-#undef BACKEND
-#define BACKEND rocblas
-#include "blas_ct_backends.hxx"
-#undef BACKEND
-#define BACKEND netlib
-#include "blas_ct_backends.hxx"
-#undef BACKEND
-#define BACKEND armpl
-#include "blas_ct_backends.hxx"
-#undef BACKEND
-#define BACKEND generic
-#include "blas_ct_backends.hxx"
-#undef BACKEND
+#define MAJOR column_major
+#include "blas_ct.hxx"
+#undef MAJOR
 
 } //namespace column_major
 namespace row_major {
 
-#define BACKEND mklcpu
-#include "blas_ct_backends.hxx"
-#undef BACKEND
-#define BACKEND mklgpu
-#include "blas_ct_backends.hxx"
-#undef BACKEND
-#define BACKEND cublas
-#include "blas_ct_backends.hxx"
-#undef BACKEND
-#define BACKEND rocblas
-#include "blas_ct_backends.hxx"
-#undef BACKEND
-#define BACKEND netlib
-#include "blas_ct_backends.hxx"
-#undef BACKEND
-#define BACKEND armpl
-#include "blas_ct_backends.hxx"
-#undef BACKEND
-#define BACKEND generic
-#include "blas_ct_backends.hxx"
-#undef BACKEND
+#define MAJOR row_major
+#include "blas_ct.hxx"
+#undef MAJOR
 
 } //namespace row_major
 } //namespace blas
 } //namespace math
 } //namespace oneapi
 
-#endif //_BLAS_CT_BACKENDS_HPP__
+#endif //_DETAIL_ARMPL_BLAS_CT_HPP_

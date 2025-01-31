@@ -73,15 +73,19 @@
     if (d->get_info<sycl::info::device::double_fp_config>().size() == 0) \
     GTEST_SKIP() << "Double precision is not supported on the device"
 
-#if defined(ONEMATH_ENABLE_MKLCPU_BACKEND) || defined(ONEMATH_ENABLE_NETLIB_BACKEND)
+#if defined(ONEMATH_ENABLE_MKLCPU_BACKEND) || defined(ONEMATH_ENABLE_NETLIB_BACKEND) || \
+    defined(ONEMATH_ENABLE_ARMPL_BACKEND)
 #ifdef ONEMATH_ENABLE_MKLCPU_BACKEND
 #define TEST_RUN_INTELCPU_SELECT_NO_ARGS(q, func) \
     func(oneapi::math::backend_selector<oneapi::math::backend::mklcpu>{ q })
 #define TEST_RUN_INTELCPU_SELECT(q, func, ...) \
     func(oneapi::math::backend_selector<oneapi::math::backend::mklcpu>{ q }, __VA_ARGS__)
-#else
+#elif defined(ONEMATH_ENABLE_NETLIB_BACKEND)
 #define TEST_RUN_INTELCPU_SELECT(q, func, ...) \
     func(oneapi::math::backend_selector<oneapi::math::backend::netlib>{ q }, __VA_ARGS__)
+#elif defined(ONEMATH_ENABLE_ARMPL_BACKEND)
+#define TEST_RUN_INTELCPU_SELECT(q, func, ...) \
+    func(oneapi::math::backend_selector<oneapi::math::backend::armpl>{ q }, __VA_ARGS__)
 #endif
 #else
 #define TEST_RUN_INTELCPU_SELECT_NO_ARGS(q, func)

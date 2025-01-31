@@ -42,11 +42,20 @@ namespace math {
 
 inline oneapi::math::device get_device_id(sycl::queue& queue) {
     oneapi::math::device device_id;
+#ifdef __x86_64__
     if (queue.get_device().is_cpu())
         device_id = device::x86cpu;
 #ifdef __HIPSYCL__
     else if (queue.is_host())
         device_id = device::x86cpu;
+#endif
+#elif __aarch64__
+    if (queue.get_device().is_cpu())
+        device_id = device::aarch64cpu;
+#ifdef __HIPSYCL__
+    else if (queue.is_host())
+        device_id = device::aarch64cpu;
+#endif
 #endif
     else if (queue.get_device().is_gpu()) {
         unsigned int vendor_id =
