@@ -87,6 +87,9 @@ The most important supported build options are:
    * - ENABLE_NETLIB_BACKEND
      - True, False
      - False     
+   * - ENABLE_ARMPL_BACKEND
+     - True, False
+     - False
    * - ENABLE_ROCBLAS_BACKEND
      - True, False
      - False     

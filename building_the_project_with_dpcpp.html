@@ -376,6 +376,7 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pure-sycl-backends-generic-blas-and-portfft">Pure SYCL backends: generic BLAS and portFFT</a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#building-for-onemath-generic-sycl-blas">Building for oneMath generic SYCL BLAS</a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#building-for-portfft">Building for portFFT</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#building-for-arm-performance-libraries">Building for Arm Performance Libraries</a></li>
 </ul>
 </li>
 </ul>
@@ -493,6 +494,14 @@ additional external libraries for the BLAS and LAPACK domains. See the section
 <tr class="row-odd"><td><p>ENABLE_NETLIB_BACKEND</p></td>
 <td><p>True, False</p></td>
 <td><p>False</p></td>
+</tr>
+<tr class="row-even"><td><p>ENABLE_ARMPL_BACKEND</p></td>
+<td><p>True, False</p></td>
+<td><p>False</p></td>
+</tr>
+<tr class="row-odd"><td><p>ENABLE_ARMPL_OMP</p></td>
+<td><p>True, False</p></td>
+<td><p>True</p></td>
 </tr>
 <tr class="row-even"><td><p>ENABLE_ROCBLAS_BACKEND</p></td>
 <td><p>True, False</p></td>
@@ -680,6 +689,15 @@ by the <code class="docutils literal notranslate"><span class="pre">CMAKE_CXX_FL
 <code class="docutils literal notranslate"><span class="pre">nvptx64-nvidia-cuda</span></code>. To enable HIP targets, <code class="docutils literal notranslate"><span class="pre">HIP_TARGETS</span></code> must be
 specified. See <a class="reference external" href="https://intel.github.io/llvm-docs/UsersManual.html">DPC++ User Manual</a> for more information on
 <code class="docutils literal notranslate"><span class="pre">-fsycl-targets</span></code>.</p>
+</section>
+<section id="building-for-arm-performance-libraries">
+<span id="build-for-armpl-dpcpp"></span><h4>Building for Arm Performance Libraries<a class="headerlink" href="#building-for-arm-performance-libraries" title="Link to this heading">#</a></h4>
+<p><a class="reference external" href="https://developer.arm.com/Tools%20and%20Software/Arm%20Performance%20Libraries">Arm Performance Libraries</a>
+backend is enabled on aarch64 platform by setting <code class="docutils literal notranslate"><span class="pre">-DENABLE_ARMPL_BACKEND=True</span></code>.</p>
+<p>By default, it will look for the <code class="docutils literal notranslate"><span class="pre">ARMPLROOT</span></code> environment variable. If another
+ArmPL is to be used, <code class="docutils literal notranslate"><span class="pre">-DARMPL_ROOT=&lt;armpl_install_prefix&gt;</span></code> can be used.</p>
+<p>Default behavior is to used the OpenMP flavor of ArmPL libraries, this can be
+changed using the <code class="docutils literal notranslate"><span class="pre">-DENABLE_ARMPL_OMP=True/False</span></code> flag.</p>
 </section>
 </section>
 </section>
@@ -928,6 +946,7 @@ setting <code class="docutils literal notranslate"><span class="pre">-DBUILD_FUN
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pure-sycl-backends-generic-blas-and-portfft">Pure SYCL backends: generic BLAS and portFFT</a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#building-for-onemath-generic-sycl-blas">Building for oneMath generic SYCL BLAS</a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#building-for-portfft">Building for portFFT</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#building-for-arm-performance-libraries">Building for Arm Performance Libraries</a></li>
 </ul>
 </li>
 </ul>
