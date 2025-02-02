@@ -23,7 +23,8 @@
 
 #include <complex>
 #include <cstdint>
-
+//this may have been defined in complex.h and conflicts with enums in types.hpp
+#undef I
 #include "oneapi/math/types.hpp"
 namespace oneapi {
 namespace math {

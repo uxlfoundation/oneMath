@@ -67,7 +67,7 @@ set(lapack_TEST_LIST
         lapack_source)
 
 if(LAPACKE_FOUND)
-  set(lapack_TEST_LINK ${LAPACKE_LINK})
+  set(lapack_TEST_LINK "")
 endif()
 
 # RNG config
@@ -240,6 +240,8 @@ foreach(domain ${TEST_TARGET_DOMAINS})
 
   if(domain STREQUAL "blas" AND CBLAS_FOUND)
     set(TEST_LD_LIBRARY_PATH ${CMAKE_BINARY_DIR}/lib:${CBLAS_LIB_DIR}:$ENV{LD_LIBRARY_PATH})
+  elseif(domain STREQUAL "lapack" AND LAPACKE_FOUND)
+    set(TEST_LD_LIBRARY_PATH ${CMAKE_BINARY_DIR}/lib:${LAPACKE64_LIB_DIR}:${CBLAS_LIB_DIR}:$ENV{LD_LIBRARY_PATH})
   else()
     set(TEST_LD_LIBRARY_PATH ${CMAKE_BINARY_DIR}/lib:$ENV{LD_LIBRARY_PATH})
   endif()

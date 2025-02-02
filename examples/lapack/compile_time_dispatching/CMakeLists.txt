@@ -30,6 +30,11 @@ set(EXAMPLE_TARGET example_lapack_getrs_usm_mklcpu_cusolver)
 # Create a CMake target with one source file
 add_executable(${EXAMPLE_TARGET} getrs_usm_mklcpu_cusolver.cpp)
 
+# May be needed to compile source files with SYCL kernels
+if (USE_ADD_SYCL_TO_TARGET_INTEGRATION)
+  add_sycl_to_target(TARGET ${EXAMPLE_TARGET} SOURCES getrs_usm_mklcpu_cusolver.cpp)
+endif()
+
 # Linking against onemath_lapack_mklcpu and onemath_lapack_cusolver in CMake will add the required include directories and dependencies.
 # One can also link against `onemath_lapack` to link against all the lapack backends built.
 # These targets should only be used for compile-time dispatching.

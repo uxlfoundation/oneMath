@@ -39,12 +39,16 @@ endif()
 message(STATUS "ONEAPI_DEVICE_SELECTOR will be set to the following value(s): [${DEVICE_FILTERS}] for run-time dispatching examples")
 
 set(EXAMPLE_TARGET example_lapack_getrs_usm)
-
 # External applications should use find_package or FetchContent to include oneMath first.
 # See https://github.com/uxlfoundation/oneMath/blob/develop/docs/using_onemath_with_cmake.rst
 
 # Create a CMake target with one source file
 add_executable(${EXAMPLE_TARGET} getrs_usm.cpp)
+
+# May be needed to compile source files with SYCL kernels
+if (USE_ADD_SYCL_TO_TARGET_INTEGRATION)
+  add_sycl_to_target(TARGET ${EXAMPLE_TARGET} SOURCES getrs_usm.cpp)
+endif()
 
 # Linking against onemath in CMake will add the required include directories and dependencies.
 # This target should only be used for runtime dispatching.
