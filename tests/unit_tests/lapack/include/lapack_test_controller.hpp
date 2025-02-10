@@ -33,6 +33,8 @@
 #include "lapack_common.hpp"
 #include "oneapi/math/exceptions.hpp"
 
+#include "test_helper.hpp"
+
 template <class T>
 std::istream& operator>>(std::istream& is, T& t) {
     int64_t i;
@@ -71,7 +73,7 @@ inline std::ostream& operator<<(std::ostream& os, const oneapi::math::generate& 
 
 class result_T {
 public:
-    enum class result { fail, pass, exception };
+    enum result { fail, pass, skipped, exception };
 
     result_T() : result_{ result::pass } {}
     result_T(bool b) : result_{ b ? result::pass : result::fail } {}
@@ -79,11 +81,15 @@ public:
             : result_{ t },
               what_{ e.what() } {}
 
-    operator bool() const& {
-        return result_ == result::pass;
+    inline operator int() {
+        std::cout << result_ << std::endl;
+        if (result_ == result::skipped)
+            return test_skipped;
+        else
+            return result_ == result::pass;
     }
-
     friend bool operator==(const result_T& lhs, const result_T& rhs);
+    friend bool operator!=(const result_T& lhs, const int& rhs);
     friend std::ostream& operator<<(std::ostream& os, result_T result);
 
 private:
@@ -97,10 +103,13 @@ inline bool operator==(const result_T& lhs, const result_T& rhs) {
 inline bool operator!=(const result_T& lhs, const result_T& rhs) {
     return !(lhs == rhs);
 }
-
+inline bool operator!=(const result_T& lhs, const int& rhs) {
+    return !(lhs.result_ == rhs);
+}
 inline std::ostream& operator<<(std::ostream& os, result_T result) {
     switch (result.result_) {
         case result_T::result::pass: os << "PASS"; break;
+        case result_T::result::skipped: os << "SKIPPED"; break;
         case result_T::result::fail: os << "FAIL"; break;
         case result_T::result::exception: os << "EXCEPTION " << result.what_; break;
     }
@@ -174,10 +183,10 @@ struct InputTestController {
             result = std::apply(tp, tp_args);
         }
         catch (const oneapi::math::unsupported_device& e) {
-            result = result_T{ e, result_T::result::pass };
+            result = result_T{ e, result_T::result::skipped };
         }
         catch (const oneapi::math::unimplemented& e) {
-            result = result_T{ e, result_T::result::pass };
+            result = result_T{ e, result_T::result::skipped };
         }
         catch (const std::exception& e) {
             result = result_T{ e };
@@ -201,7 +210,7 @@ struct InputTestController {
             size_t input_file_line = 1;
             for (auto& args : vargs) {
                 result_T result = call_test(tp, dev, args);
-                if (!result) {
+                if (result != result_T::result::pass) {
                     aggregate_result = result;
                 }
                 print_result(input_file_line++, result, args,
