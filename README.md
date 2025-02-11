@@ -276,10 +276,16 @@ Supported compilers include:
             <td align="center">Dynamic, Static</td>
         </tr>
         <tr>
-            <td rowspan=4 align="center">RNG</td>
+            <td rowspan=5 align="center">RNG</td>
             <td align="center">x86 CPU</td>
             <td align="center">Intel(R) oneMKL</td>
             <td align="center">Intel DPC++</br>AdaptiveCpp</td>
+            <td align="center">Dynamic, Static</td>
+        </tr>
+        <tr>
+            <td align="center">aarch64 CPU</td>
+            <td align="center">Arm Performance Libraries</td>
+            <td align="center">Open DPC++</br>AdaptiveCpp</td>
             <td align="center">Dynamic, Static</td>
         </tr>
         <tr>

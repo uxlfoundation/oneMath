@@ -182,6 +182,11 @@ foreach(domain ${TEST_TARGET_DOMAINS})
     list(APPEND ONEMATH_LIBRARIES_${domain} onemath_${domain}_rocrand)
   endif()
 
+  if(domain STREQUAL "rng" AND ENABLE_ARMPL_BACKEND)
+    add_dependencies(test_main_${domain}_ct onemath_${domain}_armpl)
+    list(APPEND ONEMATH_LIBRARIES_${domain} onemath_${domain}_armpl)
+  endif()
+
   if(domain STREQUAL "dft" AND ENABLE_CUFFT_BACKEND)
     add_dependencies(test_main_${domain}_ct onemath_${domain}_cufft)
     list(APPEND ONEMATH_LIBRARIES_${domain} onemath_${domain}_cufft)

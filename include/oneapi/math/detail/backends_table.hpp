@@ -177,6 +177,12 @@ static std::map<domain, std::map<device, std::vector<const char*>>> libraries = 
               LIB_NAME("rng_mklcpu")
 #endif
           } },
+        { device::aarch64cpu,
+          {
+#ifdef ONEMATH_ENABLE_ARMPL_BACKEND
+              LIB_NAME("rng_armpl")
+#endif
+          } },
         { device::intelgpu,
           {
 #ifdef ONEMATH_ENABLE_MKLGPU_BACKEND
