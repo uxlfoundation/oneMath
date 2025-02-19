@@ -46,7 +46,7 @@ extern std::vector<sycl::device*> devices;
 namespace {
 
 template <typename fp, usm::alloc alloc_type = usm::alloc::shared>
-int test(device* dev, oneapi::math::layout layout, int N, int incx) {
+int test(device* dev, oneapi::math::layout layout, int N, int incx, oneapi::math::index_base base) {
     // Catch asynchronous exceptions.
     auto exception_handler = [](exception_list exceptions) {
         for (std::exception_ptr const& e : exceptions) {
@@ -76,7 +76,7 @@ int test(device* dev, oneapi::math::layout layout, int N, int incx) {
     using fp_ref = typename ref_type_info<fp>::type;
     const int N_ref = N, incx_ref = incx;
 
-    result_ref = ::iamin(&N_ref, (fp_ref*)x.data(), &incx_ref);
+    result_ref = ::iamin(&N_ref, (fp_ref*)x.data(), &incx_ref, base);
 
     // Call DPC++ IAMIN.
 
@@ -96,11 +96,11 @@ int test(device* dev, oneapi::math::layout layout, int N, int incx) {
         switch (layout) {
             case oneapi::math::layout::col_major:
                 done = oneapi::math::blas::column_major::iamin(main_queue, N, x.data(), incx,
-                                                               result_p, dependencies);
+                                                               result_p, base, dependencies);
                 break;
             case oneapi::math::layout::row_major:
                 done = oneapi::math::blas::row_major::iamin(main_queue, N, x.data(), incx, result_p,
-                                                            dependencies);
+                                                            base, dependencies);
                 break;
             default: break;
         }
@@ -109,11 +109,11 @@ int test(device* dev, oneapi::math::layout layout, int N, int incx) {
         switch (layout) {
             case oneapi::math::layout::col_major:
                 TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::math::blas::column_major::iamin, N,
-                                        x.data(), incx, result_p, dependencies);
+                                        x.data(), incx, result_p, base, dependencies);
                 break;
             case oneapi::math::layout::row_major:
                 TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::math::blas::row_major::iamin, N,
-                                        x.data(), incx, result_p, dependencies);
+                                        x.data(), incx, result_p, base, dependencies);
                 break;
             default: break;
         }
@@ -144,43 +144,93 @@ int test(device* dev, oneapi::math::layout layout, int N, int incx) {
 class IaminUsmTests
         : public ::testing::TestWithParam<std::tuple<sycl::device*, oneapi::math::layout>> {};
 
-TEST_P(IaminUsmTests, RealSinglePrecision) {
-    EXPECT_TRUEORSKIP(test<float>(std::get<0>(GetParam()), std::get<1>(GetParam()), 1357, 2));
-    EXPECT_TRUEORSKIP(test<float>(std::get<0>(GetParam()), std::get<1>(GetParam()), 1357, 1));
-    EXPECT_TRUEORSKIP((
-        test<float, usm::alloc::device>(std::get<0>(GetParam()), std::get<1>(GetParam()), 101, 1)));
-    EXPECT_TRUEORSKIP(test<float>(std::get<0>(GetParam()), std::get<1>(GetParam()), 1357, -3));
+TEST_P(IaminUsmTests, RealSinglePrecisionBaseZero) {
+    EXPECT_TRUEORSKIP(test<float>(std::get<0>(GetParam()), std::get<1>(GetParam()), 1357, 2,
+                                  oneapi::math::index_base::zero));
+    EXPECT_TRUEORSKIP(test<float>(std::get<0>(GetParam()), std::get<1>(GetParam()), 1357, 1,
+                                  oneapi::math::index_base::zero));
+    EXPECT_TRUEORSKIP((test<float, usm::alloc::device>(
+        std::get<0>(GetParam()), std::get<1>(GetParam()), 101, 1, oneapi::math::index_base::zero)));
+    EXPECT_TRUEORSKIP(test<float>(std::get<0>(GetParam()), std::get<1>(GetParam()), 1357, -3,
+                                  oneapi::math::index_base::zero));
 }
-TEST_P(IaminUsmTests, RealDoublePrecision) {
+TEST_P(IaminUsmTests, RealSinglePrecisionBaseOne) {
+    EXPECT_TRUEORSKIP(test<float>(std::get<0>(GetParam()), std::get<1>(GetParam()), 1357, 2,
+                                  oneapi::math::index_base::one));
+    EXPECT_TRUEORSKIP(test<float>(std::get<0>(GetParam()), std::get<1>(GetParam()), 1357, 1,
+                                  oneapi::math::index_base::one));
+    EXPECT_TRUEORSKIP((test<float, usm::alloc::device>(
+        std::get<0>(GetParam()), std::get<1>(GetParam()), 101, 1, oneapi::math::index_base::one)));
+    EXPECT_TRUEORSKIP(test<float>(std::get<0>(GetParam()), std::get<1>(GetParam()), 1357, -3,
+                                  oneapi::math::index_base::one));
+}
+TEST_P(IaminUsmTests, RealDoublePrecisionBaseZero) {
     CHECK_DOUBLE_ON_DEVICE(std::get<0>(GetParam()));
 
-    EXPECT_TRUEORSKIP(test<double>(std::get<0>(GetParam()), std::get<1>(GetParam()), 1357, 2));
-    EXPECT_TRUEORSKIP(test<double>(std::get<0>(GetParam()), std::get<1>(GetParam()), 1357, 1));
-    EXPECT_TRUEORSKIP((test<double, usm::alloc::device>(std::get<0>(GetParam()),
-                                                        std::get<1>(GetParam()), 101, 1)));
-    EXPECT_TRUEORSKIP(test<double>(std::get<0>(GetParam()), std::get<1>(GetParam()), 1357, -3));
+    EXPECT_TRUEORSKIP(test<double>(std::get<0>(GetParam()), std::get<1>(GetParam()), 1357, 2,
+                                   oneapi::math::index_base::zero));
+    EXPECT_TRUEORSKIP(test<double>(std::get<0>(GetParam()), std::get<1>(GetParam()), 1357, 1,
+                                   oneapi::math::index_base::zero));
+    EXPECT_TRUEORSKIP((test<double, usm::alloc::device>(
+        std::get<0>(GetParam()), std::get<1>(GetParam()), 101, 1, oneapi::math::index_base::zero)));
+    EXPECT_TRUEORSKIP(test<double>(std::get<0>(GetParam()), std::get<1>(GetParam()), 1357, -3,
+                                   oneapi::math::index_base::zero));
 }
-TEST_P(IaminUsmTests, ComplexSinglePrecision) {
-    EXPECT_TRUEORSKIP(
-        test<std::complex<float>>(std::get<0>(GetParam()), std::get<1>(GetParam()), 1357, 2));
-    EXPECT_TRUEORSKIP(
-        test<std::complex<float>>(std::get<0>(GetParam()), std::get<1>(GetParam()), 1357, 1));
+TEST_P(IaminUsmTests, RealDoublePrecisionBaseOne) {
+    CHECK_DOUBLE_ON_DEVICE(std::get<0>(GetParam()));
+
+    EXPECT_TRUEORSKIP(test<double>(std::get<0>(GetParam()), std::get<1>(GetParam()), 1357, 2,
+                                   oneapi::math::index_base::one));
+    EXPECT_TRUEORSKIP(test<double>(std::get<0>(GetParam()), std::get<1>(GetParam()), 1357, 1,
+                                   oneapi::math::index_base::one));
+    EXPECT_TRUEORSKIP((test<double, usm::alloc::device>(
+        std::get<0>(GetParam()), std::get<1>(GetParam()), 101, 1, oneapi::math::index_base::one)));
+    EXPECT_TRUEORSKIP(test<double>(std::get<0>(GetParam()), std::get<1>(GetParam()), 1357, -3,
+                                   oneapi::math::index_base::one));
+}
+TEST_P(IaminUsmTests, ComplexSinglePrecisionBaseZero) {
+    EXPECT_TRUEORSKIP(test<std::complex<float>>(std::get<0>(GetParam()), std::get<1>(GetParam()),
+                                                1357, 2, oneapi::math::index_base::zero));
+    EXPECT_TRUEORSKIP(test<std::complex<float>>(std::get<0>(GetParam()), std::get<1>(GetParam()),
+                                                1357, 1, oneapi::math::index_base::zero));
     EXPECT_TRUEORSKIP((test<std::complex<float>, usm::alloc::device>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), 101, 1)));
-    EXPECT_TRUEORSKIP(
-        test<std::complex<float>>(std::get<0>(GetParam()), std::get<1>(GetParam()), 1357, -3));
+        std::get<0>(GetParam()), std::get<1>(GetParam()), 101, 1, oneapi::math::index_base::zero)));
+    EXPECT_TRUEORSKIP(test<std::complex<float>>(std::get<0>(GetParam()), std::get<1>(GetParam()),
+                                                1357, -3, oneapi::math::index_base::zero));
 }
-TEST_P(IaminUsmTests, ComplexDoublePrecision) {
+TEST_P(IaminUsmTests, ComplexSinglePrecisionBaseOne) {
+    EXPECT_TRUEORSKIP(test<std::complex<float>>(std::get<0>(GetParam()), std::get<1>(GetParam()),
+                                                1357, 2, oneapi::math::index_base::one));
+    EXPECT_TRUEORSKIP(test<std::complex<float>>(std::get<0>(GetParam()), std::get<1>(GetParam()),
+                                                1357, 1, oneapi::math::index_base::one));
+    EXPECT_TRUEORSKIP((test<std::complex<float>, usm::alloc::device>(
+        std::get<0>(GetParam()), std::get<1>(GetParam()), 101, 1, oneapi::math::index_base::one)));
+    EXPECT_TRUEORSKIP(test<std::complex<float>>(std::get<0>(GetParam()), std::get<1>(GetParam()),
+                                                1357, -3, oneapi::math::index_base::one));
+}
+TEST_P(IaminUsmTests, ComplexDoublePrecisionBaseZero) {
     CHECK_DOUBLE_ON_DEVICE(std::get<0>(GetParam()));
 
-    EXPECT_TRUEORSKIP(
-        test<std::complex<double>>(std::get<0>(GetParam()), std::get<1>(GetParam()), 1357, 2));
-    EXPECT_TRUEORSKIP(
-        test<std::complex<double>>(std::get<0>(GetParam()), std::get<1>(GetParam()), 1357, 1));
+    EXPECT_TRUEORSKIP(test<std::complex<double>>(std::get<0>(GetParam()), std::get<1>(GetParam()),
+                                                 1357, 2, oneapi::math::index_base::zero));
+    EXPECT_TRUEORSKIP(test<std::complex<double>>(std::get<0>(GetParam()), std::get<1>(GetParam()),
+                                                 1357, 1, oneapi::math::index_base::zero));
     EXPECT_TRUEORSKIP((test<std::complex<double>, usm::alloc::device>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), 101, 1)));
-    EXPECT_TRUEORSKIP(
-        test<std::complex<double>>(std::get<0>(GetParam()), std::get<1>(GetParam()), 1357, -3));
+        std::get<0>(GetParam()), std::get<1>(GetParam()), 101, 1, oneapi::math::index_base::zero)));
+    EXPECT_TRUEORSKIP(test<std::complex<double>>(std::get<0>(GetParam()), std::get<1>(GetParam()),
+                                                 1357, -3, oneapi::math::index_base::zero));
+}
+TEST_P(IaminUsmTests, ComplexDoublePrecisionBaseOne) {
+    CHECK_DOUBLE_ON_DEVICE(std::get<0>(GetParam()));
+
+    EXPECT_TRUEORSKIP(test<std::complex<double>>(std::get<0>(GetParam()), std::get<1>(GetParam()),
+                                                 1357, 2, oneapi::math::index_base::one));
+    EXPECT_TRUEORSKIP(test<std::complex<double>>(std::get<0>(GetParam()), std::get<1>(GetParam()),
+                                                 1357, 1, oneapi::math::index_base::one));
+    EXPECT_TRUEORSKIP((test<std::complex<double>, usm::alloc::device>(
+        std::get<0>(GetParam()), std::get<1>(GetParam()), 101, 1, oneapi::math::index_base::one)));
+    EXPECT_TRUEORSKIP(test<std::complex<double>>(std::get<0>(GetParam()), std::get<1>(GetParam()),
+                                                 1357, -3, oneapi::math::index_base::one));
 }
 
 INSTANTIATE_TEST_SUITE_P(IaminUsmTestSuite, IaminUsmTests,

@@ -678,32 +678,40 @@ ONEMATH_EXPORT void dotu(sycl::queue& queue, std::int64_t n,
                          sycl::buffer<std::complex<double>, 1>& result);
 
 ONEMATH_EXPORT void iamax(sycl::queue& queue, std::int64_t n, sycl::buffer<float, 1>& x,
-                          std::int64_t incx, sycl::buffer<std::int64_t, 1>& result);
+                          std::int64_t incx, sycl::buffer<std::int64_t, 1>& result,
+                          oneapi::math::index_base base = oneapi::math::index_base::zero);
 
 ONEMATH_EXPORT void iamax(sycl::queue& queue, std::int64_t n, sycl::buffer<double, 1>& x,
-                          std::int64_t incx, sycl::buffer<std::int64_t, 1>& result);
+                          std::int64_t incx, sycl::buffer<std::int64_t, 1>& result,
+                          oneapi::math::index_base base = oneapi::math::index_base::zero);
 
 ONEMATH_EXPORT void iamax(sycl::queue& queue, std::int64_t n,
                           sycl::buffer<std::complex<float>, 1>& x, std::int64_t incx,
-                          sycl::buffer<std::int64_t, 1>& result);
+                          sycl::buffer<std::int64_t, 1>& result,
+                          oneapi::math::index_base base = oneapi::math::index_base::zero);
 
 ONEMATH_EXPORT void iamax(sycl::queue& queue, std::int64_t n,
                           sycl::buffer<std::complex<double>, 1>& x, std::int64_t incx,
-                          sycl::buffer<std::int64_t, 1>& result);
+                          sycl::buffer<std::int64_t, 1>& result,
+                          oneapi::math::index_base base = oneapi::math::index_base::zero);
 
 ONEMATH_EXPORT void iamin(sycl::queue& queue, std::int64_t n, sycl::buffer<float, 1>& x,
-                          std::int64_t incx, sycl::buffer<std::int64_t, 1>& result);
+                          std::int64_t incx, sycl::buffer<std::int64_t, 1>& result,
+                          oneapi::math::index_base base = oneapi::math::index_base::zero);
 
 ONEMATH_EXPORT void iamin(sycl::queue& queue, std::int64_t n, sycl::buffer<double, 1>& x,
-                          std::int64_t incx, sycl::buffer<std::int64_t, 1>& result);
+                          std::int64_t incx, sycl::buffer<std::int64_t, 1>& result,
+                          oneapi::math::index_base base = oneapi::math::index_base::zero);
 
 ONEMATH_EXPORT void iamin(sycl::queue& queue, std::int64_t n,
                           sycl::buffer<std::complex<float>, 1>& x, std::int64_t incx,
-                          sycl::buffer<std::int64_t, 1>& result);
+                          sycl::buffer<std::int64_t, 1>& result,
+                          oneapi::math::index_base base = oneapi::math::index_base::zero);
 
 ONEMATH_EXPORT void iamin(sycl::queue& queue, std::int64_t n,
                           sycl::buffer<std::complex<double>, 1>& x, std::int64_t incx,
-                          sycl::buffer<std::int64_t, 1>& result);
+                          sycl::buffer<std::int64_t, 1>& result,
+                          oneapi::math::index_base base = oneapi::math::index_base::zero);
 
 ONEMATH_EXPORT void asum(sycl::queue& queue, std::int64_t n,
                          sycl::buffer<std::complex<float>, 1>& x, std::int64_t incx,
@@ -2170,34 +2178,42 @@ ONEMATH_EXPORT sycl::event dotu(sycl::queue& queue, std::int64_t n, const std::c
 
 ONEMATH_EXPORT sycl::event iamax(sycl::queue& queue, std::int64_t n, const float* x,
                                  std::int64_t incx, std::int64_t* result,
+                                 oneapi::math::index_base base = oneapi::math::index_base::zero,
                                  const std::vector<sycl::event>& dependencies = {});
 
 ONEMATH_EXPORT sycl::event iamax(sycl::queue& queue, std::int64_t n, const double* x,
                                  std::int64_t incx, std::int64_t* result,
+                                 oneapi::math::index_base base = oneapi::math::index_base::zero,
                                  const std::vector<sycl::event>& dependencies = {});
 
 ONEMATH_EXPORT sycl::event iamax(sycl::queue& queue, std::int64_t n, const std::complex<float>* x,
                                  std::int64_t incx, std::int64_t* result,
+                                 oneapi::math::index_base base = oneapi::math::index_base::zero,
                                  const std::vector<sycl::event>& dependencies = {});
 
 ONEMATH_EXPORT sycl::event iamax(sycl::queue& queue, std::int64_t n, const std::complex<double>* x,
                                  std::int64_t incx, std::int64_t* result,
+                                 oneapi::math::index_base base = oneapi::math::index_base::zero,
                                  const std::vector<sycl::event>& dependencies = {});
 
 ONEMATH_EXPORT sycl::event iamin(sycl::queue& queue, std::int64_t n, const float* x,
                                  std::int64_t incx, std::int64_t* result,
+                                 oneapi::math::index_base base = oneapi::math::index_base::zero,
                                  const std::vector<sycl::event>& dependencies = {});
 
 ONEMATH_EXPORT sycl::event iamin(sycl::queue& queue, std::int64_t n, const double* x,
                                  std::int64_t incx, std::int64_t* result,
+                                 oneapi::math::index_base base = oneapi::math::index_base::zero,
                                  const std::vector<sycl::event>& dependencies = {});
 
 ONEMATH_EXPORT sycl::event iamin(sycl::queue& queue, std::int64_t n, const std::complex<float>* x,
                                  std::int64_t incx, std::int64_t* result,
+                                 oneapi::math::index_base base = oneapi::math::index_base::zero,
                                  const std::vector<sycl::event>& dependencies = {});
 
 ONEMATH_EXPORT sycl::event iamin(sycl::queue& queue, std::int64_t n, const std::complex<double>* x,
                                  std::int64_t incx, std::int64_t* result,
+                                 oneapi::math::index_base base = oneapi::math::index_base::zero,
                                  const std::vector<sycl::event>& dependencies = {});
 
 ONEMATH_EXPORT sycl::event asum(sycl::queue& queue, std::int64_t n, const std::complex<float>* x,

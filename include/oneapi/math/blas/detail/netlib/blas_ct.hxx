@@ -622,25 +622,27 @@ void hpr(backend_selector<backend::netlib> selector, uplo upper_lower, std::int6
 }
 
 void iamin(backend_selector<backend::netlib> selector, std::int64_t n, sycl::buffer<float, 1>& x,
-           std::int64_t incx, sycl::buffer<std::int64_t, 1>& result) {
-    oneapi::math::blas::netlib::MAJOR::iamin(selector.get_queue(), n, x, incx, result);
+           std::int64_t incx, sycl::buffer<std::int64_t, 1>& result,
+           oneapi::math::index_base base) {
+    oneapi::math::blas::netlib::MAJOR::iamin(selector.get_queue(), n, x, incx, result, base);
 }
 
 void iamin(backend_selector<backend::netlib> selector, std::int64_t n, sycl::buffer<double, 1>& x,
-           std::int64_t incx, sycl::buffer<std::int64_t, 1>& result) {
-    oneapi::math::blas::netlib::MAJOR::iamin(selector.get_queue(), n, x, incx, result);
+           std::int64_t incx, sycl::buffer<std::int64_t, 1>& result,
+           oneapi::math::index_base base) {
+    oneapi::math::blas::netlib::MAJOR::iamin(selector.get_queue(), n, x, incx, result, base);
 }
 
 void iamin(backend_selector<backend::netlib> selector, std::int64_t n,
            sycl::buffer<std::complex<float>, 1>& x, std::int64_t incx,
-           sycl::buffer<std::int64_t, 1>& result) {
-    oneapi::math::blas::netlib::MAJOR::iamin(selector.get_queue(), n, x, incx, result);
+           sycl::buffer<std::int64_t, 1>& result, oneapi::math::index_base base) {
+    oneapi::math::blas::netlib::MAJOR::iamin(selector.get_queue(), n, x, incx, result, base);
 }
 
 void iamin(backend_selector<backend::netlib> selector, std::int64_t n,
            sycl::buffer<std::complex<double>, 1>& x, std::int64_t incx,
-           sycl::buffer<std::int64_t, 1>& result) {
-    oneapi::math::blas::netlib::MAJOR::iamin(selector.get_queue(), n, x, incx, result);
+           sycl::buffer<std::int64_t, 1>& result, oneapi::math::index_base base) {
+    oneapi::math::blas::netlib::MAJOR::iamin(selector.get_queue(), n, x, incx, result, base);
 }
 
 void hpmv(backend_selector<backend::netlib> selector, uplo upper_lower, std::int64_t n,
@@ -1348,25 +1350,27 @@ void spr2(backend_selector<backend::netlib> selector, uplo upper_lower, std::int
 }
 
 void iamax(backend_selector<backend::netlib> selector, std::int64_t n, sycl::buffer<float, 1>& x,
-           std::int64_t incx, sycl::buffer<std::int64_t, 1>& result) {
-    oneapi::math::blas::netlib::MAJOR::iamax(selector.get_queue(), n, x, incx, result);
+           std::int64_t incx, sycl::buffer<std::int64_t, 1>& result,
+           oneapi::math::index_base base) {
+    oneapi::math::blas::netlib::MAJOR::iamax(selector.get_queue(), n, x, incx, result, base);
 }
 
 void iamax(backend_selector<backend::netlib> selector, std::int64_t n, sycl::buffer<double, 1>& x,
-           std::int64_t incx, sycl::buffer<std::int64_t, 1>& result) {
-    oneapi::math::blas::netlib::MAJOR::iamax(selector.get_queue(), n, x, incx, result);
+           std::int64_t incx, sycl::buffer<std::int64_t, 1>& result,
+           oneapi::math::index_base base) {
+    oneapi::math::blas::netlib::MAJOR::iamax(selector.get_queue(), n, x, incx, result, base);
 }
 
 void iamax(backend_selector<backend::netlib> selector, std::int64_t n,
            sycl::buffer<std::complex<float>, 1>& x, std::int64_t incx,
-           sycl::buffer<std::int64_t, 1>& result) {
-    oneapi::math::blas::netlib::MAJOR::iamax(selector.get_queue(), n, x, incx, result);
+           sycl::buffer<std::int64_t, 1>& result, oneapi::math::index_base base) {
+    oneapi::math::blas::netlib::MAJOR::iamax(selector.get_queue(), n, x, incx, result, base);
 }
 
 void iamax(backend_selector<backend::netlib> selector, std::int64_t n,
            sycl::buffer<std::complex<double>, 1>& x, std::int64_t incx,
-           sycl::buffer<std::int64_t, 1>& result) {
-    oneapi::math::blas::netlib::MAJOR::iamax(selector.get_queue(), n, x, incx, result);
+           sycl::buffer<std::int64_t, 1>& result, oneapi::math::index_base base) {
+    oneapi::math::blas::netlib::MAJOR::iamax(selector.get_queue(), n, x, incx, result, base);
 }
 
 void rotm(backend_selector<backend::netlib> selector, std::int64_t n, sycl::buffer<float, 1>& x,
@@ -2559,34 +2563,34 @@ sycl::event hpr(backend_selector<backend::netlib> selector, uplo upper_lower, st
 }
 
 sycl::event iamin(backend_selector<backend::netlib> selector, std::int64_t n, const float* x,
-                  std::int64_t incx, std::int64_t* result,
+                  std::int64_t incx, std::int64_t* result, oneapi::math::index_base base,
                   const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::netlib::MAJOR::iamin(selector.get_queue(), n, x, incx, result,
-                                                         dependencies);
+                                                         base, dependencies);
     return done;
 }
 
 sycl::event iamin(backend_selector<backend::netlib> selector, std::int64_t n, const double* x,
-                  std::int64_t incx, std::int64_t* result,
+                  std::int64_t incx, std::int64_t* result, oneapi::math::index_base base,
                   const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::netlib::MAJOR::iamin(selector.get_queue(), n, x, incx, result,
-                                                         dependencies);
+                                                         base, dependencies);
     return done;
 }
 
 sycl::event iamin(backend_selector<backend::netlib> selector, std::int64_t n,
                   const std::complex<float>* x, std::int64_t incx, std::int64_t* result,
-                  const std::vector<sycl::event>& dependencies) {
+                  oneapi::math::index_base base, const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::netlib::MAJOR::iamin(selector.get_queue(), n, x, incx, result,
-                                                         dependencies);
+                                                         base, dependencies);
     return done;
 }
 
 sycl::event iamin(backend_selector<backend::netlib> selector, std::int64_t n,
                   const std::complex<double>* x, std::int64_t incx, std::int64_t* result,
-                  const std::vector<sycl::event>& dependencies) {
+                  oneapi::math::index_base base, const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::netlib::MAJOR::iamin(selector.get_queue(), n, x, incx, result,
-                                                         dependencies);
+                                                         base, dependencies);
     return done;
 }
 
@@ -3772,34 +3776,34 @@ sycl::event spr2(backend_selector<backend::netlib> selector, uplo upper_lower, s
 }
 
 sycl::event iamax(backend_selector<backend::netlib> selector, std::int64_t n, const float* x,
-                  std::int64_t incx, std::int64_t* result,
+                  std::int64_t incx, std::int64_t* result, oneapi::math::index_base base,
                   const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::netlib::MAJOR::iamax(selector.get_queue(), n, x, incx, result,
-                                                         dependencies);
+                                                         base, dependencies);
     return done;
 }
 
 sycl::event iamax(backend_selector<backend::netlib> selector, std::int64_t n, const double* x,
-                  std::int64_t incx, std::int64_t* result,
+                  std::int64_t incx, std::int64_t* result, oneapi::math::index_base base,
                   const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::netlib::MAJOR::iamax(selector.get_queue(), n, x, incx, result,
-                                                         dependencies);
+                                                         base, dependencies);
     return done;
 }
 
 sycl::event iamax(backend_selector<backend::netlib> selector, std::int64_t n,
                   const std::complex<float>* x, std::int64_t incx, std::int64_t* result,
-                  const std::vector<sycl::event>& dependencies) {
+                  oneapi::math::index_base base, const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::netlib::MAJOR::iamax(selector.get_queue(), n, x, incx, result,
-                                                         dependencies);
+                                                         base, dependencies);
     return done;
 }
 
 sycl::event iamax(backend_selector<backend::netlib> selector, std::int64_t n,
                   const std::complex<double>* x, std::int64_t incx, std::int64_t* result,
-                  const std::vector<sycl::event>& dependencies) {
+                  oneapi::math::index_base base, const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::netlib::MAJOR::iamax(selector.get_queue(), n, x, incx, result,
-                                                         dependencies);
+                                                         base, dependencies);
     return done;
 }
 

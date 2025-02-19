@@ -791,47 +791,55 @@ static inline void hpr2(sycl::queue& queue, uplo upper_lower, std::int64_t n,
 }
 
 static inline void iamax(sycl::queue& queue, std::int64_t n, sycl::buffer<float, 1>& x,
-                         std::int64_t incx, sycl::buffer<std::int64_t, 1>& result) {
-    detail::iamax(get_device_id(queue), queue, n, x, incx, result);
+                         std::int64_t incx, sycl::buffer<std::int64_t, 1>& result,
+                         oneapi::math::index_base base = oneapi::math::index_base::zero) {
+    detail::iamax(get_device_id(queue), queue, n, x, incx, result, base);
 }
 
 static inline void iamax(sycl::queue& queue, std::int64_t n, sycl::buffer<double, 1>& x,
-                         std::int64_t incx, sycl::buffer<std::int64_t, 1>& result) {
-    detail::iamax(get_device_id(queue), queue, n, x, incx, result);
+                         std::int64_t incx, sycl::buffer<std::int64_t, 1>& result,
+                         oneapi::math::index_base base = oneapi::math::index_base::zero) {
+    detail::iamax(get_device_id(queue), queue, n, x, incx, result, base);
 }
 
 static inline void iamax(sycl::queue& queue, std::int64_t n,
                          sycl::buffer<std::complex<float>, 1>& x, std::int64_t incx,
-                         sycl::buffer<std::int64_t, 1>& result) {
-    detail::iamax(get_device_id(queue), queue, n, x, incx, result);
+                         sycl::buffer<std::int64_t, 1>& result,
+                         oneapi::math::index_base base = oneapi::math::index_base::zero) {
+    detail::iamax(get_device_id(queue), queue, n, x, incx, result, base);
 }
 
 static inline void iamax(sycl::queue& queue, std::int64_t n,
                          sycl::buffer<std::complex<double>, 1>& x, std::int64_t incx,
-                         sycl::buffer<std::int64_t, 1>& result) {
-    detail::iamax(get_device_id(queue), queue, n, x, incx, result);
+                         sycl::buffer<std::int64_t, 1>& result,
+                         oneapi::math::index_base base = oneapi::math::index_base::zero) {
+    detail::iamax(get_device_id(queue), queue, n, x, incx, result, base);
 }
 
 static inline void iamin(sycl::queue& queue, std::int64_t n, sycl::buffer<float, 1>& x,
-                         std::int64_t incx, sycl::buffer<std::int64_t, 1>& result) {
-    detail::iamin(get_device_id(queue), queue, n, x, incx, result);
+                         std::int64_t incx, sycl::buffer<std::int64_t, 1>& result,
+                         oneapi::math::index_base base = oneapi::math::index_base::zero) {
+    detail::iamin(get_device_id(queue), queue, n, x, incx, result, base);
 }
 
 static inline void iamin(sycl::queue& queue, std::int64_t n, sycl::buffer<double, 1>& x,
-                         std::int64_t incx, sycl::buffer<std::int64_t, 1>& result) {
-    detail::iamin(get_device_id(queue), queue, n, x, incx, result);
+                         std::int64_t incx, sycl::buffer<std::int64_t, 1>& result,
+                         oneapi::math::index_base base = oneapi::math::index_base::zero) {
+    detail::iamin(get_device_id(queue), queue, n, x, incx, result, base);
 }
 
 static inline void iamin(sycl::queue& queue, std::int64_t n,
                          sycl::buffer<std::complex<float>, 1>& x, std::int64_t incx,
-                         sycl::buffer<std::int64_t, 1>& result) {
-    detail::iamin(get_device_id(queue), queue, n, x, incx, result);
+                         sycl::buffer<std::int64_t, 1>& result,
+                         oneapi::math::index_base base = oneapi::math::index_base::zero) {
+    detail::iamin(get_device_id(queue), queue, n, x, incx, result, base);
 }
 
 static inline void iamin(sycl::queue& queue, std::int64_t n,
                          sycl::buffer<std::complex<double>, 1>& x, std::int64_t incx,
-                         sycl::buffer<std::int64_t, 1>& result) {
-    detail::iamin(get_device_id(queue), queue, n, x, incx, result);
+                         sycl::buffer<std::int64_t, 1>& result,
+                         oneapi::math::index_base base = oneapi::math::index_base::zero) {
+    detail::iamin(get_device_id(queue), queue, n, x, incx, result, base);
 }
 
 static inline void nrm2(sycl::queue& queue, std::int64_t n, sycl::buffer<std::complex<float>, 1>& x,
@@ -2948,57 +2956,65 @@ static inline sycl::event hpr2(sycl::queue& queue, uplo upper_lower, std::int64_
 
 static inline sycl::event iamax(sycl::queue& queue, std::int64_t n, const float* x,
                                 std::int64_t incx, std::int64_t* result,
+                                oneapi::math::index_base base = oneapi::math::index_base::zero,
                                 const std::vector<sycl::event>& dependencies = {}) {
-    auto done = detail::iamax(get_device_id(queue), queue, n, x, incx, result, dependencies);
+    auto done = detail::iamax(get_device_id(queue), queue, n, x, incx, result, base, dependencies);
     return done;
 }
 
 static inline sycl::event iamax(sycl::queue& queue, std::int64_t n, const double* x,
                                 std::int64_t incx, std::int64_t* result,
+                                oneapi::math::index_base base = oneapi::math::index_base::zero,
                                 const std::vector<sycl::event>& dependencies = {}) {
-    auto done = detail::iamax(get_device_id(queue), queue, n, x, incx, result, dependencies);
+    auto done = detail::iamax(get_device_id(queue), queue, n, x, incx, result, base, dependencies);
     return done;
 }
 
 static inline sycl::event iamax(sycl::queue& queue, std::int64_t n, const std::complex<float>* x,
                                 std::int64_t incx, std::int64_t* result,
+                                oneapi::math::index_base base = oneapi::math::index_base::zero,
                                 const std::vector<sycl::event>& dependencies = {}) {
-    auto done = detail::iamax(get_device_id(queue), queue, n, x, incx, result, dependencies);
+    auto done = detail::iamax(get_device_id(queue), queue, n, x, incx, result, base, dependencies);
     return done;
 }
 
 static inline sycl::event iamax(sycl::queue& queue, std::int64_t n, const std::complex<double>* x,
                                 std::int64_t incx, std::int64_t* result,
+                                oneapi::math::index_base base = oneapi::math::index_base::zero,
                                 const std::vector<sycl::event>& dependencies = {}) {
-    auto done = detail::iamax(get_device_id(queue), queue, n, x, incx, result, dependencies);
+    auto done = detail::iamax(get_device_id(queue), queue, n, x, incx, result, base, dependencies);
     return done;
 }
 
 static inline sycl::event iamin(sycl::queue& queue, std::int64_t n, const float* x,
                                 std::int64_t incx, std::int64_t* result,
+                                oneapi::math::index_base base = oneapi::math::index_base::zero,
                                 const std::vector<sycl::event>& dependencies = {}) {
-    auto done = detail::iamin(get_device_id(queue), queue, n, x, incx, result, dependencies);
+    auto done = detail::iamin(get_device_id(queue), queue, n, x, incx, result, base, dependencies);
     return done;
 }
 
 static inline sycl::event iamin(sycl::queue& queue, std::int64_t n, const double* x,
                                 std::int64_t incx, std::int64_t* result,
+                                oneapi::math::index_base base = oneapi::math::index_base::zero,
                                 const std::vector<sycl::event>& dependencies = {}) {
-    auto done = detail::iamin(get_device_id(queue), queue, n, x, incx, result, dependencies);
+    auto done = detail::iamin(get_device_id(queue), queue, n, x, incx, result, base, dependencies);
     return done;
 }
 
 static inline sycl::event iamin(sycl::queue& queue, std::int64_t n, const std::complex<float>* x,
                                 std::int64_t incx, std::int64_t* result,
+                                oneapi::math::index_base base = oneapi::math::index_base::zero,
                                 const std::vector<sycl::event>& dependencies = {}) {
-    auto done = detail::iamin(get_device_id(queue), queue, n, x, incx, result, dependencies);
+    auto done = detail::iamin(get_device_id(queue), queue, n, x, incx, result, base, dependencies);
     return done;
 }
 
 static inline sycl::event iamin(sycl::queue& queue, std::int64_t n, const std::complex<double>* x,
                                 std::int64_t incx, std::int64_t* result,
+                                oneapi::math::index_base base = oneapi::math::index_base::zero,
                                 const std::vector<sycl::event>& dependencies = {}) {
-    auto done = detail::iamin(get_device_id(queue), queue, n, x, incx, result, dependencies);
+    auto done = detail::iamin(get_device_id(queue), queue, n, x, incx, result, base, dependencies);
     return done;
 }
 
