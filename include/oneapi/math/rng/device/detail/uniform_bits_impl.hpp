@@ -32,16 +32,20 @@ protected:
         typename std::conditional<EngineType::vec_size == 1, UIntType,
                                   sycl::vec<UIntType, EngineType::vec_size>>::type {
         static_assert(std::is_same<EngineType, philox4x32x10<EngineType::vec_size>>::value ||
-                          std::is_same<EngineType, mcg59<EngineType::vec_size>>::value,
-                      "oneMath: uniform_bits works only with philox4x32x10/mcg59 engines");
+                          std::is_same<EngineType, count_engine_adaptor<philox4x32x10<EngineType::vec_size>>>::value ||
+                          std::is_same<EngineType, mcg59<EngineType::vec_size>>::value ||
+                          std::is_same<EngineType, count_engine_adaptor<mcg59<EngineType::vec_size>>>::value,
+                      "oneMath: uniform_bits works only with philox4x32x10/mcg59 engines and their adaptors");
         return engine.template generate_uniform_bits<UIntType>();
     }
 
     template <typename EngineType>
     UIntType generate_single(EngineType& engine) {
         static_assert(std::is_same<EngineType, philox4x32x10<EngineType::vec_size>>::value ||
-                          std::is_same<EngineType, mcg59<EngineType::vec_size>>::value,
-                      "oneMath: uniform_bits works only with philox4x32x10/mcg59 engines");
+                          std::is_same<EngineType, count_engine_adaptor<philox4x32x10<EngineType::vec_size>>>::value ||
+                          std::is_same<EngineType, mcg59<EngineType::vec_size>>::value ||
+                          std::is_same<EngineType, count_engine_adaptor<mcg59<EngineType::vec_size>>>::value,
+                      "oneMath: uniform_bits works only with philox4x32x10/mcg59 engines and their adaptors");
         return engine.template generate_single_uniform_bits<UIntType>();
     }
 };

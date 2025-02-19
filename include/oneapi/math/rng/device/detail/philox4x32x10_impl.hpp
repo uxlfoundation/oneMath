@@ -27,6 +27,9 @@ namespace oneapi::math::rng::device {
 template <std::int32_t VecSize = 1>
 class philox4x32x10;
 
+template <typename Engine>
+class count_engine_adaptor;
+
 namespace detail {
 
 template <std::int32_t VecSize>
@@ -546,6 +549,7 @@ protected:
     }
 
     engine_state<oneapi::math::rng::device::philox4x32x10<VecSize>> state_;
+    friend class oneapi::math::rng::device::count_engine_adaptor<oneapi::math::rng::device::philox4x32x10<VecSize>>;
 };
 
 } // namespace detail

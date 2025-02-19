@@ -18,7 +18,7 @@
 #===============================================================================
 
 # Build object from all test sources
-set(SERVICE_DEVICE_TESTS_SOURCES "skip_ahead.cpp")
+set(SERVICE_DEVICE_TESTS_SOURCES "skip_ahead.cpp" "count_adaptor.cpp")
 
 add_library(rng_device_service_ct OBJECT ${SERVICE_DEVICE_TESTS_SOURCES})
 target_compile_options(rng_device_service_ct PRIVATE -DNOMINMAX)

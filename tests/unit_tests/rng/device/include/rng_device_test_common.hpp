@@ -59,17 +59,22 @@ static inline bool check_equal_device(std::uint64_t x, std::uint64_t x_ref) {
     return x == x_ref;
 }
 
-template <typename Fp, typename AllocType>
-static inline bool check_equal_vector_device(std::vector<Fp, AllocType>& r1,
-                                             std::vector<Fp, AllocType>& r2) {
+template <typename Fp>
+static inline bool check_equal_vector_device(Fp* r1, Fp* r2, size_t size) {
     bool good = true;
-    for (int i = 0; i < r1.size(); i++) {
+    for (int i = 0; i < size; i++) {
         if (!check_equal_device(r1[i], r2[i])) {
             good = false;
             break;
         }
     }
     return good;
+}
+
+template <typename Fp, typename AllocType>
+static inline bool check_equal_vector_device(std::vector<Fp, AllocType>& r1,
+                                             std::vector<Fp, AllocType>& r2) {
+    return check_equal_vector_device(r1.data(), r2.data(), r1.size());
 }
 
 template <typename Test>

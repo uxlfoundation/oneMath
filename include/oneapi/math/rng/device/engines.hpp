@@ -38,7 +38,7 @@ namespace oneapi::math::rng::device {
 //      skip_ahead
 //
 template <std::int32_t VecSize>
-class philox4x32x10 : detail::engine_base<philox4x32x10<VecSize>> {
+class philox4x32x10 : public detail::engine_base<philox4x32x10<VecSize>> {
 public:
     static constexpr std::uint64_t default_seed = 0;
 
@@ -79,7 +79,7 @@ private:
 //      skip_ahead
 //
 template <std::int32_t VecSize>
-class mrg32k3a : detail::engine_base<mrg32k3a<VecSize>> {
+class mrg32k3a : public detail::engine_base<mrg32k3a<VecSize>> {
 public:
     static constexpr std::uint32_t default_seed = 1;
 
@@ -119,7 +119,7 @@ private:
 //      skip_ahead
 //
 template <std::int32_t VecSize>
-class mcg31m1 : detail::engine_base<mcg31m1<VecSize>> {
+class mcg31m1 : public detail::engine_base<mcg31m1<VecSize>> {
 public:
     static constexpr std::uint32_t default_seed = 1;
 
@@ -146,7 +146,7 @@ private:
 //      skip_ahead
 //
 template <std::int32_t VecSize>
-class mcg59 : detail::engine_base<mcg59<VecSize>> {
+class mcg59 : public detail::engine_base<mcg59<VecSize>> {
 public:
     static constexpr std::uint32_t default_seed = 1;
 
@@ -160,6 +160,74 @@ public:
 private:
     template <typename Engine>
     friend void skip_ahead(Engine& engine, std::uint64_t num_to_skip);
+
+    template <typename DistrType>
+    friend class detail::distribution_base;
+};
+
+// ENGINE ADAPTORS
+
+// Class oneapi::math::rng::device::count_engine_adaptor
+template <typename Engine>
+class count_engine_adaptor {
+public:
+    static constexpr std::int32_t vec_size = Engine::vec_size;
+
+    // ctors
+    template <typename... Params>
+    count_engine_adaptor(Params... params) : engine_(params...) {}
+
+    count_engine_adaptor(const Engine& engine) : engine_(engine) {}
+    count_engine_adaptor(Engine&& engine) : engine_(std::move(engine)) {}
+
+    // methods
+    template <typename RealType>
+    auto generate(RealType a, RealType b) {
+        counted_ += Engine::vec_size;
+        return engine_.generate(a, b);
+    }
+
+    auto generate() {
+        counted_ += Engine::vec_size;
+        return engine_.generate();
+    }
+
+    template <typename RealType>
+    RealType generate_single(RealType a, RealType b) {
+        counted_++;
+        return engine_.generate_single(a, b);
+    }
+
+    template <typename UIntType>
+    auto generate_uniform_bits() {
+        counted_ += Engine::vec_size;
+        return engine_.template generate_uniform_bits<UIntType>();
+    }
+
+    template <typename UIntType>
+    auto generate_single_uniform_bits() {
+        counted_ += Engine::vec_size;
+        return engine_.template generate_single_uniform_bits<UIntType>();
+    }
+
+    auto generate_bits() {
+        counted_++;
+        return engine_.generate_bits();
+    }
+
+    // getters
+    std::int64_t get_count() const {
+        return counted_;
+    }
+
+    const Engine& base() const {
+        return engine_;
+    }
+
+private:
+
+    Engine engine_;
+    std::int64_t counted_ = 0;
 
     template <typename DistrType>
     friend class detail::distribution_base;

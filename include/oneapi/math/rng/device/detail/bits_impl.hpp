@@ -29,7 +29,8 @@ class distribution_base<oneapi::math::rng::device::bits<UIntType>> {
 protected:
     template <typename EngineType>
     auto generate(EngineType& engine) -> typename std::enable_if<
-        !std::is_same<EngineType, mcg59<EngineType::vec_size>>::value,
+        !std::is_same<EngineType, mcg59<EngineType::vec_size>>::value &&
+        !std::is_same<EngineType, count_engine_adaptor<mcg59<EngineType::vec_size>>>::value,
         typename std::conditional<EngineType::vec_size == 1, UIntType,
                                   sycl::vec<UIntType, EngineType::vec_size>>::type>::type {
         static_assert(std::is_same<UIntType, uint32_t>::value,
@@ -39,7 +40,8 @@ protected:
 
     template <typename EngineType>
     auto generate(EngineType& engine) -> typename std::enable_if<
-        std::is_same<EngineType, mcg59<EngineType::vec_size>>::value,
+        std::is_same<EngineType, mcg59<EngineType::vec_size>>::value ||
+        std::is_same<EngineType, count_engine_adaptor<mcg59<EngineType::vec_size>>>::value,
         typename std::conditional<EngineType::vec_size == 1, UIntType,
                                   sycl::vec<UIntType, EngineType::vec_size>>::type>::type {
         static_assert(std::is_same<UIntType, uint64_t>::value,
@@ -48,7 +50,8 @@ protected:
     }
 
     template <typename EngineType>
-    typename std::enable_if<!std::is_same<EngineType, mcg59<EngineType::vec_size>>::value,
+    typename std::enable_if<!std::is_same<EngineType, mcg59<EngineType::vec_size>>::value &&
+                            !std::is_same<EngineType, count_engine_adaptor<mcg59<EngineType::vec_size>>>::value,
                             UIntType>::type
     generate_single(EngineType& engine) {
         static_assert(std::is_same<UIntType, uint32_t>::value,
@@ -57,7 +60,8 @@ protected:
     }
 
     template <typename EngineType>
-    typename std::enable_if<std::is_same<EngineType, mcg59<EngineType::vec_size>>::value,
+    typename std::enable_if<std::is_same<EngineType, mcg59<EngineType::vec_size>>::value ||
+                            std::is_same<EngineType, count_engine_adaptor<mcg59<EngineType::vec_size>>>::value,
                             UIntType>::type
     generate_single(EngineType& engine) {
         static_assert(std::is_same<UIntType, uint64_t>::value,

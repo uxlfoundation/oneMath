@@ -25,6 +25,9 @@ namespace oneapi::math::rng::device {
 template <std::int32_t VecSize = 1>
 class mcg31m1;
 
+template <typename Engine>
+class count_engine_adaptor;
+
 namespace detail {
 
 template <std::uint64_t VecSize>
@@ -224,6 +227,7 @@ protected:
     }
 
     engine_state<oneapi::math::rng::device::mcg31m1<VecSize>> state_;
+    friend class oneapi::math::rng::device::count_engine_adaptor<oneapi::math::rng::device::mcg31m1<VecSize>>;
 };
 
 } // namespace detail
