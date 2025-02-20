@@ -1151,7 +1151,7 @@ sycl::event iamax(sycl::queue& queue, int64_t n, const double* x, int64_t incx, 
 }
 
 sycl::event iamax(sycl::queue& queue, int64_t n, const std::complex<float>* x, int64_t incx,
-                  oneapi::math::index_base base, int64_t* result,
+                  int64_t* result, oneapi::math::index_base base,
                   const std::vector<sycl::event>& dependencies) {
     auto done = queue.submit([&](sycl::handler& cgh) {
         int64_t num_events = dependencies.size();
@@ -1167,7 +1167,7 @@ sycl::event iamax(sycl::queue& queue, int64_t n, const std::complex<float>* x, i
 }
 
 sycl::event iamax(sycl::queue& queue, int64_t n, const std::complex<double>* x, int64_t incx,
-                  oneapi::math::index_base base, int64_t* result,
+                  int64_t* result, oneapi::math::index_base base,
                   const std::vector<sycl::event>& dependencies) {
     auto done = queue.submit([&](sycl::handler& cgh) {
         int64_t num_events = dependencies.size();
