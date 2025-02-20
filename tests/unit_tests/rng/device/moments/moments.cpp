@@ -67,6 +67,92 @@ TEST_P(Philox4x32x10UniformStdDeviceMomentsTests, RealDoublePrecision) {
     EXPECT_TRUEORSKIP((test3(GetParam())));
 }
 
+/* Test small types (u)int8, (u)int16 only with uniform_method::standard since numbers are always generated
+   as single precision numbers */
+TEST_P(Philox4x32x10UniformStdDeviceMomentsTests, Integer8Precision) {
+    rng_device_test<
+        moments_test<oneapi::math::rng::device::philox4x32x10<1>,
+                     oneapi::math::rng::device::uniform<
+                         std::int8_t, oneapi::math::rng::device::uniform_method::standard>>>
+        test1;
+    EXPECT_TRUEORSKIP((test1(GetParam())));
+    rng_device_test<
+        moments_test<oneapi::math::rng::device::philox4x32x10<4>,
+                     oneapi::math::rng::device::uniform<
+                         std::int8_t, oneapi::math::rng::device::uniform_method::standard>>>
+        test2;
+    EXPECT_TRUEORSKIP((test2(GetParam())));
+    rng_device_test<
+        moments_test<oneapi::math::rng::device::philox4x32x10<16>,
+                     oneapi::math::rng::device::uniform<
+                         std::int8_t, oneapi::math::rng::device::uniform_method::standard>>>
+        test3;
+    EXPECT_TRUEORSKIP((test3(GetParam())));
+}
+
+TEST_P(Philox4x32x10UniformStdDeviceMomentsTests, UnsignedInteger8Precision) {
+    rng_device_test<
+        moments_test<oneapi::math::rng::device::philox4x32x10<1>,
+                     oneapi::math::rng::device::uniform<
+                         std::uint8_t, oneapi::math::rng::device::uniform_method::standard>>>
+        test1;
+    EXPECT_TRUEORSKIP((test1(GetParam())));
+    rng_device_test<
+        moments_test<oneapi::math::rng::device::philox4x32x10<4>,
+                     oneapi::math::rng::device::uniform<
+                         std::uint8_t, oneapi::math::rng::device::uniform_method::standard>>>
+        test2;
+    EXPECT_TRUEORSKIP((test2(GetParam())));
+    rng_device_test<
+        moments_test<oneapi::math::rng::device::philox4x32x10<16>,
+                     oneapi::math::rng::device::uniform<
+                         std::uint8_t, oneapi::math::rng::device::uniform_method::standard>>>
+        test3;
+    EXPECT_TRUEORSKIP((test3(GetParam())));
+}
+
+TEST_P(Philox4x32x10UniformStdDeviceMomentsTests, Integer16Precision) {
+    rng_device_test<
+        moments_test<oneapi::math::rng::device::philox4x32x10<1>,
+                     oneapi::math::rng::device::uniform<
+                         std::int16_t, oneapi::math::rng::device::uniform_method::standard>>>
+        test1;
+    EXPECT_TRUEORSKIP((test1(GetParam())));
+    rng_device_test<
+        moments_test<oneapi::math::rng::device::philox4x32x10<4>,
+                     oneapi::math::rng::device::uniform<
+                         std::int16_t, oneapi::math::rng::device::uniform_method::standard>>>
+        test2;
+    EXPECT_TRUEORSKIP((test2(GetParam())));
+    rng_device_test<
+        moments_test<oneapi::math::rng::device::philox4x32x10<16>,
+                     oneapi::math::rng::device::uniform<
+                         std::int16_t, oneapi::math::rng::device::uniform_method::standard>>>
+        test3;
+    EXPECT_TRUEORSKIP((test3(GetParam())));
+}
+
+TEST_P(Philox4x32x10UniformStdDeviceMomentsTests, UnsignedInteger16Precision) {
+    rng_device_test<
+        moments_test<oneapi::math::rng::device::philox4x32x10<1>,
+                     oneapi::math::rng::device::uniform<
+                         std::uint16_t, oneapi::math::rng::device::uniform_method::standard>>>
+        test1;
+    EXPECT_TRUEORSKIP((test1(GetParam())));
+    rng_device_test<
+        moments_test<oneapi::math::rng::device::philox4x32x10<4>,
+                     oneapi::math::rng::device::uniform<
+                         std::uint16_t, oneapi::math::rng::device::uniform_method::standard>>>
+        test2;
+    EXPECT_TRUEORSKIP((test2(GetParam())));
+    rng_device_test<
+        moments_test<oneapi::math::rng::device::philox4x32x10<16>,
+                     oneapi::math::rng::device::uniform<
+                         std::uint16_t, oneapi::math::rng::device::uniform_method::standard>>>
+        test3;
+    EXPECT_TRUEORSKIP((test3(GetParam())));
+}
+
 TEST_P(Philox4x32x10UniformStdDeviceMomentsTests, IntegerPrecision) {
     rng_device_test<
         moments_test<oneapi::math::rng::device::philox4x32x10<1>,
