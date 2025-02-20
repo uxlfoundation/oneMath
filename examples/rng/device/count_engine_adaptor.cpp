@@ -1,5 +1,5 @@
 /*******************************************************************************
-* Copyright 2023 Intel Corporation
+* Copyright 2025 Intel Corporation
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -58,14 +58,14 @@ int run_example(sycl::queue& queue) {
     using allocator_t = sycl::usm_allocator<Type, sycl::usm::alloc::shared>;
     allocator_t allocator(queue);
 
-    std::vector<Type, allocator_t> average_vec(n, allocator);
+    std::vector<Type, allocator_t> average_vec(n / n_per_item, allocator);
     std::vector<Type, allocator_t> r_count_vec(n / n_per_item, allocator);
     Type* average = average_vec.data();
     Type* r_count = r_count_vec.data();
 
     // submit a kernel to generate on device
     try {
-        queue.parallel_for(sycl::range<1>(n), [=](sycl::item<1> item) {
+        queue.parallel_for(sycl::range<1>(n / n_per_item), [=](sycl::item<1> item) {
             size_t item_id = item.get_id(0);
             rng_device::count_engine_adaptor<rng_device::mcg59<1>> adaptor
                 (seed, item_id * n_per_item);

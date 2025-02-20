@@ -1,5 +1,5 @@
 /*******************************************************************************
-* Copyright 2023 Intel Corporation
+* Copyright 2025 Intel Corporation
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -98,6 +98,7 @@ public:
 
         // validation
         if(r_count[0] != Engine::vec_size){
+            std::cout << "Error: count = " <<r_count[0]<< ", but should be " << Engine::vec_size << std::endl;
             status = test_failed;
             return;
         }
