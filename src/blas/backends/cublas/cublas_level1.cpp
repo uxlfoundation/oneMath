@@ -488,8 +488,8 @@ inline void iamax(const char* func_name, Func func, sycl::queue& queue, int64_t 
 
 #define IAMAX_LAUNCHER(TYPE, CUBLAS_ROUTINE)                                                \
     void iamax(sycl::queue& queue, int64_t n, sycl::buffer<TYPE, 1>& x, const int64_t incx, \
-               sycl::buffer<int64_t, 1>& result) {                                          \
-        iamax(#CUBLAS_ROUTINE, CUBLAS_ROUTINE, queue, n, x, incx, result);                  \
+               sycl::buffer<int64_t, 1>& result, oneapi::math::index_base base) {           \
+        iamax(#CUBLAS_ROUTINE, CUBLAS_ROUTINE, queue, n, x, incx, result, base);            \
     }
 IAMAX_LAUNCHER(float, cublasIsamax)
 IAMAX_LAUNCHER(double, cublasIdamax)
@@ -1156,10 +1156,12 @@ inline sycl::event iamax(const char* func_name, Func func, sycl::queue& queue, i
     }
 }
 
-#define IAMAX_LAUNCHER_USM(TYPE, CUBLAS_ROUTINE)                                                \
-    sycl::event iamax(sycl::queue& queue, int64_t n, const TYPE* x, const int64_t incx,         \
-                      int64_t* result, const std::vector<sycl::event>& dependencies) {          \
-        return iamax(#CUBLAS_ROUTINE, CUBLAS_ROUTINE, queue, n, x, incx, result, dependencies); \
+#define IAMAX_LAUNCHER_USM(TYPE, CUBLAS_ROUTINE)                                        \
+    sycl::event iamax(sycl::queue& queue, int64_t n, const TYPE* x, const int64_t incx, \
+                      int64_t* result, oneapi::math::index_base base,                   \
+                      const std::vector<sycl::event>& dependencies) {                   \
+        return iamax(#CUBLAS_ROUTINE, CUBLAS_ROUTINE, queue, n, x, incx, result, base,  \
+                     dependencies);                                                     \
     }
 IAMAX_LAUNCHER_USM(float, cublasIsamax)
 IAMAX_LAUNCHER_USM(double, cublasIdamax)
