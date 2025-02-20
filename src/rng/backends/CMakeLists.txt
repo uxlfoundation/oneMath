@@ -36,3 +36,8 @@ if(ENABLE_ROCRAND_BACKEND AND UNIX)
   add_subdirectory(rocrand)
 endif()
 
+if(ENABLE_ARMPL_BACKEND AND UNIX)
+  add_subdirectory(armpl)
+endif()
+
+
