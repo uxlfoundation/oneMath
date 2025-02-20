@@ -1721,13 +1721,13 @@ ONEMATH_EXPORT sycl::event iamin(oneapi::math::device libkey, sycl::queue& queue
                                  const std::vector<sycl::event>& dependencies = {});
 ONEMATH_EXPORT sycl::event iamin(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
                                  const std::complex<float>* x, std::int64_t incx,
-                                 oneapi::math::index_base base = oneapi::math::index_base::zero,
                                  std::int64_t* result,
+                                 oneapi::math::index_base base = oneapi::math::index_base::zero,
                                  const std::vector<sycl::event>& dependencies = {});
 ONEMATH_EXPORT sycl::event iamin(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
                                  const std::complex<double>* x, std::int64_t incx,
-                                 oneapi::math::index_base base = oneapi::math::index_base::zero,
                                  std::int64_t* result,
+                                 oneapi::math::index_base base = oneapi::math::index_base::zero,
                                  const std::vector<sycl::event>& dependencies = {});
 
 ONEMATH_EXPORT sycl::event hpmv(oneapi::math::device libkey, sycl::queue& queue, uplo upper_lower,
