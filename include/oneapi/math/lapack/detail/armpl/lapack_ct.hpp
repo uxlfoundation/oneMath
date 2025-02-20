@@ -1,5 +1,6 @@
 /*******************************************************************************
-* Copyright 2021-2022 Intel Corporation
+* Copyright 2025 SiPearl
+* Copyright 2021 Intel Corporation
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -19,22 +20,24 @@
 
 #pragma once
 
-#include "oneapi/math/detail/config.hpp"
+#include <complex>
+#include <cstdint>
 
-#ifdef ONEMATH_ENABLE_MKLCPU_BACKEND
-#include "oneapi/math/lapack/detail/mklcpu/lapack_ct.hpp"
-#endif
-#ifdef ONEMATH_ENABLE_MKLGPU_BACKEND
-#include "oneapi/math/lapack/detail/mklgpu/lapack_ct.hpp"
-#endif
-#ifdef ONEMATH_ENABLE_CUSOLVER_BACKEND
-#include "oneapi/math/lapack/detail/cusolver/lapack_ct.hpp"
-#endif
-#ifdef ONEMATH_ENABLE_ROCSOLVER_BACKEND
-#include "oneapi/math/lapack/detail/rocsolver/lapack_ct.hpp"
-#endif
-#ifdef ONEMATH_ENABLE_ARMPL_BACKEND
-#include "oneapi/math/lapack/detail/armpl/lapack_ct.hpp"
-#endif
+#include <sycl/sycl.hpp>
 
-#include "oneapi/math/lapack/detail/lapack_rt.hpp"
+#include "oneapi/math/types.hpp"
+#include "oneapi/math/lapack/types.hpp"
+#include "oneapi/math/detail/backend_selector.hpp"
+#include "oneapi/math/lapack/detail/armpl/onemath_lapack_armpl.hpp"
+
+namespace oneapi {
+namespace math {
+namespace lapack {
+
+#define LAPACK_BACKEND armpl
+#include "oneapi/math/lapack/detail/armpl/lapack_ct.hxx"
+#undef LAPACK_BACKEND
+
+} //namespace lapack
+} //namespace math
+} //namespace oneapi
