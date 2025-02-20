@@ -1397,17 +1397,15 @@ int iamax(const int* n, const double* x, const int* incx, oneapi::math::index_ba
 template <>
 int iamax(const int* n, const std::complex<float>* x, const int* incx,
           oneapi::math::index_base base) {
-    return cblas_icamax_wrapper(*n, (const void*)x, *incx) + base == oneapi::math::index_base::zero
-               ? 0
-               : 1;
+    return cblas_icamax_wrapper(*n, (const void*)x, *incx) +
+           (base == oneapi::math::index_base::zero ? 0 : 1);
 }
 
 template <>
 int iamax(const int* n, const std::complex<double>* x, const int* incx,
           oneapi::math::index_base base) {
-    return cblas_izamax_wrapper(*n, (const void*)x, *incx) + base == oneapi::math::index_base::zero
-               ? 0
-               : 1;
+    return cblas_izamax_wrapper(*n, (const void*)x, *incx) +
+           (base == oneapi::math::index_base::zero ? 0 : 1);
 }
 
 inline float abs_val(float val) {
