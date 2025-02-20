@@ -154,15 +154,19 @@ typedef struct {
                                     sycl::buffer<std::complex<double>, 1>& y, std::int64_t incy,
                                     sycl::buffer<std::complex<double>, 1>& result);
     void (*column_major_isamin_sycl)(sycl::queue& queue, std::int64_t n, sycl::buffer<float, 1>& x,
-                                     std::int64_t incx, sycl::buffer<std::int64_t, 1>& result);
+                                     std::int64_t incx, sycl::buffer<std::int64_t, 1>& result,
+                                     oneapi::math::index_base base);
     void (*column_major_idamin_sycl)(sycl::queue& queue, std::int64_t n, sycl::buffer<double, 1>& x,
-                                     std::int64_t incx, sycl::buffer<std::int64_t, 1>& result);
+                                     std::int64_t incx, sycl::buffer<std::int64_t, 1>& result,
+                                     oneapi::math::index_base base);
     void (*column_major_icamin_sycl)(sycl::queue& queue, std::int64_t n,
                                      sycl::buffer<std::complex<float>, 1>& x, std::int64_t incx,
-                                     sycl::buffer<std::int64_t, 1>& result);
+                                     sycl::buffer<std::int64_t, 1>& result,
+                                     oneapi::math::index_base base);
     void (*column_major_izamin_sycl)(sycl::queue& queue, std::int64_t n,
                                      sycl::buffer<std::complex<double>, 1>& x, std::int64_t incx,
-                                     sycl::buffer<std::int64_t, 1>& result);
+                                     sycl::buffer<std::int64_t, 1>& result,
+                                     oneapi::math::index_base base);
     void (*column_major_isamax_sycl)(sycl::queue& queue, std::int64_t n, sycl::buffer<float, 1>& x,
                                      std::int64_t incx, sycl::buffer<std::int64_t, 1>& result,
                                      oneapi::math::index_base base);
@@ -1283,17 +1287,19 @@ typedef struct {
                                                const std::vector<sycl::event>& dependencies);
     sycl::event (*column_major_isamin_usm_sycl)(sycl::queue& queue, std::int64_t n, const float* x,
                                                 std::int64_t incx, std::int64_t* result,
+                                                oneapi::math::index_base base,
                                                 const std::vector<sycl::event>& dependencies);
     sycl::event (*column_major_idamin_usm_sycl)(sycl::queue& queue, std::int64_t n, const double* x,
                                                 std::int64_t incx, std::int64_t* result,
+                                                oneapi::math::index_base base,
                                                 const std::vector<sycl::event>& dependencies);
     sycl::event (*column_major_icamin_usm_sycl)(sycl::queue& queue, std::int64_t n,
                                                 const std::complex<float>* x, std::int64_t incx,
-                                                std::int64_t* result,
+                                                std::int64_t* result, oneapi::math::index_base base,
                                                 const std::vector<sycl::event>& dependencies);
     sycl::event (*column_major_izamin_usm_sycl)(sycl::queue& queue, std::int64_t n,
                                                 const std::complex<double>* x, std::int64_t incx,
-                                                std::int64_t* result,
+                                                std::int64_t* result, oneapi::math::index_base base,
                                                 const std::vector<sycl::event>& dependencies);
     sycl::event (*column_major_isamax_usm_sycl)(sycl::queue& queue, std::int64_t n, const float* x,
                                                 std::int64_t incx, std::int64_t* result,
