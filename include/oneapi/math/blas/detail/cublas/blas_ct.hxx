@@ -1348,28 +1348,26 @@ void spr2(backend_selector<backend::cublas> selector, uplo upper_lower, std::int
 }
 
 void iamax(backend_selector<backend::cublas> selector, std::int64_t n, sycl::buffer<float, 1>& x,
-           std::int64_t incx, sycl::buffer<std::int64_t, 1>& result, std::int64_t* result,
+           std::int64_t incx, sycl::buffer<std::int64_t, 1>& result,
            oneapi::math::index_base base) {
     oneapi::math::blas::cublas::MAJOR::iamax(selector.get_queue(), n, x, incx, result, base);
 }
 
 void iamax(backend_selector<backend::cublas> selector, std::int64_t n, sycl::buffer<double, 1>& x,
-           std::int64_t incx, sycl::buffer<std::int64_t, 1>& result, std::int64_t* result,
+           std::int64_t incx, sycl::buffer<std::int64_t, 1>& result,
            oneapi::math::index_base base) {
     oneapi::math::blas::cublas::MAJOR::iamax(selector.get_queue(), n, x, incx, result, base);
 }
 
 void iamax(backend_selector<backend::cublas> selector, std::int64_t n,
            sycl::buffer<std::complex<float>, 1>& x, std::int64_t incx,
-           sycl::buffer<std::int64_t, 1>& result, std::int64_t* result,
-           oneapi::math::index_base base) {
+           sycl::buffer<std::int64_t, 1>& result, oneapi::math::index_base base) {
     oneapi::math::blas::cublas::MAJOR::iamax(selector.get_queue(), n, x, incx, result, base);
 }
 
 void iamax(backend_selector<backend::cublas> selector, std::int64_t n,
            sycl::buffer<std::complex<double>, 1>& x, std::int64_t incx,
-           sycl::buffer<std::int64_t, 1>& result, std::int64_t* result,
-           oneapi::math::index_base base) {
+           sycl::buffer<std::int64_t, 1>& result, oneapi::math::index_base base) {
     oneapi::math::blas::cublas::MAJOR::iamax(selector.get_queue(), n, x, incx, result, base);
 }
 
@@ -3776,16 +3774,16 @@ sycl::event spr2(backend_selector<backend::cublas> selector, uplo upper_lower, s
 }
 
 sycl::event iamax(backend_selector<backend::cublas> selector, std::int64_t n, const float* x,
-                  std::int64_t incx, std::int64_t* result, std::int64_t* result,
-                  oneapi::math::index_base base, const std::vector<sycl::event>& dependencies) {
+                  std::int64_t incx, std::int64_t* result, oneapi::math::index_base base,
+                  const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::cublas::MAJOR::iamax(selector.get_queue(), n, x, incx, result,
                                                          base, dependencies);
     return done;
 }
 
 sycl::event iamax(backend_selector<backend::cublas> selector, std::int64_t n, const double* x,
-                  std::int64_t incx, std::int64_t* result, std::int64_t* result,
-                  oneapi::math::index_base base, const std::vector<sycl::event>& dependencies) {
+                  std::int64_t incx, std::int64_t* result, oneapi::math::index_base base,
+                  const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::cublas::MAJOR::iamax(selector.get_queue(), n, x, incx, result,
                                                          base, dependencies);
     return done;
@@ -3793,8 +3791,7 @@ sycl::event iamax(backend_selector<backend::cublas> selector, std::int64_t n, co
 
 sycl::event iamax(backend_selector<backend::cublas> selector, std::int64_t n,
                   const std::complex<float>* x, std::int64_t incx, std::int64_t* result,
-                  std::int64_t* result, oneapi::math::index_base base,
-                  const std::vector<sycl::event>& dependencies) {
+                  oneapi::math::index_base base, const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::cublas::MAJOR::iamax(selector.get_queue(), n, x, incx, result,
                                                          base, dependencies);
     return done;
@@ -3802,8 +3799,7 @@ sycl::event iamax(backend_selector<backend::cublas> selector, std::int64_t n,
 
 sycl::event iamax(backend_selector<backend::cublas> selector, std::int64_t n,
                   const std::complex<double>* x, std::int64_t incx, std::int64_t* result,
-                  std::int64_t* result, oneapi::math::index_base base,
-                  const std::vector<sycl::event>& dependencies) {
+                  oneapi::math::index_base base, const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::cublas::MAJOR::iamax(selector.get_queue(), n, x, incx, result,
                                                          base, dependencies);
     return done;
