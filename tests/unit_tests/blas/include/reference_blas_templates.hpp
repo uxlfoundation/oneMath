@@ -1386,12 +1386,12 @@ static int iamax(const int* n, const fp* x, const int* incx, oneapi::math::index
 
 template <>
 int iamax(const int* n, const float* x, const int* incx, oneapi::math::index_base base) {
-    return cblas_isamax_wrapper(*n, x, *incx) + base == oneapi::math::index_base::zero ? 0 : 1;
+    return cblas_isamax_wrapper(*n, x, *incx) + (base == oneapi::math::index_base::zero ? 0 : 1);
 }
 
 template <>
 int iamax(const int* n, const double* x, const int* incx, oneapi::math::index_base base) {
-    return cblas_idamax_wrapper(*n, x, *incx) + base == oneapi::math::index_base::zero ? 0 : 1;
+    return cblas_idamax_wrapper(*n, x, *incx) + (base == oneapi::math::index_base::zero ? 0 : 1);
 }
 
 template <>
@@ -1449,7 +1449,7 @@ int iamin(const int* n, const float* x, const int* incx, oneapi::math::index_bas
             min_val = curr_val;
         }
     }
-    return min_idx + base == oneapi::math::index_base::zero ? 0 : 1;
+    return min_idx + (base == oneapi::math::index_base::zero ? 0 : 1);
 }
 
 template <>
@@ -1472,7 +1472,7 @@ int iamin(const int* n, const double* x, const int* incx, oneapi::math::index_ba
             min_val = curr_val;
         }
     }
-    return min_idx + base == oneapi::math::index_base::zero ? 0 : 1;
+    return min_idx + (base == oneapi::math::index_base::zero ? 0 : 1);
 }
 
 template <>
@@ -1496,7 +1496,7 @@ int iamin(const int* n, const std::complex<float>* x, const int* incx,
             min_val = curr_val;
         }
     }
-    return min_idx + base == oneapi::math::index_base::zero ? 0 : 1;
+    return min_idx + (base == oneapi::math::index_base::zero ? 0 : 1);
 }
 
 template <>
@@ -1520,7 +1520,7 @@ int iamin(const int* n, const std::complex<double>* x, const int* incx,
             min_val = curr_val;
         }
     }
-    return min_idx + base == oneapi::math::index_base::zero ? 0 : 1;
+    return min_idx + (base == oneapi::math::index_base::zero ? 0 : 1);
 }
 
 /* Extensions */

@@ -479,7 +479,7 @@ inline void iamax(const char* func_name, Func func, sycl::queue& queue, int64_t 
         auto result_acc = result.template get_access<sycl::access::mode::write>(cgh);
         cgh.single_task([=]() {
             result_acc[0] = std::max(
-                (int64_t)(int_res_acc[0] + base == oneapi::math::index_base::zero ? -1 : 0),
+                (int64_t)(int_res_acc[0] + (base == oneapi::math::index_base::zero ? -1 : 0)),
                 (int64_t)0);
         });
     });
@@ -569,7 +569,7 @@ inline void iamin(const char* func_name, Func func, sycl::queue& queue, int64_t 
         auto result_acc = result.template get_access<sycl::access::mode::write>(cgh);
         cgh.single_task([=]() {
             result_acc[0] = std::max(
-                (int64_t)(int_res_acc[0] + base == oneapi::math::index_base::zero ? -1 : 0),
+                (int64_t)(int_res_acc[0] + (base == oneapi::math::index_base::zero ? -1 : 0)),
                 (int64_t)0);
         });
     });
@@ -1138,7 +1138,7 @@ inline sycl::event iamax(const char* func_name, Func func, sycl::queue& queue, i
         auto last_ev = queue.submit([&](sycl::handler& cgh) {
             cgh.single_task([=]() {
                 *result = std::max(
-                    (int64_t)(*int_res_p + base == oneapi::math::index_base::zero ? -1 : 0),
+                    (int64_t)(*int_res_p + (base == oneapi::math::index_base::zero ? -1 : 0)),
                     (int64_t)0);
             });
         });
@@ -1147,8 +1147,9 @@ inline sycl::event iamax(const char* func_name, Func func, sycl::queue& queue, i
         return last_ev;
     }
     else {
-        result[0] = std::max(
-            (int64_t)(*int_res_p + base == oneapi::math::index_base::zero ? -1 : 0), int64_t{ 0 });
+        result[0] =
+            std::max((int64_t)(*int_res_p + (base == oneapi::math::index_base::zero ? -1 : 0)),
+                     int64_t{ 0 });
         return done;
     }
 }
@@ -1245,7 +1246,7 @@ inline sycl::event iamin(const char* func_name, Func func, sycl::queue& queue, i
         auto last_ev = queue.submit([&](sycl::handler& cgh) {
             cgh.single_task([=]() {
                 *result = std::max(
-                    (int64_t)(*int_res_p + base == oneapi::math::index_base::zero ? -1 : 0),
+                    (int64_t)(*int_res_p + (base == oneapi::math::index_base::zero ? -1 : 0)),
                     (int64_t)0);
             });
         });
@@ -1254,8 +1255,9 @@ inline sycl::event iamin(const char* func_name, Func func, sycl::queue& queue, i
         return last_ev;
     }
     else {
-        result[0] = std::max(
-            (int64_t)(*int_res_p + base == oneapi::math::index_base::zero ? -1 : 0), int64_t{ 0 });
+        result[0] =
+            std::max((int64_t)(*int_res_p + (base == oneapi::math::index_base::zero ? -1 : 0)),
+                     int64_t{ 0 });
         return done;
     }
 }

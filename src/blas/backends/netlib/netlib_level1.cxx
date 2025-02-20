@@ -1090,9 +1090,8 @@ sycl::event iamin(sycl::queue& queue, int64_t n, const float* x, int64_t incx, i
             cgh.depends_on(dependencies[i]);
         }
         host_task<class netlib_isamin_usm>(cgh, [=]() {
-            result[0] =
-                ::cblas_isamin((int)n, x, (int)incx) + base == oneapi::math::index_base::zero ? 0
-                                                                                              : 1;
+            result[0] = ::cblas_isamin((int)n, x, (int)incx) +
+                        (base == oneapi::math::index_base::zero ? 0 : 1);
         });
     });
     return done;
@@ -1124,9 +1123,8 @@ sycl::event iamin(sycl::queue& queue, int64_t n, const std::complex<float>* x, i
             cgh.depends_on(dependencies[i]);
         }
         host_task<class netlib_icamin_usm>(cgh, [=]() {
-            result[0] =
-                ::cblas_icamin((int)n, x, (int)incx) + base == oneapi::math::index_base::zero ? 0
-                                                                                              : 1;
+            result[0] = ::cblas_icamin((int)n, x, (int)incx) +
+                        (base == oneapi::math::index_base::zero ? 0 : 1);
         });
     });
     return done;
@@ -1141,9 +1139,8 @@ sycl::event iamin(sycl::queue& queue, int64_t n, const std::complex<double>* x, 
             cgh.depends_on(dependencies[i]);
         }
         host_task<class netlib_izamin_usm>(cgh, [=]() {
-            result[0] =
-                ::cblas_izamin((int)n, x, (int)incx) + base == oneapi::math::index_base::zero ? 0
-                                                                                              : 1;
+            result[0] = ::cblas_izamin((int)n, x, (int)incx) +
+                        (base == oneapi::math::index_base::zero ? 0 : 1);
         });
     });
     return done;
@@ -1157,9 +1154,8 @@ sycl::event iamax(sycl::queue& queue, int64_t n, const float* x, int64_t incx, i
             cgh.depends_on(dependencies[i]);
         }
         host_task<class netlib_isamax_usm>(cgh, [=]() {
-            result[0] =
-                ::cblas_isamax((int)n, x, (int)incx) + base == oneapi::math::index_base::zero ? 0
-                                                                                              : 1;
+            result[0] = ::cblas_isamax((int)n, x, (int)incx) +
+                        (base == oneapi::math::index_base::zero ? 0 : 1);
         });
     });
     return done;
@@ -1173,9 +1169,8 @@ sycl::event iamax(sycl::queue& queue, int64_t n, const double* x, int64_t incx, 
             cgh.depends_on(dependencies[i]);
         }
         host_task<class netlib_idamax_usm>(cgh, [=]() {
-            result[0] =
-                ::cblas_idamax((int)n, x, (int)incx) + base == oneapi::math::index_base::zero ? 0
-                                                                                              : 1;
+            result[0] = ::cblas_idamax((int)n, x, (int)incx) +
+                        (base == oneapi::math::index_base::zero ? 0 : 1);
         });
     });
     return done;
@@ -1190,9 +1185,8 @@ sycl::event iamax(sycl::queue& queue, int64_t n, const std::complex<float>* x, i
             cgh.depends_on(dependencies[i]);
         }
         host_task<class netlib_icamax_usm>(cgh, [=]() {
-            result[0] =
-                ::cblas_icamax((int)n, x, (int)incx) + base == oneapi::math::index_base::zero ? 0
-                                                                                              : 1;
+            result[0] = ::cblas_icamax((int)n, x, (int)incx) +
+                        (base == oneapi::math::index_base::zero ? 0 : 1);
         });
     });
     return done;
@@ -1207,9 +1201,8 @@ sycl::event iamax(sycl::queue& queue, int64_t n, const std::complex<double>* x, 
             cgh.depends_on(dependencies[i]);
         }
         host_task<class netlib_izamax_usm>(cgh, [=]() {
-            result[0] =
-                ::cblas_izamax((int)n, x, (int)incx) + base == oneapi::math::index_base::zero ? 0
-                                                                                              : 1;
+            result[0] = ::cblas_izamax((int)n, x, (int)incx) +
+                        (base == oneapi::math::index_base::zero ? 0 : 1);
         });
     });
     return done;

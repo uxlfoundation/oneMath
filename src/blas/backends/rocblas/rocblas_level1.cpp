@@ -507,7 +507,7 @@ inline void iamax(Func func, sycl::queue& queue, int64_t n, sycl::buffer<T, 1>& 
         auto result_acc = result.template get_access<sycl::access::mode::write>(cgh);
         cgh.single_task([=]() {
             result_acc[0] = std::max(
-                (int64_t)(int_res_acc[0] + base == oneapi::math::index_base::zero ? -1 : 0),
+                (int64_t)(int_res_acc[0] + (base == oneapi::math::index_base::zero ? -1 : 0)),
                 (int64_t)0);
         });
     });
@@ -604,7 +604,7 @@ inline void iamin(Func func, sycl::queue& queue, int64_t n, sycl::buffer<T, 1>& 
         auto result_acc = result.template get_access<sycl::access::mode::write>(cgh);
         cgh.single_task([=]() {
             result_acc[0] = std::max(
-                (int64_t)(int_res_acc[0] + base == oneapi::math::index_base::zero ? -1 : 0),
+                (int64_t)(int_res_acc[0] + (base == oneapi::math::index_base::zero ? -1 : 0)),
                 (int64_t)0);
         });
     });
@@ -1076,7 +1076,7 @@ inline sycl::event iamax(Func func, sycl::queue& queue, int64_t n, const T* x, c
     });
 
     done.wait_and_throw();
-    result[0] = std::max((int64_t)(*int_res_p + base == oneapi::math::index_base::zero ? -1 : 0),
+    result[0] = std::max((int64_t)(*int_res_p + (base == oneapi::math::index_base::zero ? -1 : 0)),
                          int64_t{ 0 });
     return done;
 }
@@ -1161,7 +1161,7 @@ inline sycl::event iamin(Func func, sycl::queue& queue, int64_t n, const T* x, c
     });
 
     done.wait_and_throw();
-    result[0] = std::max((int64_t)(*int_res_p + base == oneapi::math::index_base::zero ? -1 : 0),
+    result[0] = std::max((int64_t)(*int_res_p + (base == oneapi::math::index_base::zero ? -1 : 0)),
                          int64_t{ 0 });
     return done;
 }
