@@ -439,7 +439,8 @@ ROTMG_LAUNCHER(double, cublasDrotmg)
 
 template <typename Func, typename T>
 inline void iamax(const char* func_name, Func func, sycl::queue& queue, int64_t n,
-                  sycl::buffer<T, 1>& x, const int64_t incx, sycl::buffer<int64_t, 1>& result) {
+                  sycl::buffer<T, 1>& x, const int64_t incx, sycl::buffer<int64_t, 1>& result,
+                  oneapi::math::index_base base) {
     using cuDataType = typename CudaEquivalentType<T>::Type;
     overflow_check(n, incx);
     // cuBLAS does not support int64_t as return type for the data. So we need to
@@ -1095,6 +1096,7 @@ ROTMG_LAUNCHER_USM(double, cublasDrotmg)
 template <typename Func, typename T>
 inline sycl::event iamax(const char* func_name, Func func, sycl::queue& queue, int64_t n,
                          const T* x, const int64_t incx, int64_t* result,
+                         oneapi::math::index_base base,
                          const std::vector<sycl::event>& dependencies) {
     using cuDataType = typename CudaEquivalentType<T>::Type;
     overflow_check(n, incx);
