@@ -166,176 +166,111 @@ bool compare_moments(const std::vector<Fp, AllocType>& r, double tM, double tD, 
     return true;
 }
 
+template <typename Distribution, typename Fp, typename AllocType>
+bool calculate_and_compare_moments_uniform(Distribution distr, const std::vector<Fp, AllocType>& r) {
+    using ParamsType = typename std::conditional<std::is_integral<Fp>::value, double, Fp>::type;
+
+    double tM, tD, tQ;
+    ParamsType a = distr.a();
+    ParamsType b = distr.b();
+
+    // Theoretical moments
+    if constexpr (std::is_integral<Fp>::value) {
+        tM = (a + b - 1.0) / 2.0;
+        tD = ((b - a) * (b - a) - 1.0) / 12.0;
+        tQ = (((b - a) * (b - a)) * ((1.0 / 80.0) * (b - a) * (b - a) - (1.0 / 24.0))) +
+            (7.0 / 240.0);
+    }
+    else {
+        tM = (b + a) / 2.0;
+        tD = ((b - a) * (b - a)) / 12.0;
+        tQ = ((b - a) * (b - a) * (b - a) * (b - a)) / 80.0;
+    }
+
+    return compare_moments(r, tM, tD, tQ);
+}
+
 template <typename Distribution>
 struct statistics_device {};
 
 template <typename Fp, typename Method>
-struct statistics_device<oneapi::math::rng::device::uniform<Fp, Method>> {
+struct statistics_device<oneapi::mkl::rng::device::uniform<Fp, Method>> {
     template <typename AllocType>
     bool check(const std::vector<Fp, AllocType>& r,
-               const oneapi::math::rng::device::uniform<Fp, Method>& distr) {
-        double tM, tD, tQ;
-        Fp a = distr.a();
-        Fp b = distr.b();
-
-        // Theoretical moments
-        tM = (b + a) / 2.0;
-        tD = ((b - a) * (b - a)) / 12.0;
-        tQ = ((b - a) * (b - a) * (b - a) * (b - a)) / 80.0;
-
-        return compare_moments(r, tM, tD, tQ);
+               const oneapi::mkl::rng::device::uniform<Fp, Method>& distr) {
+        return calculate_and_compare_moments_uniform(distr, r);
     }
 };
 
 template <typename Method>
-struct statistics_device<oneapi::math::rng::device::uniform<std::int8_t, Method>> {
+struct statistics_device<oneapi::mkl::rng::device::uniform<std::int8_t, Method>> {
     template <typename AllocType>
     bool check(const std::vector<std::int8_t, AllocType>& r,
-               const oneapi::math::rng::device::uniform<std::int8_t, Method>& distr) {
-        double tM, tD, tQ;
-        float a = distr.a();
-        float b = distr.b();
-
-        // Theoretical moments
-        tM = (a + b - 1.0) / 2.0;
-        tD = ((b - a) * (b - a) - 1.0) / 12.0;
-        tQ = (((b - a) * (b - a)) * ((1.0 / 80.0) * (b - a) * (b - a) - (1.0 / 24.0))) +
-             (7.0 / 240.0);
-
-        return compare_moments(r, tM, tD, tQ);
+               const oneapi::mkl::rng::device::uniform<std::int8_t, Method>& distr) {
+        return calculate_and_compare_moments_uniform(distr, r);
     }
 };
 
 template <typename Method>
-struct statistics_device<oneapi::math::rng::device::uniform<std::uint8_t, Method>> {
+struct statistics_device<oneapi::mkl::rng::device::uniform<std::uint8_t, Method>> {
     template <typename AllocType>
     bool check(const std::vector<std::uint8_t, AllocType>& r,
-               const oneapi::math::rng::device::uniform<std::uint8_t, Method>& distr) {
-        double tM, tD, tQ;
-        float a = distr.a();
-        float b = distr.b();
-
-        // Theoretical moments
-        tM = (a + b - 1.0) / 2.0;
-        tD = ((b - a) * (b - a) - 1.0) / 12.0;
-        tQ = (((b - a) * (b - a)) * ((1.0 / 80.0) * (b - a) * (b - a) - (1.0 / 24.0))) +
-             (7.0 / 240.0);
-
-        return compare_moments(r, tM, tD, tQ);
+               const oneapi::mkl::rng::device::uniform<std::uint8_t, Method>& distr) {
+        return calculate_and_compare_moments_uniform(distr, r);
     }
 };
 
 template <typename Method>
-struct statistics_device<oneapi::math::rng::device::uniform<std::int16_t, Method>> {
+struct statistics_device<oneapi::mkl::rng::device::uniform<std::int16_t, Method>> {
     template <typename AllocType>
     bool check(const std::vector<std::int16_t, AllocType>& r,
-               const oneapi::math::rng::device::uniform<std::int16_t, Method>& distr) {
-        double tM, tD, tQ;
-        float a = distr.a();
-        float b = distr.b();
-
-        // Theoretical moments
-        tM = (a + b - 1.0) / 2.0;
-        tD = ((b - a) * (b - a) - 1.0) / 12.0;
-        tQ = (((b - a) * (b - a)) * ((1.0 / 80.0) * (b - a) * (b - a) - (1.0 / 24.0))) +
-             (7.0 / 240.0);
-
-        return compare_moments(r, tM, tD, tQ);
+               const oneapi::mkl::rng::device::uniform<std::int16_t, Method>& distr) {
+        return calculate_and_compare_moments_uniform(distr, r);
     }
 };
 
 template <typename Method>
-struct statistics_device<oneapi::math::rng::device::uniform<std::uint16_t, Method>> {
+struct statistics_device<oneapi::mkl::rng::device::uniform<std::uint16_t, Method>> {
     template <typename AllocType>
     bool check(const std::vector<std::uint16_t, AllocType>& r,
-               const oneapi::math::rng::device::uniform<std::uint16_t, Method>& distr) {
-        double tM, tD, tQ;
-        float a = distr.a();
-        float b = distr.b();
-
-        // Theoretical moments
-        tM = (a + b - 1.0) / 2.0;
-        tD = ((b - a) * (b - a) - 1.0) / 12.0;
-        tQ = (((b - a) * (b - a)) * ((1.0 / 80.0) * (b - a) * (b - a) - (1.0 / 24.0))) +
-             (7.0 / 240.0);
-
-        return compare_moments(r, tM, tD, tQ);
+               const oneapi::mkl::rng::device::uniform<std::uint16_t, Method>& distr) {
+        return calculate_and_compare_moments_uniform(distr, r);
     }
 };
 
 template <typename Method>
-struct statistics_device<oneapi::math::rng::device::uniform<std::int32_t, Method>> {
+struct statistics_device<oneapi::mkl::rng::device::uniform<std::int32_t, Method>> {
     template <typename AllocType>
-    bool check(const std::vector<std::int32_t, AllocType>& r,
-               const oneapi::math::rng::device::uniform<std::int32_t, Method>& distr) {
-        double tM, tD, tQ;
-        double a = distr.a();
-        double b = distr.b();
-
-        // Theoretical moments
-        tM = (a + b - 1.0) / 2.0;
-        tD = ((b - a) * (b - a) - 1.0) / 12.0;
-        tQ = (((b - a) * (b - a)) * ((1.0 / 80.0) * (b - a) * (b - a) - (1.0 / 24.0))) +
-             (7.0 / 240.0);
-
-        return compare_moments(r, tM, tD, tQ);
+    bool check(const std::vector<int32_t, AllocType>& r,
+               const oneapi::mkl::rng::device::uniform<int32_t, Method>& distr) {
+        return calculate_and_compare_moments_uniform(distr, r);
     }
 };
 
 template <typename Method>
-struct statistics_device<oneapi::math::rng::device::uniform<std::uint32_t, Method>> {
+struct statistics_device<oneapi::mkl::rng::device::uniform<std::uint32_t, Method>> {
     template <typename AllocType>
-    bool check(const std::vector<std::uint32_t, AllocType>& r,
-               const oneapi::math::rng::device::uniform<std::uint32_t, Method>& distr) {
-        double tM, tD, tQ;
-        double a = distr.a();
-        double b = distr.b();
-
-        // Theoretical moments
-        tM = (a + b - 1.0) / 2.0;
-        tD = ((b - a) * (b - a) - 1.0) / 12.0;
-        tQ = (((b - a) * (b - a)) * ((1.0 / 80.0) * (b - a) * (b - a) - (1.0 / 24.0))) +
-             (7.0 / 240.0);
-
-        return compare_moments(r, tM, tD, tQ);
+    bool check(const std::vector<uint32_t, AllocType>& r,
+               const oneapi::mkl::rng::device::uniform<uint32_t, Method>& distr) {
+        return calculate_and_compare_moments_uniform(distr, r);
     }
 };
 
 template <typename Method>
-struct statistics_device<oneapi::math::rng::device::uniform<std::int64_t, Method>> {
+struct statistics_device<oneapi::mkl::rng::device::uniform<std::int64_t, Method>> {
     template <typename AllocType>
-    bool check(const std::vector<std::int64_t, AllocType>& r,
-               const oneapi::math::rng::device::uniform<std::int64_t, Method>& distr) {
-        double tM, tD, tQ;
-        double a = distr.a();
-        double b = distr.b();
-
-        // Theoretical moments
-        tM = (a + b - 1.0) / 2.0;
-        tD = ((b - a) * (b - a) - 1.0) / 12.0;
-        tQ = (((b - a) * (b - a)) * ((1.0 / 80.0) * (b - a) * (b - a) - (1.0 / 24.0))) +
-             (7.0 / 240.0);
-
-        return compare_moments(r, tM, tD, tQ);
+    bool check(const std::vector<int64_t, AllocType>& r,
+               const oneapi::mkl::rng::device::uniform<int64_t, Method>& distr) {
+        return calculate_and_compare_moments_uniform(distr, r);
     }
 };
 
 template <typename Method>
-struct statistics_device<oneapi::math::rng::device::uniform<std::uint64_t, Method>> {
+struct statistics_device<oneapi::mkl::rng::device::uniform<std::uint64_t, Method>> {
     template <typename AllocType>
-    bool check(const std::vector<std::uint64_t, AllocType>& r,
-               const oneapi::math::rng::device::uniform<std::uint64_t, Method>& distr) {
-        double tM, tD, tQ;
-        double a = distr.a();
-        double b = distr.b();
-
-        // Theoretical moments
-        tM = (a + b - 1.0) / 2.0;
-        tD = ((b - a) * (b - a) - 1.0) / 12.0;
-        tQ = (((b - a) * (b - a)) * ((1.0 / 80.0) * (b - a) * (b - a) - (1.0 / 24.0))) +
-             (7.0 / 240.0);
-
-        return compare_moments(r, tM, tD, tQ);
+    bool check(const std::vector<uint64_t, AllocType>& r,
+               const oneapi::mkl::rng::device::uniform<uint64_t, Method>& distr) {
+        return calculate_and_compare_moments_uniform(distr, r);
     }
 };
 
