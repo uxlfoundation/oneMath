@@ -172,21 +172,23 @@ DOTU_LAUNCHER(std::complex<double>, ::cblas_zdotu_sub)
 
 template <typename T, typename CBLAS_FUNC>
 void iamin(sycl::queue& queue, int64_t n, sycl::buffer<T, 1>& x, int64_t incx,
-           sycl::buffer<int64_t, 1>& result, CBLAS_FUNC cblas_func) {
+           sycl::buffer<int64_t, 1>& result, oneapi::math::index_base base, CBLAS_FUNC cblas_func) {
     queue.submit([&](sycl::handler& cgh) {
         auto accessor_x = x.template get_access<sycl::access::mode::read>(cgh);
         auto accessor_result = result.template get_access<sycl::access::mode::write>(cgh);
         host_task<class armpl_kernel_iamin>(cgh, [=]() {
             accessor_result[0] =
                 cblas_func((armpl_int_t)n, accessor_x.GET_MULTI_PTR, (armpl_int_t)incx);
+            if (base == oneapi::math::index_base::one && n >= 1 && incx >= 1)
+                accessor_result[0]++;
         });
     });
 }
 
 #define IAMIN_LAUNCHER(TYPE, ROUTINE)                                                 \
     void iamin(sycl::queue& queue, int64_t n, sycl::buffer<TYPE, 1>& x, int64_t incx, \
-               sycl::buffer<int64_t, 1>& result) {                                    \
-        iamin(queue, n, x, incx, result, ROUTINE);                                    \
+               sycl::buffer<int64_t, 1>& result, oneapi::math::index_base base) {     \
+        iamin(queue, n, x, incx, result, base, ROUTINE);                              \
     }
 
 IAMIN_LAUNCHER(float, ::cblas_isamin)
@@ -196,21 +198,23 @@ IAMIN_LAUNCHER(std::complex<double>, ::cblas_izamin)
 
 template <typename T, typename CBLAS_FUNC>
 void iamax(sycl::queue& queue, int64_t n, sycl::buffer<T, 1>& x, int64_t incx,
-           sycl::buffer<int64_t, 1>& result, CBLAS_FUNC cblas_func) {
+           sycl::buffer<int64_t, 1>& result, oneapi::math::index_base base, CBLAS_FUNC cblas_func) {
     queue.submit([&](sycl::handler& cgh) {
         auto accessor_x = x.template get_access<sycl::access::mode::read>(cgh);
         auto accessor_result = result.template get_access<sycl::access::mode::write>(cgh);
         host_task<class armpl_kernel_iamax>(cgh, [=]() {
             accessor_result[0] =
                 cblas_func((armpl_int_t)n, accessor_x.GET_MULTI_PTR, (armpl_int_t)incx);
+            if (base == oneapi::math::index_base::one && n >= 1 && incx >= 1)
+                accessor_result[0]++;
         });
     });
 }
 
 #define IAMAX_LAUNCHER(TYPE, ROUTINE)                                                 \
     void iamax(sycl::queue& queue, int64_t n, sycl::buffer<TYPE, 1>& x, int64_t incx, \
-               sycl::buffer<int64_t, 1>& result) {                                    \
-        iamax(queue, n, x, incx, result, ROUTINE);                                    \
+               sycl::buffer<int64_t, 1>& result, oneapi::math::index_base base) {     \
+        iamax(queue, n, x, incx, result, base, ROUTINE);                              \
     }
 
 IAMAX_LAUNCHER(float, ::cblas_isamax)
@@ -561,22 +565,27 @@ DOTU_USM_LAUNCHER(std::complex<double>, ::cblas_zdotu_sub)
 
 template <typename T, typename CBLAS_FUNC>
 sycl::event iamin(sycl::queue& queue, int64_t n, const T* x, int64_t incx, int64_t* result,
-                  const std::vector<sycl::event>& dependencies, CBLAS_FUNC cblas_func) {
+                  const std::vector<sycl::event>& dependencies, oneapi::math::index_base base,
+                  CBLAS_FUNC cblas_func) {
     auto done = queue.submit([&](sycl::handler& cgh) {
         int64_t num_events = dependencies.size();
         for (int64_t i = 0; i < num_events; ++i) {
             cgh.depends_on(dependencies[i]);
         }
-        host_task<class armpl_kernel_iamin>(
-            cgh, [=]() { result[0] = cblas_func((armpl_int_t)n, x, (armpl_int_t)incx); });
+        host_task<class armpl_kernel_iamin>(cgh, [=]() {
+            result[0] = cblas_func((armpl_int_t)n, x, (armpl_int_t)incx);
+            if (base == oneapi::math::index_base::one && n >= 1 && incx >= 1)
+                result[0]++;
+        });
     });
     return done;
 }
 
 #define IAMIN_USM_LAUNCHER(TYPE, ROUTINE)                                                          \
     sycl::event iamin(sycl::queue& queue, int64_t n, const TYPE* x, int64_t incx, int64_t* result, \
+                      oneapi::math::index_base base,                                               \
                       const std::vector<sycl::event>& dependencies) {                              \
-        return iamin(queue, n, x, incx, result, dependencies, ROUTINE);                            \
+        return iamin(queue, n, x, incx, result, base, dependencies, ROUTINE);                      \
     }
 
 IAMIN_USM_LAUNCHER(float, ::cblas_isamin)
@@ -586,22 +595,27 @@ IAMIN_USM_LAUNCHER(std::complex<double>, ::cblas_izamin)
 
 template <typename T, typename CBLAS_FUNC>
 sycl::event iamax(sycl::queue& queue, int64_t n, const T* x, int64_t incx, int64_t* result,
-                  const std::vector<sycl::event>& dependencies, CBLAS_FUNC cblas_func) {
+                  oneapi::math::index_base base, const std::vector<sycl::event>& dependencies,
+                  CBLAS_FUNC cblas_func) {
     auto done = queue.submit([&](sycl::handler& cgh) {
         int64_t num_events = dependencies.size();
         for (int64_t i = 0; i < num_events; ++i) {
             cgh.depends_on(dependencies[i]);
         }
-        host_task<class armpl_kernel_iamax>(
-            cgh, [=]() { result[0] = cblas_func((armpl_int_t)n, x, (armpl_int_t)incx); });
+        host_task<class armpl_kernel_iamax>(cgh, [=]() {
+            result[0] = cblas_func((armpl_int_t)n, x, (armpl_int_t)incx);
+            if (base == oneapi::math::index_base::one && n >= 1 && incx >= 1)
+                result[0]++;
+        });
     });
     return done;
 }
 
 #define IAMAX_USM_LAUNCHER(TYPE, ROUTINE)                                                          \
     sycl::event iamax(sycl::queue& queue, int64_t n, const TYPE* x, int64_t incx, int64_t* result, \
+                      oneapi::math::index_base base,                                               \
                       const std::vector<sycl::event>& dependencies) {                              \
-        return iamax(queue, n, x, incx, result, dependencies, ROUTINE);                            \
+        return iamax(queue, n, x, incx, result, base, dependencies, ROUTINE);                      \
     }
 
 IAMAX_USM_LAUNCHER(float, ::cblas_isamax)

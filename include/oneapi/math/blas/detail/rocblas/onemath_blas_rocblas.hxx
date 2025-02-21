@@ -133,28 +133,36 @@ void dotu(sycl::queue& queue, int64_t n, sycl::buffer<std::complex<double>, 1>& 
           sycl::buffer<std::complex<double>, 1>& result);
 
 void iamin(sycl::queue& queue, int64_t n, sycl::buffer<float, 1>& x, int64_t incx,
-           sycl::buffer<int64_t, 1>& result);
+           sycl::buffer<int64_t, 1>& result,
+           oneapi::math::index_base base = oneapi::math::index_base::zero);
 
 void iamin(sycl::queue& queue, int64_t n, sycl::buffer<double, 1>& x, int64_t incx,
-           sycl::buffer<int64_t, 1>& result);
+           sycl::buffer<int64_t, 1>& result,
+           oneapi::math::index_base base = oneapi::math::index_base::zero);
 
 void iamin(sycl::queue& queue, int64_t n, sycl::buffer<std::complex<float>, 1>& x, int64_t incx,
-           sycl::buffer<int64_t, 1>& result);
+           sycl::buffer<int64_t, 1>& result,
+           oneapi::math::index_base base = oneapi::math::index_base::zero);
 
 void iamin(sycl::queue& queue, int64_t n, sycl::buffer<std::complex<double>, 1>& x, int64_t incx,
-           sycl::buffer<int64_t, 1>& result);
+           sycl::buffer<int64_t, 1>& result,
+           oneapi::math::index_base base = oneapi::math::index_base::zero);
 
 void iamax(sycl::queue& queue, int64_t n, sycl::buffer<float, 1>& x, int64_t incx,
-           sycl::buffer<int64_t, 1>& result);
+           sycl::buffer<int64_t, 1>& result,
+           oneapi::math::index_base base = oneapi::math::index_base::zero);
 
 void iamax(sycl::queue& queue, int64_t n, sycl::buffer<double, 1>& x, int64_t incx,
-           sycl::buffer<int64_t, 1>& result);
+           sycl::buffer<int64_t, 1>& result,
+           oneapi::math::index_base base = oneapi::math::index_base::zero);
 
 void iamax(sycl::queue& queue, int64_t n, sycl::buffer<std::complex<float>, 1>& x, int64_t incx,
-           sycl::buffer<int64_t, 1>& result);
+           sycl::buffer<int64_t, 1>& result,
+           oneapi::math::index_base base = oneapi::math::index_base::zero);
 
 void iamax(sycl::queue& queue, int64_t n, sycl::buffer<std::complex<double>, 1>& x, int64_t incx,
-           sycl::buffer<int64_t, 1>& result);
+           sycl::buffer<int64_t, 1>& result,
+           oneapi::math::index_base base = oneapi::math::index_base::zero);
 
 void nrm2(sycl::queue& queue, int64_t n, sycl::buffer<std::complex<float>, 1>& x, int64_t incx,
           sycl::buffer<float, 1>& result);
@@ -1097,28 +1105,36 @@ sycl::event dotu(sycl::queue& queue, int64_t n, const std::complex<double>* x, i
                  const std::vector<sycl::event>& dependencies = {});
 
 sycl::event iamin(sycl::queue& queue, int64_t n, const float* x, int64_t incx, int64_t* result,
+                  oneapi::math::index_base base = oneapi::math::index_base::zero,
                   const std::vector<sycl::event>& dependencies = {});
 
 sycl::event iamin(sycl::queue& queue, int64_t n, const double* x, int64_t incx, int64_t* result,
+                  oneapi::math::index_base base = oneapi::math::index_base::zero,
                   const std::vector<sycl::event>& dependencies = {});
 
 sycl::event iamin(sycl::queue& queue, int64_t n, const std::complex<float>* x, int64_t incx,
-                  int64_t* result, const std::vector<sycl::event>& dependencies = {});
+                  int64_t* result, oneapi::math::index_base base = oneapi::math::index_base::zero,
+                  const std::vector<sycl::event>& dependencies = {});
 
 sycl::event iamin(sycl::queue& queue, int64_t n, const std::complex<double>* x, int64_t incx,
-                  int64_t* result, const std::vector<sycl::event>& dependencies = {});
+                  int64_t* result, oneapi::math::index_base base = oneapi::math::index_base::zero,
+                  const std::vector<sycl::event>& dependencies = {});
 
 sycl::event iamax(sycl::queue& queue, int64_t n, const float* x, int64_t incx, int64_t* result,
+                  oneapi::math::index_base base = oneapi::math::index_base::zero,
                   const std::vector<sycl::event>& dependencies = {});
 
 sycl::event iamax(sycl::queue& queue, int64_t n, const double* x, int64_t incx, int64_t* result,
+                  oneapi::math::index_base base = oneapi::math::index_base::zero,
                   const std::vector<sycl::event>& dependencies = {});
 
 sycl::event iamax(sycl::queue& queue, int64_t n, const std::complex<float>* x, int64_t incx,
-                  int64_t* result, const std::vector<sycl::event>& dependencies = {});
+                  int64_t* result, oneapi::math::index_base base = oneapi::math::index_base::zero,
+                  const std::vector<sycl::event>& dependencies = {});
 
 sycl::event iamax(sycl::queue& queue, int64_t n, const std::complex<double>* x, int64_t incx,
-                  int64_t* result, const std::vector<sycl::event>& dependencies = {});
+                  int64_t* result, oneapi::math::index_base base = oneapi::math::index_base::zero,
+                  const std::vector<sycl::event>& dependencies = {});
 
 sycl::event nrm2(sycl::queue& queue, int64_t n, const std::complex<float>* x, int64_t incx,
                  float* result, const std::vector<sycl::event>& dependencies = {});

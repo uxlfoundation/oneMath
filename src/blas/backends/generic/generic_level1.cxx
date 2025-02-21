@@ -32,22 +32,38 @@ void dotu(sycl::queue& queue, std::int64_t n, sycl::buffer<std::complex<real_t>,
 }
 
 void iamax(sycl::queue& queue, std::int64_t n, sycl::buffer<real_t, 1>& x, std::int64_t incx,
-           sycl::buffer<std::int64_t, 1>& result) {
+           sycl::buffer<std::int64_t, 1>& result, oneapi::math::index_base base) {
     CALL_GENERIC_BLAS_FN(::blas::_iamax, queue, n, x, incx, result);
+    queue.submit([&](sycl::handler& cgh) {
+        auto result_acc = result.template get_access<sycl::access::mode::read_write>(cgh);
+        cgh.single_task([=]() {
+            if (base == oneapi::math::index_base::one && n >= 1 && incx >= 1)
+                result_acc[0]++;
+        });
+    });
 }
 
 void iamax(sycl::queue& queue, std::int64_t n, sycl::buffer<std::complex<real_t>, 1>& x,
-           std::int64_t incx, sycl::buffer<std::int64_t, 1>& result) {
+           std::int64_t incx, sycl::buffer<std::int64_t, 1>& result,
+           oneapi::math::index_base base) {
     throw unimplemented("blas", "iamax", "");
 }
 
 void iamin(sycl::queue& queue, std::int64_t n, sycl::buffer<real_t, 1>& x, std::int64_t incx,
-           sycl::buffer<std::int64_t, 1>& result) {
+           sycl::buffer<std::int64_t, 1>& result, oneapi::math::index_base base) {
     CALL_GENERIC_BLAS_FN(::blas::_iamin, queue, n, x, incx, result);
+    queue.submit([&](sycl::handler& cgh) {
+        auto result_acc = result.template get_access<sycl::access::mode::read_write>(cgh);
+        cgh.single_task([=]() {
+            if (base == oneapi::math::index_base::one && n >= 1 && incx >= 1)
+                result_acc[0]++;
+        });
+    });
 }
 
 void iamin(sycl::queue& queue, std::int64_t n, sycl::buffer<std::complex<real_t>, 1>& x,
-           std::int64_t incx, sycl::buffer<std::int64_t, 1>& result) {
+           std::int64_t incx, sycl::buffer<std::int64_t, 1>& result,
+           oneapi::math::index_base base) {
     throw unimplemented("blas", "iamin", "");
 }
 
@@ -217,23 +233,43 @@ sycl::event dotu(sycl::queue& queue, std::int64_t n, const std::complex<real_t>*
 }
 
 sycl::event iamax(sycl::queue& queue, std::int64_t n, const real_t* x, std::int64_t incx,
-                  std::int64_t* result, const std::vector<sycl::event>& dependencies) {
-    CALL_GENERIC_BLAS_USM_FN(::blas::_iamax, queue, n, x, incx, result, dependencies);
+                  std::int64_t* result, oneapi::math::index_base base,
+                  const std::vector<sycl::event>& dependencies) {
+    sycl::event e = [&]() -> sycl::event {
+        CALL_GENERIC_BLAS_USM_FN(::blas::_iamax, queue, n, x, incx, result, dependencies);
+    }();
+    return queue.submit([&](sycl::handler& cgh) {
+        cgh.depends_on(e);
+        cgh.single_task([=]() {
+            if (base == oneapi::math::index_base::one && n >= 1 && incx >= 1)
+                result[0]++;
+        });
+    });
 }
 
 sycl::event iamax(sycl::queue& queue, std::int64_t n, const std::complex<real_t>* x,
-                  std::int64_t incx, std::int64_t* result,
+                  std::int64_t incx, std::int64_t* result, oneapi::math::index_base base,
                   const std::vector<sycl::event>& dependencies) {
     throw unimplemented("blas", "iamax", " for USM");
 }
 
 sycl::event iamin(sycl::queue& queue, std::int64_t n, const real_t* x, std::int64_t incx,
-                  std::int64_t* result, const std::vector<sycl::event>& dependencies) {
-    CALL_GENERIC_BLAS_USM_FN(::blas::_iamin, queue, n, x, incx, result, dependencies);
+                  std::int64_t* result, oneapi::math::index_base base,
+                  const std::vector<sycl::event>& dependencies) {
+    sycl::event e = [&]() -> sycl::event {
+        CALL_GENERIC_BLAS_USM_FN(::blas::_iamin, queue, n, x, incx, result, dependencies);
+    }();
+    return queue.submit([&](sycl::handler& cgh) {
+        cgh.depends_on(e);
+        cgh.single_task([=]() {
+            if (base == oneapi::math::index_base::one && n >= 1 && incx >= 1)
+                result[0]++;
+        });
+    });
 }
 
 sycl::event iamin(sycl::queue& queue, std::int64_t n, const std::complex<real_t>* x,
-                  std::int64_t incx, std::int64_t* result,
+                  std::int64_t incx, std::int64_t* result, oneapi::math::index_base base,
                   const std::vector<sycl::event>& dependencies) {
     throw unimplemented("blas", "iamin", " for USM");
 }

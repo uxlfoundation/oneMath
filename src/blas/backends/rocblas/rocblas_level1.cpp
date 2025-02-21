@@ -464,7 +464,8 @@ ROTMG_LAUNCHER(double, rocblas_drotmg)
 
 template <typename Func, typename T>
 inline void iamax(Func func, sycl::queue& queue, int64_t n, sycl::buffer<T, 1>& x,
-                  const int64_t incx, sycl::buffer<int64_t, 1>& result) {
+                  const int64_t incx, sycl::buffer<int64_t, 1>& result,
+                  oneapi::math::index_base base) {
     using rocDataType = typename RocEquivalentType<T>::Type;
     overflow_check(n, incx);
 
@@ -504,15 +505,18 @@ inline void iamax(Func func, sycl::queue& queue, int64_t n, sycl::buffer<T, 1>& 
     queue.submit([&](sycl::handler& cgh) {
         auto int_res_acc = int_res_buff.template get_access<sycl::access::mode::read>(cgh);
         auto result_acc = result.template get_access<sycl::access::mode::write>(cgh);
-        cgh.single_task(
-            [=]() { result_acc[0] = std::max((int64_t)int_res_acc[0] - 1, (int64_t)0); });
+        cgh.single_task([=]() {
+            result_acc[0] = std::max(
+                (int64_t)(int_res_acc[0] + (base == oneapi::math::index_base::zero ? -1 : 0)),
+                (int64_t)0);
+        });
     });
 }
 
 #define IAMAX_LAUNCHER(TYPE, ROCBLAS_ROUTINE)                                               \
     void iamax(sycl::queue& queue, int64_t n, sycl::buffer<TYPE, 1>& x, const int64_t incx, \
-               sycl::buffer<int64_t, 1>& result) {                                          \
-        iamax(ROCBLAS_ROUTINE, queue, n, x, incx, result);                                  \
+               sycl::buffer<int64_t, 1>& result, oneapi::math::index_base base) {           \
+        iamax(ROCBLAS_ROUTINE, queue, n, x, incx, result, base);                            \
     }
 
 IAMAX_LAUNCHER(float, rocblas_isamax)
@@ -557,7 +561,8 @@ SWAP_LAUNCHER(std::complex<double>, rocblas_zswap)
 
 template <typename Func, typename T>
 inline void iamin(Func func, sycl::queue& queue, int64_t n, sycl::buffer<T, 1>& x,
-                  const int64_t incx, sycl::buffer<int64_t, 1>& result) {
+                  const int64_t incx, sycl::buffer<int64_t, 1>& result,
+                  oneapi::math::index_base base) {
     using rocDataType = typename RocEquivalentType<T>::Type;
     overflow_check(n, incx);
 
@@ -597,15 +602,18 @@ inline void iamin(Func func, sycl::queue& queue, int64_t n, sycl::buffer<T, 1>& 
     queue.submit([&](sycl::handler& cgh) {
         auto int_res_acc = int_res_buff.template get_access<sycl::access::mode::read>(cgh);
         auto result_acc = result.template get_access<sycl::access::mode::write>(cgh);
-        cgh.single_task(
-            [=]() { result_acc[0] = std::max((int64_t)int_res_acc[0] - 1, (int64_t)0); });
+        cgh.single_task([=]() {
+            result_acc[0] = std::max(
+                (int64_t)(int_res_acc[0] + (base == oneapi::math::index_base::zero ? -1 : 0)),
+                (int64_t)0);
+        });
     });
 }
 
 #define IAMIN_LAUNCHER(TYPE, ROCBLAS_ROUTINE)                                               \
     void iamin(sycl::queue& queue, int64_t n, sycl::buffer<TYPE, 1>& x, const int64_t incx, \
-               sycl::buffer<int64_t, 1>& result) {                                          \
-        iamin(ROCBLAS_ROUTINE, queue, n, x, incx, result);                                  \
+               sycl::buffer<int64_t, 1>& result, oneapi::math::index_base base) {           \
+        iamin(ROCBLAS_ROUTINE, queue, n, x, incx, result, base);                            \
     }
 
 IAMIN_LAUNCHER(float, rocblas_isamin)
@@ -1039,7 +1047,8 @@ ROTMG_LAUNCHER_USM(double, rocblas_drotmg)
 
 template <typename Func, typename T>
 inline sycl::event iamax(Func func, sycl::queue& queue, int64_t n, const T* x, const int64_t incx,
-                         int64_t* result, const std::vector<sycl::event>& dependencies) {
+                         int64_t* result, oneapi::math::index_base base,
+                         const std::vector<sycl::event>& dependencies) {
     using rocDataType = typename RocEquivalentType<T>::Type;
     overflow_check(n, incx);
     // rocBLAS does not support int64_t as return type for the data by default. So we need to
@@ -1067,14 +1076,16 @@ inline sycl::event iamax(Func func, sycl::queue& queue, int64_t n, const T* x, c
     });
 
     done.wait_and_throw();
-    result[0] = std::max((int64_t)(*int_res_p - 1), int64_t{ 0 });
+    result[0] = std::max((int64_t)(*int_res_p + (base == oneapi::math::index_base::zero ? -1 : 0)),
+                         int64_t{ 0 });
     return done;
 }
 
 #define IAMAX_LAUNCHER_USM(TYPE, ROCBLAS_ROUTINE)                                       \
     sycl::event iamax(sycl::queue& queue, int64_t n, const TYPE* x, const int64_t incx, \
-                      int64_t* result, const std::vector<sycl::event>& dependencies) {  \
-        return iamax(ROCBLAS_ROUTINE, queue, n, x, incx, result, dependencies);         \
+                      int64_t* result, oneapi::math::index_base base,                   \
+                      const std::vector<sycl::event>& dependencies) {                   \
+        return iamax(ROCBLAS_ROUTINE, queue, n, x, incx, result, base, dependencies);   \
     }
 
 IAMAX_LAUNCHER_USM(float, rocblas_isamax)
@@ -1120,7 +1131,8 @@ SWAP_LAUNCHER_USM(std::complex<double>, rocblas_zswap)
 
 template <typename Func, typename T>
 inline sycl::event iamin(Func func, sycl::queue& queue, int64_t n, const T* x, const int64_t incx,
-                         int64_t* result, const std::vector<sycl::event>& dependencies) {
+                         int64_t* result, oneapi::math::index_base base,
+                         const std::vector<sycl::event>& dependencies) {
     using rocDataType = typename RocEquivalentType<T>::Type;
     overflow_check(n, incx);
     // rocBLAS does not support int64_t as return type for the data by default. So we need to
@@ -1149,14 +1161,16 @@ inline sycl::event iamin(Func func, sycl::queue& queue, int64_t n, const T* x, c
     });
 
     done.wait_and_throw();
-    result[0] = std::max((int64_t)(*int_res_p - 1), int64_t{ 0 });
+    result[0] = std::max((int64_t)(*int_res_p + (base == oneapi::math::index_base::zero ? -1 : 0)),
+                         int64_t{ 0 });
     return done;
 }
 
 #define IAMIN_LAUNCHER_USM(TYPE, ROCBLAS_ROUTINE)                                       \
     sycl::event iamin(sycl::queue& queue, int64_t n, const TYPE* x, const int64_t incx, \
-                      int64_t* result, const std::vector<sycl::event>& dependencies) {  \
-        return iamin(ROCBLAS_ROUTINE, queue, n, x, incx, result, dependencies);         \
+                      int64_t* result, oneapi::math::index_base base,                   \
+                      const std::vector<sycl::event>& dependencies) {                   \
+        return iamin(ROCBLAS_ROUTINE, queue, n, x, incx, result, base, dependencies);   \
     }
 
 IAMIN_LAUNCHER_USM(float, rocblas_isamin)
@@ -1413,14 +1427,15 @@ ROTMG_LAUNCHER(double, rocblas_drotmg)
 
 template <typename Func, typename T>
 inline void iamax(Func func, sycl::queue& queue, int64_t n, sycl::buffer<T, 1>& x,
-                  const int64_t incx, sycl::buffer<int64_t, 1>& result) {
-    column_major::iamax(func, queue, n, x, incx, result);
+                  const int64_t incx, sycl::buffer<int64_t, 1>& result,
+                  oneapi::math::index_base base) {
+    column_major::iamax(func, queue, n, x, incx, result, base);
 }
 
 #define IAMAX_LAUNCHER(TYPE, ROCBLAS_ROUTINE)                                               \
     void iamax(sycl::queue& queue, int64_t n, sycl::buffer<TYPE, 1>& x, const int64_t incx, \
-               sycl::buffer<int64_t, 1>& result) {                                          \
-        iamax(ROCBLAS_ROUTINE, queue, n, x, incx, result);                                  \
+               sycl::buffer<int64_t, 1>& result, oneapi::math::index_base base) {           \
+        iamax(ROCBLAS_ROUTINE, queue, n, x, incx, result, base);                            \
     }
 
 IAMAX_LAUNCHER(float, rocblas_isamax)
@@ -1451,14 +1466,15 @@ SWAP_LAUNCHER(std::complex<double>, rocblas_zswap)
 
 template <typename Func, typename T>
 inline void iamin(Func func, sycl::queue& queue, int64_t n, sycl::buffer<T, 1>& x,
-                  const int64_t incx, sycl::buffer<int64_t, 1>& result) {
-    column_major::iamin(func, queue, n, x, incx, result);
+                  const int64_t incx, sycl::buffer<int64_t, 1>& result,
+                  oneapi::math::index_base base) {
+    column_major::iamin(func, queue, n, x, incx, result, base);
 }
 
 #define IAMIN_LAUNCHER(TYPE, ROCBLAS_ROUTINE)                                               \
     void iamin(sycl::queue& queue, int64_t n, sycl::buffer<TYPE, 1>& x, const int64_t incx, \
-               sycl::buffer<int64_t, 1>& result) {                                          \
-        iamin(ROCBLAS_ROUTINE, queue, n, x, incx, result);                                  \
+               sycl::buffer<int64_t, 1>& result, oneapi::math::index_base base) {           \
+        iamin(ROCBLAS_ROUTINE, queue, n, x, incx, result, base);                            \
     }
 
 IAMIN_LAUNCHER(float, rocblas_isamin)
@@ -1699,14 +1715,16 @@ ROTMG_LAUNCHER_USM(double, rocblas_drotmg)
 
 template <typename Func, typename T>
 inline sycl::event iamax(Func func, sycl::queue& queue, int64_t n, const T* x, const int64_t incx,
-                         int64_t* result, const std::vector<sycl::event>& dependencies) {
-    return column_major::iamax(func, queue, n, x, incx, result, dependencies);
+                         int64_t* result, oneapi::math::index_base base,
+                         const std::vector<sycl::event>& dependencies) {
+    return column_major::iamax(func, queue, n, x, incx, result, base, dependencies);
 }
 
 #define IAMAX_LAUNCHER_USM(TYPE, ROCBLAS_ROUTINE)                                       \
     sycl::event iamax(sycl::queue& queue, int64_t n, const TYPE* x, const int64_t incx, \
-                      int64_t* result, const std::vector<sycl::event>& dependencies) {  \
-        return iamax(ROCBLAS_ROUTINE, queue, n, x, incx, result, dependencies);         \
+                      int64_t* result, oneapi::math::index_base base,                   \
+                      const std::vector<sycl::event>& dependencies) {                   \
+        return iamax(ROCBLAS_ROUTINE, queue, n, x, incx, result, base, dependencies);   \
     }
 
 IAMAX_LAUNCHER_USM(float, rocblas_isamax)
@@ -1737,14 +1755,16 @@ SWAP_LAUNCHER_USM(std::complex<double>, rocblas_zswap)
 
 template <typename Func, typename T>
 inline sycl::event iamin(Func func, sycl::queue& queue, int64_t n, const T* x, const int64_t incx,
-                         int64_t* result, const std::vector<sycl::event>& dependencies) {
-    return column_major::iamin(func, queue, n, x, incx, result, dependencies);
+                         int64_t* result, oneapi::math::index_base base,
+                         const std::vector<sycl::event>& dependencies) {
+    return column_major::iamin(func, queue, n, x, incx, result, base, dependencies);
 }
 
 #define IAMIN_LAUNCHER_USM(TYPE, ROCBLAS_ROUTINE)                                       \
     sycl::event iamin(sycl::queue& queue, int64_t n, const TYPE* x, const int64_t incx, \
-                      int64_t* result, const std::vector<sycl::event>& dependencies) {  \
-        return iamin(ROCBLAS_ROUTINE, queue, n, x, incx, result, dependencies);         \
+                      int64_t* result, oneapi::math::index_base base,                   \
+                      const std::vector<sycl::event>& dependencies) {                   \
+        return iamin(ROCBLAS_ROUTINE, queue, n, x, incx, result, base, dependencies);   \
     }
 
 IAMIN_LAUNCHER_USM(float, rocblas_isamin)

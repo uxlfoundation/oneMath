@@ -283,43 +283,71 @@ void swap(sycl::queue& queue, std::int64_t n, sycl::buffer<std::complex<double>,
 }
 
 void iamax(sycl::queue& queue, std::int64_t n, sycl::buffer<float, 1>& x, std::int64_t incx,
-           sycl::buffer<std::int64_t, 1>& result) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::iamax(queue, n, x, incx, result));
+           sycl::buffer<std::int64_t, 1>& result, oneapi::math::index_base base) {
+    RETHROW_ONEMKL_EXCEPTIONS(blas_major::iamax(queue, n, x, incx, result,
+                                                base == oneapi::math::index_base::zero
+                                                    ? oneapi::mkl::index_base::zero
+                                                    : oneapi::mkl::index_base::one));
 }
 
 void iamax(sycl::queue& queue, std::int64_t n, sycl::buffer<double, 1>& x, std::int64_t incx,
-           sycl::buffer<std::int64_t, 1>& result) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::iamax(queue, n, x, incx, result));
+           sycl::buffer<std::int64_t, 1>& result, oneapi::math::index_base base) {
+    RETHROW_ONEMKL_EXCEPTIONS(blas_major::iamax(queue, n, x, incx, result,
+                                                base == oneapi::math::index_base::zero
+                                                    ? oneapi::mkl::index_base::zero
+                                                    : oneapi::mkl::index_base::one));
 }
 
 void iamax(sycl::queue& queue, std::int64_t n, sycl::buffer<std::complex<float>, 1>& x,
-           std::int64_t incx, sycl::buffer<std::int64_t, 1>& result) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::iamax(queue, n, x, incx, result));
+           std::int64_t incx, sycl::buffer<std::int64_t, 1>& result,
+           oneapi::math::index_base base) {
+    RETHROW_ONEMKL_EXCEPTIONS(blas_major::iamax(queue, n, x, incx, result,
+                                                base == oneapi::math::index_base::zero
+                                                    ? oneapi::mkl::index_base::zero
+                                                    : oneapi::mkl::index_base::one));
 }
 
 void iamax(sycl::queue& queue, std::int64_t n, sycl::buffer<std::complex<double>, 1>& x,
-           std::int64_t incx, sycl::buffer<std::int64_t, 1>& result) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::iamax(queue, n, x, incx, result));
+           std::int64_t incx, sycl::buffer<std::int64_t, 1>& result,
+           oneapi::math::index_base base) {
+    RETHROW_ONEMKL_EXCEPTIONS(blas_major::iamax(queue, n, x, incx, result,
+                                                base == oneapi::math::index_base::zero
+                                                    ? oneapi::mkl::index_base::zero
+                                                    : oneapi::mkl::index_base::one));
 }
 
 void iamin(sycl::queue& queue, std::int64_t n, sycl::buffer<float, 1>& x, std::int64_t incx,
-           sycl::buffer<std::int64_t, 1>& result) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::iamin(queue, n, x, incx, result));
+           sycl::buffer<std::int64_t, 1>& result, oneapi::math::index_base base) {
+    RETHROW_ONEMKL_EXCEPTIONS(blas_major::iamin(queue, n, x, incx, result,
+                                                base == oneapi::math::index_base::zero
+                                                    ? oneapi::mkl::index_base::zero
+                                                    : oneapi::mkl::index_base::one));
 }
 
 void iamin(sycl::queue& queue, std::int64_t n, sycl::buffer<double, 1>& x, std::int64_t incx,
-           sycl::buffer<std::int64_t, 1>& result) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::iamin(queue, n, x, incx, result));
+           sycl::buffer<std::int64_t, 1>& result, oneapi::math::index_base base) {
+    RETHROW_ONEMKL_EXCEPTIONS(blas_major::iamin(queue, n, x, incx, result,
+                                                base == oneapi::math::index_base::zero
+                                                    ? oneapi::mkl::index_base::zero
+                                                    : oneapi::mkl::index_base::one));
 }
 
 void iamin(sycl::queue& queue, std::int64_t n, sycl::buffer<std::complex<float>, 1>& x,
-           std::int64_t incx, sycl::buffer<std::int64_t, 1>& result) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::iamin(queue, n, x, incx, result));
+           std::int64_t incx, sycl::buffer<std::int64_t, 1>& result,
+           oneapi::math::index_base base) {
+    RETHROW_ONEMKL_EXCEPTIONS(blas_major::iamin(queue, n, x, incx, result,
+                                                base == oneapi::math::index_base::zero
+                                                    ? oneapi::mkl::index_base::zero
+                                                    : oneapi::mkl::index_base::one));
 }
 
 void iamin(sycl::queue& queue, std::int64_t n, sycl::buffer<std::complex<double>, 1>& x,
-           std::int64_t incx, sycl::buffer<std::int64_t, 1>& result) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::iamin(queue, n, x, incx, result));
+           std::int64_t incx, sycl::buffer<std::int64_t, 1>& result,
+           oneapi::math::index_base base) {
+    RETHROW_ONEMKL_EXCEPTIONS(blas_major::iamin(queue, n, x, incx, result,
+                                                base == oneapi::math::index_base::zero
+                                                    ? oneapi::mkl::index_base::zero
+                                                    : oneapi::mkl::index_base::one));
 }
 
 // USM APIs
@@ -619,45 +647,81 @@ sycl::event swap(sycl::queue& queue, std::int64_t n, std::complex<double>* x, st
 }
 
 sycl::event iamax(sycl::queue& queue, std::int64_t n, const float* x, std::int64_t incx,
-                  std::int64_t* result, const std::vector<sycl::event>& dependencies) {
-    RETHROW_ONEMKL_EXCEPTIONS_RET(blas_major::iamax(queue, n, x, incx, result, dependencies));
+                  std::int64_t* result, oneapi::math::index_base base,
+                  const std::vector<sycl::event>& dependencies) {
+    RETHROW_ONEMKL_EXCEPTIONS_RET(blas_major::iamax(queue, n, x, incx, result,
+                                                    base == oneapi::math::index_base::zero
+                                                        ? oneapi::mkl::index_base::zero
+                                                        : oneapi::mkl::index_base::one,
+                                                    dependencies));
 }
 
 sycl::event iamax(sycl::queue& queue, std::int64_t n, const double* x, std::int64_t incx,
-                  std::int64_t* result, const std::vector<sycl::event>& dependencies) {
-    RETHROW_ONEMKL_EXCEPTIONS_RET(blas_major::iamax(queue, n, x, incx, result, dependencies));
+                  std::int64_t* result, oneapi::math::index_base base,
+                  const std::vector<sycl::event>& dependencies) {
+    RETHROW_ONEMKL_EXCEPTIONS_RET(blas_major::iamax(queue, n, x, incx, result,
+                                                    base == oneapi::math::index_base::zero
+                                                        ? oneapi::mkl::index_base::zero
+                                                        : oneapi::mkl::index_base::one,
+                                                    dependencies));
 }
 
 sycl::event iamax(sycl::queue& queue, std::int64_t n, const std::complex<float>* x,
-                  std::int64_t incx, std::int64_t* result,
+                  std::int64_t incx, std::int64_t* result, oneapi::math::index_base base,
                   const std::vector<sycl::event>& dependencies) {
-    RETHROW_ONEMKL_EXCEPTIONS_RET(blas_major::iamax(queue, n, x, incx, result, dependencies));
+    RETHROW_ONEMKL_EXCEPTIONS_RET(blas_major::iamax(queue, n, x, incx, result,
+                                                    base == oneapi::math::index_base::zero
+                                                        ? oneapi::mkl::index_base::zero
+                                                        : oneapi::mkl::index_base::one,
+                                                    dependencies));
 }
 
 sycl::event iamax(sycl::queue& queue, std::int64_t n, const std::complex<double>* x,
-                  std::int64_t incx, std::int64_t* result,
+                  std::int64_t incx, std::int64_t* result, oneapi::math::index_base base,
                   const std::vector<sycl::event>& dependencies) {
-    RETHROW_ONEMKL_EXCEPTIONS_RET(blas_major::iamax(queue, n, x, incx, result, dependencies));
+    RETHROW_ONEMKL_EXCEPTIONS_RET(blas_major::iamax(queue, n, x, incx, result,
+                                                    base == oneapi::math::index_base::zero
+                                                        ? oneapi::mkl::index_base::zero
+                                                        : oneapi::mkl::index_base::one,
+                                                    dependencies));
 }
 
 sycl::event iamin(sycl::queue& queue, std::int64_t n, const float* x, std::int64_t incx,
-                  std::int64_t* result, const std::vector<sycl::event>& dependencies) {
-    RETHROW_ONEMKL_EXCEPTIONS_RET(blas_major::iamin(queue, n, x, incx, result, dependencies));
+                  std::int64_t* result, oneapi::math::index_base base,
+                  const std::vector<sycl::event>& dependencies) {
+    RETHROW_ONEMKL_EXCEPTIONS_RET(blas_major::iamin(queue, n, x, incx, result,
+                                                    base == oneapi::math::index_base::zero
+                                                        ? oneapi::mkl::index_base::zero
+                                                        : oneapi::mkl::index_base::one,
+                                                    dependencies));
 }
 
 sycl::event iamin(sycl::queue& queue, std::int64_t n, const double* x, std::int64_t incx,
-                  std::int64_t* result, const std::vector<sycl::event>& dependencies) {
-    RETHROW_ONEMKL_EXCEPTIONS_RET(blas_major::iamin(queue, n, x, incx, result, dependencies));
+                  std::int64_t* result, oneapi::math::index_base base,
+                  const std::vector<sycl::event>& dependencies) {
+    RETHROW_ONEMKL_EXCEPTIONS_RET(blas_major::iamin(queue, n, x, incx, result,
+                                                    base == oneapi::math::index_base::zero
+                                                        ? oneapi::mkl::index_base::zero
+                                                        : oneapi::mkl::index_base::one,
+                                                    dependencies));
 }
 
 sycl::event iamin(sycl::queue& queue, std::int64_t n, const std::complex<float>* x,
-                  std::int64_t incx, std::int64_t* result,
+                  std::int64_t incx, std::int64_t* result, oneapi::math::index_base base,
                   const std::vector<sycl::event>& dependencies) {
-    RETHROW_ONEMKL_EXCEPTIONS_RET(blas_major::iamin(queue, n, x, incx, result, dependencies));
+    RETHROW_ONEMKL_EXCEPTIONS_RET(blas_major::iamin(queue, n, x, incx, result,
+                                                    base == oneapi::math::index_base::zero
+                                                        ? oneapi::mkl::index_base::zero
+                                                        : oneapi::mkl::index_base::one,
+                                                    dependencies));
 }
 
 sycl::event iamin(sycl::queue& queue, std::int64_t n, const std::complex<double>* x,
-                  std::int64_t incx, std::int64_t* result,
+                  std::int64_t incx, std::int64_t* result, oneapi::math::index_base base,
                   const std::vector<sycl::event>& dependencies) {
-    RETHROW_ONEMKL_EXCEPTIONS_RET(blas_major::iamin(queue, n, x, incx, result, dependencies));
+    RETHROW_ONEMKL_EXCEPTIONS_RET(blas_major::iamin(queue, n, x, incx, result,
+                                                    base == oneapi::math::index_base::zero
+                                                        ? oneapi::mkl::index_base::zero
+                                                        : oneapi::mkl::index_base::one,
+                                                    dependencies));
 }

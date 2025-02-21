@@ -241,47 +241,51 @@ void dotu(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
 }
 
 void iamin(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
-           sycl::buffer<float, 1>& x, std::int64_t incx, sycl::buffer<std::int64_t, 1>& result) {
-    function_tables[{ libkey, queue }].column_major_isamin_sycl(queue, n, x, incx, result);
+           sycl::buffer<float, 1>& x, std::int64_t incx, sycl::buffer<std::int64_t, 1>& result,
+           oneapi::math::index_base base) {
+    function_tables[{ libkey, queue }].column_major_isamin_sycl(queue, n, x, incx, result, base);
 }
 
 void iamin(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
-           sycl::buffer<double, 1>& x, std::int64_t incx, sycl::buffer<std::int64_t, 1>& result) {
-    function_tables[{ libkey, queue }].column_major_idamin_sycl(queue, n, x, incx, result);
+           sycl::buffer<double, 1>& x, std::int64_t incx, sycl::buffer<std::int64_t, 1>& result,
+           oneapi::math::index_base base) {
+    function_tables[{ libkey, queue }].column_major_idamin_sycl(queue, n, x, incx, result, base);
 }
 
 void iamin(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
            sycl::buffer<std::complex<float>, 1>& x, std::int64_t incx,
-           sycl::buffer<std::int64_t, 1>& result) {
-    function_tables[{ libkey, queue }].column_major_icamin_sycl(queue, n, x, incx, result);
+           sycl::buffer<std::int64_t, 1>& result, oneapi::math::index_base base) {
+    function_tables[{ libkey, queue }].column_major_icamin_sycl(queue, n, x, incx, result, base);
 }
 
 void iamin(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
            sycl::buffer<std::complex<double>, 1>& x, std::int64_t incx,
-           sycl::buffer<std::int64_t, 1>& result) {
-    function_tables[{ libkey, queue }].column_major_izamin_sycl(queue, n, x, incx, result);
+           sycl::buffer<std::int64_t, 1>& result, oneapi::math::index_base base) {
+    function_tables[{ libkey, queue }].column_major_izamin_sycl(queue, n, x, incx, result, base);
 }
 
 void iamax(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
-           sycl::buffer<float, 1>& x, std::int64_t incx, sycl::buffer<std::int64_t, 1>& result) {
-    function_tables[{ libkey, queue }].column_major_isamax_sycl(queue, n, x, incx, result);
+           sycl::buffer<float, 1>& x, std::int64_t incx, sycl::buffer<std::int64_t, 1>& result,
+           oneapi::math::index_base base) {
+    function_tables[{ libkey, queue }].column_major_isamax_sycl(queue, n, x, incx, result, base);
 }
 
 void iamax(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
-           sycl::buffer<double, 1>& x, std::int64_t incx, sycl::buffer<std::int64_t, 1>& result) {
-    function_tables[{ libkey, queue }].column_major_idamax_sycl(queue, n, x, incx, result);
+           sycl::buffer<double, 1>& x, std::int64_t incx, sycl::buffer<std::int64_t, 1>& result,
+           oneapi::math::index_base base) {
+    function_tables[{ libkey, queue }].column_major_idamax_sycl(queue, n, x, incx, result, base);
 }
 
 void iamax(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
            sycl::buffer<std::complex<float>, 1>& x, std::int64_t incx,
-           sycl::buffer<std::int64_t, 1>& result) {
-    function_tables[{ libkey, queue }].column_major_icamax_sycl(queue, n, x, incx, result);
+           sycl::buffer<std::int64_t, 1>& result, oneapi::math::index_base base) {
+    function_tables[{ libkey, queue }].column_major_icamax_sycl(queue, n, x, incx, result, base);
 }
 
 void iamax(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
            sycl::buffer<std::complex<double>, 1>& x, std::int64_t incx,
-           sycl::buffer<std::int64_t, 1>& result) {
-    function_tables[{ libkey, queue }].column_major_izamax_sycl(queue, n, x, incx, result);
+           sycl::buffer<std::int64_t, 1>& result, oneapi::math::index_base base) {
+    function_tables[{ libkey, queue }].column_major_izamax_sycl(queue, n, x, incx, result, base);
 }
 
 void nrm2(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
@@ -2042,59 +2046,59 @@ sycl::event dotu(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n
 }
 
 sycl::event iamin(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n, const float* x,
-                  std::int64_t incx, std::int64_t* result,
+                  std::int64_t incx, std::int64_t* result, oneapi::math::index_base base,
                   const std::vector<sycl::event>& dependencies) {
-    return function_tables[{ libkey, queue }].column_major_isamin_usm_sycl(queue, n, x, incx,
-                                                                           result, dependencies);
+    return function_tables[{ libkey, queue }].column_major_isamin_usm_sycl(
+        queue, n, x, incx, result, base, dependencies);
 }
 
 sycl::event iamin(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n, const double* x,
-                  std::int64_t incx, std::int64_t* result,
+                  std::int64_t incx, std::int64_t* result, oneapi::math::index_base base,
                   const std::vector<sycl::event>& dependencies) {
-    return function_tables[{ libkey, queue }].column_major_idamin_usm_sycl(queue, n, x, incx,
-                                                                           result, dependencies);
+    return function_tables[{ libkey, queue }].column_major_idamin_usm_sycl(
+        queue, n, x, incx, result, base, dependencies);
 }
 
 sycl::event iamin(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
                   const std::complex<float>* x, std::int64_t incx, std::int64_t* result,
-                  const std::vector<sycl::event>& dependencies) {
-    return function_tables[{ libkey, queue }].column_major_icamin_usm_sycl(queue, n, x, incx,
-                                                                           result, dependencies);
+                  oneapi::math::index_base base, const std::vector<sycl::event>& dependencies) {
+    return function_tables[{ libkey, queue }].column_major_icamin_usm_sycl(
+        queue, n, x, incx, result, base, dependencies);
 }
 
 sycl::event iamin(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
                   const std::complex<double>* x, std::int64_t incx, std::int64_t* result,
-                  const std::vector<sycl::event>& dependencies) {
-    return function_tables[{ libkey, queue }].column_major_izamin_usm_sycl(queue, n, x, incx,
-                                                                           result, dependencies);
+                  oneapi::math::index_base base, const std::vector<sycl::event>& dependencies) {
+    return function_tables[{ libkey, queue }].column_major_izamin_usm_sycl(
+        queue, n, x, incx, result, base, dependencies);
 }
 
 sycl::event iamax(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n, const float* x,
-                  std::int64_t incx, std::int64_t* result,
+                  std::int64_t incx, std::int64_t* result, oneapi::math::index_base base,
                   const std::vector<sycl::event>& dependencies) {
-    return function_tables[{ libkey, queue }].column_major_isamax_usm_sycl(queue, n, x, incx,
-                                                                           result, dependencies);
+    return function_tables[{ libkey, queue }].column_major_isamax_usm_sycl(
+        queue, n, x, incx, result, base, dependencies);
 }
 
 sycl::event iamax(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n, const double* x,
-                  std::int64_t incx, std::int64_t* result,
+                  std::int64_t incx, std::int64_t* result, oneapi::math::index_base base,
                   const std::vector<sycl::event>& dependencies) {
-    return function_tables[{ libkey, queue }].column_major_idamax_usm_sycl(queue, n, x, incx,
-                                                                           result, dependencies);
+    return function_tables[{ libkey, queue }].column_major_idamax_usm_sycl(
+        queue, n, x, incx, result, base, dependencies);
 }
 
 sycl::event iamax(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
                   const std::complex<float>* x, std::int64_t incx, std::int64_t* result,
-                  const std::vector<sycl::event>& dependencies) {
-    return function_tables[{ libkey, queue }].column_major_icamax_usm_sycl(queue, n, x, incx,
-                                                                           result, dependencies);
+                  oneapi::math::index_base base, const std::vector<sycl::event>& dependencies) {
+    return function_tables[{ libkey, queue }].column_major_icamax_usm_sycl(
+        queue, n, x, incx, result, base, dependencies);
 }
 
 sycl::event iamax(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
                   const std::complex<double>* x, std::int64_t incx, std::int64_t* result,
-                  const std::vector<sycl::event>& dependencies) {
-    return function_tables[{ libkey, queue }].column_major_izamax_usm_sycl(queue, n, x, incx,
-                                                                           result, dependencies);
+                  oneapi::math::index_base base, const std::vector<sycl::event>& dependencies) {
+    return function_tables[{ libkey, queue }].column_major_izamax_usm_sycl(
+        queue, n, x, incx, result, base, dependencies);
 }
 
 sycl::event nrm2(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
@@ -4219,47 +4223,51 @@ void dotu(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
 }
 
 void iamin(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
-           sycl::buffer<float, 1>& x, std::int64_t incx, sycl::buffer<std::int64_t, 1>& result) {
-    function_tables[{ libkey, queue }].row_major_isamin_sycl(queue, n, x, incx, result);
+           sycl::buffer<float, 1>& x, std::int64_t incx, sycl::buffer<std::int64_t, 1>& result,
+           oneapi::math::index_base base) {
+    function_tables[{ libkey, queue }].row_major_isamin_sycl(queue, n, x, incx, result, base);
 }
 
 void iamin(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
-           sycl::buffer<double, 1>& x, std::int64_t incx, sycl::buffer<std::int64_t, 1>& result) {
-    function_tables[{ libkey, queue }].row_major_idamin_sycl(queue, n, x, incx, result);
+           sycl::buffer<double, 1>& x, std::int64_t incx, sycl::buffer<std::int64_t, 1>& result,
+           oneapi::math::index_base base) {
+    function_tables[{ libkey, queue }].row_major_idamin_sycl(queue, n, x, incx, result, base);
 }
 
 void iamin(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
            sycl::buffer<std::complex<float>, 1>& x, std::int64_t incx,
-           sycl::buffer<std::int64_t, 1>& result) {
-    function_tables[{ libkey, queue }].row_major_icamin_sycl(queue, n, x, incx, result);
+           sycl::buffer<std::int64_t, 1>& result, oneapi::math::index_base base) {
+    function_tables[{ libkey, queue }].row_major_icamin_sycl(queue, n, x, incx, result, base);
 }
 
 void iamin(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
            sycl::buffer<std::complex<double>, 1>& x, std::int64_t incx,
-           sycl::buffer<std::int64_t, 1>& result) {
-    function_tables[{ libkey, queue }].row_major_izamin_sycl(queue, n, x, incx, result);
+           sycl::buffer<std::int64_t, 1>& result, oneapi::math::index_base base) {
+    function_tables[{ libkey, queue }].row_major_izamin_sycl(queue, n, x, incx, result, base);
 }
 
 void iamax(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
-           sycl::buffer<float, 1>& x, std::int64_t incx, sycl::buffer<std::int64_t, 1>& result) {
-    function_tables[{ libkey, queue }].row_major_isamax_sycl(queue, n, x, incx, result);
+           sycl::buffer<float, 1>& x, std::int64_t incx, sycl::buffer<std::int64_t, 1>& result,
+           oneapi::math::index_base base) {
+    function_tables[{ libkey, queue }].row_major_isamax_sycl(queue, n, x, incx, result, base);
 }
 
 void iamax(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
-           sycl::buffer<double, 1>& x, std::int64_t incx, sycl::buffer<std::int64_t, 1>& result) {
-    function_tables[{ libkey, queue }].row_major_idamax_sycl(queue, n, x, incx, result);
+           sycl::buffer<double, 1>& x, std::int64_t incx, sycl::buffer<std::int64_t, 1>& result,
+           oneapi::math::index_base base) {
+    function_tables[{ libkey, queue }].row_major_idamax_sycl(queue, n, x, incx, result, base);
 }
 
 void iamax(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
            sycl::buffer<std::complex<float>, 1>& x, std::int64_t incx,
-           sycl::buffer<std::int64_t, 1>& result) {
-    function_tables[{ libkey, queue }].row_major_icamax_sycl(queue, n, x, incx, result);
+           sycl::buffer<std::int64_t, 1>& result, oneapi::math::index_base base) {
+    function_tables[{ libkey, queue }].row_major_icamax_sycl(queue, n, x, incx, result, base);
 }
 
 void iamax(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
            sycl::buffer<std::complex<double>, 1>& x, std::int64_t incx,
-           sycl::buffer<std::int64_t, 1>& result) {
-    function_tables[{ libkey, queue }].row_major_izamax_sycl(queue, n, x, incx, result);
+           sycl::buffer<std::int64_t, 1>& result, oneapi::math::index_base base) {
+    function_tables[{ libkey, queue }].row_major_izamax_sycl(queue, n, x, incx, result, base);
 }
 
 void nrm2(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
@@ -6020,59 +6028,59 @@ sycl::event dotu(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n
 }
 
 sycl::event iamin(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n, const float* x,
-                  std::int64_t incx, std::int64_t* result,
+                  std::int64_t incx, std::int64_t* result, oneapi::math::index_base base,
                   const std::vector<sycl::event>& dependencies) {
     return function_tables[{ libkey, queue }].row_major_isamin_usm_sycl(queue, n, x, incx, result,
-                                                                        dependencies);
+                                                                        base, dependencies);
 }
 
 sycl::event iamin(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n, const double* x,
-                  std::int64_t incx, std::int64_t* result,
+                  std::int64_t incx, std::int64_t* result, oneapi::math::index_base base,
                   const std::vector<sycl::event>& dependencies) {
     return function_tables[{ libkey, queue }].row_major_idamin_usm_sycl(queue, n, x, incx, result,
-                                                                        dependencies);
+                                                                        base, dependencies);
 }
 
 sycl::event iamin(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
                   const std::complex<float>* x, std::int64_t incx, std::int64_t* result,
-                  const std::vector<sycl::event>& dependencies) {
+                  oneapi::math::index_base base, const std::vector<sycl::event>& dependencies) {
     return function_tables[{ libkey, queue }].row_major_icamin_usm_sycl(queue, n, x, incx, result,
-                                                                        dependencies);
+                                                                        base, dependencies);
 }
 
 sycl::event iamin(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
                   const std::complex<double>* x, std::int64_t incx, std::int64_t* result,
-                  const std::vector<sycl::event>& dependencies) {
+                  oneapi::math::index_base base, const std::vector<sycl::event>& dependencies) {
     return function_tables[{ libkey, queue }].row_major_izamin_usm_sycl(queue, n, x, incx, result,
-                                                                        dependencies);
+                                                                        base, dependencies);
 }
 
 sycl::event iamax(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n, const float* x,
-                  std::int64_t incx, std::int64_t* result,
+                  std::int64_t incx, std::int64_t* result, oneapi::math::index_base base,
                   const std::vector<sycl::event>& dependencies) {
     return function_tables[{ libkey, queue }].row_major_isamax_usm_sycl(queue, n, x, incx, result,
-                                                                        dependencies);
+                                                                        base, dependencies);
 }
 
 sycl::event iamax(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n, const double* x,
-                  std::int64_t incx, std::int64_t* result,
+                  std::int64_t incx, std::int64_t* result, oneapi::math::index_base base,
                   const std::vector<sycl::event>& dependencies) {
     return function_tables[{ libkey, queue }].row_major_idamax_usm_sycl(queue, n, x, incx, result,
-                                                                        dependencies);
+                                                                        base, dependencies);
 }
 
 sycl::event iamax(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
                   const std::complex<float>* x, std::int64_t incx, std::int64_t* result,
-                  const std::vector<sycl::event>& dependencies) {
+                  oneapi::math::index_base base, const std::vector<sycl::event>& dependencies) {
     return function_tables[{ libkey, queue }].row_major_icamax_usm_sycl(queue, n, x, incx, result,
-                                                                        dependencies);
+                                                                        base, dependencies);
 }
 
 sycl::event iamax(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
                   const std::complex<double>* x, std::int64_t incx, std::int64_t* result,
-                  const std::vector<sycl::event>& dependencies) {
+                  oneapi::math::index_base base, const std::vector<sycl::event>& dependencies) {
     return function_tables[{ libkey, queue }].row_major_izamax_usm_sycl(queue, n, x, incx, result,
-                                                                        dependencies);
+                                                                        base, dependencies);
 }
 
 sycl::event nrm2(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,

@@ -424,16 +424,20 @@ ONEMATH_EXPORT void gemm_bias(oneapi::math::device libkey, sycl::queue& queue, t
 
 ONEMATH_EXPORT void iamin(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
                           sycl::buffer<float, 1>& x, std::int64_t incx,
-                          sycl::buffer<std::int64_t, 1>& result);
+                          sycl::buffer<std::int64_t, 1>& result,
+                          oneapi::math::index_base base = oneapi::math::index_base::zero);
 ONEMATH_EXPORT void iamin(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
                           sycl::buffer<double, 1>& x, std::int64_t incx,
-                          sycl::buffer<std::int64_t, 1>& result);
+                          sycl::buffer<std::int64_t, 1>& result,
+                          oneapi::math::index_base base = oneapi::math::index_base::zero);
 ONEMATH_EXPORT void iamin(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
                           sycl::buffer<std::complex<float>, 1>& x, std::int64_t incx,
-                          sycl::buffer<std::int64_t, 1>& result);
+                          sycl::buffer<std::int64_t, 1>& result,
+                          oneapi::math::index_base base = oneapi::math::index_base::zero);
 ONEMATH_EXPORT void iamin(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
                           sycl::buffer<std::complex<double>, 1>& x, std::int64_t incx,
-                          sycl::buffer<std::int64_t, 1>& result);
+                          sycl::buffer<std::int64_t, 1>& result,
+                          oneapi::math::index_base base = oneapi::math::index_base::zero);
 
 ONEMATH_EXPORT void hpmv(oneapi::math::device libkey, sycl::queue& queue, uplo upper_lower,
                          std::int64_t n, std::complex<float> alpha,
@@ -817,16 +821,20 @@ ONEMATH_EXPORT void hemv(oneapi::math::device libkey, sycl::queue& queue, uplo u
 
 ONEMATH_EXPORT void iamax(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
                           sycl::buffer<float, 1>& x, std::int64_t incx,
-                          sycl::buffer<std::int64_t, 1>& result);
+                          sycl::buffer<std::int64_t, 1>& result,
+                          oneapi::math::index_base base = oneapi::math::index_base::zero);
 ONEMATH_EXPORT void iamax(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
                           sycl::buffer<double, 1>& x, std::int64_t incx,
-                          sycl::buffer<std::int64_t, 1>& result);
+                          sycl::buffer<std::int64_t, 1>& result,
+                          oneapi::math::index_base base = oneapi::math::index_base::zero);
 ONEMATH_EXPORT void iamax(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
                           sycl::buffer<std::complex<float>, 1>& x, std::int64_t incx,
-                          sycl::buffer<std::int64_t, 1>& result);
+                          sycl::buffer<std::int64_t, 1>& result,
+                          oneapi::math::index_base base = oneapi::math::index_base::zero);
 ONEMATH_EXPORT void iamax(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
                           sycl::buffer<std::complex<double>, 1>& x, std::int64_t incx,
-                          sycl::buffer<std::int64_t, 1>& result);
+                          sycl::buffer<std::int64_t, 1>& result,
+                          oneapi::math::index_base base = oneapi::math::index_base::zero);
 
 ONEMATH_EXPORT void sbmv(oneapi::math::device libkey, sycl::queue& queue, uplo upper_lower,
                          std::int64_t n, std::int64_t k, float alpha, sycl::buffer<float, 1>& a,
@@ -1705,17 +1713,21 @@ ONEMATH_EXPORT sycl::event hpr(oneapi::math::device libkey, sycl::queue& queue, 
 
 ONEMATH_EXPORT sycl::event iamin(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
                                  const float* x, std::int64_t incx, std::int64_t* result,
+                                 oneapi::math::index_base base = oneapi::math::index_base::zero,
                                  const std::vector<sycl::event>& dependencies = {});
 ONEMATH_EXPORT sycl::event iamin(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
                                  const double* x, std::int64_t incx, std::int64_t* result,
+                                 oneapi::math::index_base base = oneapi::math::index_base::zero,
                                  const std::vector<sycl::event>& dependencies = {});
 ONEMATH_EXPORT sycl::event iamin(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
                                  const std::complex<float>* x, std::int64_t incx,
                                  std::int64_t* result,
+                                 oneapi::math::index_base base = oneapi::math::index_base::zero,
                                  const std::vector<sycl::event>& dependencies = {});
 ONEMATH_EXPORT sycl::event iamin(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
                                  const std::complex<double>* x, std::int64_t incx,
                                  std::int64_t* result,
+                                 oneapi::math::index_base base = oneapi::math::index_base::zero,
                                  const std::vector<sycl::event>& dependencies = {});
 
 ONEMATH_EXPORT sycl::event hpmv(oneapi::math::device libkey, sycl::queue& queue, uplo upper_lower,
@@ -2248,17 +2260,21 @@ ONEMATH_EXPORT sycl::event hemv(oneapi::math::device libkey, sycl::queue& queue,
 
 ONEMATH_EXPORT sycl::event iamax(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
                                  const float* x, std::int64_t incx, std::int64_t* result,
+                                 oneapi::math::index_base base = oneapi::math::index_base::zero,
                                  const std::vector<sycl::event>& dependencies = {});
 ONEMATH_EXPORT sycl::event iamax(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
                                  const double* x, std::int64_t incx, std::int64_t* result,
+                                 oneapi::math::index_base base = oneapi::math::index_base::zero,
                                  const std::vector<sycl::event>& dependencies = {});
 ONEMATH_EXPORT sycl::event iamax(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
                                  const std::complex<float>* x, std::int64_t incx,
                                  std::int64_t* result,
+                                 oneapi::math::index_base base = oneapi::math::index_base::zero,
                                  const std::vector<sycl::event>& dependencies = {});
 ONEMATH_EXPORT sycl::event iamax(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
                                  const std::complex<double>* x, std::int64_t incx,
                                  std::int64_t* result,
+                                 oneapi::math::index_base base = oneapi::math::index_base::zero,
                                  const std::vector<sycl::event>& dependencies = {});
 
 ONEMATH_EXPORT sycl::event sbmv(oneapi::math::device libkey, sycl::queue& queue, uplo upper_lower,

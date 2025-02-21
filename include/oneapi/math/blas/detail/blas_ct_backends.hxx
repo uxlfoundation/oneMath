@@ -396,19 +396,23 @@ static inline void hpr(backend_selector<backend::BACKEND> selector, uplo upper_l
 
 static inline void iamin(backend_selector<backend::BACKEND> selector, std::int64_t n,
                          sycl::buffer<float, 1>& x, std::int64_t incx,
-                         sycl::buffer<std::int64_t, 1>& result);
+                         sycl::buffer<std::int64_t, 1>& result,
+                         oneapi::math::index_base base = oneapi::math::index_base::zero);
 
 static inline void iamin(backend_selector<backend::BACKEND> selector, std::int64_t n,
                          sycl::buffer<double, 1>& x, std::int64_t incx,
-                         sycl::buffer<std::int64_t, 1>& result);
+                         sycl::buffer<std::int64_t, 1>& result,
+                         oneapi::math::index_base base = oneapi::math::index_base::zero);
 
 static inline void iamin(backend_selector<backend::BACKEND> selector, std::int64_t n,
                          sycl::buffer<std::complex<float>, 1>& x, std::int64_t incx,
-                         sycl::buffer<std::int64_t, 1>& result);
+                         sycl::buffer<std::int64_t, 1>& result,
+                         oneapi::math::index_base base = oneapi::math::index_base::zero);
 
 static inline void iamin(backend_selector<backend::BACKEND> selector, std::int64_t n,
                          sycl::buffer<std::complex<double>, 1>& x, std::int64_t incx,
-                         sycl::buffer<std::int64_t, 1>& result);
+                         sycl::buffer<std::int64_t, 1>& result,
+                         oneapi::math::index_base base = oneapi::math::index_base::zero);
 
 static inline void gemm_batch(backend_selector<backend::BACKEND> selector, transpose transa,
                               transpose transb, std::int64_t m, std::int64_t n, std::int64_t k,
@@ -965,19 +969,23 @@ static inline void spr2(backend_selector<backend::BACKEND> selector, uplo upper_
 
 static inline void iamax(backend_selector<backend::BACKEND> selector, std::int64_t n,
                          sycl::buffer<float, 1>& x, std::int64_t incx,
-                         sycl::buffer<std::int64_t, 1>& result);
+                         sycl::buffer<std::int64_t, 1>& result,
+                         oneapi::math::index_base base = oneapi::math::index_base::zero);
 
 static inline void iamax(backend_selector<backend::BACKEND> selector, std::int64_t n,
                          sycl::buffer<double, 1>& x, std::int64_t incx,
-                         sycl::buffer<std::int64_t, 1>& result);
+                         sycl::buffer<std::int64_t, 1>& result,
+                         oneapi::math::index_base base = oneapi::math::index_base::zero);
 
 static inline void iamax(backend_selector<backend::BACKEND> selector, std::int64_t n,
                          sycl::buffer<std::complex<float>, 1>& x, std::int64_t incx,
-                         sycl::buffer<std::int64_t, 1>& result);
+                         sycl::buffer<std::int64_t, 1>& result,
+                         oneapi::math::index_base base = oneapi::math::index_base::zero);
 
 static inline void iamax(backend_selector<backend::BACKEND> selector, std::int64_t n,
                          sycl::buffer<std::complex<double>, 1>& x, std::int64_t incx,
-                         sycl::buffer<std::int64_t, 1>& result);
+                         sycl::buffer<std::int64_t, 1>& result,
+                         oneapi::math::index_base base = oneapi::math::index_base::zero);
 
 static inline void trsm_batch(backend_selector<backend::BACKEND> selector, side left_right,
                               uplo upper_lower, transpose trans, diag unit_diag, std::int64_t m,
@@ -1775,20 +1783,24 @@ static inline sycl::event hpr(backend_selector<backend::BACKEND> selector, uplo 
 
 static inline sycl::event iamin(backend_selector<backend::BACKEND> selector, std::int64_t n,
                                 const float* x, std::int64_t incx, std::int64_t* result,
+                                oneapi::math::index_base base = oneapi::math::index_base::zero,
                                 const std::vector<sycl::event>& dependencies = {});
 
 static inline sycl::event iamin(backend_selector<backend::BACKEND> selector, std::int64_t n,
                                 const double* x, std::int64_t incx, std::int64_t* result,
+                                oneapi::math::index_base base = oneapi::math::index_base::zero,
                                 const std::vector<sycl::event>& dependencies = {});
 
 static inline sycl::event iamin(backend_selector<backend::BACKEND> selector, std::int64_t n,
                                 const std::complex<float>* x, std::int64_t incx,
                                 std::int64_t* result,
+                                oneapi::math::index_base base = oneapi::math::index_base::zero,
                                 const std::vector<sycl::event>& dependencies = {});
 
 static inline sycl::event iamin(backend_selector<backend::BACKEND> selector, std::int64_t n,
                                 const std::complex<double>* x, std::int64_t incx,
                                 std::int64_t* result,
+                                oneapi::math::index_base base = oneapi::math::index_base::zero,
                                 const std::vector<sycl::event>& dependencies = {});
 
 static inline sycl::event gemm_batch(backend_selector<backend::BACKEND> selector, transpose* transa,
@@ -2558,20 +2570,24 @@ static inline sycl::event spr2(backend_selector<backend::BACKEND> selector, uplo
 
 static inline sycl::event iamax(backend_selector<backend::BACKEND> selector, std::int64_t n,
                                 const float* x, std::int64_t incx, std::int64_t* result,
+                                oneapi::math::index_base base = oneapi::math::index_base::zero,
                                 const std::vector<sycl::event>& dependencies = {});
 
 static inline sycl::event iamax(backend_selector<backend::BACKEND> selector, std::int64_t n,
                                 const double* x, std::int64_t incx, std::int64_t* result,
+                                oneapi::math::index_base base = oneapi::math::index_base::zero,
                                 const std::vector<sycl::event>& dependencies = {});
 
 static inline sycl::event iamax(backend_selector<backend::BACKEND> selector, std::int64_t n,
                                 const std::complex<float>* x, std::int64_t incx,
                                 std::int64_t* result,
+                                oneapi::math::index_base base = oneapi::math::index_base::zero,
                                 const std::vector<sycl::event>& dependencies = {});
 
 static inline sycl::event iamax(backend_selector<backend::BACKEND> selector, std::int64_t n,
                                 const std::complex<double>* x, std::int64_t incx,
                                 std::int64_t* result,
+                                oneapi::math::index_base base = oneapi::math::index_base::zero,
                                 const std::vector<sycl::event>& dependencies = {});
 
 static inline sycl::event rotm(backend_selector<backend::BACKEND> selector, std::int64_t n,

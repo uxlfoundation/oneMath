@@ -439,7 +439,8 @@ ROTMG_LAUNCHER(double, cublasDrotmg)
 
 template <typename Func, typename T>
 inline void iamax(const char* func_name, Func func, sycl::queue& queue, int64_t n,
-                  sycl::buffer<T, 1>& x, const int64_t incx, sycl::buffer<int64_t, 1>& result) {
+                  sycl::buffer<T, 1>& x, const int64_t incx, sycl::buffer<int64_t, 1>& result,
+                  oneapi::math::index_base base) {
     using cuDataType = typename CudaEquivalentType<T>::Type;
     overflow_check(n, incx);
     // cuBLAS does not support int64_t as return type for the data. So we need to
@@ -477,15 +478,18 @@ inline void iamax(const char* func_name, Func func, sycl::queue& queue, int64_t 
     queue.submit([&](sycl::handler& cgh) {
         auto int_res_acc = int_res_buff.template get_access<sycl::access::mode::read>(cgh);
         auto result_acc = result.template get_access<sycl::access::mode::write>(cgh);
-        cgh.single_task(
-            [=]() { result_acc[0] = std::max((int64_t)int_res_acc[0] - 1, (int64_t)0); });
+        cgh.single_task([=]() {
+            result_acc[0] = std::max(
+                (int64_t)(int_res_acc[0] + (base == oneapi::math::index_base::zero ? -1 : 0)),
+                (int64_t)0);
+        });
     });
 }
 
 #define IAMAX_LAUNCHER(TYPE, CUBLAS_ROUTINE)                                                \
     void iamax(sycl::queue& queue, int64_t n, sycl::buffer<TYPE, 1>& x, const int64_t incx, \
-               sycl::buffer<int64_t, 1>& result) {                                          \
-        iamax(#CUBLAS_ROUTINE, CUBLAS_ROUTINE, queue, n, x, incx, result);                  \
+               sycl::buffer<int64_t, 1>& result, oneapi::math::index_base base) {           \
+        iamax(#CUBLAS_ROUTINE, CUBLAS_ROUTINE, queue, n, x, incx, result, base);            \
     }
 IAMAX_LAUNCHER(float, cublasIsamax)
 IAMAX_LAUNCHER(double, cublasIdamax)
@@ -525,7 +529,8 @@ SWAP_LAUNCHER(std::complex<double>, cublasZswap)
 
 template <typename Func, typename T>
 inline void iamin(const char* func_name, Func func, sycl::queue& queue, int64_t n,
-                  sycl::buffer<T, 1>& x, const int64_t incx, sycl::buffer<int64_t, 1>& result) {
+                  sycl::buffer<T, 1>& x, const int64_t incx, sycl::buffer<int64_t, 1>& result,
+                  oneapi::math::index_base base) {
     using cuDataType = typename CudaEquivalentType<T>::Type;
     overflow_check(n, incx);
     // cuBLAS does not support int64_t as return type for the data. So we need to
@@ -563,15 +568,18 @@ inline void iamin(const char* func_name, Func func, sycl::queue& queue, int64_t 
     queue.submit([&](sycl::handler& cgh) {
         auto int_res_acc = int_res_buff.template get_access<sycl::access::mode::read>(cgh);
         auto result_acc = result.template get_access<sycl::access::mode::write>(cgh);
-        cgh.single_task(
-            [=]() { result_acc[0] = std::max((int64_t)int_res_acc[0] - 1, (int64_t)0); });
+        cgh.single_task([=]() {
+            result_acc[0] = std::max(
+                (int64_t)(int_res_acc[0] + (base == oneapi::math::index_base::zero ? -1 : 0)),
+                (int64_t)0);
+        });
     });
 }
 
 #define IAMIN_LAUNCHER(TYPE, CUBLAS_ROUTINE)                                                \
     void iamin(sycl::queue& queue, int64_t n, sycl::buffer<TYPE, 1>& x, const int64_t incx, \
-               sycl::buffer<int64_t, 1>& result) {                                          \
-        iamin(#CUBLAS_ROUTINE, CUBLAS_ROUTINE, queue, n, x, incx, result);                  \
+               sycl::buffer<int64_t, 1>& result, oneapi::math::index_base base) {           \
+        iamin(#CUBLAS_ROUTINE, CUBLAS_ROUTINE, queue, n, x, incx, result, base);            \
     }
 IAMIN_LAUNCHER(float, cublasIsamin)
 IAMIN_LAUNCHER(double, cublasIdamin)
@@ -1088,6 +1096,7 @@ ROTMG_LAUNCHER_USM(double, cublasDrotmg)
 template <typename Func, typename T>
 inline sycl::event iamax(const char* func_name, Func func, sycl::queue& queue, int64_t n,
                          const T* x, const int64_t incx, int64_t* result,
+                         oneapi::math::index_base base,
                          const std::vector<sycl::event>& dependencies) {
     using cuDataType = typename CudaEquivalentType<T>::Type;
     overflow_check(n, incx);
@@ -1129,22 +1138,30 @@ inline sycl::event iamax(const char* func_name, Func func, sycl::queue& queue, i
     done.wait();
     if (result_on_device) {
         auto last_ev = queue.submit([&](sycl::handler& cgh) {
-            cgh.single_task([=]() { *result = std::max((int64_t)*int_res_p - 1, (int64_t)0); });
+            cgh.single_task([=]() {
+                *result = std::max(
+                    (int64_t)(*int_res_p + (base == oneapi::math::index_base::zero ? -1 : 0)),
+                    (int64_t)0);
+            });
         });
         last_ev.wait();
         sycl::free(int_res_p, queue);
         return last_ev;
     }
     else {
-        result[0] = std::max((int64_t)(*int_res_p - 1), int64_t{ 0 });
+        result[0] =
+            std::max((int64_t)(*int_res_p + (base == oneapi::math::index_base::zero ? -1 : 0)),
+                     int64_t{ 0 });
         return done;
     }
 }
 
-#define IAMAX_LAUNCHER_USM(TYPE, CUBLAS_ROUTINE)                                                \
-    sycl::event iamax(sycl::queue& queue, int64_t n, const TYPE* x, const int64_t incx,         \
-                      int64_t* result, const std::vector<sycl::event>& dependencies) {          \
-        return iamax(#CUBLAS_ROUTINE, CUBLAS_ROUTINE, queue, n, x, incx, result, dependencies); \
+#define IAMAX_LAUNCHER_USM(TYPE, CUBLAS_ROUTINE)                                        \
+    sycl::event iamax(sycl::queue& queue, int64_t n, const TYPE* x, const int64_t incx, \
+                      int64_t* result, oneapi::math::index_base base,                   \
+                      const std::vector<sycl::event>& dependencies) {                   \
+        return iamax(#CUBLAS_ROUTINE, CUBLAS_ROUTINE, queue, n, x, incx, result, base,  \
+                     dependencies);                                                     \
     }
 IAMAX_LAUNCHER_USM(float, cublasIsamax)
 IAMAX_LAUNCHER_USM(double, cublasIdamax)
@@ -1189,6 +1206,7 @@ SWAP_LAUNCHER_USM(std::complex<double>, cublasZswap)
 template <typename Func, typename T>
 inline sycl::event iamin(const char* func_name, Func func, sycl::queue& queue, int64_t n,
                          const T* x, const int64_t incx, int64_t* result,
+                         oneapi::math::index_base base,
                          const std::vector<sycl::event>& dependencies) {
     using cuDataType = typename CudaEquivalentType<T>::Type;
     overflow_check(n, incx);
@@ -1230,22 +1248,30 @@ inline sycl::event iamin(const char* func_name, Func func, sycl::queue& queue, i
     done.wait();
     if (result_on_device) {
         auto last_ev = queue.submit([&](sycl::handler& cgh) {
-            cgh.single_task([=]() { *result = std::max((int64_t)*int_res_p - 1, (int64_t)0); });
+            cgh.single_task([=]() {
+                *result = std::max(
+                    (int64_t)(*int_res_p + (base == oneapi::math::index_base::zero ? -1 : 0)),
+                    (int64_t)0);
+            });
         });
         last_ev.wait();
         sycl::free(int_res_p, queue);
         return last_ev;
     }
     else {
-        result[0] = std::max((int64_t)(*int_res_p - 1), int64_t{ 0 });
+        result[0] =
+            std::max((int64_t)(*int_res_p + (base == oneapi::math::index_base::zero ? -1 : 0)),
+                     int64_t{ 0 });
         return done;
     }
 }
 
-#define IAMIN_LAUNCHER_USM(TYPE, CUBLAS_ROUTINE)                                                \
-    sycl::event iamin(sycl::queue& queue, int64_t n, const TYPE* x, const int64_t incx,         \
-                      int64_t* result, const std::vector<sycl::event>& dependencies) {          \
-        return iamin(#CUBLAS_ROUTINE, CUBLAS_ROUTINE, queue, n, x, incx, result, dependencies); \
+#define IAMIN_LAUNCHER_USM(TYPE, CUBLAS_ROUTINE)                                        \
+    sycl::event iamin(sycl::queue& queue, int64_t n, const TYPE* x, const int64_t incx, \
+                      int64_t* result, oneapi::math::index_base base,                   \
+                      const std::vector<sycl::event>& dependencies) {                   \
+        return iamin(#CUBLAS_ROUTINE, CUBLAS_ROUTINE, queue, n, x, incx, result, base,  \
+                     dependencies);                                                     \
     }
 IAMIN_LAUNCHER_USM(float, cublasIsamin)
 IAMIN_LAUNCHER_USM(double, cublasIdamin)
@@ -1498,14 +1524,15 @@ ROTMG_LAUNCHER(double, cublasDrotmg)
 
 template <typename Func, typename T>
 inline void iamax(const char* func_name, Func func, sycl::queue& queue, int64_t n,
-                  sycl::buffer<T, 1>& x, const int64_t incx, sycl::buffer<int64_t, 1>& result) {
+                  sycl::buffer<T, 1>& x, const int64_t incx, sycl::buffer<int64_t, 1>& result,
+                  oneapi::math::index_base base) {
     throw unimplemented("blas", "iamax", "for row_major layout");
 }
 
 #define IAMAX_LAUNCHER(TYPE, CUBLAS_ROUTINE)                                                \
     void iamax(sycl::queue& queue, int64_t n, sycl::buffer<TYPE, 1>& x, const int64_t incx, \
-               sycl::buffer<int64_t, 1>& result) {                                          \
-        iamax(#CUBLAS_ROUTINE, CUBLAS_ROUTINE, queue, n, x, incx, result);                  \
+               sycl::buffer<int64_t, 1>& result, oneapi::math::index_base base) {           \
+        iamax(#CUBLAS_ROUTINE, CUBLAS_ROUTINE, queue, n, x, incx, result, base);            \
     }
 IAMAX_LAUNCHER(float, cublasIsamax)
 IAMAX_LAUNCHER(double, cublasIdamax)
@@ -1533,14 +1560,15 @@ SWAP_LAUNCHER(std::complex<double>, cublasZswap)
 
 template <typename Func, typename T>
 inline void iamin(const char* func_name, Func func, sycl::queue& queue, int64_t n,
-                  sycl::buffer<T, 1>& x, const int64_t incx, sycl::buffer<int64_t, 1>& result) {
+                  sycl::buffer<T, 1>& x, const int64_t incx, sycl::buffer<int64_t, 1>& result,
+                  oneapi::math::index_base base) {
     throw unimplemented("blas", "iamin", "for row_major layout");
 }
 
 #define IAMIN_LAUNCHER(TYPE, CUBLAS_ROUTINE)                                                \
     void iamin(sycl::queue& queue, int64_t n, sycl::buffer<TYPE, 1>& x, const int64_t incx, \
-               sycl::buffer<int64_t, 1>& result) {                                          \
-        iamin(#CUBLAS_ROUTINE, CUBLAS_ROUTINE, queue, n, x, incx, result);                  \
+               sycl::buffer<int64_t, 1>& result, oneapi::math::index_base base) {           \
+        iamin(#CUBLAS_ROUTINE, CUBLAS_ROUTINE, queue, n, x, incx, result, base);            \
     }
 IAMIN_LAUNCHER(float, cublasIsamin)
 IAMIN_LAUNCHER(double, cublasIdamin)
@@ -1776,14 +1804,17 @@ ROTMG_LAUNCHER_USM(double, cublasDrotmg)
 template <typename Func, typename T>
 inline sycl::event iamax(const char* func_name, Func func, sycl::queue& queue, int64_t n,
                          const T* x, const int64_t incx, int64_t* result,
+                         oneapi::math::index_base base,
                          const std::vector<sycl::event>& dependencies) {
     throw unimplemented("blas", "iamax", "for row_major layout");
 }
 
-#define IAMAX_LAUNCHER_USM(TYPE, CUBLAS_ROUTINE)                                                \
-    sycl::event iamax(sycl::queue& queue, int64_t n, const TYPE* x, const int64_t incx,         \
-                      int64_t* result, const std::vector<sycl::event>& dependencies) {          \
-        return iamax(#CUBLAS_ROUTINE, CUBLAS_ROUTINE, queue, n, x, incx, result, dependencies); \
+#define IAMAX_LAUNCHER_USM(TYPE, CUBLAS_ROUTINE)                                        \
+    sycl::event iamax(sycl::queue& queue, int64_t n, const TYPE* x, const int64_t incx, \
+                      int64_t* result, oneapi::math::index_base base,                   \
+                      const std::vector<sycl::event>& dependencies) {                   \
+        return iamax(#CUBLAS_ROUTINE, CUBLAS_ROUTINE, queue, n, x, incx, result, base,  \
+                     dependencies);                                                     \
     }
 IAMAX_LAUNCHER_USM(float, cublasIsamax)
 IAMAX_LAUNCHER_USM(double, cublasIdamax)
@@ -1813,14 +1844,17 @@ SWAP_LAUNCHER_USM(std::complex<double>, cublasZswap)
 template <typename Func, typename T>
 inline sycl::event iamin(const char* func_name, Func func, sycl::queue& queue, int64_t n,
                          const T* x, const int64_t incx, int64_t* result,
+                         oneapi::math::index_base base,
                          const std::vector<sycl::event>& dependencies) {
     throw unimplemented("blas", "iamin", "for row_major layout");
 }
 
-#define IAMIN_LAUNCHER_USM(TYPE, CUBLAS_ROUTINE)                                                \
-    sycl::event iamin(sycl::queue& queue, int64_t n, const TYPE* x, const int64_t incx,         \
-                      int64_t* result, const std::vector<sycl::event>& dependencies) {          \
-        return iamin(#CUBLAS_ROUTINE, CUBLAS_ROUTINE, queue, n, x, incx, result, dependencies); \
+#define IAMIN_LAUNCHER_USM(TYPE, CUBLAS_ROUTINE)                                        \
+    sycl::event iamin(sycl::queue& queue, int64_t n, const TYPE* x, const int64_t incx, \
+                      int64_t* result, oneapi::math::index_base base,                   \
+                      const std::vector<sycl::event>& dependencies) {                   \
+        return iamin(#CUBLAS_ROUTINE, CUBLAS_ROUTINE, queue, n, x, incx, result, base,  \
+                     dependencies);                                                     \
     }
 IAMIN_LAUNCHER_USM(float, cublasIsamin)
 IAMIN_LAUNCHER_USM(double, cublasIdamin)

@@ -1382,26 +1382,40 @@ void dotu(std::complex<double>* pres, const int* n, const std::complex<double>* 
 }
 
 template <typename fp>
-static int iamax(const int* n, const fp* x, const int* incx);
+static int iamax(const int* n, const fp* x, const int* incx, oneapi::math::index_base base);
 
 template <>
-int iamax(const int* n, const float* x, const int* incx) {
-    return cblas_isamax_wrapper(*n, x, *incx);
+int iamax(const int* n, const float* x, const int* incx, oneapi::math::index_base base) {
+    int res = cblas_isamax_wrapper(*n, x, *incx);
+    if (base == oneapi::math::index_base::one && *n >= 1 && *incx >= 1)
+      res++;
+    return res;
 }
 
 template <>
-int iamax(const int* n, const double* x, const int* incx) {
-    return cblas_idamax_wrapper(*n, x, *incx);
+int iamax(const int* n, const double* x, const int* incx, oneapi::math::index_base base) {
+    int res = cblas_idamax_wrapper(*n, x, *incx);
+    if (base == oneapi::math::index_base::one && *n >= 1 && *incx >= 1)
+      res++;
+    return res;
 }
 
 template <>
-int iamax(const int* n, const std::complex<float>* x, const int* incx) {
-    return cblas_icamax_wrapper(*n, (const void*)x, *incx);
+int iamax(const int* n, const std::complex<float>* x, const int* incx,
+          oneapi::math::index_base base) {
+    int res = cblas_icamax_wrapper(*n, (const void*)x, *incx);
+    if (base == oneapi::math::index_base::one && *n >= 1 && *incx >= 1)
+      res++;
+    return res;
 }
 
 template <>
-int iamax(const int* n, const std::complex<double>* x, const int* incx) {
-    return cblas_izamax_wrapper(*n, (const void*)x, *incx);
+int iamax(const int* n, const std::complex<double>* x, const int* incx,
+          oneapi::math::index_base base) {
+    int res = cblas_izamax_wrapper(*n, (const void*)x, *incx);
+    if (base == oneapi::math::index_base::one && *n >= 1 && *incx >= 1)
+      res++;
+    return res;
 }
 
 inline float abs_val(float val) {
@@ -1421,10 +1435,10 @@ inline double abs_val(std::complex<double> val) {
 }
 
 template <typename fp>
-static int iamin(const int* n, const fp* x, const int* incx);
+static int iamin(const int* n, const fp* x, const int* incx, oneapi::math::index_base base);
 
 template <>
-int iamin(const int* n, const float* x, const int* incx) {
+int iamin(const int* n, const float* x, const int* incx, oneapi::math::index_base base) {
     if (*n < 1 || *incx < 1) {
         return 0;
     }
@@ -1443,11 +1457,11 @@ int iamin(const int* n, const float* x, const int* incx) {
             min_val = curr_val;
         }
     }
-    return min_idx;
+    return min_idx + (base == oneapi::math::index_base::zero ? 0 : 1);
 }
 
 template <>
-int iamin(const int* n, const double* x, const int* incx) {
+int iamin(const int* n, const double* x, const int* incx, oneapi::math::index_base base) {
     if (*n < 1 || *incx < 1) {
         return 0;
     }
@@ -1466,11 +1480,12 @@ int iamin(const int* n, const double* x, const int* incx) {
             min_val = curr_val;
         }
     }
-    return min_idx;
+    return min_idx + (base == oneapi::math::index_base::zero ? 0 : 1);
 }
 
 template <>
-int iamin(const int* n, const std::complex<float>* x, const int* incx) {
+int iamin(const int* n, const std::complex<float>* x, const int* incx,
+          oneapi::math::index_base base) {
     if (*n < 1 || *incx < 1) {
         return 0;
     }
@@ -1489,11 +1504,12 @@ int iamin(const int* n, const std::complex<float>* x, const int* incx) {
             min_val = curr_val;
         }
     }
-    return min_idx;
+    return min_idx + (base == oneapi::math::index_base::zero ? 0 : 1);
 }
 
 template <>
-int iamin(const int* n, const std::complex<double>* x, const int* incx) {
+int iamin(const int* n, const std::complex<double>* x, const int* incx,
+          oneapi::math::index_base base) {
     if (*n < 1 || *incx < 1) {
         return 0;
     }
@@ -1512,7 +1528,7 @@ int iamin(const int* n, const std::complex<double>* x, const int* incx) {
             min_val = curr_val;
         }
     }
-    return min_idx;
+    return min_idx + (base == oneapi::math::index_base::zero ? 0 : 1);
 }
 
 /* Extensions */
