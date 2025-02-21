@@ -36,8 +36,14 @@ namespace oneapi::math::rng::device {
 // Supported types:
 //      float
 //      double
+//      std::int8_t
+//      std::uint8_t
+//      std::int16_t
+//      std::uint16_t
 //      std::int32_t
 //      std::uint32_t
+//      std::int64_t
+//      std::uint64_t
 //
 // Supported methods:
 //      oneapi::math::rng::device::uniform_method::standard
@@ -46,7 +52,8 @@ namespace oneapi::math::rng::device {
 // Input arguments:
 //      a - left bound. 0.0 by default
 //      b - right bound. 1.0 by default (for std::(u)int32_t std::numeric_limits<std::int32_t>::max()
-//          is used for accurate method and 2^23 is used for standard method)
+//          is used for accurate method and 2^23 is used for standard method;
+//          for std::(u)int8, std::(u)int16, std::(u)int64_t are used std::numeric_limits<one_of_these_three_types>::max())
 //
 // Note: using (un)signed integer uniform distribution with uniform_method::standard method may
 // cause incorrect statistics of the produced random numbers (due to rounding error) if
@@ -61,6 +68,8 @@ public:
                   "oneMath: rng/uniform: method is incorrect");
 
     static_assert(std::is_same<Type, float>::value || std::is_same<Type, double>::value ||
+                      std::is_same_v<Type, std::int8_t> || std::is_same_v<Type, std::uint8_t> ||
+                      std::is_same_v<Type, std::int16_t> || std::is_same_v<Type, std::uint16_t> ||
                       std::is_same<Type, std::int32_t>::value ||
                       std::is_same<Type, std::uint32_t>::value ||
                       std::is_same<Type, std::int64_t>::value ||
@@ -76,6 +85,11 @@ public:
                   Type(0.0),
                   std::is_integral<Type>::value
                       ? ((std::is_same_v<Type, std::uint64_t> || std::is_same_v<Type, std::int64_t>)
+                             ? (std::numeric_limits<Type>::max)()
+                         : (std::is_same_v<Type, std::int8_t> ||
+                            std::is_same_v<Type, std::uint8_t> ||
+                            std::is_same_v<Type, std::int16_t> ||
+                            std::is_same_v<Type, std::uint16_t>)
                              ? (std::numeric_limits<Type>::max)()
                              : (std::is_same<Method, uniform_method::standard>::value
                                     ? (1 << 23)
@@ -579,8 +593,12 @@ public:
 // Represents discrete Bernoulli random number distribution
 //
 // Supported types:
-//      std::uint32_t
+//      std::int8_t
+//      std::uint8_t
+//      std::int16_t
+//      std::uint16_t
 //      std::int32_t
+//      std::uint32_t
 //
 // Supported methods:
 //      oneapi::math::rng::bernoulli_method::icdf;
