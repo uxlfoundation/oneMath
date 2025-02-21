@@ -64,7 +64,7 @@ public:
             auto event = queue.parallel_for(range, [=](sycl::item<1> item) {
                 size_t id = item.get_id(0);
                 oneapi::math::rng::device::count_engine_adaptor<Engine> engine
-                    (SEED, id * Engine::vec_size);
+                    (SEED, 2 * id * Engine::vec_size);
                 oneapi::math::rng::device::bits<UIntType> distr;
                 auto res = oneapi::math::rng::device::generate(distr, engine);
 

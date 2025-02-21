@@ -206,12 +206,12 @@ public:
 
     template <typename UIntType>
     auto generate_single_uniform_bits() {
-        counted_ += Engine::vec_size;
+        counted_++;
         return engine_.template generate_single_uniform_bits<UIntType>();
     }
 
     auto generate_bits() {
-        counted_++;
+        counted_ += Engine::vec_size;
         return engine_.generate_bits();
     }
 
