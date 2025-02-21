@@ -68,10 +68,8 @@ public:
                   "oneMath: rng/uniform: method is incorrect");
 
     static_assert(std::is_same<Type, float>::value || std::is_same<Type, double>::value ||
-                      std::is_same_v<Type, std::int8_t> ||
-                      std::is_same_v<Type, std::uint8_t> ||
-                      std::is_same_v<Type, std::int16_t> ||
-                      std::is_same_v<Type, std::uint16_t> ||
+                      std::is_same_v<Type, std::int8_t> || std::is_same_v<Type, std::uint8_t> ||
+                      std::is_same_v<Type, std::int16_t> || std::is_same_v<Type, std::uint16_t> ||
                       std::is_same<Type, std::int32_t>::value ||
                       std::is_same<Type, std::uint32_t>::value ||
                       std::is_same<Type, std::int64_t>::value ||
@@ -86,15 +84,17 @@ public:
             : detail::distribution_base<uniform<Type, Method>>(
                   Type(0.0),
                   std::is_integral<Type>::value
-                    ? ((std::is_same_v<Type, std::uint64_t> || std::is_same_v<Type, std::int64_t>)
-                        ? (std::numeric_limits<Type>::max)()
-                        : (std::is_same_v<Type, std::int8_t> || std::is_same_v<Type, std::uint8_t> ||
-                           std::is_same_v<Type, std::int16_t> || std::is_same_v<Type, std::uint16_t>)
-                            ? (std::numeric_limits<Type>::max)()
-                            : (std::is_same<Method, uniform_method::standard>::value
-                                ? (1 << 23)
-                                : (std::numeric_limits<Type>::max)()))
-                  : Type(1.0)) {}
+                      ? ((std::is_same_v<Type, std::uint64_t> || std::is_same_v<Type, std::int64_t>)
+                             ? (std::numeric_limits<Type>::max)()
+                         : (std::is_same_v<Type, std::int8_t> ||
+                            std::is_same_v<Type, std::uint8_t> ||
+                            std::is_same_v<Type, std::int16_t> ||
+                            std::is_same_v<Type, std::uint16_t>)
+                             ? (std::numeric_limits<Type>::max)()
+                             : (std::is_same<Method, uniform_method::standard>::value
+                                    ? (1 << 23)
+                                    : (std::numeric_limits<Type>::max)()))
+                      : Type(1.0)) {}
 
     explicit uniform(Type a, Type b) : detail::distribution_base<uniform<Type, Method>>(a, b) {}
     explicit uniform(const param_type& pt)
@@ -593,12 +593,12 @@ public:
 // Represents discrete Bernoulli random number distribution
 //
 // Supported types:
-//      std::uint32_t
-//      std::int32_t
-//      std::uint16_t
-//      std::int16_t
-//      std::uint8_t
 //      std::int8_t
+//      std::uint8_t
+//      std::int16_t
+//      std::uint16_t
+//      std::int32_t
+//      std::uint32_t
 //
 // Supported methods:
 //      oneapi::math::rng::bernoulli_method::icdf;

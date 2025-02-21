@@ -123,7 +123,8 @@ protected:
         OutType res;
         if constexpr (std::is_integral<Type>::value) {
             if constexpr (std::is_same_v<Type, std::int8_t> || std::is_same_v<Type, std::uint8_t> ||
-                          std::is_same_v<Type, std::int16_t> || std::is_same_v<Type, std::uint16_t>) {
+                          std::is_same_v<Type, std::int16_t> ||
+                          std::is_same_v<Type, std::uint16_t>) {
                 return generate_single_int<float, OutType>(engine);
             }
             else if constexpr (std::is_same_v<Type, std::int32_t> ||
@@ -248,7 +249,8 @@ protected:
         Type res;
         if constexpr (std::is_integral<Type>::value) {
             if constexpr (std::is_same_v<Type, std::int8_t> || std::is_same_v<Type, std::uint8_t> ||
-                          std::is_same_v<Type, std::int16_t> || std::is_same_v<Type, std::uint16_t>) {
+                          std::is_same_v<Type, std::int16_t> ||
+                          std::is_same_v<Type, std::uint16_t>) {
                 float res_fp =
                     engine.generate_single(static_cast<float>(a_), static_cast<float>(b_));
                 res_fp = sycl::floor(res_fp);
