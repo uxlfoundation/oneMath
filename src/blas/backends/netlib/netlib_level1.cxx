@@ -315,8 +315,9 @@ void iamin(sycl::queue& queue, int64_t n, sycl::buffer<float, 1>& x, int64_t inc
         auto accessor_x = x.get_access<sycl::access::mode::read>(cgh);
         auto accessor_result = result.get_access<sycl::access::mode::write>(cgh);
         host_task<class netlib_isamin>(cgh, [=]() {
-            accessor_result[0] = ::cblas_isamin((int)n, accessor_x.GET_MULTI_PTR, (int)incx) +
-                                 (base == oneapi::math::index_base::zero ? 0 : 1);
+            accessor_result[0] = ::cblas_isamin((int)n, accessor_x.GET_MULTI_PTR, (int)incx);
+            if (base == oneapi::math::index_base::one && n >= 1 && incx >= 1)
+                accessor_result[0]++;
         });
     });
 }
@@ -327,8 +328,9 @@ void iamin(sycl::queue& queue, int64_t n, sycl::buffer<double, 1>& x, int64_t in
         auto accessor_x = x.template get_access<sycl::access::mode::read>(cgh);
         auto accessor_result = result.template get_access<sycl::access::mode::write>(cgh);
         host_task<class netlib_idamin>(cgh, [=]() {
-            accessor_result[0] = ::cblas_idamin((int)n, accessor_x.GET_MULTI_PTR, (int)incx) +
-                                 (base == oneapi::math::index_base::zero ? 0 : 1);
+            accessor_result[0] = ::cblas_idamin((int)n, accessor_x.GET_MULTI_PTR, (int)incx);
+            if (base == oneapi::math::index_base::one && n >= 1 && incx >= 1)
+                accessor_result[0]++;
         });
     });
 }
@@ -339,8 +341,9 @@ void iamin(sycl::queue& queue, int64_t n, sycl::buffer<std::complex<float>, 1>& 
         auto accessor_x = x.get_access<sycl::access::mode::read>(cgh);
         auto accessor_result = result.get_access<sycl::access::mode::write>(cgh);
         host_task<class netlib_icamin>(cgh, [=]() {
-            accessor_result[0] = ::cblas_icamin((int)n, accessor_x.GET_MULTI_PTR, (int)incx) +
-                                 (base == oneapi::math::index_base::zero ? 0 : 1);
+            accessor_result[0] = ::cblas_icamin((int)n, accessor_x.GET_MULTI_PTR, (int)incx);
+            if (base == oneapi::math::index_base::one && n >= 1 && incx >= 1)
+                accessor_result[0]++;
         });
     });
 }
@@ -351,8 +354,9 @@ void iamin(sycl::queue& queue, int64_t n, sycl::buffer<std::complex<double>, 1>&
         auto accessor_x = x.get_access<sycl::access::mode::read>(cgh);
         auto accessor_result = result.get_access<sycl::access::mode::write>(cgh);
         host_task<class netlib_izamin>(cgh, [=]() {
-            accessor_result[0] = ::cblas_izamin((int)n, accessor_x.GET_MULTI_PTR, (int)incx) +
-                                 (base == oneapi::math::index_base::zero ? 0 : 1);
+            accessor_result[0] = ::cblas_izamin((int)n, accessor_x.GET_MULTI_PTR, (int)incx);
+            if (base == oneapi::math::index_base::one && n >= 1 && incx >= 1)
+                accessor_result[0]++;
         });
     });
 }
@@ -363,8 +367,9 @@ void iamax(sycl::queue& queue, int64_t n, sycl::buffer<float, 1>& x, int64_t inc
         auto accessor_x = x.get_access<sycl::access::mode::read>(cgh);
         auto accessor_result = result.get_access<sycl::access::mode::write>(cgh);
         host_task<class netlib_isamax>(cgh, [=]() {
-            accessor_result[0] = ::cblas_isamax((int)n, accessor_x.GET_MULTI_PTR, (int)incx) +
-                                 (base == oneapi::math::index_base::zero ? 0 : 1);
+            accessor_result[0] = ::cblas_isamax((int)n, accessor_x.GET_MULTI_PTR, (int)incx);
+            if (base == oneapi::math::index_base::one && n >= 1 && incx >= 1)
+                accessor_result[0]++;
         });
     });
 }
@@ -375,8 +380,9 @@ void iamax(sycl::queue& queue, int64_t n, sycl::buffer<double, 1>& x, int64_t in
         auto accessor_x = x.get_access<sycl::access::mode::read>(cgh);
         auto accessor_result = result.get_access<sycl::access::mode::write>(cgh);
         host_task<class netlib_idamax>(cgh, [=]() {
-            accessor_result[0] = ::cblas_idamax((int)n, accessor_x.GET_MULTI_PTR, (int)incx) +
-                                 (base == oneapi::math::index_base::zero ? 0 : 1);
+            accessor_result[0] = ::cblas_idamax((int)n, accessor_x.GET_MULTI_PTR, (int)incx);
+            if (base == oneapi::math::index_base::one && n >= 1 && incx >= 1)
+                accessor_result[0]++;
         });
     });
 }
@@ -387,8 +393,9 @@ void iamax(sycl::queue& queue, int64_t n, sycl::buffer<std::complex<float>, 1>& 
         auto accessor_x = x.get_access<sycl::access::mode::read>(cgh);
         auto accessor_result = result.get_access<sycl::access::mode::write>(cgh);
         host_task<class netlib_icamax>(cgh, [=]() {
-            accessor_result[0] = ::cblas_icamax((int)n, accessor_x.GET_MULTI_PTR, (int)incx) +
-                                 (base == oneapi::math::index_base::zero ? 0 : 1);
+            accessor_result[0] = ::cblas_icamax((int)n, accessor_x.GET_MULTI_PTR, (int)incx);
+            if (base == oneapi::math::index_base::one && n >= 1 && incx >= 1)
+                accessor_result[0]++;
         });
     });
 }
@@ -399,8 +406,9 @@ void iamax(sycl::queue& queue, int64_t n, sycl::buffer<std::complex<double>, 1>&
         auto accessor_x = x.get_access<sycl::access::mode::read>(cgh);
         auto accessor_result = result.get_access<sycl::access::mode::write>(cgh);
         host_task<class netlib_izamax>(cgh, [=]() {
-            accessor_result[0] = ::cblas_izamax((int)n, accessor_x.GET_MULTI_PTR, (int)incx) +
-                                 (base == oneapi::math::index_base::zero ? 0 : 1);
+            accessor_result[0] = ::cblas_izamax((int)n, accessor_x.GET_MULTI_PTR, (int)incx);
+            if (base == oneapi::math::index_base::one && n >= 1 && incx >= 1)
+                accessor_result[0]++;
         });
     });
 }
@@ -1066,8 +1074,9 @@ sycl::event iamin(sycl::queue& queue, int64_t n, const float* x, int64_t incx, i
             cgh.depends_on(dependencies[i]);
         }
         host_task<class netlib_isamin_usm>(cgh, [=]() {
-            result[0] = ::cblas_isamin((int)n, x, (int)incx) +
-                        (base == oneapi::math::index_base::zero ? 0 : 1);
+            result[0] = ::cblas_isamin((int)n, x, (int)incx);
+            if (base == oneapi::math::index_base::one && n >= 1 && incx >= 1)
+                result[0]++;
         });
     });
     return done;
@@ -1081,8 +1090,9 @@ sycl::event iamin(sycl::queue& queue, int64_t n, const double* x, int64_t incx, 
             cgh.depends_on(dependencies[i]);
         }
         host_task<class netlib_idamin_usm>(cgh, [=]() {
-            result[0] = ::cblas_idamin((const int)n, x, (const int)incx) +
-                        (base == oneapi::math::index_base::zero ? 0 : 1);
+            result[0] = ::cblas_idamin((const int)n, x, (const int)incx);
+            if (base == oneapi::math::index_base::one && n >= 1 && incx >= 1)
+                result[0]++;
         });
     });
     return done;
@@ -1097,8 +1107,9 @@ sycl::event iamin(sycl::queue& queue, int64_t n, const std::complex<float>* x, i
             cgh.depends_on(dependencies[i]);
         }
         host_task<class netlib_icamin_usm>(cgh, [=]() {
-            result[0] = ::cblas_icamin((int)n, x, (int)incx) +
-                        (base == oneapi::math::index_base::zero ? 0 : 1);
+            result[0] = ::cblas_icamin((int)n, x, (int)incx);
+            if (base == oneapi::math::index_base::one && n >= 1 && incx >= 1)
+                result[0]++;
         });
     });
     return done;
@@ -1113,8 +1124,9 @@ sycl::event iamin(sycl::queue& queue, int64_t n, const std::complex<double>* x, 
             cgh.depends_on(dependencies[i]);
         }
         host_task<class netlib_izamin_usm>(cgh, [=]() {
-            result[0] = ::cblas_izamin((int)n, x, (int)incx) +
-                        (base == oneapi::math::index_base::zero ? 0 : 1);
+            result[0] = ::cblas_izamin((int)n, x, (int)incx);
+            if (base == oneapi::math::index_base::one && n >= 1 && incx >= 1)
+                result[0]++;
         });
     });
     return done;
@@ -1128,8 +1140,9 @@ sycl::event iamax(sycl::queue& queue, int64_t n, const float* x, int64_t incx, i
             cgh.depends_on(dependencies[i]);
         }
         host_task<class netlib_isamax_usm>(cgh, [=]() {
-            result[0] = ::cblas_isamax((int)n, x, (int)incx) +
-                        (base == oneapi::math::index_base::zero ? 0 : 1);
+            result[0] = ::cblas_isamax((int)n, x, (int)incx);
+            if (base == oneapi::math::index_base::one && n >= 1 && incx >= 1)
+                result[0]++;
         });
     });
     return done;
@@ -1143,8 +1156,9 @@ sycl::event iamax(sycl::queue& queue, int64_t n, const double* x, int64_t incx, 
             cgh.depends_on(dependencies[i]);
         }
         host_task<class netlib_idamax_usm>(cgh, [=]() {
-            result[0] = ::cblas_idamax((int)n, x, (int)incx) +
-                        (base == oneapi::math::index_base::zero ? 0 : 1);
+            result[0] = ::cblas_idamax((int)n, x, (int)incx);
+            if (base == oneapi::math::index_base::one && n >= 1 && incx >= 1)
+                result[0]++;
         });
     });
     return done;
@@ -1159,8 +1173,9 @@ sycl::event iamax(sycl::queue& queue, int64_t n, const std::complex<float>* x, i
             cgh.depends_on(dependencies[i]);
         }
         host_task<class netlib_icamax_usm>(cgh, [=]() {
-            result[0] = ::cblas_icamax((int)n, x, (int)incx) +
-                        (base == oneapi::math::index_base::zero ? 0 : 1);
+            result[0] = ::cblas_icamax((int)n, x, (int)incx);
+            if (base == oneapi::math::index_base::one && n >= 1 && incx >= 1)
+                result[0]++;
         });
     });
     return done;
@@ -1175,8 +1190,9 @@ sycl::event iamax(sycl::queue& queue, int64_t n, const std::complex<double>* x, 
             cgh.depends_on(dependencies[i]);
         }
         host_task<class netlib_izamax_usm>(cgh, [=]() {
-            result[0] = ::cblas_izamax((int)n, x, (int)incx) +
-                        (base == oneapi::math::index_base::zero ? 0 : 1);
+            result[0] = ::cblas_izamax((int)n, x, (int)incx);
+            if (base == oneapi::math::index_base::one && n >= 1 && incx >= 1)
+                result[0]++;
         });
     });
     return done;
