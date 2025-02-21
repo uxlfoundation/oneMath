@@ -1473,7 +1473,7 @@ inline void iamin(Func func, sycl::queue& queue, int64_t n, sycl::buffer<T, 1>& 
 
 #define IAMIN_LAUNCHER(TYPE, ROCBLAS_ROUTINE)                                               \
     void iamin(sycl::queue& queue, int64_t n, sycl::buffer<TYPE, 1>& x, const int64_t incx, \
-               oneapi::math::index_base base, sycl::buffer<int64_t, 1>& result) {           \
+               sycl::buffer<int64_t, 1>& result, oneapi::math::index_base base) {           \
         iamin(ROCBLAS_ROUTINE, queue, n, x, incx, result, base);                            \
     }
 

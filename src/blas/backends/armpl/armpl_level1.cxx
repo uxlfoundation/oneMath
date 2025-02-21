@@ -178,10 +178,9 @@ void iamin(sycl::queue& queue, int64_t n, sycl::buffer<T, 1>& x, int64_t incx,
         auto accessor_result = result.template get_access<sycl::access::mode::write>(cgh);
         host_task<class armpl_kernel_iamin>(cgh, [=]() {
             accessor_result[0] =
-                cblas_func((armpl_int_t)n, accessor_x.GET_MULTI_PTR, (armpl_int_t)incx) + base ==
-                        oneapi::math::index_base::zero
-                    ? 0
-                    : 1;
+                cblas_func((armpl_int_t)n, accessor_x.GET_MULTI_PTR, (armpl_int_t)incx);
+            if (base == oneapi::math::index_base::one && n >= 1 && incx >= 1)
+                accessor_result[0]++;
         });
     });
 }
@@ -205,10 +204,9 @@ void iamax(sycl::queue& queue, int64_t n, sycl::buffer<T, 1>& x, int64_t incx,
         auto accessor_result = result.template get_access<sycl::access::mode::write>(cgh);
         host_task<class armpl_kernel_iamax>(cgh, [=]() {
             accessor_result[0] =
-                cblas_func((armpl_int_t)n, accessor_x.GET_MULTI_PTR, (armpl_int_t)incx) + base ==
-                        oneapi::math::index_base::zero
-                    ? 0
-                    : 1;
+                cblas_func((armpl_int_t)n, accessor_x.GET_MULTI_PTR, (armpl_int_t)incx);
+            if (base == oneapi::math::index_base::one && n >= 1 && incx >= 1)
+                accessor_result[0]++;
         });
     });
 }
@@ -575,10 +573,9 @@ sycl::event iamin(sycl::queue& queue, int64_t n, const T* x, int64_t incx, int64
             cgh.depends_on(dependencies[i]);
         }
         host_task<class armpl_kernel_iamin>(cgh, [=]() {
-            result[0] = cblas_func((armpl_int_t)n, x, (armpl_int_t)incx) + base ==
-                                oneapi::math::index_base::zero
-                            ? 0
-                            : 1;
+            result[0] = cblas_func((armpl_int_t)n, x, (armpl_int_t)incx);
+            if (base == oneapi::math::index_base::one && n >= 1 && incx >= 1)
+                result[0]++;
         });
     });
     return done;
@@ -606,10 +603,9 @@ sycl::event iamax(sycl::queue& queue, int64_t n, const T* x, int64_t incx, int64
             cgh.depends_on(dependencies[i]);
         }
         host_task<class armpl_kernel_iamax>(cgh, [=]() {
-            result[0] = cblas_func((armpl_int_t)n, x, (armpl_int_t)incx) + base ==
-                                oneapi::math::index_base::zero
-                            ? 0
-                            : 1;
+            result[0] = cblas_func((armpl_int_t)n, x, (armpl_int_t)incx);
+            if (base == oneapi::math::index_base::one && n >= 1 && incx >= 1)
+                result[0]++;
         });
     });
     return done;
