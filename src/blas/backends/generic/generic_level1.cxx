@@ -34,13 +34,13 @@ void dotu(sycl::queue& queue, std::int64_t n, sycl::buffer<std::complex<real_t>,
 void iamax(sycl::queue& queue, std::int64_t n, sycl::buffer<real_t, 1>& x, std::int64_t incx,
            sycl::buffer<std::int64_t, 1>& result, oneapi::math::index_base base) {
     CALL_GENERIC_BLAS_FN(::blas::_iamax, queue, n, x, incx, result);
-    queue.submit([&](sycl::handler& cgh) {
-        auto result_acc = result.template get_access<sycl::access::mode::read_write>(cgh);
-        cgh.single_task([=]() {
-            if (base == oneapi::math::index_base::one && n >= 1 && incx >= 1)
-                result_acc[0]++;
+    // TODO: It is better to do this in the _iamax kernel in https://github.com/uxlfoundation/generic-sycl-components
+    if (base == oneapi::math::index_base::one && n >= 1 && incx >= 1) {
+        queue.submit([&](sycl::handler& cgh) {
+            auto result_acc = result.template get_access<sycl::access::mode::read_write>(cgh);
+            cgh.single_task([=]() { result_acc[0]++; });
         });
-    });
+    }
 }
 
 void iamax(sycl::queue& queue, std::int64_t n, sycl::buffer<std::complex<real_t>, 1>& x,
@@ -52,13 +52,13 @@ void iamax(sycl::queue& queue, std::int64_t n, sycl::buffer<std::complex<real_t>
 void iamin(sycl::queue& queue, std::int64_t n, sycl::buffer<real_t, 1>& x, std::int64_t incx,
            sycl::buffer<std::int64_t, 1>& result, oneapi::math::index_base base) {
     CALL_GENERIC_BLAS_FN(::blas::_iamin, queue, n, x, incx, result);
-    queue.submit([&](sycl::handler& cgh) {
-        auto result_acc = result.template get_access<sycl::access::mode::read_write>(cgh);
-        cgh.single_task([=]() {
-            if (base == oneapi::math::index_base::one && n >= 1 && incx >= 1)
-                result_acc[0]++;
+    // TODO: It is better to do this in the _iamin kernel in https://github.com/uxlfoundation/generic-sycl-components
+    if (base == oneapi::math::index_base::one && n >= 1 && incx >= 1) {
+        queue.submit([&](sycl::handler& cgh) {
+            auto result_acc = result.template get_access<sycl::access::mode::read_write>(cgh);
+            cgh.single_task([=]() { result_acc[0]++; });
         });
-    });
+    }
 }
 
 void iamin(sycl::queue& queue, std::int64_t n, sycl::buffer<std::complex<real_t>, 1>& x,
@@ -238,13 +238,14 @@ sycl::event iamax(sycl::queue& queue, std::int64_t n, const real_t* x, std::int6
     sycl::event e = [&]() -> sycl::event {
         CALL_GENERIC_BLAS_USM_FN(::blas::_iamax, queue, n, x, incx, result, dependencies);
     }();
-    return queue.submit([&](sycl::handler& cgh) {
-        cgh.depends_on(e);
-        cgh.single_task([=]() {
-            if (base == oneapi::math::index_base::one && n >= 1 && incx >= 1)
-                result[0]++;
+    // TODO: It is better to do this in the _iamax kernel in https://github.com/uxlfoundation/generic-sycl-components
+    if (base == oneapi::math::index_base::one && n >= 1 && incx >= 1) {
+        return queue.submit([&](sycl::handler& cgh) {
+            cgh.depends_on(e);
+            cgh.single_task([=]() { result[0]++; });
         });
-    });
+    }
+    return e;
 }
 
 sycl::event iamax(sycl::queue& queue, std::int64_t n, const std::complex<real_t>* x,
@@ -259,13 +260,14 @@ sycl::event iamin(sycl::queue& queue, std::int64_t n, const real_t* x, std::int6
     sycl::event e = [&]() -> sycl::event {
         CALL_GENERIC_BLAS_USM_FN(::blas::_iamin, queue, n, x, incx, result, dependencies);
     }();
-    return queue.submit([&](sycl::handler& cgh) {
-        cgh.depends_on(e);
-        cgh.single_task([=]() {
-            if (base == oneapi::math::index_base::one && n >= 1 && incx >= 1)
-                result[0]++;
+    // TODO: It is better to do this in the _iamin kernel in https://github.com/uxlfoundation/generic-sycl-components
+    if (base == oneapi::math::index_base::one && n >= 1 && incx >= 1) {
+        return queue.submit([&](sycl::handler& cgh) {
+            cgh.depends_on(e);
+            cgh.single_task([=]() { result[0]++; });
         });
-    });
+    }
+    return e;
 }
 
 sycl::event iamin(sycl::queue& queue, std::int64_t n, const std::complex<real_t>* x,

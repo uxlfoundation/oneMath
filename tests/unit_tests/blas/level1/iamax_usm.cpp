@@ -144,7 +144,7 @@ int test(device* dev, oneapi::math::layout layout, int N, int incx, oneapi::math
 class IamaxUsmTests
         : public ::testing::TestWithParam<std::tuple<sycl::device*, oneapi::math::layout>> {};
 
-TEST_P(IamaxUsmTests, RealSinglePrecisionBaseZero) {
+TEST_P(IamaxUsmTests, RealSinglePrecision) {
     EXPECT_TRUEORSKIP(test<float>(std::get<0>(GetParam()), std::get<1>(GetParam()), 1357, 2,
                                   oneapi::math::index_base::zero));
     EXPECT_TRUEORSKIP(test<float>(std::get<0>(GetParam()), std::get<1>(GetParam()), 1357, 1,
@@ -164,7 +164,7 @@ TEST_P(IamaxUsmTests, RealSinglePrecisionBaseOne) {
     EXPECT_TRUEORSKIP(test<float>(std::get<0>(GetParam()), std::get<1>(GetParam()), 1357, -3,
                                   oneapi::math::index_base::one));
 }
-TEST_P(IamaxUsmTests, RealDoublePrecisionBaseZero) {
+TEST_P(IamaxUsmTests, RealDoublePrecision) {
     CHECK_DOUBLE_ON_DEVICE(std::get<0>(GetParam()));
 
     EXPECT_TRUEORSKIP(test<double>(std::get<0>(GetParam()), std::get<1>(GetParam()), 1357, 2,
@@ -176,19 +176,7 @@ TEST_P(IamaxUsmTests, RealDoublePrecisionBaseZero) {
     EXPECT_TRUEORSKIP(test<double>(std::get<0>(GetParam()), std::get<1>(GetParam()), 1357, -3,
                                    oneapi::math::index_base::zero));
 }
-TEST_P(IamaxUsmTests, RealDoublePrecisionBaseOne) {
-    CHECK_DOUBLE_ON_DEVICE(std::get<0>(GetParam()));
-
-    EXPECT_TRUEORSKIP(test<double>(std::get<0>(GetParam()), std::get<1>(GetParam()), 1357, 2,
-                                   oneapi::math::index_base::one));
-    EXPECT_TRUEORSKIP(test<double>(std::get<0>(GetParam()), std::get<1>(GetParam()), 1357, 1,
-                                   oneapi::math::index_base::one));
-    EXPECT_TRUEORSKIP((test<double, usm::alloc::device>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), 101, 1, oneapi::math::index_base::one)));
-    EXPECT_TRUEORSKIP(test<double>(std::get<0>(GetParam()), std::get<1>(GetParam()), 1357, -3,
-                                   oneapi::math::index_base::one));
-}
-TEST_P(IamaxUsmTests, ComplexSinglePrecisionBaseZero) {
+TEST_P(IamaxUsmTests, ComplexSinglePrecision) {
     EXPECT_TRUEORSKIP(test<std::complex<float>>(std::get<0>(GetParam()), std::get<1>(GetParam()),
                                                 1357, 2, oneapi::math::index_base::zero));
     EXPECT_TRUEORSKIP(test<std::complex<float>>(std::get<0>(GetParam()), std::get<1>(GetParam()),
@@ -198,17 +186,7 @@ TEST_P(IamaxUsmTests, ComplexSinglePrecisionBaseZero) {
     EXPECT_TRUEORSKIP(test<std::complex<float>>(std::get<0>(GetParam()), std::get<1>(GetParam()),
                                                 1357, -3, oneapi::math::index_base::zero));
 }
-TEST_P(IamaxUsmTests, ComplexSinglePrecisionBaseOne) {
-    EXPECT_TRUEORSKIP(test<std::complex<float>>(std::get<0>(GetParam()), std::get<1>(GetParam()),
-                                                1357, 2, oneapi::math::index_base::one));
-    EXPECT_TRUEORSKIP(test<std::complex<float>>(std::get<0>(GetParam()), std::get<1>(GetParam()),
-                                                1357, 1, oneapi::math::index_base::one));
-    EXPECT_TRUEORSKIP((test<std::complex<float>, usm::alloc::device>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), 101, 1, oneapi::math::index_base::one)));
-    EXPECT_TRUEORSKIP(test<std::complex<float>>(std::get<0>(GetParam()), std::get<1>(GetParam()),
-                                                1357, -3, oneapi::math::index_base::one));
-}
-TEST_P(IamaxUsmTests, ComplexDoublePrecisionBaseZero) {
+TEST_P(IamaxUsmTests, ComplexDoublePrecision) {
     CHECK_DOUBLE_ON_DEVICE(std::get<0>(GetParam()));
 
     EXPECT_TRUEORSKIP(test<std::complex<double>>(std::get<0>(GetParam()), std::get<1>(GetParam()),
@@ -219,18 +197,6 @@ TEST_P(IamaxUsmTests, ComplexDoublePrecisionBaseZero) {
         std::get<0>(GetParam()), std::get<1>(GetParam()), 101, 1, oneapi::math::index_base::zero)));
     EXPECT_TRUEORSKIP(test<std::complex<double>>(std::get<0>(GetParam()), std::get<1>(GetParam()),
                                                  1357, -3, oneapi::math::index_base::zero));
-}
-TEST_P(IamaxUsmTests, ComplexDoublePrecisionBaseOne) {
-    CHECK_DOUBLE_ON_DEVICE(std::get<0>(GetParam()));
-
-    EXPECT_TRUEORSKIP(test<std::complex<double>>(std::get<0>(GetParam()), std::get<1>(GetParam()),
-                                                 1357, 2, oneapi::math::index_base::one));
-    EXPECT_TRUEORSKIP(test<std::complex<double>>(std::get<0>(GetParam()), std::get<1>(GetParam()),
-                                                 1357, 1, oneapi::math::index_base::one));
-    EXPECT_TRUEORSKIP((test<std::complex<double>, usm::alloc::device>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), 101, 1, oneapi::math::index_base::one)));
-    EXPECT_TRUEORSKIP(test<std::complex<double>>(std::get<0>(GetParam()), std::get<1>(GetParam()),
-                                                 1357, -3, oneapi::math::index_base::one));
 }
 
 INSTANTIATE_TEST_SUITE_P(IamaxUsmTestSuite, IamaxUsmTests,
