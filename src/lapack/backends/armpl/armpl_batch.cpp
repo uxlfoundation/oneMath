@@ -503,7 +503,6 @@ inline sycl::event potrf_batch(sycl::queue& queue, oneapi::math::uplo* uplo, std
     throw unimplemented("lapack", "potrf_batch");
 }
 
-// Scratchpad memory not needed as parts of buffer a is used as workspace memory
 #define POTRF_BATCH_LAUNCHER_USM(TYPE)                                                            \
     sycl::event potrf_batch(                                                                      \
         sycl::queue& queue, oneapi::math::uplo* uplo, std::int64_t* n, TYPE** a,                  \
@@ -561,7 +560,6 @@ inline sycl::event potrs_batch(sycl::queue& queue, oneapi::math::uplo* uplo, std
     throw unimplemented("lapack", "potrs_batch");
 }
 
-// Scratchpad memory not needed as parts of buffer a is used as workspace memory
 #define POTRS_BATCH_LAUNCHER_USM(TYPE)                                                      \
     sycl::event potrs_batch(                                                                \
         sycl::queue& queue, oneapi::math::uplo* uplo, std::int64_t* n, std::int64_t* nrhs,  \
@@ -955,7 +953,7 @@ POTRF_GROUP_LAUNCHER_SCRATCH(std::complex<double>)
         sycl::queue & queue, oneapi::math::uplo * uplo, std::int64_t* n, std::int64_t* nrhs, \
         std::int64_t* lda, std::int64_t* ldb, std::int64_t group_count,                      \
         std::int64_t* group_sizes) {                                                         \
-        throw unimplemented("lapack", "potrfs_batch_scratchpad_size");                       \
+        throw unimplemented("lapack", "potrs_batch_scratchpad_size");                       \
     }
 
 POTRS_GROUP_LAUNCHER_SCRATCH(float)
