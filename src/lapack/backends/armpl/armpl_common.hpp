@@ -149,6 +149,32 @@ constexpr auto cast_to_int_if_complex(const T& alpha) {
     }
 }
 
+class armpl_lapacke_error : virtual public std::runtime_error {
+protected:
+    // Lapacke errors are already reported by a printf in lapacke_xerbla, so this may be redundant.
+    inline std::string lapacke_error_message(std::int64_t info) {
+        if (info == LAPACK_WORK_MEMORY_ERROR) {
+            return std::string("Not enough memory to allocate work array\n");
+        }
+        else if (info == LAPACK_TRANSPOSE_MEMORY_ERROR) {
+            return std::string("Not enough memory to transpose matrix\n");
+        }
+        else if (info < 0) {
+            return std::string("Wrong parameter number " + std::to_string(-info));
+        }
+        else {
+            return std::string("Runtime error\n");
+        }
+    }
+
+public:
+    explicit armpl_lapacke_error(std::string func, std::int64_t result)
+            : std::runtime_error("Arm Performance Libraries backend: LAPACKE error in " + func +
+                                 ": " + std::string(lapacke_error_message(result))) {}
+
+    virtual ~armpl_lapacke_error() throw() {}
+};
+
 } // namespace armpl
 } // namespace lapack
 } // namespace math
