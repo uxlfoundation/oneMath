@@ -953,7 +953,7 @@ POTRF_GROUP_LAUNCHER_SCRATCH(std::complex<double>)
         sycl::queue & queue, oneapi::math::uplo * uplo, std::int64_t* n, std::int64_t* nrhs, \
         std::int64_t* lda, std::int64_t* ldb, std::int64_t group_count,                      \
         std::int64_t* group_sizes) {                                                         \
-        throw unimplemented("lapack", "potrs_batch_scratchpad_size");                       \
+        throw unimplemented("lapack", "potrs_batch_scratchpad_size");                        \
     }
 
 POTRS_GROUP_LAUNCHER_SCRATCH(float)
