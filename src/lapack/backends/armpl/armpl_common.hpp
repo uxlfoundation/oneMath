@@ -21,9 +21,6 @@
 #ifndef _ARMPL_COMMON_HPP_
 #define _ARMPL_COMMON_HPP_
 
-#define MKL_Complex8  std::complex<float>
-#define MKL_Complex16 std::complex<double>
-
 #define __fp16    _Float16
 #define INTEGER64 1
 
@@ -42,8 +39,6 @@ namespace math {
 namespace lapack {
 namespace armpl {
 
-// host_task automatically uses run_on_host_intel if it is supported by the
-//  compiler. Otherwise, it falls back to single_task.
 template <typename K, typename H, typename F>
 static inline auto host_task_internal(H& cgh, F f, int) -> decltype(cgh.host_task(f)) {
     return cgh.host_task(f);
@@ -108,6 +103,7 @@ inline char get_jobsvd(oneapi::math::jobsvd job) {
         case oneapi::math::jobsvd::A: return 'A';
         case oneapi::math::jobsvd::O: return 'O';
         case oneapi::math::jobsvd::S: return 'S';
+        default: throw "Wrong job.";
     }
 }
 
@@ -115,6 +111,7 @@ inline char get_diag(oneapi::math::diag diag) {
     switch (diag) {
         case oneapi::math::diag::N: return 'N';
         case oneapi::math::diag::U: return 'U';
+        default: throw "Wrong diag.";
     }
 }
 
@@ -141,8 +138,6 @@ template <>
 inline constexpr bool is_complex<armpl_singlecomplex_t> = true;
 template <>
 inline constexpr bool is_complex<armpl_doublecomplex_t> = true;
-//static constexpr bool is_complex(armpl_singlecomplex_t> = true;
-//static constexpr bool is_complex(armpl_doublecomplex_t> = true;
 
 template <typename T>
 constexpr auto cast_to_int_if_complex(const T& alpha) {
