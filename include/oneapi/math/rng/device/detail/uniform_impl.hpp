@@ -118,17 +118,15 @@ protected:
         using OutType = typename std::conditional<EngineType::vec_size == 1, Type,
                                                   sycl::vec<Type, EngineType::vec_size>>::type;
         using FpType =
-            typename std::conditional<std::is_same<Method, uniform_method::accurate>::value, double,
-                                      float>::type;
+            typename std::conditional<std::is_same<
+                !std::is_same_v<Method, uniform_method::accurate> ||
+                std::is_same_v<Type, std::int8_t> ||
+                std::is_same_v<Type, std::uint8_t> ||
+                std::is_same_v<Type, std::int16_t> ||
+                std::is_same_v<Type, std::uint16_t>, float, double>::type;
         OutType res;
         if constexpr (std::is_integral<Type>::value) {
-            if constexpr (std::is_same_v<Type, std::int8_t> || std::is_same_v<Type, std::uint8_t> ||
-                          std::is_same_v<Type, std::int16_t> ||
-                          std::is_same_v<Type, std::uint16_t>) {
-                return generate_single_int<float, OutType>(engine);
-            }
-            else if constexpr (std::is_same_v<Type, std::int32_t> ||
-                               std::is_same_v<Type, std::uint32_t>) {
+            if constexpr (!std::is_same_v<Type, std::int64_t> && !std::is_same_v<Type, std::uint64_t>) {
                 return generate_single_int<FpType, OutType>(engine);
             }
             else {
@@ -244,21 +242,15 @@ protected:
     template <typename EngineType>
     Type generate_single(EngineType& engine) {
         using FpType =
-            typename std::conditional<std::is_same<Method, uniform_method::accurate>::value, double,
-                                      float>::type;
+            typename std::conditional<std::is_same<
+                !std::is_same_v<Method, uniform_method::accurate> ||
+                std::is_same_v<Type, std::int8_t> ||
+                std::is_same_v<Type, std::uint8_t> ||
+                std::is_same_v<Type, std::int16_t> ||
+                std::is_same_v<Type, std::uint16_t>, float, double>::type;
         Type res;
         if constexpr (std::is_integral<Type>::value) {
-            if constexpr (std::is_same_v<Type, std::int8_t> || std::is_same_v<Type, std::uint8_t> ||
-                          std::is_same_v<Type, std::int16_t> ||
-                          std::is_same_v<Type, std::uint16_t>) {
-                float res_fp =
-                    engine.generate_single(static_cast<float>(a_), static_cast<float>(b_));
-                res_fp = sycl::floor(res_fp);
-                res = static_cast<Type>(res_fp);
-                return res;
-            }
-            else if constexpr (std::is_same_v<Type, std::int32_t> ||
-                               std::is_same_v<Type, std::uint32_t>) {
+            if constexpr (!std::is_same_v<Type, std::int64_t> && !std::is_same_v<Type, std::uint64_t>) {
                 FpType res_fp =
                     engine.generate_single(static_cast<FpType>(a_), static_cast<FpType>(b_));
                 res_fp = sycl::floor(res_fp);
