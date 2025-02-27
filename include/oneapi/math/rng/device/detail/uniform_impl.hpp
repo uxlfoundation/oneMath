@@ -117,12 +117,11 @@ protected:
                                   sycl::vec<Type, EngineType::vec_size>>::type {
         using OutType = typename std::conditional<EngineType::vec_size == 1, Type,
                                                   sycl::vec<Type, EngineType::vec_size>>::type;
-        using FpType =
-            typename std::conditional<
-                !std::is_same_v<Method, uniform_method::accurate> ||
+        using FpType = typename std::conditional<
+            !std::is_same_v<Method, uniform_method::accurate> ||
                 std::is_same_v<Type, std::int8_t> || std::is_same_v<Type, std::uint8_t> ||
                 std::is_same_v<Type, std::int16_t> || std::is_same_v<Type, std::uint16_t>,
-                float, double>::type;
+            float, double>::type;
         OutType res;
         if constexpr (std::is_integral<Type>::value) {
             if constexpr (!std::is_same_v<Type, std::int64_t> &&
@@ -241,12 +240,11 @@ protected:
 
     template <typename EngineType>
     Type generate_single(EngineType& engine) {
-        using FpType =
-            typename std::conditional<
-                !std::is_same_v<Method, uniform_method::accurate> ||
+        using FpType = typename std::conditional<
+            !std::is_same_v<Method, uniform_method::accurate> ||
                 std::is_same_v<Type, std::int8_t> || std::is_same_v<Type, std::uint8_t> ||
                 std::is_same_v<Type, std::int16_t> || std::is_same_v<Type, std::uint16_t>,
-                float, double>::type;
+            float, double>::type;
         Type res;
         if constexpr (std::is_integral<Type>::value) {
             if constexpr (!std::is_same_v<Type, std::int64_t> &&
