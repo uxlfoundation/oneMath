@@ -21,11 +21,13 @@ find_package(CUDA 10.0 REQUIRED)
 get_filename_component(SYCL_BINARY_DIR ${CMAKE_CXX_COMPILER} DIRECTORY)
 # the OpenCL include file from cuda is opencl 1.1 and it is not compatible with DPC++
 # the OpenCL include headers 1.2 onward is required. This is used to bypass NVIDIA OpenCL headers
-find_path(OPENCL_INCLUDE_DIR CL/cl.h OpenCL/cl.h 
-HINTS 
-${OPENCL_INCLUDE_DIR}
-${SYCL_BINARY_DIR}/../include/sycl/
-${SYCL_BINARY_DIR}/../include/
+find_path(OPENCL_INCLUDE_DIR
+  NAMES CL/cl.h OpenCL/cl.h
+  HINTS
+  ${OPENCL_INCLUDE_DIR}
+  ${SYCL_BINARY_DIR}/../include/
+  ${SYCL_BINARY_DIR}/../../include/
+  PATH_SUFFIXES sycl
 )
 # this is work around to avoid duplication half creation in both cuda and SYCL
 add_compile_definitions(CUDA_NO_HALF)

@@ -62,11 +62,13 @@ get_filename_component(SYCL_BINARY_DIR ${CMAKE_CXX_COMPILER} DIRECTORY)
 if (NOT (ONEMATH_SYCL_IMPLEMENTATION STREQUAL "hipsycl"))
 # the OpenCL include file from cuda is opencl 1.1 and it is not compatible with DPC++
 # the OpenCL include headers 1.2 onward is required. This is used to bypass NVIDIA OpenCL headers
-find_path(OPENCL_INCLUDE_DIR CL/cl.h OpenCL/cl.h 
-HINTS 
-${OPENCL_INCLUDE_DIR}
-${SYCL_BINARY_DIR}/../include/sycl/
-${SYCL_BINARY_DIR}/../include/
+find_path(OPENCL_INCLUDE_DIR
+  NAMES CL/cl.h OpenCL/cl.h
+  HINTS
+  ${OPENCL_INCLUDE_DIR}
+  ${SYCL_BINARY_DIR}/../include/
+  ${SYCL_BINARY_DIR}/../../include/
+  PATH_SUFFIXES sycl
 )
 endif()
 

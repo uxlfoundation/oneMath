@@ -25,7 +25,14 @@ check_cxx_compiler_flag("-fsycl" is_dpcpp)
 if(is_dpcpp)
   # Workaround for internal compiler error during linking if -fsycl is used
   get_filename_component(SYCL_BINARY_DIR ${CMAKE_CXX_COMPILER} DIRECTORY)
-  find_library(SYCL_LIBRARY NAMES sycl PATHS "${SYCL_BINARY_DIR}/../lib" "${SYCL_BINARY_DIR}/lib" ENV LIBRARY_PATH ENV PATH)
+  find_library(SYCL_LIBRARY NAMES sycl
+    PATHS
+      "${SYCL_BINARY_DIR}/lib"
+      "${SYCL_BINARY_DIR}/../lib"
+      "${SYCL_BINARY_DIR}/../../lib"
+      ENV LIBRARY_PATH
+      ENV PATH
+  )
   if(NOT SYCL_LIBRARY)
     message(FATAL_ERROR "SYCL library is not found in ${SYCL_BINARY_DIR}/../lib, PATH, and LIBRARY_PATH")
   endif()
