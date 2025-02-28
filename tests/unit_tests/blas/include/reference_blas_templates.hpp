@@ -1388,7 +1388,7 @@ template <>
 int iamax(const int* n, const float* x, const int* incx, oneapi::math::index_base base) {
     int res = cblas_isamax_wrapper(*n, x, *incx);
     if (base == oneapi::math::index_base::one && *n >= 1 && *incx >= 1)
-      res++;
+        res++;
     return res;
 }
 
@@ -1396,7 +1396,7 @@ template <>
 int iamax(const int* n, const double* x, const int* incx, oneapi::math::index_base base) {
     int res = cblas_idamax_wrapper(*n, x, *incx);
     if (base == oneapi::math::index_base::one && *n >= 1 && *incx >= 1)
-      res++;
+        res++;
     return res;
 }
 
@@ -1405,7 +1405,7 @@ int iamax(const int* n, const std::complex<float>* x, const int* incx,
           oneapi::math::index_base base) {
     int res = cblas_icamax_wrapper(*n, (const void*)x, *incx);
     if (base == oneapi::math::index_base::one && *n >= 1 && *incx >= 1)
-      res++;
+        res++;
     return res;
 }
 
@@ -1414,7 +1414,7 @@ int iamax(const int* n, const std::complex<double>* x, const int* incx,
           oneapi::math::index_base base) {
     int res = cblas_izamax_wrapper(*n, (const void*)x, *incx);
     if (base == oneapi::math::index_base::one && *n >= 1 && *incx >= 1)
-      res++;
+        res++;
     return res;
 }
 
