@@ -169,11 +169,9 @@ bool compare_moments(const std::vector<Fp, AllocType>& r, double tM, double tD, 
 template <typename Distribution, typename Fp, typename AllocType>
 bool calculate_and_compare_moments_uniform(Distribution distr,
                                            const std::vector<Fp, AllocType>& r) {
-    using ParamsType = typename std::conditional<std::is_integral<Fp>::value, double, Fp>::type;
-
     double tM, tD, tQ;
-    ParamsType a = distr.a();
-    ParamsType b = distr.b();
+    double a = distr.a();
+    double b = distr.b();
 
     // Theoretical moments
     if constexpr (std::is_integral<Fp>::value) {
