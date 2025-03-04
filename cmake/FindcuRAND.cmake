@@ -65,9 +65,9 @@ if (NOT (ONEMATH_SYCL_IMPLEMENTATION STREQUAL "hipsycl"))
 find_path(OPENCL_INCLUDE_DIR
   NAMES CL/cl.h OpenCL/cl.h
   HINTS
-  ${OPENCL_INCLUDE_DIR}
-  ${SYCL_BINARY_DIR}/../include/
-  ${SYCL_BINARY_DIR}/../../include/
+    ${OPENCL_INCLUDE_DIR}
+    ${SYCL_BINARY_DIR}/../include/
+    ${SYCL_BINARY_DIR}/../../include/
   PATH_SUFFIXES sycl
 )
 endif()
