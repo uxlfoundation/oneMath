@@ -37,6 +37,7 @@ int DFT_Test<precision, domain>::test_out_of_place_real_real_USM() {
         descriptor_t descriptor{ sizes };
 
         PrecisionType backward_scale = 1.f / static_cast<PrecisionType>(forward_elements);
+        bool scale_at_check = false;
         descriptor.set_value(oneapi::math::dft::config_param::PLACEMENT,
                              oneapi::math::dft::config_value::NOT_INPLACE);
         descriptor.set_value(oneapi::math::dft::config_param::COMPLEX_STORAGE,
@@ -46,7 +47,14 @@ int DFT_Test<precision, domain>::test_out_of_place_real_real_USM() {
         descriptor.set_value(oneapi::math::dft::config_param::BWD_DISTANCE, forward_elements);
         descriptor.set_value(oneapi::math::dft::config_param::BACKWARD_SCALE, backward_scale);
 
-        commit_descriptor(descriptor, sycl_queue);
+        try {
+            commit_descriptor(descriptor, sycl_queue);
+        }
+        catch (...) { //BACKWARD_SCALE not supported, go with 1 and scale at check
+            descriptor.set_value(oneapi::math::dft::config_param::BACKWARD_SCALE, 1.f);
+            commit_descriptor(descriptor, sycl_queue);
+            scale_at_check = true;
+        }
 
         auto ua_input = usm_allocator_t<PrecisionType>(cxt, *dev);
         auto ua_output = usm_allocator_t<PrecisionType>(cxt, *dev);
@@ -83,6 +91,11 @@ int DFT_Test<precision, domain>::test_out_of_place_real_real_USM() {
             output_data[i] = { out_back_re[i], out_back_im[i] };
         }
 
+        // account for scaling that occurs during DFT
+        if (scale_at_check)
+            std::for_each(input.begin(), input.end(),
+                          [this](auto& x) { x *= static_cast<PrecisionType>(forward_elements); });
+
         EXPECT_TRUE(check_equal_vector(output_data.data(), input.data(), input.size(),
                                        abs_error_margin, rel_error_margin, std::cout));
     }
@@ -105,6 +118,7 @@ int DFT_Test<precision, domain>::test_out_of_place_real_real_buffer() {
         descriptor_t descriptor{ sizes };
 
         PrecisionType backward_scale = 1.f / static_cast<PrecisionType>(forward_elements);
+        bool scale_at_check = false;
         descriptor.set_value(oneapi::math::dft::config_param::PLACEMENT,
                              oneapi::math::dft::config_value::NOT_INPLACE);
         descriptor.set_value(oneapi::math::dft::config_param::COMPLEX_STORAGE,
@@ -114,7 +128,14 @@ int DFT_Test<precision, domain>::test_out_of_place_real_real_buffer() {
         descriptor.set_value(oneapi::math::dft::config_param::BWD_DISTANCE, forward_elements);
         descriptor.set_value(oneapi::math::dft::config_param::BACKWARD_SCALE, backward_scale);
 
-        commit_descriptor(descriptor, sycl_queue);
+        try {
+            commit_descriptor(descriptor, sycl_queue);
+        }
+        catch (...) { //BACKWARD_SCALE not supported, go with 1 and scale at check
+            descriptor.set_value(oneapi::math::dft::config_param::BACKWARD_SCALE, 1.f);
+            commit_descriptor(descriptor, sycl_queue);
+            scale_at_check = true;
+        }
 
         sycl::buffer<PrecisionType, 1> in_dev_re{ input_re.data(), sycl::range<1>(size_total) };
         sycl::buffer<PrecisionType, 1> in_dev_im{ input_im.data(), sycl::range<1>(size_total) };
@@ -149,6 +170,11 @@ int DFT_Test<precision, domain>::test_out_of_place_real_real_buffer() {
             for (std::size_t i = 0; i < output_data.size(); ++i) {
                 output_data[i] = { acc_back_out_re[i], acc_back_out_im[i] };
             }
+            // account for scaling that occurs during DFT
+            if (scale_at_check)
+                std::for_each(input.begin(), input.end(), [this](auto& x) {
+                    x *= static_cast<PrecisionType>(forward_elements);
+                });
             EXPECT_TRUE(check_equal_vector(output_data.data(), input.data(), input.size(),
                                            abs_error_margin, rel_error_margin, std::cout));
         }

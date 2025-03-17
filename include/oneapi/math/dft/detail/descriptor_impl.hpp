@@ -91,6 +91,10 @@ public:
     void commit(backend_selector<backend::portfft> selector);
 #endif
 
+#ifdef ONEMATH_ENABLE_ARMPL_BACKEND
+    void commit(backend_selector<backend::armpl> selector);
+#endif
+
     const dft_values<prec, dom>& get_values() const noexcept {
         return values_;
     }

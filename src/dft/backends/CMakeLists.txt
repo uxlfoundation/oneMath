@@ -39,3 +39,8 @@ endif()
 if(ENABLE_PORTFFT_BACKEND)
   add_subdirectory(portfft)
 endif()
+
+if(ENABLE_ARMPL_BACKEND)
+  add_subdirectory(armpl)
+endif()
+

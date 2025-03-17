@@ -92,6 +92,8 @@
 #define TEST_RUN_INTELCPU_SELECT(q, func, ...) \
     func(oneapi::math::backend_selector<oneapi::math::backend::netlib>{ q }, __VA_ARGS__)
 #elif defined(ONEMATH_ENABLE_ARMPL_BACKEND)
+#define TEST_RUN_INTELCPU_SELECT_NO_ARGS(q, func) \
+    func(oneapi::math::backend_selector<oneapi::math::backend::armpl>{ q })
 #define TEST_RUN_INTELCPU_SELECT(q, func, ...) \
     func(oneapi::math::backend_selector<oneapi::math::backend::armpl>{ q }, __VA_ARGS__)
 #endif
