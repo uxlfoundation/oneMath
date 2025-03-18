@@ -95,7 +95,7 @@ static std::map<domain, std::map<device, std::vector<const char*>>> libraries = 
           } },
         { device::generic_device,
           {
-#ifdef ENABLE_GENERIC_BLAS_BACKEND
+#ifdef ONEMATH_ENABLE_GENERIC_BLAS_BACKEND
               LIB_NAME("blas_generic"),
 #endif
           } } } },
@@ -139,7 +139,7 @@ static std::map<domain, std::map<device, std::vector<const char*>>> libraries = 
           } },
         { device::generic_device,
           {
-#ifdef ENABLE_PORTFFT_BACKEND
+#ifdef ONEMATH_ENABLE_PORTFFT_BACKEND
               LIB_NAME("dft_portfft"),
 #endif
           } } } },
