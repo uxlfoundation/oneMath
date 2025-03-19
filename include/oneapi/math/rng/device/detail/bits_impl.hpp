@@ -28,31 +28,34 @@ template <typename UIntType>
 class distribution_base<oneapi::math::rng::device::bits<UIntType>> {
 protected:
     template <typename EngineType>
-    auto generate(EngineType& engine) -> typename std::enable_if<
-        !std::is_same<EngineType, mcg59<EngineType::vec_size>>::value &&
-        !std::is_same<EngineType, count_engine_adaptor<mcg59<EngineType::vec_size>>>::value,
-        typename std::conditional<EngineType::vec_size == 1, UIntType,
-                                  sycl::vec<UIntType, EngineType::vec_size>>::type>::type {
+    auto generate(EngineType& engine) ->
+        typename std::enable_if<
+            !std::is_same<EngineType, mcg59<EngineType::vec_size>>::value &&
+                !std::is_same<EngineType, count_engine_adaptor<mcg59<EngineType::vec_size>>>::value,
+            typename std::conditional<EngineType::vec_size == 1, UIntType,
+                                      sycl::vec<UIntType, EngineType::vec_size>>::type>::type {
         static_assert(std::is_same<UIntType, uint32_t>::value,
                       "oneMath: bits works only with std::uint32_t");
         return engine.generate();
     }
 
     template <typename EngineType>
-    auto generate(EngineType& engine) -> typename std::enable_if<
-        std::is_same<EngineType, mcg59<EngineType::vec_size>>::value ||
-        std::is_same<EngineType, count_engine_adaptor<mcg59<EngineType::vec_size>>>::value,
-        typename std::conditional<EngineType::vec_size == 1, UIntType,
-                                  sycl::vec<UIntType, EngineType::vec_size>>::type>::type {
+    auto generate(EngineType& engine) ->
+        typename std::enable_if<
+            std::is_same<EngineType, mcg59<EngineType::vec_size>>::value ||
+                std::is_same<EngineType, count_engine_adaptor<mcg59<EngineType::vec_size>>>::value,
+            typename std::conditional<EngineType::vec_size == 1, UIntType,
+                                      sycl::vec<UIntType, EngineType::vec_size>>::type>::type {
         static_assert(std::is_same<UIntType, uint64_t>::value,
                       "oneMath: bits for mcg59 works only with std::uint64_t");
         return engine.generate_bits();
     }
 
     template <typename EngineType>
-    typename std::enable_if<!std::is_same<EngineType, mcg59<EngineType::vec_size>>::value &&
-                            !std::is_same<EngineType, count_engine_adaptor<mcg59<EngineType::vec_size>>>::value,
-                            UIntType>::type
+    typename std::enable_if<
+        !std::is_same<EngineType, mcg59<EngineType::vec_size>>::value &&
+            !std::is_same<EngineType, count_engine_adaptor<mcg59<EngineType::vec_size>>>::value,
+        UIntType>::type
     generate_single(EngineType& engine) {
         static_assert(std::is_same<UIntType, uint32_t>::value,
                       "oneMath: bits works only with std::uint32_t");
@@ -60,9 +63,10 @@ protected:
     }
 
     template <typename EngineType>
-    typename std::enable_if<std::is_same<EngineType, mcg59<EngineType::vec_size>>::value ||
-                            std::is_same<EngineType, count_engine_adaptor<mcg59<EngineType::vec_size>>>::value,
-                            UIntType>::type
+    typename std::enable_if<
+        std::is_same<EngineType, mcg59<EngineType::vec_size>>::value ||
+            std::is_same<EngineType, count_engine_adaptor<mcg59<EngineType::vec_size>>>::value,
+        UIntType>::type
     generate_single(EngineType& engine) {
         static_assert(std::is_same<UIntType, uint64_t>::value,
                       "oneMath: bits for mcg59 works only with std::uint64_t");

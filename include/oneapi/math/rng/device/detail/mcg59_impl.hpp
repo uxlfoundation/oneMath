@@ -270,7 +270,8 @@ protected:
     }
 
     engine_state<oneapi::math::rng::device::mcg59<VecSize>> state_;
-    friend class oneapi::math::rng::device::count_engine_adaptor<oneapi::math::rng::device::mcg59<VecSize>>;
+    friend class oneapi::math::rng::device::count_engine_adaptor<
+        oneapi::math::rng::device::mcg59<VecSize>>;
 };
 
 } // namespace detail

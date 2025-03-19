@@ -34,8 +34,9 @@ TEST_P(Philox4x32x10DeviceCountAdaptorTests, BinaryPrecision) {
     EXPECT_TRUEORSKIP((test2(GetParam())));
 }
 
-INSTANTIATE_TEST_SUITE_P(Philox4x32x10DeviceCountAdaptorTestsSuite, Philox4x32x10DeviceCountAdaptorTests,
-                         ::testing::ValuesIn(devices), ::DeviceNamePrint());
+INSTANTIATE_TEST_SUITE_P(Philox4x32x10DeviceCountAdaptorTestsSuite,
+                         Philox4x32x10DeviceCountAdaptorTests, ::testing::ValuesIn(devices),
+                         ::DeviceNamePrint());
 
 class Mrg32k3aDeviceCountAdaptorTests : public ::testing::TestWithParam<sycl::device*> {};
 

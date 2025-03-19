@@ -63,8 +63,8 @@ public:
 
             auto event = queue.parallel_for(range, [=](sycl::item<1> item) {
                 size_t id = item.get_id(0);
-                oneapi::math::rng::device::count_engine_adaptor<Engine> engine
-                    (SEED, 2 * id * Engine::vec_size);
+                oneapi::math::rng::device::count_engine_adaptor<Engine> engine(
+                    SEED, 2 * id * Engine::vec_size);
                 oneapi::math::rng::device::bits<UIntType> distr;
                 auto res = oneapi::math::rng::device::generate(distr, engine);
 
@@ -73,13 +73,13 @@ public:
                 if constexpr (Engine::vec_size == 1) {
                     r[id] = res;
                 }
-                else{
+                else {
                     for (int j = 0; j < Engine::vec_size; ++j) {
                         r[id * Engine::vec_size + j] = res[j];
                     }
                 }
 
-                if(id == 42)
+                if (id == 42)
                     r_count[0] = engine.get_count();
             });
             event.wait_and_throw();
@@ -97,8 +97,9 @@ public:
         }
 
         // validation
-        if(r_count[0] != Engine::vec_size){
-            std::cout << "Error: count = " <<r_count[0]<< ", but should be " << Engine::vec_size << std::endl;
+        if (r_count[0] != Engine::vec_size) {
+            std::cout << "Error: count = " << r_count[0] << ", but should be " << Engine::vec_size
+                      << std::endl;
             status = test_failed;
             return;
         }
@@ -111,7 +112,7 @@ public:
             if constexpr (Engine::vec_size == 1) {
                 r_ref[i] = res;
             }
-            else{
+            else {
                 for (int j = 0; j < Engine::vec_size; ++j) {
                     r_ref[i + j] = res[j];
                 }

@@ -549,7 +549,8 @@ protected:
     }
 
     engine_state<oneapi::math::rng::device::philox4x32x10<VecSize>> state_;
-    friend class oneapi::math::rng::device::count_engine_adaptor<oneapi::math::rng::device::philox4x32x10<VecSize>>;
+    friend class oneapi::math::rng::device::count_engine_adaptor<
+        oneapi::math::rng::device::philox4x32x10<VecSize>>;
 };
 
 } // namespace detail

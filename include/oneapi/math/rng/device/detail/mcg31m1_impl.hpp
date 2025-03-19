@@ -227,7 +227,8 @@ protected:
     }
 
     engine_state<oneapi::math::rng::device::mcg31m1<VecSize>> state_;
-    friend class oneapi::math::rng::device::count_engine_adaptor<oneapi::math::rng::device::mcg31m1<VecSize>>;
+    friend class oneapi::math::rng::device::count_engine_adaptor<
+        oneapi::math::rng::device::mcg31m1<VecSize>>;
 };
 
 } // namespace detail

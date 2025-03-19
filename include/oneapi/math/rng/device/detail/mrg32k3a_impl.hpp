@@ -380,7 +380,8 @@ protected:
     }
 
     engine_state<oneapi::math::rng::device::mrg32k3a<VecSize>> state_;
-    friend class oneapi::math::rng::device::count_engine_adaptor<oneapi::math::rng::device::mrg32k3a<VecSize>>;
+    friend class oneapi::math::rng::device::count_engine_adaptor<
+        oneapi::math::rng::device::mrg32k3a<VecSize>>;
 };
 
 } // namespace detail

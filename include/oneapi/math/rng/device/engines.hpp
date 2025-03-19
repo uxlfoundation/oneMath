@@ -225,7 +225,6 @@ public:
     }
 
 private:
-
     Engine engine_;
     std::int64_t counted_ = 0;
 
