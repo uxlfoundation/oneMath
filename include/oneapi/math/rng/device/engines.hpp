@@ -200,13 +200,23 @@ public:
 
     template <typename UIntType>
     auto generate_uniform_bits() {
-        counted_ += Engine::vec_size;
+        if constexpr (std::is_same<UIntType, std::uint32_t>::value) {
+            counted_ += Engine::vec_size;
+        }
+        else {
+            counted_ += 2 * Engine::vec_size;
+        }
         return engine_.template generate_uniform_bits<UIntType>();
     }
 
     template <typename UIntType>
     auto generate_single_uniform_bits() {
-        counted_++;
+        if constexpr (std::is_same<UIntType, std::uint32_t>::value) {
+            counted_ += 1;
+        }
+        else {
+            counted_ += 2;
+        }
         return engine_.template generate_single_uniform_bits<UIntType>();
     }
 

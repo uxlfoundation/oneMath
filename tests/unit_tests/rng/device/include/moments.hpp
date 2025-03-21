@@ -108,11 +108,7 @@ public:
 
         // validation (statistics check is turned out for mcg59)
         if constexpr (!std::is_same<Engine,
-                                    oneapi::math::rng::device::mcg59<Engine::vec_size>>::value ||
-                      !std::is_same<
-                          Engine, oneapi::math::rng::device::count_engine_adaptor<
-                                      oneapi::math::rng::device::mcg59<Engine::vec_size>>>::value) {
-            statistics_device<Distribution> stat;
+            oneapi::math::rng::device::mcg59<Engine::vec_size>>::value) {            statistics_device<Distribution> stat;
             status = stat.check(r, Distribution{});
         }
         return;
