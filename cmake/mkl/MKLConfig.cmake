@@ -223,12 +223,28 @@ if(CMAKE_Fortran_COMPILER)
 endif()
 
 # Determine Compiler Family
-if(CXX_COMPILER_NAME STREQUAL "dpcpp" OR CXX_COMPILER_NAME STREQUAL "dpcpp.exe"
-    OR CXX_COMPILER_NAME STREQUAL "icpx" OR CXX_COMPILER_NAME STREQUAL "icx.exe")
-  set(SYCL_COMPILER ON)
+
+include(CMakePackageConfigHelpers)
+include(CheckCXXCompilerFlag)
+include(CheckIncludeFileCXX)
+include(GNUInstallDirs)
+
+# Check SYCL support by the compiler
+check_cxx_compiler_flag("-fsycl" _fsycl_option)
+if (_fsycl_option)
+  CHECK_INCLUDE_FILE_CXX("sycl/sycl.hpp" _sycl_header "-fsycl")
+  if (NOT _sycl_header)
+    CHECK_INCLUDE_FILE_CXX("CL/sycl.hpp" _sycl_header_old "-fsycl")
+  endif()
+  if (_sycl_header OR _sycl_header_old)
+    set(SYCL_COMPILER ON)
+  endif()
 endif()
-if(C_COMPILER_NAME MATCHES "^clang" OR CXX_COMPILER_NAME MATCHES "^clang")
-  set(CLANG_COMPILER ON)
+
+if(NOT DEFINED SYCL_COMPILER OR SYCL_COMPILER MATCHES OFF)
+  if(C_COMPILER_NAME MATCHES "^clang" OR CXX_COMPILER_NAME MATCHES "^clang")
+    set(CLANG_COMPILER ON)
+  endif()
 endif()
 if(CMAKE_C_COMPILER_ID STREQUAL "Intel" OR CMAKE_CXX_COMPILER_ID STREQUAL "Intel" OR CMAKE_Fortran_COMPILER_ID STREQUAL "Intel"
     OR CMAKE_C_COMPILER_ID STREQUAL "IntelLLVM" OR CMAKE_CXX_COMPILER_ID STREQUAL "IntelLLVM" OR CMAKE_Fortran_COMPILER_ID STREQUAL "IntelLLVM")
