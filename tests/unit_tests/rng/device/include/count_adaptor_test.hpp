@@ -57,7 +57,7 @@ public:
         std::vector<UIntType, allocator_t> r_count_vec(1, allocator);
         UIntType* r = r_vec.data();
         UIntType* r_count = r_count_vec.data();
-        const int count_idx = std::max(N_GEN - 1, 42);
+        const int count_idx = std::min(N_GEN - 1, 42);
 
         try {
             sycl::range<1> range(N_GEN / Engine::vec_size);
