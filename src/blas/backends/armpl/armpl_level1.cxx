@@ -565,7 +565,7 @@ DOTU_USM_LAUNCHER(std::complex<double>, ::cblas_zdotu_sub)
 
 template <typename T, typename CBLAS_FUNC>
 sycl::event iamin(sycl::queue& queue, int64_t n, const T* x, int64_t incx, int64_t* result,
-                  const std::vector<sycl::event>& dependencies, oneapi::math::index_base base,
+                  oneapi::math::index_base base, const std::vector<sycl::event>& dependencies,
                   CBLAS_FUNC cblas_func) {
     auto done = queue.submit([&](sycl::handler& cgh) {
         int64_t num_events = dependencies.size();
