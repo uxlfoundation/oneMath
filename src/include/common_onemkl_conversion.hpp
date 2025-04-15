@@ -110,40 +110,39 @@ inline auto get_onemkl_order(oneapi::math::order param) {
 } // namespace math
 } // namespace oneapi
 
-
 // Rethrow Intel(R) oneMKL exceptions as oneMath exceptions
-#define RETHROW_ONEMKL_EXCEPTIONS(EXPRESSION)                  \
-    do {                                                       \
-        try {                                                  \
-            EXPRESSION;                                        \
-        }                                                      \
-        catch (const oneapi::mkl::unsupported_device& e) {     \
-            throw oneapi::math::unsupported_device(e.what());  \
-        }                                                      \
-        catch (const oneapi::mkl::host_bad_alloc& e) {         \
-            throw oneapi::math::host_bad_alloc(e.what());      \
-        }                                                      \
-        catch (const oneapi::mkl::device_bad_alloc& e) {       \
-            throw oneapi::math::device_bad_alloc(e.what());    \
-        }                                                      \
-        catch (const oneapi::mkl::unimplemented& e) {          \
-            throw oneapi::math::unimplemented(e.what());       \
-        }                                                      \
-        catch (const oneapi::mkl::invalid_argument& e) {       \
-            throw oneapi::math::invalid_argument(e.what());    \
-        }                                                      \
-        catch (const oneapi::mkl::uninitialized& e) {          \
-            throw oneapi::math::uninitialized(e.what());       \
-        }                                                      \
-        catch (const oneapi::mkl::computation_error& e) {      \
-            throw oneapi::math::computation_error(e.what());   \
-        }                                                      \
-        catch (const oneapi::mkl::batch_error& e) {            \
-            throw oneapi::math::batch_error(e.what());         \
-        }                                                      \
-        catch (const oneapi::mkl::exception& e) {              \
-            throw oneapi::math::exception(e.what());           \
-        }                                                      \
+#define RETHROW_ONEMKL_EXCEPTIONS(EXPRESSION)                 \
+    do {                                                      \
+        try {                                                 \
+            EXPRESSION;                                       \
+        }                                                     \
+        catch (const oneapi::mkl::unsupported_device& e) {    \
+            throw oneapi::math::unsupported_device(e.what()); \
+        }                                                     \
+        catch (const oneapi::mkl::host_bad_alloc& e) {        \
+            throw oneapi::math::host_bad_alloc(e.what());     \
+        }                                                     \
+        catch (const oneapi::mkl::device_bad_alloc& e) {      \
+            throw oneapi::math::device_bad_alloc(e.what());   \
+        }                                                     \
+        catch (const oneapi::mkl::unimplemented& e) {         \
+            throw oneapi::math::unimplemented(e.what());      \
+        }                                                     \
+        catch (const oneapi::mkl::invalid_argument& e) {      \
+            throw oneapi::math::invalid_argument(e.what());   \
+        }                                                     \
+        catch (const oneapi::mkl::uninitialized& e) {         \
+            throw oneapi::math::uninitialized(e.what());      \
+        }                                                     \
+        catch (const oneapi::mkl::computation_error& e) {     \
+            throw oneapi::math::computation_error(e.what());  \
+        }                                                     \
+        catch (const oneapi::mkl::batch_error& e) {           \
+            throw oneapi::math::batch_error(e.what());        \
+        }                                                     \
+        catch (const oneapi::mkl::exception& e) {             \
+            throw oneapi::math::exception(e.what());          \
+        }                                                     \
     } while (0)
 
 #define RETHROW_ONEMKL_EXCEPTIONS_RET(EXPRESSION)     \
@@ -151,49 +150,44 @@ inline auto get_onemkl_order(oneapi::math::order param) {
         RETHROW_ONEMKL_EXCEPTIONS(return EXPRESSION); \
     } while (0)
 
-
-
 // Rethrow Intel(R) oneMKL LAPCK exceptions as oneMath LAPACK exceptions
-#define RETHROW_ONEMKL_LAPACK_EXCEPTIONS(EXPRESSION)                             \
-    do {                                                                         \
-        try {                                                                    \
-            EXPRESSION;                                                          \
-        }                                                                        \
-        catch (const oneapi::mkl::unsupported_device& e) {                       \
-            throw oneapi::math::unsupported_device(e.what());                    \
-        }                                                                        \
-        catch (const oneapi::mkl::host_bad_alloc& e) {                           \
-            throw oneapi::math::host_bad_alloc(e.what());                        \
-        }                                                                        \
-        catch (const oneapi::mkl::device_bad_alloc& e) {                         \
-            throw oneapi::math::device_bad_alloc(e.what());                      \
-        }                                                                        \
-        catch (const oneapi::mkl::unimplemented& e) {                            \
-            throw oneapi::math::unimplemented(e.what());                         \
-        }                                                                        \
-       catch (const oneapi::mkl::uninitialized& e) {                             \
-            throw oneapi::math::uninitialized(e.what());                         \
-        }                                                                        \
-        catch (const oneapi::mkl::lapack::invalid_argument& e) {                 \
-            throw oneapi::math::lapack::invalid_argument(e.what(), e.info(),     \
-                                                                e.detail());     \
-        }                                                                        \
-        catch (const oneapi::mkl::lapack::computation_error& e) {                \
-            throw oneapi::math::lapack::computation_error(e.what(), e.info());   \
-        }                                                                        \
-        catch (const oneapi::mkl::lapack::batch_error& e) {                      \
-            throw oneapi::math::lapack::batch_error(e.what(), e.info(), e.ids(), \
-                                                                e.exceptions()); \
-        }                                                                        \
-        catch (const oneapi::mkl::exception& e) {                                \
-            throw oneapi::math::exception(e.what());                             \
-        }                                                                        \
+#define RETHROW_ONEMKL_LAPACK_EXCEPTIONS(EXPRESSION)                                              \
+    do {                                                                                          \
+        try {                                                                                     \
+            EXPRESSION;                                                                           \
+        }                                                                                         \
+        catch (const oneapi::mkl::unsupported_device& e) {                                        \
+            throw oneapi::math::unsupported_device(e.what());                                     \
+        }                                                                                         \
+        catch (const oneapi::mkl::host_bad_alloc& e) {                                            \
+            throw oneapi::math::host_bad_alloc(e.what());                                         \
+        }                                                                                         \
+        catch (const oneapi::mkl::device_bad_alloc& e) {                                          \
+            throw oneapi::math::device_bad_alloc(e.what());                                       \
+        }                                                                                         \
+        catch (const oneapi::mkl::unimplemented& e) {                                             \
+            throw oneapi::math::unimplemented(e.what());                                          \
+        }                                                                                         \
+        catch (const oneapi::mkl::uninitialized& e) {                                             \
+            throw oneapi::math::uninitialized(e.what());                                          \
+        }                                                                                         \
+        catch (const oneapi::mkl::lapack::invalid_argument& e) {                                  \
+            throw oneapi::math::lapack::invalid_argument(e.what(), e.info(), e.detail());         \
+        }                                                                                         \
+        catch (const oneapi::mkl::lapack::computation_error& e) {                                 \
+            throw oneapi::math::lapack::computation_error(e.what(), e.info());                    \
+        }                                                                                         \
+        catch (const oneapi::mkl::lapack::batch_error& e) {                                       \
+            throw oneapi::math::lapack::batch_error(e.what(), e.info(), e.ids(), e.exceptions()); \
+        }                                                                                         \
+        catch (const oneapi::mkl::exception& e) {                                                 \
+            throw oneapi::math::exception(e.what());                                              \
+        }                                                                                         \
     } while (0)
 
 #define RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(EXPRESSION)     \
     do {                                                     \
         RETHROW_ONEMKL_LAPACK_EXCEPTIONS(return EXPRESSION); \
     } while (0)
-
 
 #endif // _ONEMATH_SRC_INCLUDE_COMMON_ONEMKL_TYPES_CONVERSION_HPP_

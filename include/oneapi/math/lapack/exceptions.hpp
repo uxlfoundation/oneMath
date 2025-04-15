@@ -60,7 +60,7 @@ public:
 class batch_error : public oneapi::math::batch_error, public oneapi::math::lapack::exception {
 public:
     batch_error(const std::string& message, std::int64_t num_errors,
-              std::vector<std::int64_t> ids = {}, std::vector<std::exception_ptr> exceptions = {})
+                std::vector<std::int64_t> ids = {}, std::vector<std::exception_ptr> exceptions = {})
             : oneapi::math::batch_error(message),
               oneapi::math::lapack::exception(this, num_errors),
               _ids(ids),
@@ -87,8 +87,8 @@ private:
 class invalid_argument : public oneapi::math::invalid_argument,
                          public oneapi::math::lapack::exception {
 public:
-    invalid_argument(const std::string& message,
-                  std::int64_t arg_position = 0, std::int64_t detail = 0)
+    invalid_argument(const std::string& message, std::int64_t arg_position = 0,
+                     std::int64_t detail = 0)
             : oneapi::math::invalid_argument(message),
               oneapi::math::lapack::exception(this, arg_position, detail) {}
     invalid_argument(const std::string& function, const std::string& info,

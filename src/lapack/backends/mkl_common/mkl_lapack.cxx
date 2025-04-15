@@ -21,30 +21,30 @@ void gebrd(sycl::queue& queue, std::int64_t m, std::int64_t n, sycl::buffer<std:
            std::int64_t lda, sycl::buffer<float>& d, sycl::buffer<float>& e,
            sycl::buffer<std::complex<float>>& tauq, sycl::buffer<std::complex<float>>& taup,
            sycl::buffer<std::complex<float>>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::gebrd(queue, m, n, a, lda, d, e, tauq, taup,
-                                                           scratchpad, scratchpad_size));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::gebrd(
+        queue, m, n, a, lda, d, e, tauq, taup, scratchpad, scratchpad_size));
 }
 void gebrd(sycl::queue& queue, std::int64_t m, std::int64_t n, sycl::buffer<double>& a,
            std::int64_t lda, sycl::buffer<double>& d, sycl::buffer<double>& e,
            sycl::buffer<double>& tauq, sycl::buffer<double>& taup, sycl::buffer<double>& scratchpad,
            std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::gebrd(queue, m, n, a, lda, d, e, tauq, taup,
-                                                           scratchpad, scratchpad_size));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::gebrd(
+        queue, m, n, a, lda, d, e, tauq, taup, scratchpad, scratchpad_size));
 }
 void gebrd(sycl::queue& queue, std::int64_t m, std::int64_t n, sycl::buffer<float>& a,
            std::int64_t lda, sycl::buffer<float>& d, sycl::buffer<float>& e,
            sycl::buffer<float>& tauq, sycl::buffer<float>& taup, sycl::buffer<float>& scratchpad,
            std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::gebrd(queue, m, n, a, lda, d, e, tauq, taup,
-                                                           scratchpad, scratchpad_size));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::gebrd(
+        queue, m, n, a, lda, d, e, tauq, taup, scratchpad, scratchpad_size));
 }
 void gebrd(sycl::queue& queue, std::int64_t m, std::int64_t n,
            sycl::buffer<std::complex<double>>& a, std::int64_t lda, sycl::buffer<double>& d,
            sycl::buffer<double>& e, sycl::buffer<std::complex<double>>& tauq,
            sycl::buffer<std::complex<double>>& taup, sycl::buffer<std::complex<double>>& scratchpad,
            std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::gebrd(queue, m, n, a, lda, d, e, tauq, taup,
-                                                           scratchpad, scratchpad_size));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::gebrd(
+        queue, m, n, a, lda, d, e, tauq, taup, scratchpad, scratchpad_size));
 }
 void gerqf(sycl::queue& queue, std::int64_t m, std::int64_t n, sycl::buffer<float>& a,
            std::int64_t lda, sycl::buffer<float>& tau, sycl::buffer<float>& scratchpad,
@@ -217,16 +217,16 @@ void gesvd(sycl::queue& queue, oneapi::math::jobsvd jobu, oneapi::math::jobsvd j
 void heevd(sycl::queue& queue, oneapi::math::job jobz, oneapi::math::uplo uplo, std::int64_t n,
            sycl::buffer<std::complex<float>>& a, std::int64_t lda, sycl::buffer<float>& w,
            sycl::buffer<std::complex<float>>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::heevd(queue, detail::get_onemkl_job(jobz),
-                                                           detail::get_onemkl_uplo(uplo), n, a, lda,
-                                                           w, scratchpad, scratchpad_size));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::heevd(
+        queue, detail::get_onemkl_job(jobz), detail::get_onemkl_uplo(uplo), n, a, lda, w,
+        scratchpad, scratchpad_size));
 }
 void heevd(sycl::queue& queue, oneapi::math::job jobz, oneapi::math::uplo uplo, std::int64_t n,
            sycl::buffer<std::complex<double>>& a, std::int64_t lda, sycl::buffer<double>& w,
            sycl::buffer<std::complex<double>>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::heevd(queue, detail::get_onemkl_job(jobz),
-                                                           detail::get_onemkl_uplo(uplo), n, a, lda,
-                                                           w, scratchpad, scratchpad_size));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::heevd(
+        queue, detail::get_onemkl_job(jobz), detail::get_onemkl_uplo(uplo), n, a, lda, w,
+        scratchpad, scratchpad_size));
 }
 void hegvd(sycl::queue& queue, std::int64_t itype, oneapi::math::job jobz, oneapi::math::uplo uplo,
            std::int64_t n, sycl::buffer<std::complex<float>>& a, std::int64_t lda,
@@ -274,16 +274,16 @@ void hetrf(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n,
 void orgbr(sycl::queue& queue, oneapi::math::generate vec, std::int64_t m, std::int64_t n,
            std::int64_t k, sycl::buffer<float>& a, std::int64_t lda, sycl::buffer<float>& tau,
            sycl::buffer<float>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::orgbr(queue, detail::get_onemkl_generate(vec),
-                                                           m, n, k, a, lda, tau, scratchpad,
-                                                           scratchpad_size));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(
+        ::oneapi::mkl::lapack::orgbr(queue, detail::get_onemkl_generate(vec), m, n, k, a, lda, tau,
+                                     scratchpad, scratchpad_size));
 }
 void orgbr(sycl::queue& queue, oneapi::math::generate vec, std::int64_t m, std::int64_t n,
            std::int64_t k, sycl::buffer<double>& a, std::int64_t lda, sycl::buffer<double>& tau,
            sycl::buffer<double>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::orgbr(queue, detail::get_onemkl_generate(vec),
-                                                           m, n, k, a, lda, tau, scratchpad,
-                                                           scratchpad_size));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(
+        ::oneapi::mkl::lapack::orgbr(queue, detail::get_onemkl_generate(vec), m, n, k, a, lda, tau,
+                                     scratchpad, scratchpad_size));
 }
 void orgqr(sycl::queue& queue, std::int64_t m, std::int64_t n, std::int64_t k,
            sycl::buffer<double>& a, std::int64_t lda, sycl::buffer<double>& tau,
@@ -361,91 +361,91 @@ void ormqr(sycl::queue& queue, oneapi::math::side side, oneapi::math::transpose 
 }
 void potrf(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n, sycl::buffer<float>& a,
            std::int64_t lda, sycl::buffer<float>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::potrf(queue, detail::get_onemkl_uplo(uplo), n,
-                                                           a, lda, scratchpad, scratchpad_size));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::potrf(
+        queue, detail::get_onemkl_uplo(uplo), n, a, lda, scratchpad, scratchpad_size));
 }
 void potrf(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n, sycl::buffer<double>& a,
            std::int64_t lda, sycl::buffer<double>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::potrf(queue, detail::get_onemkl_uplo(uplo), n,
-                                                           a, lda, scratchpad, scratchpad_size));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::potrf(
+        queue, detail::get_onemkl_uplo(uplo), n, a, lda, scratchpad, scratchpad_size));
 }
 void potrf(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n,
            sycl::buffer<std::complex<float>>& a, std::int64_t lda,
            sycl::buffer<std::complex<float>>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::potrf(queue, detail::get_onemkl_uplo(uplo), n,
-                                                           a, lda, scratchpad, scratchpad_size));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::potrf(
+        queue, detail::get_onemkl_uplo(uplo), n, a, lda, scratchpad, scratchpad_size));
 }
 void potrf(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n,
            sycl::buffer<std::complex<double>>& a, std::int64_t lda,
            sycl::buffer<std::complex<double>>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::potrf(queue, detail::get_onemkl_uplo(uplo), n,
-                                                           a, lda, scratchpad, scratchpad_size));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::potrf(
+        queue, detail::get_onemkl_uplo(uplo), n, a, lda, scratchpad, scratchpad_size));
 }
 void potri(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n, sycl::buffer<float>& a,
            std::int64_t lda, sycl::buffer<float>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::potri(queue, detail::get_onemkl_uplo(uplo), n,
-                                                           a, lda, scratchpad, scratchpad_size));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::potri(
+        queue, detail::get_onemkl_uplo(uplo), n, a, lda, scratchpad, scratchpad_size));
 }
 void potri(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n, sycl::buffer<double>& a,
            std::int64_t lda, sycl::buffer<double>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::potri(queue, detail::get_onemkl_uplo(uplo), n,
-                                                           a, lda, scratchpad, scratchpad_size));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::potri(
+        queue, detail::get_onemkl_uplo(uplo), n, a, lda, scratchpad, scratchpad_size));
 }
 void potri(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n,
            sycl::buffer<std::complex<float>>& a, std::int64_t lda,
            sycl::buffer<std::complex<float>>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::potri(queue, detail::get_onemkl_uplo(uplo), n,
-                                                           a, lda, scratchpad, scratchpad_size));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::potri(
+        queue, detail::get_onemkl_uplo(uplo), n, a, lda, scratchpad, scratchpad_size));
 }
 void potri(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n,
            sycl::buffer<std::complex<double>>& a, std::int64_t lda,
            sycl::buffer<std::complex<double>>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::potri(queue, detail::get_onemkl_uplo(uplo), n,
-                                                           a, lda, scratchpad, scratchpad_size));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::potri(
+        queue, detail::get_onemkl_uplo(uplo), n, a, lda, scratchpad, scratchpad_size));
 }
 void potrs(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n, std::int64_t nrhs,
            sycl::buffer<float>& a, std::int64_t lda, sycl::buffer<float>& b, std::int64_t ldb,
            sycl::buffer<float>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::potrs(queue, detail::get_onemkl_uplo(uplo), n,
-                                                           nrhs, a, lda, b, ldb, scratchpad,
-                                                           scratchpad_size));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(
+        ::oneapi::mkl::lapack::potrs(queue, detail::get_onemkl_uplo(uplo), n, nrhs, a, lda, b, ldb,
+                                     scratchpad, scratchpad_size));
 }
 void potrs(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n, std::int64_t nrhs,
            sycl::buffer<double>& a, std::int64_t lda, sycl::buffer<double>& b, std::int64_t ldb,
            sycl::buffer<double>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::potrs(queue, detail::get_onemkl_uplo(uplo), n,
-                                                           nrhs, a, lda, b, ldb, scratchpad,
-                                                           scratchpad_size));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(
+        ::oneapi::mkl::lapack::potrs(queue, detail::get_onemkl_uplo(uplo), n, nrhs, a, lda, b, ldb,
+                                     scratchpad, scratchpad_size));
 }
 void potrs(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n, std::int64_t nrhs,
            sycl::buffer<std::complex<float>>& a, std::int64_t lda,
            sycl::buffer<std::complex<float>>& b, std::int64_t ldb,
            sycl::buffer<std::complex<float>>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::potrs(queue, detail::get_onemkl_uplo(uplo), n,
-                                                           nrhs, a, lda, b, ldb, scratchpad,
-                                                           scratchpad_size));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(
+        ::oneapi::mkl::lapack::potrs(queue, detail::get_onemkl_uplo(uplo), n, nrhs, a, lda, b, ldb,
+                                     scratchpad, scratchpad_size));
 }
 void potrs(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n, std::int64_t nrhs,
            sycl::buffer<std::complex<double>>& a, std::int64_t lda,
            sycl::buffer<std::complex<double>>& b, std::int64_t ldb,
            sycl::buffer<std::complex<double>>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::potrs(queue, detail::get_onemkl_uplo(uplo), n,
-                                                           nrhs, a, lda, b, ldb, scratchpad,
-                                                           scratchpad_size));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(
+        ::oneapi::mkl::lapack::potrs(queue, detail::get_onemkl_uplo(uplo), n, nrhs, a, lda, b, ldb,
+                                     scratchpad, scratchpad_size));
 }
 void syevd(sycl::queue& queue, oneapi::math::job jobz, oneapi::math::uplo uplo, std::int64_t n,
            sycl::buffer<double>& a, std::int64_t lda, sycl::buffer<double>& w,
            sycl::buffer<double>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::syevd(queue, detail::get_onemkl_job(jobz),
-                                                           detail::get_onemkl_uplo(uplo), n, a, lda,
-                                                           w, scratchpad, scratchpad_size));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::syevd(
+        queue, detail::get_onemkl_job(jobz), detail::get_onemkl_uplo(uplo), n, a, lda, w,
+        scratchpad, scratchpad_size));
 }
 void syevd(sycl::queue& queue, oneapi::math::job jobz, oneapi::math::uplo uplo, std::int64_t n,
            sycl::buffer<float>& a, std::int64_t lda, sycl::buffer<float>& w,
            sycl::buffer<float>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::syevd(queue, detail::get_onemkl_job(jobz),
-                                                           detail::get_onemkl_uplo(uplo), n, a, lda,
-                                                           w, scratchpad, scratchpad_size));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::syevd(
+        queue, detail::get_onemkl_job(jobz), detail::get_onemkl_uplo(uplo), n, a, lda, w,
+        scratchpad, scratchpad_size));
 }
 void sygvd(sycl::queue& queue, std::int64_t itype, oneapi::math::job jobz, oneapi::math::uplo uplo,
            std::int64_t n, sycl::buffer<double>& a, std::int64_t lda, sycl::buffer<double>& b,
@@ -540,17 +540,17 @@ void ungbr(sycl::queue& queue, oneapi::math::generate vec, std::int64_t m, std::
            std::int64_t k, sycl::buffer<std::complex<float>>& a, std::int64_t lda,
            sycl::buffer<std::complex<float>>& tau, sycl::buffer<std::complex<float>>& scratchpad,
            std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::ungbr(queue, detail::get_onemkl_generate(vec),
-                                                           m, n, k, a, lda, tau, scratchpad,
-                                                           scratchpad_size));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(
+        ::oneapi::mkl::lapack::ungbr(queue, detail::get_onemkl_generate(vec), m, n, k, a, lda, tau,
+                                     scratchpad, scratchpad_size));
 }
 void ungbr(sycl::queue& queue, oneapi::math::generate vec, std::int64_t m, std::int64_t n,
            std::int64_t k, sycl::buffer<std::complex<double>>& a, std::int64_t lda,
            sycl::buffer<std::complex<double>>& tau, sycl::buffer<std::complex<double>>& scratchpad,
            std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::ungbr(queue, detail::get_onemkl_generate(vec),
-                                                           m, n, k, a, lda, tau, scratchpad,
-                                                           scratchpad_size));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(
+        ::oneapi::mkl::lapack::ungbr(queue, detail::get_onemkl_generate(vec), m, n, k, a, lda, tau,
+                                     scratchpad, scratchpad_size));
 }
 void ungqr(sycl::queue& queue, std::int64_t m, std::int64_t n, std::int64_t k,
            sycl::buffer<std::complex<float>>& a, std::int64_t lda,
@@ -667,50 +667,50 @@ sycl::event gebrd(sycl::queue& queue, std::int64_t m, std::int64_t n, std::compl
 sycl::event gerqf(sycl::queue& queue, std::int64_t m, std::int64_t n, float* a, std::int64_t lda,
                   float* tau, float* scratchpad, std::int64_t scratchpad_size,
                   const std::vector<sycl::event>& dependencies) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::gerqf(queue, m, n, a, lda, tau, scratchpad,
-                                                               scratchpad_size, dependencies));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::gerqf(
+        queue, m, n, a, lda, tau, scratchpad, scratchpad_size, dependencies));
 }
 sycl::event gerqf(sycl::queue& queue, std::int64_t m, std::int64_t n, double* a, std::int64_t lda,
                   double* tau, double* scratchpad, std::int64_t scratchpad_size,
                   const std::vector<sycl::event>& dependencies) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::gerqf(queue, m, n, a, lda, tau, scratchpad,
-                                                               scratchpad_size, dependencies));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::gerqf(
+        queue, m, n, a, lda, tau, scratchpad, scratchpad_size, dependencies));
 }
 sycl::event gerqf(sycl::queue& queue, std::int64_t m, std::int64_t n, std::complex<float>* a,
                   std::int64_t lda, std::complex<float>* tau, std::complex<float>* scratchpad,
                   std::int64_t scratchpad_size, const std::vector<sycl::event>& dependencies) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::gerqf(queue, m, n, a, lda, tau, scratchpad,
-                                                               scratchpad_size, dependencies));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::gerqf(
+        queue, m, n, a, lda, tau, scratchpad, scratchpad_size, dependencies));
 }
 sycl::event gerqf(sycl::queue& queue, std::int64_t m, std::int64_t n, std::complex<double>* a,
                   std::int64_t lda, std::complex<double>* tau, std::complex<double>* scratchpad,
                   std::int64_t scratchpad_size, const std::vector<sycl::event>& dependencies) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::gerqf(queue, m, n, a, lda, tau, scratchpad,
-                                                               scratchpad_size, dependencies));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::gerqf(
+        queue, m, n, a, lda, tau, scratchpad, scratchpad_size, dependencies));
 }
 sycl::event geqrf(sycl::queue& queue, std::int64_t m, std::int64_t n, std::complex<float>* a,
                   std::int64_t lda, std::complex<float>* tau, std::complex<float>* scratchpad,
                   std::int64_t scratchpad_size, const std::vector<sycl::event>& dependencies) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::geqrf(queue, m, n, a, lda, tau, scratchpad,
-                                                               scratchpad_size, dependencies));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::geqrf(
+        queue, m, n, a, lda, tau, scratchpad, scratchpad_size, dependencies));
 }
 sycl::event geqrf(sycl::queue& queue, std::int64_t m, std::int64_t n, double* a, std::int64_t lda,
                   double* tau, double* scratchpad, std::int64_t scratchpad_size,
                   const std::vector<sycl::event>& dependencies) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::geqrf(queue, m, n, a, lda, tau, scratchpad,
-                                                               scratchpad_size, dependencies));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::geqrf(
+        queue, m, n, a, lda, tau, scratchpad, scratchpad_size, dependencies));
 }
 sycl::event geqrf(sycl::queue& queue, std::int64_t m, std::int64_t n, float* a, std::int64_t lda,
                   float* tau, float* scratchpad, std::int64_t scratchpad_size,
                   const std::vector<sycl::event>& dependencies) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::geqrf(queue, m, n, a, lda, tau, scratchpad,
-                                                               scratchpad_size, dependencies));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::geqrf(
+        queue, m, n, a, lda, tau, scratchpad, scratchpad_size, dependencies));
 }
 sycl::event geqrf(sycl::queue& queue, std::int64_t m, std::int64_t n, std::complex<double>* a,
                   std::int64_t lda, std::complex<double>* tau, std::complex<double>* scratchpad,
                   std::int64_t scratchpad_size, const std::vector<sycl::event>& dependencies) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::geqrf(queue, m, n, a, lda, tau, scratchpad,
-                                                               scratchpad_size, dependencies));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::geqrf(
+        queue, m, n, a, lda, tau, scratchpad, scratchpad_size, dependencies));
 }
 sycl::event getrf(sycl::queue& queue, std::int64_t m, std::int64_t n, std::complex<float>* a,
                   std::int64_t lda, std::int64_t* ipiv, std::complex<float>* scratchpad,
@@ -739,26 +739,26 @@ sycl::event getrf(sycl::queue& queue, std::int64_t m, std::int64_t n, std::compl
 sycl::event getri(sycl::queue& queue, std::int64_t n, std::complex<float>* a, std::int64_t lda,
                   std::int64_t* ipiv, std::complex<float>* scratchpad, std::int64_t scratchpad_size,
                   const std::vector<sycl::event>& dependencies) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::getri(queue, n, a, lda, ipiv, scratchpad,
-                                                               scratchpad_size, dependencies));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::getri(
+        queue, n, a, lda, ipiv, scratchpad, scratchpad_size, dependencies));
 }
 sycl::event getri(sycl::queue& queue, std::int64_t n, double* a, std::int64_t lda,
                   std::int64_t* ipiv, double* scratchpad, std::int64_t scratchpad_size,
                   const std::vector<sycl::event>& dependencies) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::getri(queue, n, a, lda, ipiv, scratchpad,
-                                                               scratchpad_size, dependencies));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::getri(
+        queue, n, a, lda, ipiv, scratchpad, scratchpad_size, dependencies));
 }
 sycl::event getri(sycl::queue& queue, std::int64_t n, float* a, std::int64_t lda,
                   std::int64_t* ipiv, float* scratchpad, std::int64_t scratchpad_size,
                   const std::vector<sycl::event>& dependencies) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::getri(queue, n, a, lda, ipiv, scratchpad,
-                                                               scratchpad_size, dependencies));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::getri(
+        queue, n, a, lda, ipiv, scratchpad, scratchpad_size, dependencies));
 }
 sycl::event getri(sycl::queue& queue, std::int64_t n, std::complex<double>* a, std::int64_t lda,
                   std::int64_t* ipiv, std::complex<double>* scratchpad,
                   std::int64_t scratchpad_size, const std::vector<sycl::event>& dependencies) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::getri(queue, n, a, lda, ipiv, scratchpad,
-                                                               scratchpad_size, dependencies));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::getri(
+        queue, n, a, lda, ipiv, scratchpad, scratchpad_size, dependencies));
 }
 sycl::event getrs(sycl::queue& queue, oneapi::math::transpose trans, std::int64_t n,
                   std::int64_t nrhs, std::complex<float>* a, std::int64_t lda, std::int64_t* ipiv,
@@ -864,33 +864,33 @@ sycl::event hetrd(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n,
                   std::complex<float>* a, std::int64_t lda, float* d, float* e,
                   std::complex<float>* tau, std::complex<float>* scratchpad,
                   std::int64_t scratchpad_size, const std::vector<sycl::event>& dependencies) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::hetrd(queue, detail::get_onemkl_uplo(uplo),
-                                                               n, a, lda, d, e, tau, scratchpad,
-                                                               scratchpad_size, dependencies));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(
+        ::oneapi::mkl::lapack::hetrd(queue, detail::get_onemkl_uplo(uplo), n, a, lda, d, e, tau,
+                                     scratchpad, scratchpad_size, dependencies));
 }
 sycl::event hetrd(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n,
                   std::complex<double>* a, std::int64_t lda, double* d, double* e,
                   std::complex<double>* tau, std::complex<double>* scratchpad,
                   std::int64_t scratchpad_size, const std::vector<sycl::event>& dependencies) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::hetrd(queue, detail::get_onemkl_uplo(uplo),
-                                                               n, a, lda, d, e, tau, scratchpad,
-                                                               scratchpad_size, dependencies));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(
+        ::oneapi::mkl::lapack::hetrd(queue, detail::get_onemkl_uplo(uplo), n, a, lda, d, e, tau,
+                                     scratchpad, scratchpad_size, dependencies));
 }
 sycl::event hetrf(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n,
                   std::complex<float>* a, std::int64_t lda, std::int64_t* ipiv,
                   std::complex<float>* scratchpad, std::int64_t scratchpad_size,
                   const std::vector<sycl::event>& dependencies) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::hetrf(queue, detail::get_onemkl_uplo(uplo),
-                                                               n, a, lda, ipiv, scratchpad,
-                                                               scratchpad_size, dependencies));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(
+        ::oneapi::mkl::lapack::hetrf(queue, detail::get_onemkl_uplo(uplo), n, a, lda, ipiv,
+                                     scratchpad, scratchpad_size, dependencies));
 }
 sycl::event hetrf(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n,
                   std::complex<double>* a, std::int64_t lda, std::int64_t* ipiv,
                   std::complex<double>* scratchpad, std::int64_t scratchpad_size,
                   const std::vector<sycl::event>& dependencies) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::hetrf(queue, detail::get_onemkl_uplo(uplo),
-                                                               n, a, lda, ipiv, scratchpad,
-                                                               scratchpad_size, dependencies));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(
+        ::oneapi::mkl::lapack::hetrf(queue, detail::get_onemkl_uplo(uplo), n, a, lda, ipiv,
+                                     scratchpad, scratchpad_size, dependencies));
 }
 sycl::event orgbr(sycl::queue& queue, oneapi::math::generate vec, std::int64_t m, std::int64_t n,
                   std::int64_t k, float* a, std::int64_t lda, float* tau, float* scratchpad,
@@ -921,16 +921,16 @@ sycl::event orgqr(sycl::queue& queue, std::int64_t m, std::int64_t n, std::int64
 sycl::event orgtr(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n, float* a,
                   std::int64_t lda, float* tau, float* scratchpad, std::int64_t scratchpad_size,
                   const std::vector<sycl::event>& dependencies) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::orgtr(queue, detail::get_onemkl_uplo(uplo),
-                                                               n, a, lda, tau, scratchpad,
-                                                               scratchpad_size, dependencies));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(
+        ::oneapi::mkl::lapack::orgtr(queue, detail::get_onemkl_uplo(uplo), n, a, lda, tau,
+                                     scratchpad, scratchpad_size, dependencies));
 }
 sycl::event orgtr(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n, double* a,
                   std::int64_t lda, double* tau, double* scratchpad, std::int64_t scratchpad_size,
                   const std::vector<sycl::event>& dependencies) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::orgtr(queue, detail::get_onemkl_uplo(uplo),
-                                                               n, a, lda, tau, scratchpad,
-                                                               scratchpad_size, dependencies));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(
+        ::oneapi::mkl::lapack::orgtr(queue, detail::get_onemkl_uplo(uplo), n, a, lda, tau,
+                                     scratchpad, scratchpad_size, dependencies));
 }
 sycl::event ormtr(sycl::queue& queue, oneapi::math::side side, oneapi::math::uplo uplo,
                   oneapi::math::transpose trans, std::int64_t m, std::int64_t n, float* a,
@@ -985,88 +985,88 @@ sycl::event ormqr(sycl::queue& queue, oneapi::math::side side, oneapi::math::tra
 sycl::event potrf(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n, float* a,
                   std::int64_t lda, float* scratchpad, std::int64_t scratchpad_size,
                   const std::vector<sycl::event>& dependencies) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::potrf(queue, detail::get_onemkl_uplo(uplo),
-                                                               n, a, lda, scratchpad,
-                                                               scratchpad_size, dependencies));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(
+        ::oneapi::mkl::lapack::potrf(queue, detail::get_onemkl_uplo(uplo), n, a, lda, scratchpad,
+                                     scratchpad_size, dependencies));
 }
 sycl::event potrf(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n, double* a,
                   std::int64_t lda, double* scratchpad, std::int64_t scratchpad_size,
                   const std::vector<sycl::event>& dependencies) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::potrf(queue, detail::get_onemkl_uplo(uplo),
-                                                               n, a, lda, scratchpad,
-                                                               scratchpad_size, dependencies));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(
+        ::oneapi::mkl::lapack::potrf(queue, detail::get_onemkl_uplo(uplo), n, a, lda, scratchpad,
+                                     scratchpad_size, dependencies));
 }
 sycl::event potrf(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n,
                   std::complex<float>* a, std::int64_t lda, std::complex<float>* scratchpad,
                   std::int64_t scratchpad_size, const std::vector<sycl::event>& dependencies) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::potrf(queue, detail::get_onemkl_uplo(uplo),
-                                                               n, a, lda, scratchpad,
-                                                               scratchpad_size, dependencies));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(
+        ::oneapi::mkl::lapack::potrf(queue, detail::get_onemkl_uplo(uplo), n, a, lda, scratchpad,
+                                     scratchpad_size, dependencies));
 }
 sycl::event potrf(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n,
                   std::complex<double>* a, std::int64_t lda, std::complex<double>* scratchpad,
                   std::int64_t scratchpad_size, const std::vector<sycl::event>& dependencies) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::potrf(queue, detail::get_onemkl_uplo(uplo),
-                                                               n, a, lda, scratchpad,
-                                                               scratchpad_size, dependencies));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(
+        ::oneapi::mkl::lapack::potrf(queue, detail::get_onemkl_uplo(uplo), n, a, lda, scratchpad,
+                                     scratchpad_size, dependencies));
 }
 sycl::event potri(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n, float* a,
                   std::int64_t lda, float* scratchpad, std::int64_t scratchpad_size,
                   const std::vector<sycl::event>& dependencies) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::potri(queue, detail::get_onemkl_uplo(uplo),
-                                                               n, a, lda, scratchpad,
-                                                               scratchpad_size, dependencies));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(
+        ::oneapi::mkl::lapack::potri(queue, detail::get_onemkl_uplo(uplo), n, a, lda, scratchpad,
+                                     scratchpad_size, dependencies));
 }
 sycl::event potri(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n, double* a,
                   std::int64_t lda, double* scratchpad, std::int64_t scratchpad_size,
                   const std::vector<sycl::event>& dependencies) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::potri(queue, detail::get_onemkl_uplo(uplo),
-                                                               n, a, lda, scratchpad,
-                                                               scratchpad_size, dependencies));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(
+        ::oneapi::mkl::lapack::potri(queue, detail::get_onemkl_uplo(uplo), n, a, lda, scratchpad,
+                                     scratchpad_size, dependencies));
 }
 sycl::event potri(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n,
                   std::complex<float>* a, std::int64_t lda, std::complex<float>* scratchpad,
                   std::int64_t scratchpad_size, const std::vector<sycl::event>& dependencies) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::potri(queue, detail::get_onemkl_uplo(uplo),
-                                                               n, a, lda, scratchpad,
-                                                               scratchpad_size, dependencies));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(
+        ::oneapi::mkl::lapack::potri(queue, detail::get_onemkl_uplo(uplo), n, a, lda, scratchpad,
+                                     scratchpad_size, dependencies));
 }
 sycl::event potri(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n,
                   std::complex<double>* a, std::int64_t lda, std::complex<double>* scratchpad,
                   std::int64_t scratchpad_size, const std::vector<sycl::event>& dependencies) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::potri(queue, detail::get_onemkl_uplo(uplo),
-                                                               n, a, lda, scratchpad,
-                                                               scratchpad_size, dependencies));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(
+        ::oneapi::mkl::lapack::potri(queue, detail::get_onemkl_uplo(uplo), n, a, lda, scratchpad,
+                                     scratchpad_size, dependencies));
 }
 sycl::event potrs(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n, std::int64_t nrhs,
                   float* a, std::int64_t lda, float* b, std::int64_t ldb, float* scratchpad,
                   std::int64_t scratchpad_size, const std::vector<sycl::event>& dependencies) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::potrs(queue, detail::get_onemkl_uplo(uplo),
-                                                               n, nrhs, a, lda, b, ldb, scratchpad,
-                                                               scratchpad_size, dependencies));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(
+        ::oneapi::mkl::lapack::potrs(queue, detail::get_onemkl_uplo(uplo), n, nrhs, a, lda, b, ldb,
+                                     scratchpad, scratchpad_size, dependencies));
 }
 sycl::event potrs(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n, std::int64_t nrhs,
                   double* a, std::int64_t lda, double* b, std::int64_t ldb, double* scratchpad,
                   std::int64_t scratchpad_size, const std::vector<sycl::event>& dependencies) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::potrs(queue, detail::get_onemkl_uplo(uplo),
-                                                               n, nrhs, a, lda, b, ldb, scratchpad,
-                                                               scratchpad_size, dependencies));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(
+        ::oneapi::mkl::lapack::potrs(queue, detail::get_onemkl_uplo(uplo), n, nrhs, a, lda, b, ldb,
+                                     scratchpad, scratchpad_size, dependencies));
 }
 sycl::event potrs(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n, std::int64_t nrhs,
                   std::complex<float>* a, std::int64_t lda, std::complex<float>* b,
                   std::int64_t ldb, std::complex<float>* scratchpad, std::int64_t scratchpad_size,
                   const std::vector<sycl::event>& dependencies) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::potrs(queue, detail::get_onemkl_uplo(uplo),
-                                                               n, nrhs, a, lda, b, ldb, scratchpad,
-                                                               scratchpad_size, dependencies));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(
+        ::oneapi::mkl::lapack::potrs(queue, detail::get_onemkl_uplo(uplo), n, nrhs, a, lda, b, ldb,
+                                     scratchpad, scratchpad_size, dependencies));
 }
 sycl::event potrs(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n, std::int64_t nrhs,
                   std::complex<double>* a, std::int64_t lda, std::complex<double>* b,
                   std::int64_t ldb, std::complex<double>* scratchpad, std::int64_t scratchpad_size,
                   const std::vector<sycl::event>& dependencies) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::potrs(queue, detail::get_onemkl_uplo(uplo),
-                                                               n, nrhs, a, lda, b, ldb, scratchpad,
-                                                               scratchpad_size, dependencies));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(
+        ::oneapi::mkl::lapack::potrs(queue, detail::get_onemkl_uplo(uplo), n, nrhs, a, lda, b, ldb,
+                                     scratchpad, scratchpad_size, dependencies));
 }
 sycl::event syevd(sycl::queue& queue, oneapi::math::job jobz, oneapi::math::uplo uplo,
                   std::int64_t n, double* a, std::int64_t lda, double* w, double* scratchpad,
@@ -1101,46 +1101,46 @@ sycl::event sygvd(sycl::queue& queue, std::int64_t itype, oneapi::math::job jobz
 sycl::event sytrd(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n, double* a,
                   std::int64_t lda, double* d, double* e, double* tau, double* scratchpad,
                   std::int64_t scratchpad_size, const std::vector<sycl::event>& dependencies) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::sytrd(queue, detail::get_onemkl_uplo(uplo),
-                                                               n, a, lda, d, e, tau, scratchpad,
-                                                               scratchpad_size, dependencies));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(
+        ::oneapi::mkl::lapack::sytrd(queue, detail::get_onemkl_uplo(uplo), n, a, lda, d, e, tau,
+                                     scratchpad, scratchpad_size, dependencies));
 }
 sycl::event sytrd(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n, float* a,
                   std::int64_t lda, float* d, float* e, float* tau, float* scratchpad,
                   std::int64_t scratchpad_size, const std::vector<sycl::event>& dependencies) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::sytrd(queue, detail::get_onemkl_uplo(uplo),
-                                                               n, a, lda, d, e, tau, scratchpad,
-                                                               scratchpad_size, dependencies));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(
+        ::oneapi::mkl::lapack::sytrd(queue, detail::get_onemkl_uplo(uplo), n, a, lda, d, e, tau,
+                                     scratchpad, scratchpad_size, dependencies));
 }
 sycl::event sytrf(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n, float* a,
                   std::int64_t lda, std::int64_t* ipiv, float* scratchpad,
                   std::int64_t scratchpad_size, const std::vector<sycl::event>& dependencies) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::sytrf(queue, detail::get_onemkl_uplo(uplo),
-                                                               n, a, lda, ipiv, scratchpad,
-                                                               scratchpad_size, dependencies));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(
+        ::oneapi::mkl::lapack::sytrf(queue, detail::get_onemkl_uplo(uplo), n, a, lda, ipiv,
+                                     scratchpad, scratchpad_size, dependencies));
 }
 sycl::event sytrf(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n, double* a,
                   std::int64_t lda, std::int64_t* ipiv, double* scratchpad,
                   std::int64_t scratchpad_size, const std::vector<sycl::event>& dependencies) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::sytrf(queue, detail::get_onemkl_uplo(uplo),
-                                                               n, a, lda, ipiv, scratchpad,
-                                                               scratchpad_size, dependencies));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(
+        ::oneapi::mkl::lapack::sytrf(queue, detail::get_onemkl_uplo(uplo), n, a, lda, ipiv,
+                                     scratchpad, scratchpad_size, dependencies));
 }
 sycl::event sytrf(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n,
                   std::complex<float>* a, std::int64_t lda, std::int64_t* ipiv,
                   std::complex<float>* scratchpad, std::int64_t scratchpad_size,
                   const std::vector<sycl::event>& dependencies) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::sytrf(queue, detail::get_onemkl_uplo(uplo),
-                                                               n, a, lda, ipiv, scratchpad,
-                                                               scratchpad_size, dependencies));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(
+        ::oneapi::mkl::lapack::sytrf(queue, detail::get_onemkl_uplo(uplo), n, a, lda, ipiv,
+                                     scratchpad, scratchpad_size, dependencies));
 }
 sycl::event sytrf(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n,
                   std::complex<double>* a, std::int64_t lda, std::int64_t* ipiv,
                   std::complex<double>* scratchpad, std::int64_t scratchpad_size,
                   const std::vector<sycl::event>& dependencies) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::sytrf(queue, detail::get_onemkl_uplo(uplo),
-                                                               n, a, lda, ipiv, scratchpad,
-                                                               scratchpad_size, dependencies));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(
+        ::oneapi::mkl::lapack::sytrf(queue, detail::get_onemkl_uplo(uplo), n, a, lda, ipiv,
+                                     scratchpad, scratchpad_size, dependencies));
 }
 sycl::event trtrs(sycl::queue& queue, oneapi::math::uplo uplo, oneapi::math::transpose trans,
                   oneapi::math::diag diag, std::int64_t n, std::int64_t nrhs,
@@ -1214,17 +1214,17 @@ sycl::event ungtr(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n,
                   std::complex<float>* a, std::int64_t lda, std::complex<float>* tau,
                   std::complex<float>* scratchpad, std::int64_t scratchpad_size,
                   const std::vector<sycl::event>& dependencies) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::ungtr(queue, detail::get_onemkl_uplo(uplo),
-                                                               n, a, lda, tau, scratchpad,
-                                                               scratchpad_size, dependencies));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(
+        ::oneapi::mkl::lapack::ungtr(queue, detail::get_onemkl_uplo(uplo), n, a, lda, tau,
+                                     scratchpad, scratchpad_size, dependencies));
 }
 sycl::event ungtr(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n,
                   std::complex<double>* a, std::int64_t lda, std::complex<double>* tau,
                   std::complex<double>* scratchpad, std::int64_t scratchpad_size,
                   const std::vector<sycl::event>& dependencies) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::ungtr(queue, detail::get_onemkl_uplo(uplo),
-                                                               n, a, lda, tau, scratchpad,
-                                                               scratchpad_size, dependencies));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(
+        ::oneapi::mkl::lapack::ungtr(queue, detail::get_onemkl_uplo(uplo), n, a, lda, tau,
+                                     scratchpad, scratchpad_size, dependencies));
 }
 sycl::event unmrq(sycl::queue& queue, oneapi::math::side side, oneapi::math::transpose trans,
                   std::int64_t m, std::int64_t n, std::int64_t k, std::complex<float>* a,
@@ -1413,17 +1413,17 @@ void orgqr_batch(sycl::queue& queue, std::int64_t m, std::int64_t n, std::int64_
                  sycl::buffer<float>& a, std::int64_t lda, std::int64_t stride_a,
                  sycl::buffer<float>& tau, std::int64_t stride_tau, std::int64_t batch_size,
                  sycl::buffer<float>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::orgqr_batch(queue, m, n, k, a, lda, stride_a,
-                                                                 tau, stride_tau, batch_size,
-                                                                 scratchpad, scratchpad_size));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(
+        ::oneapi::mkl::lapack::orgqr_batch(queue, m, n, k, a, lda, stride_a, tau, stride_tau,
+                                           batch_size, scratchpad, scratchpad_size));
 }
 void orgqr_batch(sycl::queue& queue, std::int64_t m, std::int64_t n, std::int64_t k,
                  sycl::buffer<double>& a, std::int64_t lda, std::int64_t stride_a,
                  sycl::buffer<double>& tau, std::int64_t stride_tau, std::int64_t batch_size,
                  sycl::buffer<double>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::orgqr_batch(queue, m, n, k, a, lda, stride_a,
-                                                                 tau, stride_tau, batch_size,
-                                                                 scratchpad, scratchpad_size));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(
+        ::oneapi::mkl::lapack::orgqr_batch(queue, m, n, k, a, lda, stride_a, tau, stride_tau,
+                                           batch_size, scratchpad, scratchpad_size));
 }
 void potrf_batch(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n,
                  sycl::buffer<float>& a, std::int64_t lda, std::int64_t stride_a,
@@ -1498,18 +1498,18 @@ void ungqr_batch(sycl::queue& queue, std::int64_t m, std::int64_t n, std::int64_
                  sycl::buffer<std::complex<float>>& tau, std::int64_t stride_tau,
                  std::int64_t batch_size, sycl::buffer<std::complex<float>>& scratchpad,
                  std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::ungqr_batch(queue, m, n, k, a, lda, stride_a,
-                                                                 tau, stride_tau, batch_size,
-                                                                 scratchpad, scratchpad_size));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(
+        ::oneapi::mkl::lapack::ungqr_batch(queue, m, n, k, a, lda, stride_a, tau, stride_tau,
+                                           batch_size, scratchpad, scratchpad_size));
 }
 void ungqr_batch(sycl::queue& queue, std::int64_t m, std::int64_t n, std::int64_t k,
                  sycl::buffer<std::complex<double>>& a, std::int64_t lda, std::int64_t stride_a,
                  sycl::buffer<std::complex<double>>& tau, std::int64_t stride_tau,
                  std::int64_t batch_size, sycl::buffer<std::complex<double>>& scratchpad,
                  std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::ungqr_batch(queue, m, n, k, a, lda, stride_a,
-                                                                 tau, stride_tau, batch_size,
-                                                                 scratchpad, scratchpad_size));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(
+        ::oneapi::mkl::lapack::ungqr_batch(queue, m, n, k, a, lda, stride_a, tau, stride_tau,
+                                           batch_size, scratchpad, scratchpad_size));
 }
 sycl::event geqrf_batch(sycl::queue& queue, std::int64_t m, std::int64_t n, float* a,
                         std::int64_t lda, std::int64_t stride_a, float* tau,
@@ -2110,9 +2110,10 @@ std::int64_t gesvd_scratchpad_size<std::complex<float>>(sycl::queue& queue,
                                                         oneapi::math::jobsvd jobvt, std::int64_t m,
                                                         std::int64_t n, std::int64_t lda,
                                                         std::int64_t ldu, std::int64_t ldvt) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::gesvd_scratchpad_size<std::complex<float>>(
-        queue, detail::get_onemkl_jobsvd(jobu), detail::get_onemkl_jobsvd(jobvt), m, n, lda, ldu,
-        ldvt));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(
+        ::oneapi::mkl::lapack::gesvd_scratchpad_size<std::complex<float>>(
+            queue, detail::get_onemkl_jobsvd(jobu), detail::get_onemkl_jobsvd(jobvt), m, n, lda,
+            ldu, ldvt));
 }
 template <>
 std::int64_t gesvd_scratchpad_size<std::complex<double>>(sycl::queue& queue,
@@ -2190,8 +2191,9 @@ std::int64_t getrs_scratchpad_size<std::complex<float>>(sycl::queue& queue,
                                                         oneapi::math::transpose trans,
                                                         std::int64_t n, std::int64_t nrhs,
                                                         std::int64_t lda, std::int64_t ldb) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::getrs_scratchpad_size<std::complex<float>>(
-        queue, detail::get_onemkl_transpose(trans), n, nrhs, lda, ldb));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(
+        ::oneapi::mkl::lapack::getrs_scratchpad_size<std::complex<float>>(
+            queue, detail::get_onemkl_transpose(trans), n, nrhs, lda, ldb));
 }
 template <>
 std::int64_t getrs_scratchpad_size<std::complex<double>>(sycl::queue& queue,
@@ -2206,8 +2208,9 @@ template <>
 std::int64_t heevd_scratchpad_size<std::complex<float>>(sycl::queue& queue, oneapi::math::job jobz,
                                                         oneapi::math::uplo uplo, std::int64_t n,
                                                         std::int64_t lda) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::heevd_scratchpad_size<std::complex<float>>(
-        queue, detail::get_onemkl_job(jobz), detail::get_onemkl_uplo(uplo), n, lda));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(
+        ::oneapi::mkl::lapack::heevd_scratchpad_size<std::complex<float>>(
+            queue, detail::get_onemkl_job(jobz), detail::get_onemkl_uplo(uplo), n, lda));
 }
 template <>
 std::int64_t heevd_scratchpad_size<std::complex<double>>(sycl::queue& queue, oneapi::math::job jobz,
@@ -2222,8 +2225,10 @@ std::int64_t hegvd_scratchpad_size<std::complex<float>>(sycl::queue& queue, std:
                                                         oneapi::math::job jobz,
                                                         oneapi::math::uplo uplo, std::int64_t n,
                                                         std::int64_t lda, std::int64_t ldb) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::hegvd_scratchpad_size<std::complex<float>>(
-        queue, itype, detail::get_onemkl_job(jobz), detail::get_onemkl_uplo(uplo), n, lda, ldb));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(
+        ::oneapi::mkl::lapack::hegvd_scratchpad_size<std::complex<float>>(
+            queue, itype, detail::get_onemkl_job(jobz), detail::get_onemkl_uplo(uplo), n, lda,
+            ldb));
 }
 template <>
 std::int64_t hegvd_scratchpad_size<std::complex<double>>(sycl::queue& queue, std::int64_t itype,
@@ -2238,8 +2243,9 @@ std::int64_t hegvd_scratchpad_size<std::complex<double>>(sycl::queue& queue, std
 template <>
 std::int64_t hetrd_scratchpad_size<std::complex<float>>(sycl::queue& queue, oneapi::math::uplo uplo,
                                                         std::int64_t n, std::int64_t lda) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::hetrd_scratchpad_size<std::complex<float>>(
-        queue, detail::get_onemkl_uplo(uplo), n, lda));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(
+        ::oneapi::mkl::lapack::hetrd_scratchpad_size<std::complex<float>>(
+            queue, detail::get_onemkl_uplo(uplo), n, lda));
 }
 template <>
 std::int64_t hetrd_scratchpad_size<std::complex<double>>(sycl::queue& queue,
@@ -2252,8 +2258,9 @@ std::int64_t hetrd_scratchpad_size<std::complex<double>>(sycl::queue& queue,
 template <>
 std::int64_t hetrf_scratchpad_size<std::complex<float>>(sycl::queue& queue, oneapi::math::uplo uplo,
                                                         std::int64_t n, std::int64_t lda) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::hetrf_scratchpad_size<std::complex<float>>(
-        queue, detail::get_onemkl_uplo(uplo), n, lda));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(
+        ::oneapi::mkl::lapack::hetrf_scratchpad_size<std::complex<float>>(
+            queue, detail::get_onemkl_uplo(uplo), n, lda));
 }
 template <>
 std::int64_t hetrf_scratchpad_size<std::complex<double>>(sycl::queue& queue,
@@ -2370,8 +2377,9 @@ std::int64_t potrf_scratchpad_size<double>(sycl::queue& queue, oneapi::math::upl
 template <>
 std::int64_t potrf_scratchpad_size<std::complex<float>>(sycl::queue& queue, oneapi::math::uplo uplo,
                                                         std::int64_t n, std::int64_t lda) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::potrf_scratchpad_size<std::complex<float>>(
-        queue, detail::get_onemkl_uplo(uplo), n, lda));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(
+        ::oneapi::mkl::lapack::potrf_scratchpad_size<std::complex<float>>(
+            queue, detail::get_onemkl_uplo(uplo), n, lda));
 }
 template <>
 std::int64_t potrf_scratchpad_size<std::complex<double>>(sycl::queue& queue,
@@ -2399,8 +2407,9 @@ template <>
 std::int64_t potrs_scratchpad_size<std::complex<float>>(sycl::queue& queue, oneapi::math::uplo uplo,
                                                         std::int64_t n, std::int64_t nrhs,
                                                         std::int64_t lda, std::int64_t ldb) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::potrs_scratchpad_size<std::complex<float>>(
-        queue, detail::get_onemkl_uplo(uplo), n, nrhs, lda, ldb));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(
+        ::oneapi::mkl::lapack::potrs_scratchpad_size<std::complex<float>>(
+            queue, detail::get_onemkl_uplo(uplo), n, nrhs, lda, ldb));
 }
 template <>
 std::int64_t potrs_scratchpad_size<std::complex<double>>(sycl::queue& queue,
@@ -2426,8 +2435,9 @@ std::int64_t potri_scratchpad_size<double>(sycl::queue& queue, oneapi::math::upl
 template <>
 std::int64_t potri_scratchpad_size<std::complex<float>>(sycl::queue& queue, oneapi::math::uplo uplo,
                                                         std::int64_t n, std::int64_t lda) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::potri_scratchpad_size<std::complex<float>>(
-        queue, detail::get_onemkl_uplo(uplo), n, lda));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(
+        ::oneapi::mkl::lapack::potri_scratchpad_size<std::complex<float>>(
+            queue, detail::get_onemkl_uplo(uplo), n, lda));
 }
 template <>
 std::int64_t potri_scratchpad_size<std::complex<double>>(sycl::queue& queue,
@@ -2452,8 +2462,9 @@ std::int64_t sytrf_scratchpad_size<double>(sycl::queue& queue, oneapi::math::upl
 template <>
 std::int64_t sytrf_scratchpad_size<std::complex<float>>(sycl::queue& queue, oneapi::math::uplo uplo,
                                                         std::int64_t n, std::int64_t lda) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::sytrf_scratchpad_size<std::complex<float>>(
-        queue, detail::get_onemkl_uplo(uplo), n, lda));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(
+        ::oneapi::mkl::lapack::sytrf_scratchpad_size<std::complex<float>>(
+            queue, detail::get_onemkl_uplo(uplo), n, lda));
 }
 template <>
 std::int64_t sytrf_scratchpad_size<std::complex<double>>(sycl::queue& queue,
@@ -2527,9 +2538,10 @@ std::int64_t trtrs_scratchpad_size<std::complex<float>>(sycl::queue& queue, onea
                                                         oneapi::math::diag diag, std::int64_t n,
                                                         std::int64_t nrhs, std::int64_t lda,
                                                         std::int64_t ldb) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::trtrs_scratchpad_size<std::complex<float>>(
-        queue, detail::get_onemkl_uplo(uplo), detail::get_onemkl_transpose(trans),
-        detail::get_onemkl_diag(diag), n, nrhs, lda, ldb));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(
+        ::oneapi::mkl::lapack::trtrs_scratchpad_size<std::complex<float>>(
+            queue, detail::get_onemkl_uplo(uplo), detail::get_onemkl_transpose(trans),
+            detail::get_onemkl_diag(diag), n, nrhs, lda, ldb));
 }
 template <>
 std::int64_t trtrs_scratchpad_size<std::complex<double>>(sycl::queue& queue,
@@ -2548,8 +2560,9 @@ std::int64_t ungbr_scratchpad_size<std::complex<float>>(sycl::queue& queue,
                                                         oneapi::math::generate vect, std::int64_t m,
                                                         std::int64_t n, std::int64_t k,
                                                         std::int64_t lda) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::ungbr_scratchpad_size<std::complex<float>>(
-        queue, detail::get_onemkl_generate(vect), m, n, k, lda));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(
+        ::oneapi::mkl::lapack::ungbr_scratchpad_size<std::complex<float>>(
+            queue, detail::get_onemkl_generate(vect), m, n, k, lda));
 }
 template <>
 std::int64_t ungbr_scratchpad_size<std::complex<double>>(sycl::queue& queue,
@@ -2577,8 +2590,9 @@ std::int64_t ungqr_scratchpad_size<std::complex<double>>(sycl::queue& queue, std
 template <>
 std::int64_t ungtr_scratchpad_size<std::complex<float>>(sycl::queue& queue, oneapi::math::uplo uplo,
                                                         std::int64_t n, std::int64_t lda) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::ungtr_scratchpad_size<std::complex<float>>(
-        queue, detail::get_onemkl_uplo(uplo), n, lda));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(
+        ::oneapi::mkl::lapack::ungtr_scratchpad_size<std::complex<float>>(
+            queue, detail::get_onemkl_uplo(uplo), n, lda));
 }
 template <>
 std::int64_t ungtr_scratchpad_size<std::complex<double>>(sycl::queue& queue,
@@ -2594,9 +2608,10 @@ std::int64_t unmrq_scratchpad_size<std::complex<float>>(sycl::queue& queue, onea
                                                         std::int64_t m, std::int64_t n,
                                                         std::int64_t k, std::int64_t lda,
                                                         std::int64_t ldc) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::unmrq_scratchpad_size<std::complex<float>>(
-        queue, detail::get_onemkl_side(side), detail::get_onemkl_transpose(trans), m, n, k, lda,
-        ldc));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(
+        ::oneapi::mkl::lapack::unmrq_scratchpad_size<std::complex<float>>(
+            queue, detail::get_onemkl_side(side), detail::get_onemkl_transpose(trans), m, n, k, lda,
+            ldc));
 }
 template <>
 std::int64_t unmrq_scratchpad_size<std::complex<double>>(
@@ -2613,9 +2628,10 @@ std::int64_t unmqr_scratchpad_size<std::complex<float>>(sycl::queue& queue, onea
                                                         std::int64_t m, std::int64_t n,
                                                         std::int64_t k, std::int64_t lda,
                                                         std::int64_t ldc) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::unmqr_scratchpad_size<std::complex<float>>(
-        queue, detail::get_onemkl_side(side), detail::get_onemkl_transpose(trans), m, n, k, lda,
-        ldc));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(
+        ::oneapi::mkl::lapack::unmqr_scratchpad_size<std::complex<float>>(
+            queue, detail::get_onemkl_side(side), detail::get_onemkl_transpose(trans), m, n, k, lda,
+            ldc));
 }
 template <>
 std::int64_t unmqr_scratchpad_size<std::complex<double>>(
@@ -2632,9 +2648,10 @@ std::int64_t unmtr_scratchpad_size<std::complex<float>>(sycl::queue& queue, onea
                                                         oneapi::math::transpose trans,
                                                         std::int64_t m, std::int64_t n,
                                                         std::int64_t lda, std::int64_t ldc) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(::oneapi::mkl::lapack::unmtr_scratchpad_size<std::complex<float>>(
-        queue, detail::get_onemkl_side(side), detail::get_onemkl_uplo(uplo),
-        detail::get_onemkl_transpose(trans), m, n, lda, ldc));
+    RETHROW_ONEMKL_LAPACK_EXCEPTIONS_RET(
+        ::oneapi::mkl::lapack::unmtr_scratchpad_size<std::complex<float>>(
+            queue, detail::get_onemkl_side(side), detail::get_onemkl_uplo(uplo),
+            detail::get_onemkl_transpose(trans), m, n, lda, ldc));
 }
 template <>
 std::int64_t unmtr_scratchpad_size<std::complex<double>>(sycl::queue& queue,
