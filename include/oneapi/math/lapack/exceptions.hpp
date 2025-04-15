@@ -48,6 +48,9 @@ private:
 class computation_error : public oneapi::math::computation_error,
                           public oneapi::math::lapack::exception {
 public:
+    computation_error(const std::string& message, std::int64_t code)
+            : oneapi::math::computation_error(message),
+              oneapi::math::lapack::exception(this, code) {}
     computation_error(const std::string& function, const std::string& info, std::int64_t code)
             : oneapi::math::computation_error("LAPACK", function, info),
               oneapi::math::lapack::exception(this, code) {}
@@ -56,6 +59,12 @@ public:
 
 class batch_error : public oneapi::math::batch_error, public oneapi::math::lapack::exception {
 public:
+    batch_error(const std::string& message, std::int64_t num_errors,
+              std::vector<std::int64_t> ids = {}, std::vector<std::exception_ptr> exceptions = {})
+            : oneapi::math::batch_error(message),
+              oneapi::math::lapack::exception(this, num_errors),
+              _ids(ids),
+              _exceptions(exceptions) {}
     batch_error(const std::string& function, const std::string& info, std::int64_t num_errors,
                 std::vector<std::int64_t> ids = {}, std::vector<std::exception_ptr> exceptions = {})
             : oneapi::math::batch_error("LAPACK", function, info),
@@ -78,6 +87,10 @@ private:
 class invalid_argument : public oneapi::math::invalid_argument,
                          public oneapi::math::lapack::exception {
 public:
+    invalid_argument(const std::string& message,
+                  std::int64_t arg_position = 0, std::int64_t detail = 0)
+            : oneapi::math::invalid_argument(message),
+              oneapi::math::lapack::exception(this, arg_position, detail) {}
     invalid_argument(const std::string& function, const std::string& info,
                      std::int64_t arg_position = 0, std::int64_t detail = 0)
             : oneapi::math::invalid_argument("LAPACK", function, info),
