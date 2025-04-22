@@ -34,20 +34,20 @@ namespace mklcpu {
 // host_task automatically uses run_on_host_intel if it is supported by the
 //  compiler. Otherwise, it falls back to single_task.
 template <typename K, typename H, typename F>
-static inline auto host_task_internal(H& cgh, F f, int) -> decltype(cgh.host_task(f)) {
-    return cgh.host_task(f);
+static inline auto host_task_internal(H& cgh, F&& f, int) {
+    return cgh.host_task(std::forward<F>(f));
 }
 
 template <typename K, typename H, typename F>
-static inline void host_task_internal(H& cgh, F f, long) {
+static inline void host_task_internal(H& cgh, F&& f, long) {
 #ifndef __SYCL_DEVICE_ONLY__
-    cgh.template single_task<K>(f);
+    cgh.template single_task<K>(std::forward<F>(f));
 #endif
 }
 
 template <typename K, typename H, typename F>
-static inline void host_task(H& cgh, F f) {
-    (void)host_task_internal<K>(cgh, f, 0);
+static inline void host_task(H& cgh, F&& f) {
+    (void)host_task_internal<K>(cgh, std::forward<F>(f), 0);
 }
 
 template <typename Engine, typename Distr>
