@@ -18,7 +18,7 @@
 #===============================================================================
 
 include_guard()
-set(ARMPL_SEQ armpl_intp64)
+set(ARMPL_SEQ armpl_int64)
 set(ARMPL_OMP armpl_int64_mp)
 
 include(FindPackageHandleStandardArgs)
