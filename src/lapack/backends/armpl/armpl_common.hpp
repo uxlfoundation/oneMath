@@ -145,9 +145,9 @@ constexpr auto cast_to_int_if_complex(const T& alpha) {
         //armpl 25.04 uses directly std::complex so most of the ArmEquivalentType gymnastics is redundant
         if constexpr (std::is_same_v<T, std::complex<float>> ||
                       std::is_same_v<T, std::complex<double>>)
-          return static_cast<std::int64_t>(alpha.real());
+            return static_cast<std::int64_t>(alpha.real());
         else
-          return static_cast<std::int64_t>((*((T*)&alpha)));
+            return static_cast<std::int64_t>((*((T*)&alpha)));
     }
     else {
         return (std::int64_t)alpha;
