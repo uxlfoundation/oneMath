@@ -32,36 +32,80 @@ namespace cublas {
  */
 thread_local cublas_handle CublasScopedContextHandler::handle_helper = cublas_handle{};
 
-CublasScopedContextHandler::CublasScopedContextHandler(sycl::interop_handle& ih) : ih(ih) {}
+CublasScopedContextHandler::CublasScopedContextHandler(sycl::interop_handle& ih) : ih(ih) {
+    // Initialize streamID member to a CUstream associated with the queue `ih`
+    // has been submitted to.
+    streamId = ih.get_native_queue<sycl::backend::ext_oneapi_cuda>();
 
-cublasHandle_t CublasScopedContextHandler::get_handle() {
+    // Initialize the `cublasHandle_t` member `nativeHandle`
     CUdevice device = ih.get_native_device<sycl::backend::ext_oneapi_cuda>();
-    CUstream streamId = get_stream();
-    cublasStatus_t err;
-
     auto it = handle_helper.cublas_handle_mapper_.find(device);
     if (it != handle_helper.cublas_handle_mapper_.end()) {
-        cublasHandle_t nativeHandle = it->second;
+        // Use existing handle if one already exists for the device, but update
+        // the native stream.
+        nativeHandle = it->second;
         cudaStream_t currentStreamId;
+        cublasStatus_t err;
         CUBLAS_ERROR_FUNC(cublasGetStream, err, nativeHandle, &currentStreamId);
         if (currentStreamId != streamId) {
             CUBLAS_ERROR_FUNC(cublasSetStream, err, nativeHandle, streamId);
         }
-        return nativeHandle;
     }
-
-    cublasHandle_t nativeHandle;
-    CUBLAS_ERROR_FUNC(cublasCreate, err, &nativeHandle);
-    CUBLAS_ERROR_FUNC(cublasSetStream, err, nativeHandle, streamId);
-
-    auto insert_iter =
+    else {
+        // Create a new handle if one doesn't already exist for the device
+        cublasStatus_t err;
+        CUBLAS_ERROR_FUNC(cublasCreate, err, &nativeHandle);
+        CUBLAS_ERROR_FUNC(cublasSetStream, err, nativeHandle, streamId);
         handle_helper.cublas_handle_mapper_.insert(std::make_pair(device, nativeHandle));
-
-    return nativeHandle;
+    }
 }
 
-CUstream CublasScopedContextHandler::get_stream() {
-    return ih.get_native_queue<sycl::backend::ext_oneapi_cuda>();
+void CublasScopedContextHandler::begin_recording_if_graph() {
+// interop_handle graph methods only available from extension version 2
+#if SYCL_EXT_ONEAPI_ENQUEUE_NATIVE_COMMAND >= 2
+    if (!ih.ext_codeplay_has_graph()) {
+        return;
+    }
+
+    CUresult err;
+#if CUDA_VERSION >= 12030
+    // After CUDA 12.3 we can use cuStreamBeginCaptureToGraph to capture
+    // the stream directly in the native graph, rather than needing to
+    // instantiate the stream capture as a new graph.
+    auto graph = ih.ext_codeplay_get_native_graph<sycl::backend::ext_oneapi_cuda>();
+    CUDA_ERROR_FUNC(cuStreamBeginCaptureToGraph, err, streamId, graph, nullptr, nullptr, 0,
+                    CU_STREAM_CAPTURE_MODE_GLOBAL);
+#else
+    CUDA_ERROR_FUNC(cuStreamBeginCapture, err, streamId, CU_STREAM_CAPTURE_MODE_GLOBAL);
+#endif // CUDA_VERSION
+#endif // SYCL_EXT_ONEAPI_ENQUEUE_NATIVE_COMMAND >= 2
+}
+
+void CublasScopedContextHandler::end_recording_if_graph() {
+// interop_handle graph methods only available from extension version 2
+#if SYCL_EXT_ONEAPI_ENQUEUE_NATIVE_COMMAND >= 2
+    if (!ih.ext_codeplay_has_graph()) {
+        return;
+    }
+
+    auto graph = ih.ext_codeplay_get_native_graph<sycl::backend::ext_oneapi_cuda>();
+    CUresult err;
+#if CUDA_VERSION >= 12030
+    CUDA_ERROR_FUNC(cuStreamEndCapture, err, streamId, &graph);
+#else
+    // cuStreamEndCapture returns a new graph, if we overwrite
+    // "graph" it won't be picked up by the SYCL runtime, as
+    // "ext_codeplay_get_native_graph" returns a passed-by-value pointer.
+    CUgraph recorded_graph;
+    CUDA_ERROR_FUNC(cuStreamEndCapture, err, streamId, &recorded_graph);
+
+    // Add graph to native graph as a child node
+    // Need to return a node object for the node to be created,
+    // can't be nullptr.
+    CUgraphNode node;
+    CUDA_ERROR_FUNC(cuGraphAddChildGraphNode, err, &node, graph, nullptr, 0, recorded_graph);
+#endif // CUDA_VERSION
+#endif // SYCL_EXT_ONEAPI_ENQUEUE_NATIVE_COMMAND >= 2
 }
 } // namespace cublas
 } // namespace blas

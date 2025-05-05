@@ -61,7 +61,9 @@ static inline void host_task_internal(H& cgh, F f) {
     cgh.host_task([f](sycl::interop_handle ih) {
 #endif
         auto sc = CublasScopedContextHandler(ih);
+        sc.begin_recording_if_graph();
         f(sc);
+        sc.end_recording_if_graph();
     });
 }
 #endif

@@ -63,18 +63,49 @@ the handle must be destroyed when the context goes out of scope. This will bind 
 class CublasScopedContextHandler {
     sycl::interop_handle& ih;
     static thread_local cublas_handle handle_helper;
-    CUstream get_stream();
+    cublasHandle_t nativeHandle;
+    // Cache the native CU stream when the `CublasScopedContextHandler`object
+    // is constructed. This avoids calling `get_native_queue(ih)` multiple
+    // times which isn't guaranteed to return the same CUstream handle each
+    // time. A scenario that causes problems when trying to start/end cuda
+    // stream recording to a graph.
+    CUstream streamId;
 
 public:
+    /**
+    * @brief Constructor
+    * @detail Creates the cublasHandle_t by implicitly impose the advice
+    * given by nvidia for creating a cublas_handle. (e.g. one cuStream per device
+    * per thread).
+    */
     CublasScopedContextHandler(sycl::interop_handle& ih);
 
     /**
-   * @brief get_handle: creates the handle by implicitly impose the advice
-   * given by nvidia for creating a cublas_handle. (e.g. one cuStream per device
-   * per thread).
-   * @return cublasHandle_t a handle to construct cublas routines
-   */
-    cublasHandle_t get_handle();
+    * @brief Start recording cuBlas calls to a graph.
+    * @detail Checks if the command-group associated with \p ih is being added
+    * to a graph, and if so, begin stream recording of the native CUDA stream
+    * associated with \p queue to the native cuda-graph object.
+    */
+    void begin_recording_if_graph();
+
+    /**
+    * @brief End recording cuBlas calls to a graph.
+    * @detail Checks if the command-group associated with \p ih is being added
+    * to a graph, and if so, ends stream recording of the native CUDA stream
+    * associated with \p queue to the native cuda-graph object. Doing any
+    * extra work to ensure that stream recorded calls get added as nodes to
+    * the native graph object associated with \p ih.
+    * @param queue The sycl queue to end stream recording on native stream
+    * backing the queue.
+    */
+    void end_recording_if_graph();
+
+    /// @brief Query the cuBLAS handle created on construction
+    /// @return cublasHandle_t a handle to construct cublas routines
+    cublasHandle_t get_handle() const {
+        return nativeHandle;
+    }
+
     // This is a work-around function for reinterpret_casting the memory. This
     // will be fixed when SYCL-2020 has been implemented for Pi backend.
     template <typename T, typename U>

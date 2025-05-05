@@ -48,7 +48,7 @@ extern std::vector<sycl::device*> devices;
 namespace {
 
 template <typename Ta, typename Tb, typename Tc, typename Ts>
-int test(device* dev, oneapi::math::layout layout, int64_t group_count) {
+int test(device* dev, oneapi::math::layout layout, int64_t group_count, bool graph_record = false) {
     // Catch asynchronous exceptions.
     auto exception_handler = [](exception_list exceptions) {
         for (std::exception_ptr const& e : exceptions) {
@@ -247,6 +247,15 @@ int test(device* dev, oneapi::math::layout layout, int64_t group_count) {
 
     try {
 #ifdef CALL_RT_API
+#ifdef SYCL_EXT_ONEAPI_GRAPH
+        namespace sycl_exp = sycl::ext::oneapi::experimental;
+        using modifiable_graph = sycl_exp::command_graph<sycl_exp::graph_state::modifiable>;
+        std::unique_ptr<modifiable_graph> graph;
+        if (graph_record) {
+            graph = std::make_unique<modifiable_graph>(main_queue);
+            graph->begin_recording(main_queue);
+        }
+#endif
         switch (layout) {
             case oneapi::math::layout::col_major:
                 done = oneapi::math::blas::column_major::gemm_batch(
@@ -262,7 +271,18 @@ int test(device* dev, oneapi::math::layout layout, int64_t group_count) {
                 break;
             default: break;
         }
-        done.wait_and_throw();
+
+#ifdef SYCL_EXT_ONEAPI_GRAPH
+        if (graph_record) {
+            graph->end_recording(main_queue);
+            auto exec_graph = graph->finalize();
+            main_queue.ext_oneapi_graph(exec_graph).wait_and_throw();
+        }
+        else
+#endif
+        {
+            done.wait_and_throw();
+        }
 #else
         switch (layout) {
             case oneapi::math::layout::col_major:
@@ -365,58 +385,65 @@ int test(device* dev, oneapi::math::layout layout, int64_t group_count) {
 }
 
 class GemmBatchUsmTests
-        : public ::testing::TestWithParam<std::tuple<sycl::device*, oneapi::math::layout>> {};
+        : public ::testing::TestWithParam<std::tuple<sycl::device*, oneapi::math::layout, bool>> {
+    virtual void SetUp() override {
+        // Skip test if graph recording variant and device doesn't support sycl_ext_oneapi_graph
+        if (std::get<2>(GetParam())) {
+            CHECK_GRAPH_ON_DEVICE(std::get<0>(GetParam()));
+        }
+    }
+};
 
 TEST_P(GemmBatchUsmTests, RealHalfPrecision) {
     EXPECT_TRUEORSKIP((test<sycl::half, sycl::half, sycl::half, sycl::half>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), 5)));
+        std::get<0>(GetParam()), std::get<1>(GetParam()), 5, std::get<2>(GetParam()))));
 }
 
 TEST_P(GemmBatchUsmTests, HalfHalfFloatPrecision) {
-    EXPECT_TRUEORSKIP((test<sycl::half, sycl::half, float, float>(std::get<0>(GetParam()),
-                                                                  std::get<1>(GetParam()), 5)));
+    EXPECT_TRUEORSKIP((test<sycl::half, sycl::half, float, float>(
+        std::get<0>(GetParam()), std::get<1>(GetParam()), 5, std::get<2>(GetParam()))));
 }
 
 TEST_P(GemmBatchUsmTests, Int8Int8SinglePrecision) {
-    EXPECT_TRUEORSKIP((test<std::int8_t, std::int8_t, float, float>(std::get<0>(GetParam()),
-                                                                    std::get<1>(GetParam()), 5)));
+    EXPECT_TRUEORSKIP((test<std::int8_t, std::int8_t, float, float>(
+        std::get<0>(GetParam()), std::get<1>(GetParam()), 5, std::get<2>(GetParam()))));
 }
 
 TEST_P(GemmBatchUsmTests, Int8Int8Int32Precision) {
     EXPECT_TRUEORSKIP((test<std::int8_t, std::int8_t, std::int32_t, float>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), 5)));
+        std::get<0>(GetParam()), std::get<1>(GetParam()), 5, std::get<2>(GetParam()))));
 }
 
 TEST_P(GemmBatchUsmTests, RealSinglePrecision) {
-    EXPECT_TRUEORSKIP(
-        (test<float, float, float, float>(std::get<0>(GetParam()), std::get<1>(GetParam()), 5)));
+    EXPECT_TRUEORSKIP((test<float, float, float, float>(
+        std::get<0>(GetParam()), std::get<1>(GetParam()), 5, std::get<2>(GetParam()))));
 }
 
 TEST_P(GemmBatchUsmTests, RealDoublePrecision) {
     CHECK_DOUBLE_ON_DEVICE(std::get<0>(GetParam()));
 
-    EXPECT_TRUEORSKIP((
-        test<double, double, double, double>(std::get<0>(GetParam()), std::get<1>(GetParam()), 5)));
+    EXPECT_TRUEORSKIP((test<double, double, double, double>(
+        std::get<0>(GetParam()), std::get<1>(GetParam()), 5, std::get<2>(GetParam()))));
 }
 
 TEST_P(GemmBatchUsmTests, ComplexSinglePrecision) {
     EXPECT_TRUEORSKIP(
         (test<std::complex<float>, std::complex<float>, std::complex<float>, std::complex<float>>(
-            std::get<0>(GetParam()), std::get<1>(GetParam()), 5)));
+            std::get<0>(GetParam()), std::get<1>(GetParam()), 5, std::get<2>(GetParam()))));
 }
 
 TEST_P(GemmBatchUsmTests, ComplexDoublePrecision) {
     CHECK_DOUBLE_ON_DEVICE(std::get<0>(GetParam()));
 
-    EXPECT_TRUEORSKIP(
-        (test<std::complex<double>, std::complex<double>, std::complex<double>,
-              std::complex<double>>(std::get<0>(GetParam()), std::get<1>(GetParam()), 5)));
+    EXPECT_TRUEORSKIP((test<std::complex<double>, std::complex<double>, std::complex<double>,
+                            std::complex<double>>(std::get<0>(GetParam()), std::get<1>(GetParam()),
+                                                  5, std::get<2>(GetParam()))));
 }
 
 INSTANTIATE_TEST_SUITE_P(GemmBatchUsmTestSuite, GemmBatchUsmTests,
                          ::testing::Combine(testing::ValuesIn(devices),
                                             testing::Values(oneapi::math::layout::col_major,
-                                                            oneapi::math::layout::row_major)),
-                         ::LayoutDeviceNamePrint());
-
+                                                            oneapi::math::layout::row_major),
+                                            testing::Values(true, false)),
+                         ::LayoutGraphDeviceNamePrint());
 } // anonymous namespace
