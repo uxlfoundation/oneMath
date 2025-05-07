@@ -39,5 +39,6 @@ class engine_base {};
 #include "oneapi/math/rng/device/detail/mrg32k3a_impl.hpp"
 #include "oneapi/math/rng/device/detail/mcg31m1_impl.hpp"
 #include "oneapi/math/rng/device/detail/mcg59_impl.hpp"
+#include "oneapi/math/rng/device/detail/pcg64_dxsm_impl.hpp"
 
 #endif // ONEMATH_RNG_DEVICE_ENGINE_BASE_HPP_
