@@ -74,4 +74,17 @@ TEST_P(Mcg59DeviceCountAdaptorTests, BinaryPrecision) {
 INSTANTIATE_TEST_SUITE_P(Mcg59DeviceCountAdaptorTestsSuite, Mcg59DeviceCountAdaptorTests,
                          ::testing::ValuesIn(devices), ::DeviceNamePrint());
 
+class Pcg64DXSMDeviceCountAdaptorTests : public ::testing::TestWithParam<sycl::device*> {};
+
+TEST_P(Pcg64DXSMDeviceCountAdaptorTests, BinaryPrecision) {
+    rng_device_test<count_adaptor_test<oneapi::math::rng::device::pcg64_dxsm<1>>> test1;
+    EXPECT_TRUEORSKIP((test1(GetParam())));
+    rng_device_test<count_adaptor_test<oneapi::math::rng::device::pcg64_dxsm<4>>> test2;
+    EXPECT_TRUEORSKIP((test2(GetParam())));
+}
+
+INSTANTIATE_TEST_SUITE_P(Pcg64DXSMDeviceCountAdaptorTestsSuite,
+                         Pcg64DXSMDeviceCountAdaptorTests, ::testing::ValuesIn(devices),
+                         ::DeviceNamePrint());
+
 } // namespace
