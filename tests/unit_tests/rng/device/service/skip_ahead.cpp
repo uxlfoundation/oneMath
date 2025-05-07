@@ -135,8 +135,7 @@ TEST_P(Pcg64DXSMDeviceSkipAheadExTests, BinaryPrecision) {
 INSTANTIATE_TEST_SUITE_P(Pcg64DXSMDeviceSkipAheadTestsSuite, Pcg64DXSMDeviceSkipAheadTests,
                          ::testing::ValuesIn(devices), ::DeviceNamePrint());
 
-INSTANTIATE_TEST_SUITE_P(Pcg64DXSMDeviceSkipAheadExTestsSuite,
-                         Pcg64DXSMDeviceSkipAheadExTests, ::testing::ValuesIn(devices),
-                         ::DeviceNamePrint());
+INSTANTIATE_TEST_SUITE_P(Pcg64DXSMDeviceSkipAheadExTestsSuite, Pcg64DXSMDeviceSkipAheadExTests,
+                         ::testing::ValuesIn(devices), ::DeviceNamePrint());
 
 } // namespace
