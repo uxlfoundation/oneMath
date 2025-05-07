@@ -83,8 +83,7 @@ TEST_P(Pcg64DXSMDeviceCountAdaptorTests, BinaryPrecision) {
     EXPECT_TRUEORSKIP((test2(GetParam())));
 }
 
-INSTANTIATE_TEST_SUITE_P(Pcg64DXSMDeviceCountAdaptorTestsSuite,
-                         Pcg64DXSMDeviceCountAdaptorTests, ::testing::ValuesIn(devices),
-                         ::DeviceNamePrint());
+INSTANTIATE_TEST_SUITE_P(Pcg64DXSMDeviceCountAdaptorTestsSuite, Pcg64DXSMDeviceCountAdaptorTests,
+                         ::testing::ValuesIn(devices), ::DeviceNamePrint());
 
 } // namespace
