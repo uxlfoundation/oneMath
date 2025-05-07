@@ -22,7 +22,7 @@
 
 namespace oneapi::math::rng::device {
 
-template <std::int32_t VecSize = 1> 
+template <std::int32_t VecSize = 1>
 class pcg64_dxsm;
 
 namespace detail {
@@ -37,7 +37,7 @@ struct pcg64_dxsm_param {
     static constexpr pcg128_t increment = { 0x5851f42d4c957f2dULL, 0x14057b7ef767814fULL };
 };
 
-template <std::int32_t VecSize> 
+template <std::int32_t VecSize>
 struct engine_state<oneapi::math::rng::device::pcg64_dxsm<VecSize>> {
     pcg128_t s;
     std::uint32_t result;
@@ -309,7 +309,7 @@ static inline std::uint64_t generate_single32(
 
 } // namespace pcg64_dxsm_impl
 
-template <std::int32_t VecSize> 
+template <std::int32_t VecSize>
 class engine_base<oneapi::math::rng::device::pcg64_dxsm<VecSize>> {
 protected:
     engine_base(std::uint64_t seed, std::uint64_t offset = 0) {
@@ -346,7 +346,7 @@ protected:
     }
 
     inline auto generate() -> typename std::conditional<VecSize == 1, std::uint32_t,
-                                                 sycl::vec<std::uint32_t, VecSize>>::type {
+                                                        sycl::vec<std::uint32_t, VecSize>>::type {
         return pcg64_dxsm_impl::generate32(this->state_);
     }
 
@@ -361,7 +361,7 @@ protected:
         }
     }
 
-    template <typename RealType> 
+    template <typename RealType>
     inline RealType generate_single(RealType a, RealType b) {
         std::uint32_t res_uint;
         RealType res;
@@ -380,7 +380,7 @@ protected:
         return pcg64_dxsm_impl::generate_single32(this->state_);
     }
 
-    template <typename UIntType> 
+    template <typename UIntType>
     inline auto generate_single_uniform_bits() {
         if constexpr (std::is_same<UIntType, std::uint32_t>::value) {
             return pcg64_dxsm_impl::generate_single32(this->state_);

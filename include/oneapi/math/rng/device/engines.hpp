@@ -191,9 +191,9 @@ public:
             : detail::engine_base<pcg64_dxsm<VecSize>>(seed, offset.size(), offset.begin()) {}
 
     pcg64_dxsm(std::initializer_list<std::uint64_t> seed,
-                  std::initializer_list<std::uint64_t> offset)
+               std::initializer_list<std::uint64_t> offset)
             : detail::engine_base<pcg64_dxsm<VecSize>>(seed.size(), seed.begin(), offset.size(),
-                                                          offset.begin()) {}
+                                                       offset.begin()) {}
 
 private:
     template <typename Engine>
