@@ -895,18 +895,18 @@ class Pcg64DXSMUniformAccDeviceMomentsTests : public ::testing::TestWithParam<sy
 
 TEST_P(Pcg64DXSMUniformStdDeviceMomentsTests, RealSinglePrecision) {
     rng_device_test<moments_test<oneapi::math::rng::device::pcg64_dxsm<1>,
-                                oneapi::math::rng::device::uniform<
-                                    float, oneapi::math::rng::device::uniform_method::standard>>>
+                                 oneapi::math::rng::device::uniform<
+                                     float, oneapi::math::rng::device::uniform_method::standard>>>
         test1;
     EXPECT_TRUEORSKIP((test1(GetParam())));
     rng_device_test<moments_test<oneapi::math::rng::device::pcg64_dxsm<4>,
-                                oneapi::math::rng::device::uniform<
-                                    float, oneapi::math::rng::device::uniform_method::standard>>>
+                                 oneapi::math::rng::device::uniform<
+                                     float, oneapi::math::rng::device::uniform_method::standard>>>
         test2;
     EXPECT_TRUEORSKIP((test2(GetParam())));
     rng_device_test<moments_test<oneapi::math::rng::device::pcg64_dxsm<16>,
-                                oneapi::math::rng::device::uniform<
-                                    float, oneapi::math::rng::device::uniform_method::standard>>>
+                                 oneapi::math::rng::device::uniform<
+                                     float, oneapi::math::rng::device::uniform_method::standard>>>
         test3;
     EXPECT_TRUEORSKIP((test3(GetParam())));
 }
@@ -1232,12 +1232,12 @@ TEST_P(Pcg64DXSMUniformAccDeviceMomentsTests, UnsignedInteger64Precision) {
 }
 
 INSTANTIATE_TEST_SUITE_P(Pcg64DXSMUniformStdDeviceMomentsTestsSuite,
-                        Pcg64DXSMUniformStdDeviceMomentsTests, ::testing::ValuesIn(devices),
-                        ::DeviceNamePrint());
+                         Pcg64DXSMUniformStdDeviceMomentsTests, ::testing::ValuesIn(devices),
+                         ::DeviceNamePrint());
 
 INSTANTIATE_TEST_SUITE_P(Pcg64DXSMUniformAccDeviceMomentsTestsSuite,
-                        Pcg64DXSMUniformAccDeviceMomentsTests, ::testing::ValuesIn(devices),
-                        ::DeviceNamePrint());
+                         Pcg64DXSMUniformAccDeviceMomentsTests, ::testing::ValuesIn(devices),
+                         ::DeviceNamePrint());
 
 class Philox4x32x10BitsDeviceMomentsTests : public ::testing::TestWithParam<sycl::device*> {};
 
