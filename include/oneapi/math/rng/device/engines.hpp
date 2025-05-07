@@ -165,6 +165,47 @@ private:
     friend class detail::distribution_base;
 };
 
+// Class template oneapi::math::rng::device::pcg64_dxsm
+//
+// Represents PCG64-DXSM pseudorandom number generator
+//
+// Supported parallelization methods:
+//      skip_ahead
+//
+template <std::int32_t VecSize>
+class pcg64_dxsm : public detail::engine_base<pcg64_dxsm<VecSize>> {
+public:
+    static constexpr std::uint64_t default_seed = 0;
+
+    static constexpr std::int32_t vec_size = VecSize;
+
+    pcg64_dxsm() : detail::engine_base<pcg64_dxsm<VecSize>>(default_seed) {}
+
+    pcg64_dxsm(std::uint64_t seed, std::uint64_t offset = 0)
+            : detail::engine_base<pcg64_dxsm<VecSize>>(seed, offset) {}
+
+    pcg64_dxsm(std::initializer_list<std::uint64_t> seed, std::uint64_t offset = 0)
+            : detail::engine_base<pcg64_dxsm<VecSize>>(seed.size(), seed.begin(), offset) {}
+
+    pcg64_dxsm(std::uint64_t seed, std::initializer_list<std::uint64_t> offset)
+            : detail::engine_base<pcg64_dxsm<VecSize>>(seed, offset.size(), offset.begin()) {}
+
+    pcg64_dxsm(std::initializer_list<std::uint64_t> seed,
+                  std::initializer_list<std::uint64_t> offset)
+            : detail::engine_base<pcg64_dxsm<VecSize>>(seed.size(), seed.begin(), offset.size(),
+                                                          offset.begin()) {}
+
+private:
+    template <typename Engine>
+    friend void skip_ahead(Engine& engine, std::uint64_t num_to_skip);
+
+    template <typename Engine>
+    friend void skip_ahead(Engine& engine, std::initializer_list<std::uint64_t> num_to_skip);
+
+    template <typename DistrType>
+    friend class detail::distribution_base;
+};
+
 // ENGINE ADAPTORS
 
 // Class oneapi::math::rng::device::count_engine_adaptor
