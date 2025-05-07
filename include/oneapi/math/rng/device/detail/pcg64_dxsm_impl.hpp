@@ -98,7 +98,6 @@ static inline void update_state(pcg128_t& local_state) {
 
 template <std::int32_t VecSize>
 static inline void bump32(engine_state<oneapi::math::rng::device::pcg64_dxsm<VecSize>>& state) {
-
     if (state.has_32) {
         state.has_32 = false;
     }
