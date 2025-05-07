@@ -106,7 +106,7 @@ public:
             return;
         }
 
-        // validation (statistics check is turned out for mcg59)
+        // validation (statistics check is turned off for mcg59)
         if constexpr (!std::is_same<Engine,
                                     oneapi::math::rng::device::mcg59<Engine::vec_size>>::value) {
             statistics_device<Distribution> stat;
