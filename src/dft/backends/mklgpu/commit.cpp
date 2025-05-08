@@ -40,8 +40,20 @@
 #include <mkl_version.h>
 #if INTEL_MKL_VERSION < 20250000
 #include <mkl/dfti.hpp>
+namespace oneapi::math::dft::mklgpu::detail {
+template <typename D, typename C, typename V>
+void set_vector_value(D& desc, C p, V const& vec) {
+    desc.set_value(p, vec.data());
+}
+}
 #else
 #include <mkl/dft.hpp>
+namespace oneapi::math::dft::mklgpu::detail {
+template <typename D, typename C, typename V>
+void set_vector_value(D& desc, C p, V const& vec) {
+    desc.set_value(p, vec);
+}
+}
 #endif
 
 // Intel oneMKL 2024.1 deprecates input/output strides.
@@ -159,14 +171,18 @@ private:
         desc.set_value(backend_param::FORWARD_SCALE, config.fwd_scale);
         desc.set_value(backend_param::BACKWARD_SCALE, config.bwd_scale);
         desc.set_value(backend_param::NUMBER_OF_TRANSFORMS, config.number_of_transforms);
-        desc.set_value(backend_param::COMPLEX_STORAGE,
-                       to_mklgpu<onemath_param::COMPLEX_STORAGE>(config.complex_storage));
-        if (config.real_storage != dft::detail::config_value::REAL_REAL) {
-            throw math::invalid_argument("dft/backends/mklgpu", "commit",
-                                         "MKLGPU only supports real-real real storage.");
+        if (config.complex_storage != dft::detail::config_value::COMPLEX_COMPLEX) {
+            throw math::unimplemented("dft/backends/mklgpu", "commit",
+                                      "MKLGPU only supports complex-complex complex storage.");
         }
-        desc.set_value(backend_param::CONJUGATE_EVEN_STORAGE,
-                       to_mklgpu<onemath_param::CONJUGATE_EVEN_STORAGE>(config.conj_even_storage));
+        if (config.real_storage != dft::detail::config_value::REAL_REAL) {
+            throw math::unimplemented("dft/backends/mklgpu", "commit",
+                                      "MKLGPU only supports real-real real storage.");
+        }
+        if (config.conj_even_storage != dft::detail::config_value::COMPLEX_COMPLEX) {
+            throw math::unimplemented("dft/backends/mklgpu", "commit",
+                                      "MKLGPU only supports complex-complex conjugate even storage.");
+        }
         desc.set_value(backend_param::PLACEMENT,
                        to_mklgpu<onemath_param::PLACEMENT>(config.placement));
 
@@ -175,8 +191,8 @@ private:
                 throw math::unimplemented("dft/backends/mklgpu", "commit",
                                           "MKLGPU does not support nonzero offsets.");
             }
-            desc.set_value(backend_param::FWD_STRIDES, config.fwd_strides.data());
-            desc.set_value(backend_param::BWD_STRIDES, config.bwd_strides.data());
+            set_vector_value(desc, backend_param::FWD_STRIDES, config.fwd_strides);
+            set_vector_value(desc, backend_param::BWD_STRIDES, config.bwd_strides);
         }
         else {
             if (config.input_strides[0] != 0 || config.output_strides[0] != 0) {
@@ -184,12 +200,12 @@ private:
                                           "MKLGPU does not support nonzero offsets.");
             }
             if (assume_fwd_dft) {
-                desc.set_value(backend_param::FWD_STRIDES, config.input_strides.data());
-                desc.set_value(backend_param::BWD_STRIDES, config.output_strides.data());
+                set_vector_value(desc, backend_param::FWD_STRIDES, config.input_strides);
+                set_vector_value(desc, backend_param::BWD_STRIDES, config.output_strides);
             }
             else {
-                desc.set_value(backend_param::FWD_STRIDES, config.output_strides.data());
-                desc.set_value(backend_param::BWD_STRIDES, config.input_strides.data());
+                set_vector_value(desc, backend_param::FWD_STRIDES, config.output_strides);
+                set_vector_value(desc, backend_param::BWD_STRIDES, config.input_strides);
             }
         }
         desc.set_value(backend_param::FWD_DISTANCE, config.fwd_dist);
@@ -197,7 +213,7 @@ private:
         if (config.workspace_placement == dft::detail::config_value::WORKSPACE_EXTERNAL) {
             // Setting WORKSPACE_INTERNAL (default) causes FFT_INVALID_DESCRIPTOR.
             desc.set_value(backend_param::WORKSPACE,
-                           to_mklgpu_config_value<onemath_param::WORKSPACE_PLACEMENT>(
+                           to_mklgpu<onemath_param::WORKSPACE_PLACEMENT>(
                                config.workspace_placement));
         }
         // Setting the ordering causes an FFT_INVALID_DESCRIPTOR. Check that default is used:
@@ -214,11 +230,11 @@ private:
 
     // This is called by the workspace_helper, and is not part of the user API.
     virtual std::int64_t get_workspace_external_bytes_impl() override {
-        std::size_t workspaceSizeFwd = 0, workspaceSizeBwd = 0;
+        std::int64_t workspaceSizeFwd = 0, workspaceSizeBwd = 0;
         using backend_param = oneapi::mkl::dft::config_param;
         handle.first->get_value(backend_param::WORKSPACE_BYTES, &workspaceSizeFwd);
         handle.second->get_value(backend_param::WORKSPACE_BYTES, &workspaceSizeBwd);
-        return static_cast<std::int64_t>(std::max(workspaceSizeFwd, workspaceSizeFwd));
+        return std::max(workspaceSizeFwd, workspaceSizeFwd);
     }
 };
 } // namespace detail

@@ -62,9 +62,9 @@ inline auto compute_forward(dft::detail::descriptor<prec, dom>& desc, ArgTs&&...
     }
     auto handle = reinterpret_cast<handle_t*>(commit_handle->get_handle());
     auto mklgpu_desc = handle->first; // First because forward DFT.
-    int commit_status{ DFTI_UNCOMMITTED };
+    auto commit_status = uncommitted;
     mklgpu_desc->get_value(oneapi::mkl::dft::config_param::COMMIT_STATUS, &commit_status);
-    if (commit_status != DFTI_COMMITTED) {
+    if (commit_status != committed) {
         throw math::invalid_argument("DFT", "compute_forward",
                                      "MKLGPU DFT descriptor was not successfully committed.");
     }
