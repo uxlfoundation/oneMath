@@ -30,13 +30,13 @@
 namespace oneapi::math::dft::mklgpu::detail {
 constexpr int committed = DFTI_COMMITTED;
 constexpr int uncommitted = DFTI_UNCOMMITTED;
-}
+} // namespace oneapi::math::dft::mklgpu::detail
 #else
 #include <mkl/dft.hpp>
 namespace oneapi::math::dft::mklgpu::detail {
 constexpr auto committed = oneapi::mkl::dft::config_value::COMMITTED;
 constexpr auto uncommitted = oneapi::mkl::dft::config_value::UNCOMMITTED;
-}
+} // namespace oneapi::math::dft::mklgpu::detail
 #endif
 
 namespace oneapi {
@@ -109,13 +109,11 @@ template <>
 struct to_mklgpu_impl<dft::detail::config_param::PLACEMENT> {
     inline constexpr auto operator()(dft::detail::config_value value) -> int {
         switch (value) {
-        case dft::detail::config_value::INPLACE:
-            return DFTI_INPLACE;
-        case dft::detail::config_value::NOT_INPLACE:
-            return DFTI_NOT_INPLACE;
-        default:
-            throw math::invalid_argument("dft", "MKLGPU descriptor set_value()",
-                                         "Invalid config value for inplace.");
+            case dft::detail::config_value::INPLACE: return DFTI_INPLACE;
+            case dft::detail::config_value::NOT_INPLACE: return DFTI_NOT_INPLACE;
+            default:
+                throw math::invalid_argument("dft", "MKLGPU descriptor set_value()",
+                                             "Invalid config value for inplace.");
         }
     }
 };
@@ -124,13 +122,12 @@ template <>
 struct to_mklgpu_impl<dft::detail::config_param::PLACEMENT> {
     inline constexpr auto operator()(dft::detail::config_value value) {
         switch (value) {
-        case dft::detail::config_value::INPLACE:
-            return oneapi::mkl::dft::config_value::INPLACE;
-        case dft::detail::config_value::NOT_INPLACE:
-            return oneapi::mkl::dft::config_value::NOT_INPLACE;
-        default:
-            throw math::invalid_argument("dft", "MKLGPU descriptor set_value()",
-                                         "Invalid config value for inplace.");
+            case dft::detail::config_value::INPLACE: return oneapi::mkl::dft::config_value::INPLACE;
+            case dft::detail::config_value::NOT_INPLACE:
+                return oneapi::mkl::dft::config_value::NOT_INPLACE;
+            default:
+                throw math::invalid_argument("dft", "MKLGPU descriptor set_value()",
+                                             "Invalid config value for inplace.");
         }
     }
 };
@@ -140,13 +137,13 @@ template <>
 struct to_mklgpu_impl<dft::detail::config_param::WORKSPACE_PLACEMENT> {
     inline constexpr auto operator()(dft::detail::config_value value) {
         switch (value) {
-        case dft::detail::config_value::WORKSPACE_AUTOMATIC:
-            return oneapi::mkl::dft::config_value::WORKSPACE_INTERNAL;
-        case dft::detail::config_value::WORKSPACE_EXTERNAL:
-            return oneapi::mkl::dft::config_value::WORKSPACE_EXTERNAL;
-        default:
-            throw math::invalid_argument("dft", "MKLGPU descriptor set_value()",
-                                         "Invalid config value for inplace.");
+            case dft::detail::config_value::WORKSPACE_AUTOMATIC:
+                return oneapi::mkl::dft::config_value::WORKSPACE_INTERNAL;
+            case dft::detail::config_value::WORKSPACE_EXTERNAL:
+                return oneapi::mkl::dft::config_value::WORKSPACE_EXTERNAL;
+            default:
+                throw math::invalid_argument("dft", "MKLGPU descriptor set_value()",
+                                             "Invalid config value for inplace.");
         }
     }
 };

@@ -45,7 +45,7 @@ template <typename D, typename C, typename V>
 void set_vector_value(D& desc, C p, V const& vec) {
     desc.set_value(p, vec.data());
 }
-}
+} // namespace oneapi::math::dft::mklgpu::detail
 #else
 #include <mkl/dft.hpp>
 namespace oneapi::math::dft::mklgpu::detail {
@@ -53,7 +53,7 @@ template <typename D, typename C, typename V>
 void set_vector_value(D& desc, C p, V const& vec) {
     desc.set_value(p, vec);
 }
-}
+} // namespace oneapi::math::dft::mklgpu::detail
 #endif
 
 // Intel oneMKL 2024.1 deprecates input/output strides.
@@ -180,8 +180,9 @@ private:
                                       "MKLGPU only supports real-real real storage.");
         }
         if (config.conj_even_storage != dft::detail::config_value::COMPLEX_COMPLEX) {
-            throw math::unimplemented("dft/backends/mklgpu", "commit",
-                                      "MKLGPU only supports complex-complex conjugate even storage.");
+            throw math::unimplemented(
+                "dft/backends/mklgpu", "commit",
+                "MKLGPU only supports complex-complex conjugate even storage.");
         }
         desc.set_value(backend_param::PLACEMENT,
                        to_mklgpu<onemath_param::PLACEMENT>(config.placement));
@@ -212,9 +213,8 @@ private:
         desc.set_value(backend_param::BWD_DISTANCE, config.bwd_dist);
         if (config.workspace_placement == dft::detail::config_value::WORKSPACE_EXTERNAL) {
             // Setting WORKSPACE_INTERNAL (default) causes FFT_INVALID_DESCRIPTOR.
-            desc.set_value(backend_param::WORKSPACE,
-                           to_mklgpu<onemath_param::WORKSPACE_PLACEMENT>(
-                               config.workspace_placement));
+            desc.set_value(backend_param::WORKSPACE, to_mklgpu<onemath_param::WORKSPACE_PLACEMENT>(
+                                                         config.workspace_placement));
         }
         // Setting the ordering causes an FFT_INVALID_DESCRIPTOR. Check that default is used:
         if (config.ordering != dft::detail::config_value::ORDERED) {
