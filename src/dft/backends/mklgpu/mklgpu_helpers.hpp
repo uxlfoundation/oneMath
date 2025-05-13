@@ -65,33 +65,6 @@ inline constexpr oneapi::mkl::dft::precision to_mklgpu(dft::detail::precision do
     }
 }
 
-/// Convert a config_param to equivalent backend native value.
-/*inline constexpr oneapi::mkl::dft::config_param to_mklgpu(dft::detail::config_param param) {
-    using iparam = dft::detail::config_param;
-    using oparam = oneapi::mkl::dft::config_param;
-    switch (param) {
-        case iparam::FORWARD_DOMAIN: return oparam::FORWARD_DOMAIN;
-        case iparam::DIMENSION: return oparam::DIMENSION;
-        case iparam::LENGTHS: return oparam::LENGTHS;
-        case iparam::PRECISION: return oparam::PRECISION;
-        case iparam::FORWARD_SCALE: return oparam::FORWARD_SCALE;
-        case iparam::NUMBER_OF_TRANSFORMS: return oparam::NUMBER_OF_TRANSFORMS;
-        case iparam::COMPLEX_STORAGE: return oparam::COMPLEX_STORAGE;
-        case iparam::CONJUGATE_EVEN_STORAGE: return oparam::CONJUGATE_EVEN_STORAGE;
-        case iparam::FWD_DISTANCE: return oparam::FWD_DISTANCE;
-        case iparam::BWD_DISTANCE: return oparam::BWD_DISTANCE;
-        case iparam::WORKSPACE: return oparam::WORKSPACE;
-        case iparam::PACKED_FORMAT: return oparam::PACKED_FORMAT;
-        case iparam::WORKSPACE_PLACEMENT: return oparam::WORKSPACE; // Same as WORKSPACE
-        case iparam::WORKSPACE_EXTERNAL_BYTES: return oparam::WORKSPACE_BYTES;
-        case iparam::COMMIT_STATUS: return oparam::COMMIT_STATUS;
-        default:
-            throw math::invalid_argument("dft", "MKLGPU descriptor set_value()",
-                                         "Invalid config param.");
-            return static_cast<oparam>(0);
-    }
-}*/
-
 template <dft::detail::config_param Param>
 struct to_mklgpu_impl;
 
