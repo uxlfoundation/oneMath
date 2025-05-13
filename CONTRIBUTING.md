@@ -72,6 +72,11 @@ For GitHub questions, issues, RFCs, or PRs you can contact maintainers via one o
 | @uxlfoundation/onemath-rng-write | oneMath RNG maintainers |
 | @uxlfoundation/onemath-sparse-write | oneMath Sparse Algebra maintainers |
 | @uxlfoundation/onemath-vm-write | oneMath Vector Math maintainers |
+| @uxlfoundation/onemath-cpu-aarch64 | AArch64 CPU maintainers |
+| @uxlfoundation/onemath-cpu-x64 | x86 CPU maintainers |
+| @uxlfoundation/onemath-gpu-amd | AMD GPU maintainers |
+| @uxlfoundation/onemath-gpu-intel | Intel GPU maintainers |
+| @uxlfoundation/onemath-gpu-nvidia | NVIDIA GPU maintainers |
 
 Please read [MAINTAINERS page](MAINTAINERS.md) for more information about maintainer roles, responsibilities, and how to become one of them.
 
