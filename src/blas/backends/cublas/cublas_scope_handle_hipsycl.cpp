@@ -26,13 +26,11 @@ namespace cublas {
 
 thread_local cublas_handle CublasScopedContextHandler::handle_helper = cublas_handle{};
 
-CublasScopedContextHandler::CublasScopedContextHandler(sycl::queue queue, sycl::interop_handle& ih)
-        : interop_h(ih) {}
+CublasScopedContextHandler::CublasScopedContextHandler(sycl::interop_handle& ih) : interop_h(ih) {}
 
-cublasHandle_t CublasScopedContextHandler::get_handle(const sycl::queue& queue) {
-    sycl::device device = queue.get_device();
+cublasHandle_t CublasScopedContextHandler::get_handle() {
     CUdevice current_device = interop_h.get_native_device<sycl::backend::cuda>();
-    CUstream streamId = get_stream(queue);
+    CUstream streamId = get_stream();
     cublasStatus_t err;
     auto it = handle_helper.cublas_handle_mapper_.find(current_device);
     if (it != handle_helper.cublas_handle_mapper_.end()) {
@@ -54,7 +52,7 @@ cublasHandle_t CublasScopedContextHandler::get_handle(const sycl::queue& queue) 
     return handle;
 }
 
-CUstream CublasScopedContextHandler::get_stream(const sycl::queue& queue) {
+CUstream CublasScopedContextHandler::get_stream() {
     return interop_h.get_native_queue<sycl::backend::cuda>();
 }
 
