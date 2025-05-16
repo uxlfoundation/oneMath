@@ -161,8 +161,8 @@ inline void gemm_batch_impl(sycl::queue& queue, transpose transa, transpose tran
         auto a_acc = a.template get_access<sycl::access::mode::read>(cgh);
         auto b_acc = b.template get_access<sycl::access::mode::read>(cgh);
         auto c_acc = c.template get_access<sycl::access::mode::read_write>(cgh);
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto a_ = sc.get_mem<cuTypeA*>(a_acc);
             auto b_ = sc.get_mem<cuTypeB*>(b_acc);
             auto c_ = sc.get_mem<cuTypeC*>(c_acc);
@@ -514,8 +514,8 @@ inline sycl::event gemv_batch(const char* func_name, Func func, sycl::queue& que
     }
     auto done = queue.submit([&](sycl::handler& cgh) {
         cgh.depends_on(dependencies);
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             int64_t offset = 0;
             cublasStatus_t err;
             auto** a_ = reinterpret_cast<const cuDataType**>(a);
@@ -632,8 +632,8 @@ inline sycl::event gemm_batch_strided_usm_impl(sycl::queue& queue, transpose tra
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             cublasStatus_t err;
 #ifdef SYCL_EXT_ONEAPI_ENQUEUE_NATIVE_COMMAND
             CUBLAS_ERROR_FUNC_T("cublasGemmStridedBatchedEx", cublasGemmStridedBatchedEx, err,
@@ -718,8 +718,8 @@ inline sycl::event gemm_batch_usm_impl(sycl::queue& queue, transpose* transa, tr
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             int64_t offset = 0;
             cublasStatus_t err;
             for (int64_t i = 0; i < group_count; i++) {
@@ -832,8 +832,8 @@ inline sycl::event trsm_batch(const char* func_name, Func func, sycl::queue& que
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             int64_t offset = 0;
             cublasStatus_t err;
             for (int64_t i = 0; i < group_count; i++) {

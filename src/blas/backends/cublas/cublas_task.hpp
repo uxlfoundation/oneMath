@@ -46,19 +46,19 @@ namespace cublas {
 
 #ifdef __HIPSYCL__
 template <typename H, typename F>
-static inline void host_task_internal(H& cgh, sycl::queue queue, F f) {
-    cgh.hipSYCL_enqueue_custom_operation([f, queue](sycl::interop_handle ih) {
-        auto sc = CublasScopedContextHandler(queue, ih);
+static inline void host_task_internal(H& cgh, F f) {
+    cgh.hipSYCL_enqueue_custom_operation([f](sycl::interop_handle ih) {
+        auto sc = CublasScopedContextHandler(ih);
         f(sc);
     });
 }
 #else
 template <typename H, typename F>
-static inline void host_task_internal(H& cgh, sycl::queue queue, F f) {
+static inline void host_task_internal(H& cgh, F f) {
 #ifdef SYCL_EXT_ONEAPI_ENQUEUE_NATIVE_COMMAND
-    cgh.ext_codeplay_enqueue_native_command([f, queue](sycl::interop_handle ih) {
+    cgh.ext_codeplay_enqueue_native_command([f](sycl::interop_handle ih) {
 #else
-    cgh.host_task([f, queue](sycl::interop_handle ih) {
+    cgh.host_task([f](sycl::interop_handle ih) {
 #endif
         auto sc = CublasScopedContextHandler(ih);
         f(sc);
@@ -66,8 +66,8 @@ static inline void host_task_internal(H& cgh, sycl::queue queue, F f) {
 }
 #endif
 template <typename H, typename F>
-static inline void onemath_cublas_host_task(H& cgh, sycl::queue queue, F f) {
-    (void)host_task_internal(cgh, queue, f);
+static inline void onemath_cublas_host_task(H& cgh, F f) {
+    (void)host_task_internal(cgh, f);
 }
 
 } // namespace cublas

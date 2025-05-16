@@ -41,8 +41,8 @@ inline void asum(const char* func_name, Func func, sycl::queue& queue, int64_t n
     queue.submit([&](sycl::handler& cgh) {
         auto x_acc = x.template get_access<sycl::access::mode::read>(cgh);
         auto res_acc = result.template get_access<sycl::access::mode::write>(cgh);
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             // By default the pointer mode is the CUBLAS_POINTER_MODE_HOST
             // when the data is on buffer, it must be set to
             // CUBLAS_POINTER_MODE_DEVICE mode otherwise it causes the segmentation
@@ -81,8 +81,8 @@ inline void scal(const char* func_name, Func func, sycl::queue& queue, int64_t n
     overflow_check(n, incx);
     queue.submit([&](sycl::handler& cgh) {
         auto x_acc = x.template get_access<sycl::access::mode::read_write>(cgh);
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto x_ = sc.get_mem<cuDataType2*>(x_acc);
             cublasStatus_t err;
             // SCAL does not support negative incx
@@ -112,8 +112,8 @@ inline void axpy(const char* func_name, Func func, sycl::queue& queue, int64_t n
     queue.submit([&](sycl::handler& cgh) {
         auto x_acc = x.template get_access<sycl::access::mode::read>(cgh);
         auto y_acc = y.template get_access<sycl::access::mode::read_write>(cgh);
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto x_ = sc.get_mem<cuDataType*>(x_acc);
             auto y_ = sc.get_mem<cuDataType*>(y_acc);
             cublasStatus_t err;
@@ -167,8 +167,8 @@ inline void rotg(const char* func_name, Func func, sycl::queue& queue, sycl::buf
         auto b_acc = b.template get_access<sycl::access::mode::read_write>(cgh);
         auto c_acc = c.template get_access<sycl::access::mode::read_write>(cgh);
         auto s_acc = s.template get_access<sycl::access::mode::read_write>(cgh);
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             // By default the pointer mode is the CUBLAS_POINTER_MODE_HOST
             // when the data is on buffer, it must be set to
             // CUBLAS_POINTER_MODE_DEVICE mode otherwise it causes the segmentation
@@ -211,8 +211,8 @@ inline void rotm(const char* func_name, Func func, sycl::queue& queue, int64_t n
         auto x_acc = x.template get_access<sycl::access::mode::read_write>(cgh);
         auto y_acc = y.template get_access<sycl::access::mode::read_write>(cgh);
         auto param_acc = param.template get_access<sycl::access::mode::read>(cgh);
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             // By default the pointer mode is the CUBLAS_POINTER_MODE_HOST
             // when the data is on buffer, it must be set to
             // CUBLAS_POINTER_MODE_DEVICE mode otherwise it causes the segmentation
@@ -250,8 +250,8 @@ inline void copy(const char* func_name, Func func, sycl::queue& queue, int64_t n
     queue.submit([&](sycl::handler& cgh) {
         auto x_acc = x.template get_access<sycl::access::mode::read>(cgh);
         auto y_acc = y.template get_access<sycl::access::mode::read_write>(cgh);
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto x_ = sc.get_mem<cuDataType*>(x_acc);
             auto y_ = sc.get_mem<cuDataType*>(y_acc);
             cublasStatus_t err;
@@ -282,8 +282,8 @@ inline void dot(const char* func_name, Func func, sycl::queue& queue, int64_t n,
         auto x_acc = x.template get_access<sycl::access::mode::read>(cgh);
         auto y_acc = y.template get_access<sycl::access::mode::read>(cgh);
         auto res_acc = result.template get_access<sycl::access::mode::write>(cgh);
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             // By default the pointer mode is the CUBLAS_POINTER_MODE_HOST
             // when the data is on buffer, it must be set to
             // CUBLAS_POINTER_MODE_DEVICE mode otherwise it causes the segmentation
@@ -327,8 +327,8 @@ inline void rot(const char* func_name, Func func, sycl::queue& queue, int64_t n,
     queue.submit([&](sycl::handler& cgh) {
         auto x_acc = x.template get_access<sycl::access::mode::read_write>(cgh);
         auto y_acc = y.template get_access<sycl::access::mode::read_write>(cgh);
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             // By default the pointer mode is the CUBLAS_POINTER_MODE_HOST
             // when the data is on buffer, it must be set to
             // CUBLAS_POINTER_MODE_DEVICE mode otherwise it causes the segmentation
@@ -364,8 +364,8 @@ void sdsdot(sycl::queue& queue, int64_t n, float sb, sycl::buffer<float, 1>& x, 
         auto x_acc = x.get_access<sycl::access::mode::read>(cgh);
         auto y_acc = y.get_access<sycl::access::mode::read>(cgh);
         auto res_acc = result.get_access<sycl::access::mode::write>(cgh);
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             // By default the pointer mode is the CUBLAS_POINTER_MODE_HOST
             // when the data is on buffer, it must be set to
             // CUBLAS_POINTER_MODE_DEVICE mode otherwise it causes the segmentation
@@ -404,8 +404,8 @@ inline void rotmg(const char* func_name, Func func, sycl::queue& queue, sycl::bu
         auto x1_acc = x1.template get_access<sycl::access::mode::read_write>(cgh);
         auto y1_acc = y1_buff.template get_access<sycl::access::mode::read>(cgh);
         auto param_acc = param.template get_access<sycl::access::mode::read_write>(cgh);
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             // By default the pointer mode is the CUBLAS_POINTER_MODE_HOST
             // when the data is on buffer, it must be set to
             // CUBLAS_POINTER_MODE_DEVICE mode otherwise it causes the segmentation
@@ -454,8 +454,8 @@ inline void iamax(const char* func_name, Func func, sycl::queue& queue, int64_t 
     queue.submit([&](sycl::handler& cgh) {
         auto x_acc = x.template get_access<sycl::access::mode::read>(cgh);
         auto int_res_acc = int_res_buff.template get_access<sycl::access::mode::write>(cgh);
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             // By default the pointer mode is the CUBLAS_POINTER_MODE_HOST
             // when the data is on buffer, it must be set to
             // CUBLAS_POINTER_MODE_DEVICE mode otherwise it causes the segmentation
@@ -505,8 +505,8 @@ inline void swap(const char* func_name, Func func, sycl::queue& queue, int64_t n
     queue.submit([&](sycl::handler& cgh) {
         auto x_acc = x.template get_access<sycl::access::mode::read_write>(cgh);
         auto y_acc = y.template get_access<sycl::access::mode::read_write>(cgh);
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto x_ = sc.get_mem<cuDataType*>(x_acc);
             auto y_ = sc.get_mem<cuDataType*>(y_acc);
             cublasStatus_t err;
@@ -544,8 +544,8 @@ inline void iamin(const char* func_name, Func func, sycl::queue& queue, int64_t 
     queue.submit([&](sycl::handler& cgh) {
         auto x_acc = x.template get_access<sycl::access::mode::read>(cgh);
         auto int_res_acc = int_res_buff.template get_access<sycl::access::mode::write>(cgh);
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             // By default the pointer mode is the CUBLAS_POINTER_MODE_HOST
             // when the data is on buffer, it must be set to
             // CUBLAS_POINTER_MODE_DEVICE mode otherwise it causes the segmentation
@@ -597,8 +597,8 @@ inline void nrm2(const char* func_name, Func func, sycl::queue& queue, int64_t n
     queue.submit([&](sycl::handler& cgh) {
         auto x_acc = x.template get_access<sycl::access::mode::read>(cgh);
         auto res_acc = result.template get_access<sycl::access::mode::write>(cgh);
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             // By default the pointer mode is the CUBLAS_POINTER_MODE_HOST
             // when the data is on buffer, it must be set to
             // CUBLAS_POINTER_MODE_DEVICE mode otherwise it causes the segmentation
@@ -647,8 +647,8 @@ inline sycl::event asum(const char* func_name, Func func, sycl::queue& queue, in
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto x_ = reinterpret_cast<const cuDataType1*>(x);
             auto res_ = reinterpret_cast<cuDataType2*>(result);
             if (result_on_device) {
@@ -687,8 +687,8 @@ inline sycl::event scal(const char* func_name, Func func, sycl::queue& queue, in
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto x_ = reinterpret_cast<cuDataType2*>(x);
             cublasStatus_t err;
             // SCAL does not support negative incx
@@ -723,8 +723,8 @@ inline sycl::event axpy(const char* func_name, Func func, sycl::queue& queue, in
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto x_ = reinterpret_cast<const cuDataType*>(x);
             auto y_ = reinterpret_cast<cuDataType*>(y);
             cublasStatus_t err;
@@ -796,8 +796,8 @@ inline sycl::event rotg(const char* func_name, Func func, sycl::queue& queue, T1
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto a_ = reinterpret_cast<cuDataType1*>(a);
             auto b_ = reinterpret_cast<cuDataType1*>(b);
             auto c_ = reinterpret_cast<cuDataType2*>(c);
@@ -838,8 +838,8 @@ inline sycl::event rotm(const char* func_name, Func func, sycl::queue& queue, in
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto x_ = reinterpret_cast<cuDataType*>(x);
             auto y_ = reinterpret_cast<cuDataType*>(y);
             auto param_ = reinterpret_cast<cuDataType*>(param);
@@ -872,8 +872,8 @@ inline sycl::event copy(const char* func_name, Func func, sycl::queue& queue, in
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto x_ = reinterpret_cast<const cuDataType*>(x);
             auto y_ = reinterpret_cast<cuDataType*>(y);
             cublasStatus_t err;
@@ -908,8 +908,8 @@ inline sycl::event dot(const char* func_name, Func func, sycl::queue& queue, int
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto x_ = reinterpret_cast<const cuDataType*>(x);
             auto y_ = reinterpret_cast<const cuDataType*>(y);
             auto res_ = reinterpret_cast<cuDataType*>(result);
@@ -954,8 +954,8 @@ inline sycl::event rot(const char* func_name, Func func, sycl::queue& queue, int
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto x_ = reinterpret_cast<cuDataType1*>(x);
             auto y_ = reinterpret_cast<cuDataType1*>(y);
             cublasStatus_t err;
@@ -992,8 +992,8 @@ sycl::event sdsdot(sycl::queue& queue, int64_t n, float sb, const float* x, int6
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto x_ = reinterpret_cast<const float*>(x);
             auto y_ = reinterpret_cast<const float*>(y);
             auto res_ = reinterpret_cast<float*>(result);
@@ -1057,8 +1057,8 @@ inline sycl::event rotmg(const char* func_name, Func func, sycl::queue& queue, T
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto d1_ = reinterpret_cast<cuDataType*>(d1);
             auto d2_ = reinterpret_cast<cuDataType*>(d2);
             auto x1_ = reinterpret_cast<cuDataType*>(x1);
@@ -1120,8 +1120,8 @@ inline sycl::event iamax(const char* func_name, Func func, sycl::queue& queue, i
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto x_ = reinterpret_cast<const cuDataType*>(x);
             if (result_on_device) {
                 cublasSetPointerMode(handle, CUBLAS_POINTER_MODE_DEVICE);
@@ -1180,8 +1180,8 @@ inline sycl::event swap(const char* func_name, Func func, sycl::queue& queue, in
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto x_ = reinterpret_cast<cuDataType*>(x);
             auto y_ = reinterpret_cast<cuDataType*>(y);
             cublasStatus_t err;
@@ -1230,8 +1230,8 @@ inline sycl::event iamin(const char* func_name, Func func, sycl::queue& queue, i
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto x_ = reinterpret_cast<const cuDataType*>(x);
             if (result_on_device) {
                 cublasSetPointerMode(handle, CUBLAS_POINTER_MODE_DEVICE);
@@ -1294,8 +1294,8 @@ inline sycl::event nrm2(const char* func_name, Func func, sycl::queue& queue, in
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto x_ = reinterpret_cast<const cuDataType1*>(x);
             auto res_ = reinterpret_cast<cuDataType2*>(result);
             if (result_on_device) {

@@ -63,8 +63,7 @@ the handle must be destroyed when the context goes out of scope. This will bind 
 class CublasScopedContextHandler {
     sycl::interop_handle& ih;
     static thread_local cublas_handle handle_helper;
-    CUstream get_stream(const sycl::queue& queue);
-    sycl::context get_context(const sycl::queue& queue);
+    CUstream get_stream();
 
 public:
     CublasScopedContextHandler(sycl::interop_handle& ih);
@@ -73,20 +72,15 @@ public:
    * @brief get_handle: creates the handle by implicitly impose the advice
    * given by nvidia for creating a cublas_handle. (e.g. one cuStream per device
    * per thread).
-   * @param queue sycl queue.
    * @return cublasHandle_t a handle to construct cublas routines
    */
-    cublasHandle_t get_handle(const sycl::queue& queue);
+    cublasHandle_t get_handle();
     // This is a work-around function for reinterpret_casting the memory. This
     // will be fixed when SYCL-2020 has been implemented for Pi backend.
     template <typename T, typename U>
     inline T get_mem(U acc) {
         CUdeviceptr cudaPtr = ih.get_native_mem<sycl::backend::ext_oneapi_cuda>(acc);
         return reinterpret_cast<T>(cudaPtr);
-    }
-
-    void wait_stream(const sycl::queue& queue) {
-        cuStreamSynchronize(get_stream(queue));
     }
 };
 

@@ -40,8 +40,8 @@ inline void gemv(const char* func_name, Func func, sycl::queue& queue, transpose
         auto a_acc = a.template get_access<sycl::access::mode::read>(cgh);
         auto x_acc = x.template get_access<sycl::access::mode::read>(cgh);
         auto y_acc = y.template get_access<sycl::access::mode::read_write>(cgh);
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto a_ = sc.get_mem<cuDataType*>(a_acc);
             auto x_ = sc.get_mem<cuDataType*>(x_acc);
             auto y_ = sc.get_mem<cuDataType*>(y_acc);
@@ -77,8 +77,8 @@ inline void gbmv(const char* func_name, Func func, sycl::queue& queue, transpose
         auto a_acc = a.template get_access<sycl::access::mode::read>(cgh);
         auto x_acc = x.template get_access<sycl::access::mode::read>(cgh);
         auto y_acc = y.template get_access<sycl::access::mode::read_write>(cgh);
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto a_ = sc.get_mem<cuDataType*>(a_acc);
             auto x_ = sc.get_mem<cuDataType*>(x_acc);
             auto y_ = sc.get_mem<cuDataType*>(y_acc);
@@ -114,8 +114,8 @@ inline void ger(const char* func_name, Func func, sycl::queue& queue, int64_t m,
         auto a_acc = a.template get_access<sycl::access::mode::read_write>(cgh);
         auto x_acc = x.template get_access<sycl::access::mode::read>(cgh);
         auto y_acc = y.template get_access<sycl::access::mode::read>(cgh);
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto a_ = sc.get_mem<cuDataType*>(a_acc);
             auto x_ = sc.get_mem<cuDataType*>(x_acc);
             auto y_ = sc.get_mem<cuDataType*>(y_acc);
@@ -151,8 +151,8 @@ inline void hbmv(const char* func_name, Func func, sycl::queue& queue, uplo uppe
         auto a_acc = a.template get_access<sycl::access::mode::read>(cgh);
         auto x_acc = x.template get_access<sycl::access::mode::read>(cgh);
         auto y_acc = y.template get_access<sycl::access::mode::read_write>(cgh);
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto a_ = sc.get_mem<cuDataType*>(a_acc);
             auto x_ = sc.get_mem<cuDataType*>(x_acc);
             auto y_ = sc.get_mem<cuDataType*>(y_acc);
@@ -186,8 +186,8 @@ inline void hemv(const char* func_name, Func func, sycl::queue& queue, uplo uppe
         auto a_acc = a.template get_access<sycl::access::mode::read>(cgh);
         auto x_acc = x.template get_access<sycl::access::mode::read>(cgh);
         auto y_acc = y.template get_access<sycl::access::mode::read_write>(cgh);
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto a_ = sc.get_mem<cuDataType*>(a_acc);
             auto x_ = sc.get_mem<cuDataType*>(x_acc);
             auto y_ = sc.get_mem<cuDataType*>(y_acc);
@@ -222,8 +222,8 @@ inline void her(const char* func_name, Func func, sycl::queue& queue, uplo upper
     queue.submit([&](sycl::handler& cgh) {
         auto a_acc = a.template get_access<sycl::access::mode::read_write>(cgh);
         auto x_acc = x.template get_access<sycl::access::mode::read>(cgh);
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto a_ = sc.get_mem<cuDataType*>(a_acc);
             auto x_ = sc.get_mem<cuDataType*>(x_acc);
             cublasStatus_t err;
@@ -256,8 +256,8 @@ inline void her2(const char* func_name, Func func, sycl::queue& queue, uplo uppe
         auto a_acc = a.template get_access<sycl::access::mode::read_write>(cgh);
         auto x_acc = x.template get_access<sycl::access::mode::read>(cgh);
         auto y_acc = y.template get_access<sycl::access::mode::read>(cgh);
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto a_ = sc.get_mem<cuDataType*>(a_acc);
             auto x_ = sc.get_mem<cuDataType*>(x_acc);
             auto y_ = sc.get_mem<cuDataType*>(y_acc);
@@ -292,8 +292,8 @@ inline void hpmv(const char* func_name, Func func, sycl::queue& queue, uplo uppe
         auto a_acc = a.template get_access<sycl::access::mode::read>(cgh);
         auto x_acc = x.template get_access<sycl::access::mode::read>(cgh);
         auto y_acc = y.template get_access<sycl::access::mode::read_write>(cgh);
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto a_ = sc.get_mem<cuDataType*>(a_acc);
             auto x_ = sc.get_mem<cuDataType*>(x_acc);
             auto y_ = sc.get_mem<cuDataType*>(y_acc);
@@ -328,8 +328,8 @@ inline void hpr(const char* func_name, Func func, sycl::queue& queue, uplo upper
     queue.submit([&](sycl::handler& cgh) {
         auto a_acc = a.template get_access<sycl::access::mode::read_write>(cgh);
         auto x_acc = x.template get_access<sycl::access::mode::read>(cgh);
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto a_ = sc.get_mem<cuDataType*>(a_acc);
             auto x_ = sc.get_mem<cuDataType*>(x_acc);
             cublasStatus_t err;
@@ -361,8 +361,8 @@ inline void hpr2(const char* func_name, Func func, sycl::queue& queue, uplo uppe
         auto a_acc = a.template get_access<sycl::access::mode::read_write>(cgh);
         auto x_acc = x.template get_access<sycl::access::mode::read>(cgh);
         auto y_acc = y.template get_access<sycl::access::mode::read>(cgh);
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto a_ = sc.get_mem<cuDataType*>(a_acc);
             auto x_ = sc.get_mem<cuDataType*>(x_acc);
             auto y_ = sc.get_mem<cuDataType*>(y_acc);
@@ -396,8 +396,8 @@ inline void sbmv(const char* func_name, Func func, sycl::queue& queue, uplo uppe
         auto a_acc = a.template get_access<sycl::access::mode::read>(cgh);
         auto x_acc = x.template get_access<sycl::access::mode::read>(cgh);
         auto y_acc = y.template get_access<sycl::access::mode::read_write>(cgh);
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto a_ = sc.get_mem<cuDataType*>(a_acc);
             auto x_ = sc.get_mem<cuDataType*>(x_acc);
             auto y_ = sc.get_mem<cuDataType*>(y_acc);
@@ -432,8 +432,8 @@ inline void symv(const char* func_name, Func func, sycl::queue& queue, uplo uppe
         auto a_acc = a.template get_access<sycl::access::mode::read>(cgh);
         auto x_acc = x.template get_access<sycl::access::mode::read>(cgh);
         auto y_acc = y.template get_access<sycl::access::mode::read_write>(cgh);
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto a_ = sc.get_mem<cuDataType*>(a_acc);
             auto x_ = sc.get_mem<cuDataType*>(x_acc);
             auto y_ = sc.get_mem<cuDataType*>(y_acc);
@@ -466,8 +466,8 @@ inline void syr(const char* func_name, Func func, sycl::queue& queue, uplo upper
     queue.submit([&](sycl::handler& cgh) {
         auto a_acc = a.template get_access<sycl::access::mode::read_write>(cgh);
         auto x_acc = x.template get_access<sycl::access::mode::read>(cgh);
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto a_ = sc.get_mem<cuDataType*>(a_acc);
             auto x_ = sc.get_mem<cuDataType*>(x_acc);
             cublasStatus_t err;
@@ -501,8 +501,8 @@ inline void syr2(const char* func_name, Func func, sycl::queue& queue, uplo uppe
         auto a_acc = a.template get_access<sycl::access::mode::read_write>(cgh);
         auto x_acc = x.template get_access<sycl::access::mode::read>(cgh);
         auto y_acc = y.template get_access<sycl::access::mode::read>(cgh);
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto a_ = sc.get_mem<cuDataType*>(a_acc);
             auto x_ = sc.get_mem<cuDataType*>(x_acc);
             auto y_ = sc.get_mem<cuDataType*>(y_acc);
@@ -540,8 +540,8 @@ inline void spmv(const char* func_name, Func func, sycl::queue& queue, uplo uppe
         auto a_acc = a.template get_access<sycl::access::mode::read>(cgh);
         auto x_acc = x.template get_access<sycl::access::mode::read>(cgh);
         auto y_acc = y.template get_access<sycl::access::mode::read_write>(cgh);
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto a_ = sc.get_mem<cuDataType*>(a_acc);
             auto x_ = sc.get_mem<cuDataType*>(x_acc);
             auto y_ = sc.get_mem<cuDataType*>(y_acc);
@@ -574,8 +574,8 @@ inline void spr(const char* func_name, Func func, sycl::queue& queue, uplo upper
     queue.submit([&](sycl::handler& cgh) {
         auto a_acc = a.template get_access<sycl::access::mode::read_write>(cgh);
         auto x_acc = x.template get_access<sycl::access::mode::read>(cgh);
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto a_ = sc.get_mem<cuDataType*>(a_acc);
             auto x_ = sc.get_mem<cuDataType*>(x_acc);
             cublasStatus_t err;
@@ -607,8 +607,8 @@ inline void spr2(const char* func_name, Func func, sycl::queue& queue, uplo uppe
         auto a_acc = a.template get_access<sycl::access::mode::read_write>(cgh);
         auto x_acc = x.template get_access<sycl::access::mode::read>(cgh);
         auto y_acc = y.template get_access<sycl::access::mode::read>(cgh);
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto a_ = sc.get_mem<cuDataType*>(a_acc);
             auto x_ = sc.get_mem<cuDataType*>(x_acc);
             auto y_ = sc.get_mem<cuDataType*>(y_acc);
@@ -641,8 +641,8 @@ inline void tbmv(const char* func_name, Func func, sycl::queue& queue, uplo uppe
     queue.submit([&](sycl::handler& cgh) {
         auto a_acc = a.template get_access<sycl::access::mode::read>(cgh);
         auto x_acc = x.template get_access<sycl::access::mode::read_write>(cgh);
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto a_ = sc.get_mem<cuDataType*>(a_acc);
             auto x_ = sc.get_mem<cuDataType*>(x_acc);
             cublasStatus_t err;
@@ -677,8 +677,8 @@ inline void tbsv(const char* func_name, Func func, sycl::queue& queue, uplo uppe
     queue.submit([&](sycl::handler& cgh) {
         auto a_acc = a.template get_access<sycl::access::mode::read>(cgh);
         auto x_acc = x.template get_access<sycl::access::mode::read_write>(cgh);
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto a_ = sc.get_mem<cuDataType*>(a_acc);
             auto x_ = sc.get_mem<cuDataType*>(x_acc);
             cublasStatus_t err;
@@ -713,8 +713,8 @@ inline void tpmv(const char* func_name, Func func, sycl::queue& queue, uplo uppe
     queue.submit([&](sycl::handler& cgh) {
         auto a_acc = a.template get_access<sycl::access::mode::read>(cgh);
         auto x_acc = x.template get_access<sycl::access::mode::read_write>(cgh);
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto a_ = sc.get_mem<cuDataType*>(a_acc);
             auto x_ = sc.get_mem<cuDataType*>(x_acc);
             cublasStatus_t err;
@@ -748,8 +748,8 @@ inline void tpsv(const char* func_name, Func func, sycl::queue& queue, uplo uppe
     queue.submit([&](sycl::handler& cgh) {
         auto a_acc = a.template get_access<sycl::access::mode::read>(cgh);
         auto x_acc = x.template get_access<sycl::access::mode::read_write>(cgh);
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto a_ = sc.get_mem<cuDataType*>(a_acc);
             auto x_ = sc.get_mem<cuDataType*>(x_acc);
             cublasStatus_t err;
@@ -783,8 +783,8 @@ inline void trmv(const char* func_name, Func func, sycl::queue& queue, uplo uppe
     queue.submit([&](sycl::handler& cgh) {
         auto a_acc = a.template get_access<sycl::access::mode::read>(cgh);
         auto x_acc = x.template get_access<sycl::access::mode::read_write>(cgh);
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto a_ = sc.get_mem<cuDataType*>(a_acc);
             auto x_ = sc.get_mem<cuDataType*>(x_acc);
             cublasStatus_t err;
@@ -818,8 +818,8 @@ inline void trsv(const char* func_name, Func func, sycl::queue& queue, uplo uppe
     queue.submit([&](sycl::handler& cgh) {
         auto a_acc = a.template get_access<sycl::access::mode::read>(cgh);
         auto x_acc = x.template get_access<sycl::access::mode::read_write>(cgh);
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto a_ = sc.get_mem<cuDataType*>(a_acc);
             auto x_ = sc.get_mem<cuDataType*>(x_acc);
             cublasStatus_t err;
@@ -858,8 +858,8 @@ inline sycl::event gemv(const char* func_name, Func func, sycl::queue& queue, tr
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto a_ = reinterpret_cast<const cuDataType*>(a);
             auto x_ = reinterpret_cast<const cuDataType*>(x);
             auto y_ = reinterpret_cast<cuDataType*>(y);
@@ -898,8 +898,8 @@ inline sycl::event gbmv(const char* func_name, Func func, sycl::queue& queue, tr
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto a_ = reinterpret_cast<const cuDataType*>(a);
             auto x_ = reinterpret_cast<const cuDataType*>(x);
             auto y_ = reinterpret_cast<cuDataType*>(y);
@@ -938,8 +938,8 @@ inline sycl::event ger(const char* func_name, Func func, sycl::queue& queue, int
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto a_ = reinterpret_cast<cuDataType*>(a);
             auto x_ = reinterpret_cast<const cuDataType*>(x);
             auto y_ = reinterpret_cast<const cuDataType*>(y);
@@ -979,8 +979,8 @@ inline sycl::event hbmv(const char* func_name, Func func, sycl::queue& queue, up
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto a_ = reinterpret_cast<const cuDataType*>(a);
             auto x_ = reinterpret_cast<const cuDataType*>(x);
             auto y_ = reinterpret_cast<cuDataType*>(y);
@@ -1016,8 +1016,8 @@ inline sycl::event hemv(const char* func_name, Func func, sycl::queue& queue, up
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto a_ = reinterpret_cast<const cuDataType*>(a);
             auto x_ = reinterpret_cast<const cuDataType*>(x);
             auto y_ = reinterpret_cast<cuDataType*>(y);
@@ -1055,8 +1055,8 @@ inline sycl::event her(const char* func_name, Func func, sycl::queue& queue, upl
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto a_ = reinterpret_cast<cuDataType*>(a);
             auto x_ = reinterpret_cast<const cuDataType*>(x);
             cublasStatus_t err;
@@ -1092,8 +1092,8 @@ inline sycl::event her2(const char* func_name, Func func, sycl::queue& queue, up
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto a_ = reinterpret_cast<cuDataType*>(a);
             auto x_ = reinterpret_cast<const cuDataType*>(x);
             auto y_ = reinterpret_cast<const cuDataType*>(y);
@@ -1130,8 +1130,8 @@ inline sycl::event hpmv(const char* func_name, Func func, sycl::queue& queue, up
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto a_ = reinterpret_cast<const cuDataType*>(a);
             auto x_ = reinterpret_cast<const cuDataType*>(x);
             auto y_ = reinterpret_cast<cuDataType*>(y);
@@ -1169,8 +1169,8 @@ inline sycl::event hpr(const char* func_name, Func func, sycl::queue& queue, upl
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto a_ = reinterpret_cast<cuDataType*>(a);
             auto x_ = reinterpret_cast<const cuDataType*>(x);
             cublasStatus_t err;
@@ -1206,8 +1206,8 @@ inline sycl::event hpr2(const char* func_name, Func func, sycl::queue& queue, up
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto a_ = reinterpret_cast<cuDataType*>(a);
             auto x_ = reinterpret_cast<const cuDataType*>(x);
             auto y_ = reinterpret_cast<const cuDataType*>(y);
@@ -1245,8 +1245,8 @@ inline sycl::event sbmv(const char* func_name, Func func, sycl::queue& queue, up
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto a_ = reinterpret_cast<const cuDataType*>(a);
             auto x_ = reinterpret_cast<const cuDataType*>(x);
             auto y_ = reinterpret_cast<cuDataType*>(y);
@@ -1283,8 +1283,8 @@ inline sycl::event symv(const char* func_name, Func func, sycl::queue& queue, up
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto a_ = reinterpret_cast<const cuDataType*>(a);
             auto x_ = reinterpret_cast<const cuDataType*>(x);
             auto y_ = reinterpret_cast<cuDataType*>(y);
@@ -1321,8 +1321,8 @@ inline sycl::event syr(const char* func_name, Func func, sycl::queue& queue, upl
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto a_ = reinterpret_cast<cuDataType*>(a);
             auto x_ = reinterpret_cast<const cuDataType*>(x);
             cublasStatus_t err;
@@ -1360,8 +1360,8 @@ inline sycl::event syr2(const char* func_name, Func func, sycl::queue& queue, up
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto a_ = reinterpret_cast<cuDataType*>(a);
             auto x_ = reinterpret_cast<const cuDataType*>(x);
             auto y_ = reinterpret_cast<const cuDataType*>(y);
@@ -1401,8 +1401,8 @@ inline sycl::event spmv(const char* func_name, Func func, sycl::queue& queue, up
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto a_ = reinterpret_cast<const cuDataType*>(a);
             auto x_ = reinterpret_cast<const cuDataType*>(x);
             auto y_ = reinterpret_cast<cuDataType*>(y);
@@ -1439,8 +1439,8 @@ inline sycl::event spr(const char* func_name, Func func, sycl::queue& queue, upl
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto a_ = reinterpret_cast<cuDataType*>(a);
             auto x_ = reinterpret_cast<const cuDataType*>(x);
             cublasStatus_t err;
@@ -1475,8 +1475,8 @@ inline sycl::event spr2(const char* func_name, Func func, sycl::queue& queue, up
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto a_ = reinterpret_cast<cuDataType*>(a);
             auto x_ = reinterpret_cast<const cuDataType*>(x);
             auto y_ = reinterpret_cast<const cuDataType*>(y);
@@ -1514,8 +1514,8 @@ inline sycl::event tbmv(const char* func_name, Func func, sycl::queue& queue, up
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto a_ = reinterpret_cast<const cuDataType*>(a);
             auto x_ = reinterpret_cast<cuDataType*>(x);
             cublasStatus_t err;
@@ -1554,8 +1554,8 @@ inline sycl::event tbsv(const char* func_name, Func func, sycl::queue& queue, up
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto a_ = reinterpret_cast<const cuDataType*>(a);
             auto x_ = reinterpret_cast<cuDataType*>(x);
             cublasStatus_t err;
@@ -1593,8 +1593,8 @@ inline sycl::event tpmv(const char* func_name, Func func, sycl::queue& queue, up
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto a_ = reinterpret_cast<const cuDataType*>(a);
             auto x_ = reinterpret_cast<cuDataType*>(x);
             cublasStatus_t err;
@@ -1632,8 +1632,8 @@ inline sycl::event tpsv(const char* func_name, Func func, sycl::queue& queue, up
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto a_ = reinterpret_cast<const cuDataType*>(a);
             auto x_ = reinterpret_cast<cuDataType*>(x);
             cublasStatus_t err;
@@ -1671,8 +1671,8 @@ inline sycl::event trmv(const char* func_name, Func func, sycl::queue& queue, up
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto a_ = reinterpret_cast<const cuDataType*>(a);
             auto x_ = reinterpret_cast<cuDataType*>(x);
             cublasStatus_t err;
@@ -1710,8 +1710,8 @@ inline sycl::event trsv(const char* func_name, Func func, sycl::queue& queue, up
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        onemath_cublas_host_task(cgh, queue, [=](CublasScopedContextHandler& sc) {
-            auto handle = sc.get_handle(queue);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
             auto a_ = reinterpret_cast<const cuDataType*>(a);
             auto x_ = reinterpret_cast<cuDataType*>(x);
             cublasStatus_t err;
