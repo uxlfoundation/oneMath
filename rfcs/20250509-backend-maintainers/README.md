@@ -6,6 +6,7 @@
 |Date       |Revision | Comments                                                                 |
 |-----------|---------|--------------------------------------------------------------------------|
 |  20250509 |  1.0    | Initial version                                                          |
+|  20250522 |  1.1    | Include CODEOWNERS file in project changes                               |
 
 ## Motivation
 
@@ -61,8 +62,8 @@ one specific domain of the project.
 
 ## Changes in the Project
 
-The changes will be in the Github roles as well as changes in the MAINTAINERS.md
-and CONTRIBUTING.md files to describe these new roles.
+The changes will be in the Github roles and CODEOWNERS as well as changes in
+the MAINTAINERS.md and CONTRIBUTING.md files to describe these new roles.
 
 ## Open questions
 
