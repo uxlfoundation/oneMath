@@ -101,7 +101,6 @@ Responsibilities:
 
 Requirements:
   * Experience as Contributor in the specific backend for at least 6 months.
-  * Commit at least 25% of working time to the project.
   * Track record of accepted code contributions to a specific backend.
   * Track record of contributions to the code review process.
   * Demonstrated in-depth knowledge of the specific backend.
