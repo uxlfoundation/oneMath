@@ -37,6 +37,13 @@
 /include/oneapi/math/blas.hxx @uxlfoundation/onemath-blas-write
 /include/oneapi/math/bfloat16.hpp @uxlfoundation/onemath-blas-write
 /include/oneapi/mkl/blas.hpp @uxlfoundation/onemath-blas-write
+/src/blas/backends/armpl/ @uxlfoundation/onemath-cpu-aarch64 @uxlfoundation/onemath-blas-write
+/src/blas/backends/cublas/ @uxlfoundation/onemath-gpu-nvidia @uxlfoundation/onemath-blas-write
+/src/blas/backends/mkl_common/ @uxlfoundation/onemath-cpu-x64 @uxlfoundation/onemath-gpu-intel @uxlfoundation/onemath-blas-write
+/src/blas/backends/mklcpu/ @uxlfoundation/onemath-cpu-x64 @uxlfoundation/onemath-blas-write
+/src/blas/backends/mklgpu/ @uxlfoundation/onemath-gpu-intel @uxlfoundation/onemath-blas-write
+/src/blas/backends/netlib/ @uxlfoundation/onemath-cpu-x64 @uxlfoundation/onemath-blas-write
+/src/blas/backends/rocblas/ @uxlfoundation/onemath-gpu-amd @uxlfoundation/onemath-blas-write
 /src/blas/ @uxlfoundation/onemath-blas-write
 /tests/unit_tests/blas/ @uxlfoundation/onemath-blas-write
 
@@ -45,6 +52,10 @@
 /include/oneapi/math/dft/ @uxlfoundation/onemath-dft-write
 /include/oneapi/math/dft.hpp @uxlfoundation/onemath-dft-write
 /include/oneapi/mkl/dft.hpp @uxlfoundation/onemath-dft-write
+/src/dft/backends/cufft/ @uxlfoundation/onemath-gpu-nvidia @uxlfoundation/onemath-dft-write
+/src/dft/backends/mklcpu/ @uxlfoundation/onemath-cpu-x64 @uxlfoundation/onemath-dft-write
+/src/dft/backends/mklgpu/ @uxlfoundation/onemath-gpu-intel @uxlfoundation/onemath-dft-write
+/src/dft/backends/rocfft/ @uxlfoundation/onemath-gpu-amd @uxlfoundation/onemath-dft-write
 /src/dft/ @uxlfoundation/onemath-dft-write
 /tests/unit_tests/dft/ @uxlfoundation/onemath-dft-write
 
@@ -53,6 +64,12 @@
 /include/oneapi/math/lapack/ @uxlfoundation/onemath-lapack-write
 /include/oneapi/math/lapack.hpp @uxlfoundation/onemath-lapack-write
 /include/oneapi/mkl/lapack.hpp @uxlfoundation/onemath-lapack-write
+/src/lapack/backends/armpl/ @uxlfoundation/onemath-cpu-aarch64 @uxlfoundation/onemath-lapack-write
+/src/lapack/backends/cusolver/ @uxlfoundation/onemath-gpu-nvidia @uxlfoundation/onemath-lapack-write
+/src/lapack/backends/mkl_common/ @uxlfoundation/onemath-cpu-x64 @uxlfoundation/onemath-gpu-intel @uxlfoundation/onemath-lapack-write
+/src/lapack/backends/mklcpu/ @uxlfoundation/onemath-cpu-x64 @uxlfoundation/onemath-lapack-write
+/src/lapack/backends/mklgpu/ @uxlfoundation/onemath-gpu-intel @uxlfoundation/onemath-lapack-write
+/src/lapack/backends/rocsolver/ @uxlfoundation/onemath-gpu-amd @uxlfoundation/onemath-lapack-write
 /src/lapack/ @uxlfoundation/onemath-lapack-write
 /tests/unit_tests/lapack/ @uxlfoundation/onemath-lapack-write
 
@@ -62,6 +79,11 @@
 /include/oneapi/math/rng.hpp @uxlfoundation/onemath-rng-write
 /include/oneapi/mkl/rng.hpp @uxlfoundation/onemath-rng-write
 /include/oneapi/mkl/rng/device.hpp @uxlfoundation/onemath-rng-write
+/src/rng/backends/armpl/ @uxlfoundation/onemath-cpu-aarch64 @uxlfoundation/onemath-rng-write
+/src/rng/backends/curand/ @uxlfoundation/onemath-gpu-nvidia @uxlfoundation/onemath-rng-write
+/src/rng/backends/mklcpu/ @uxlfoundation/onemath-cpu-x64 @uxlfoundation/onemath-rng-write
+/src/rng/backends/mklgpu/ @uxlfoundation/onemath-gpu-intel @uxlfoundation/onemath-rng-write
+/src/rng/backends/rocrand/ @uxlfoundation/onemath-gpu-amd @uxlfoundation/onemath-rng-write
 /src/rng/ @uxlfoundation/onemath-rng-write
 /tests/unit_tests/rng/ @uxlfoundation/onemath-rng-write
 
@@ -70,6 +92,11 @@
 /include/oneapi/math/sparse_blas/ @uxlfoundation/onemath-sparse-write
 /include/oneapi/math/sparse_blas.hpp @uxlfoundation/onemath-sparse-write
 /include/oneapi/mkl/sparse_blas.hpp @uxlfoundation/onemath-sparse-write
+/src/sparse_blas/backends/cusparse/ @uxlfoundation/onemath-gpu-nvidia @uxlfoundation/onemath-sparse-write
+/src/sparse_blas/backends/mkl_common/ @uxlfoundation/onemath-cpu-x64 @uxlfoundation/onemath-gpu-intel @uxlfoundation/onemath-sparse-write
+/src/sparse_blas/backends/mklcpu/ @uxlfoundation/onemath-cpu-x64 @uxlfoundation/onemath-sparse-write
+/src/sparse_blas/backends/mklgpu/ @uxlfoundation/onemath-gpu-intel @uxlfoundation/onemath-sparse-write
+/src/sparse_blas/backends/rocsparse/ @uxlfoundation/onemath-gpu-amd @uxlfoundation/onemath-sparse-write
 /src/sparse_blas/ @uxlfoundation/onemath-sparse-write
 /tests/unit_tests/sparse_blas/ @uxlfoundation/onemath-sparse-write
 
