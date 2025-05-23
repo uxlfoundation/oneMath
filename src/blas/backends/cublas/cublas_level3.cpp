@@ -95,15 +95,15 @@ inline void gemm_ex(DATATYPE_A DT_A, DATATYPE_B DT_B, DATATYPE_C DT_C, sycl::que
             auto c_ = sc.get_mem<cuDataType_C*>(c_acc);
             cublasStatus_t err;
 #ifdef SYCL_EXT_ONEAPI_ENQUEUE_NATIVE_COMMAND
+            CUBLAS_ERROR_FUNC(cublasGemmEx, err, handle, get_cublas_operation(transa),
+                              get_cublas_operation(transb), m, n, k, (cuDataType_C*)&alpha, a_,
+                              DT_A, lda, b_, DT_B, ldb, (cuDataType_C*)&beta, c_, DT_C, ldc, DT_C,
+                              CUBLAS_GEMM_DEFAULT);
+#else
             CUBLAS_ERROR_FUNC_SYNC(cublasGemmEx, err, handle, get_cublas_operation(transa),
                                    get_cublas_operation(transb), m, n, k, (cuDataType_C*)&alpha, a_,
                                    DT_A, lda, b_, DT_B, ldb, (cuDataType_C*)&beta, c_, DT_C, ldc,
                                    DT_C, CUBLAS_GEMM_DEFAULT);
-#else
-            CUBLAS_ERROR_FUNC(cublasGemmEx, err, handle, get_cublas_operation(transa),
-                                   get_cublas_operation(transb), m, n, k, (cuDataType_C *)&alpha,
-                                   a_, DT_A, lda, b_, DT_B, ldb, (cuDataType_C *)&beta, c_, DT_C,
-                                   ldc, DT_C, CUBLAS_GEMM_DEFAULT);
 #endif
         });
     });
@@ -500,15 +500,15 @@ inline sycl::event gemm_ex_usm(DATATYPE_A DT_A, DATATYPE_B DT_B, DATATYPE_C DT_C
             auto c_ = reinterpret_cast<cuDataType_C*>(c);
             cublasStatus_t err;
 #ifdef SYCL_EXT_ONEAPI_ENQUEUE_NATIVE_COMMAND
+            CUBLAS_ERROR_FUNC(cublasGemmEx, err, handle, get_cublas_operation(transa),
+                              get_cublas_operation(transb), m, n, k, (cuDataType_C*)&alpha, a_,
+                              DT_A, lda, b_, DT_B, ldb, (cuDataType_C*)&beta, c_, DT_C, ldc, DT_C,
+                              CUBLAS_GEMM_DEFAULT);
+#else
             CUBLAS_ERROR_FUNC_SYNC(cublasGemmEx, err, handle, get_cublas_operation(transa),
                                    get_cublas_operation(transb), m, n, k, (cuDataType_C*)&alpha, a_,
                                    DT_A, lda, b_, DT_B, ldb, (cuDataType_C*)&beta, c_, DT_C, ldc,
                                    DT_C, CUBLAS_GEMM_DEFAULT);
-#else
-            CUBLAS_ERROR_FUNC(cublasGemmEx, err, handle, get_cublas_operation(transa),
-                                   get_cublas_operation(transb), m, n, k, (cuDataType_C *)&alpha,
-                                   a_, DT_A, lda, b_, DT_B, ldb, (cuDataType_C *)&beta, c_, DT_C,
-                                   ldc, DT_C, CUBLAS_GEMM_DEFAULT);
 #endif
         });
     });
