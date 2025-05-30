@@ -34,18 +34,6 @@
 #include "rocblas_scope_handle_hipsycl.hpp"
 #endif
 
-// After Plugin Interface removal in DPC++ ur.hpp is the new include
-#if __has_include(<sycl/detail/ur.hpp>)
-#include <sycl/detail/ur.hpp>
-#ifndef ONEMATH_PI_INTERFACE_REMOVED
-#define ONEMATH_PI_INTERFACE_REMOVED
-#endif
-#elif __has_include(<sycl/detail/pi.hpp>)
-#include <sycl/detail/pi.hpp>
-#else
-#include <CL/sycl/detail/pi.hpp>
-#endif
-
 namespace oneapi {
 namespace math {
 namespace blas {
