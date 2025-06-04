@@ -54,7 +54,8 @@ set(blas_TEST_LIST
         blas_level2
         blas_level3
         blas_batch
-        blas_extensions)
+        blas_extensions
+        blas_sycl_graph)
 
 set(blas_TEST_LINK "")
 

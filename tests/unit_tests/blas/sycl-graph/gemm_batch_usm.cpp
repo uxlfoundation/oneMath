@@ -1,5 +1,5 @@
 /*******************************************************************************
-* Copyright 2020-2021 Intel Corporation
+* Copyright 2025 Intel Corporation
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -41,14 +41,14 @@
 #include <gtest/gtest.h>
 
 using namespace sycl;
-using std::vector;
 
 extern std::vector<sycl::device*> devices;
 
 namespace {
 
+#ifdef SYCL_EXT_ONEAPI_GRAPH
 template <typename Ta, typename Tb, typename Tc, typename Ts>
-int test(device* dev, oneapi::math::layout layout, int64_t group_count) {
+int test(device* dev, oneapi::math::layout layout, int64_t group_count, size_t graph_nodes) {
     // Catch asynchronous exceptions.
     auto exception_handler = [](exception_list exceptions) {
         for (std::exception_ptr const& e : exceptions) {
@@ -63,21 +63,20 @@ int test(device* dev, oneapi::math::layout layout, int64_t group_count) {
         }
     };
 
-    queue main_queue(*dev, exception_handler);
+    queue main_queue(*dev, exception_handler, property::queue::in_order{});
     context cxt = main_queue.get_context();
-    event done;
-    std::vector<event> dependencies;
 
     // Prepare data.
     auto uaint = usm_allocator<int64_t, usm::alloc::shared, 64>(cxt, *dev);
-    vector<int64_t, decltype(uaint)> m(uaint), n(uaint), k(uaint), lda(uaint), ldb(uaint),
+    std::vector<int64_t, decltype(uaint)> m(uaint), n(uaint), k(uaint), lda(uaint), ldb(uaint),
         ldc(uaint), group_size(uaint);
 
     auto uatranspose = usm_allocator<oneapi::math::transpose, usm::alloc::shared, 64>(cxt, *dev);
-    vector<oneapi::math::transpose, decltype(uatranspose)> transa(uatranspose), transb(uatranspose);
+    std::vector<oneapi::math::transpose, decltype(uatranspose)> transa(uatranspose),
+        transb(uatranspose);
 
     auto uaTs = usm_allocator<Ts, usm::alloc::shared, 64>(cxt, *dev);
-    vector<Ts, decltype(uaTs)> alpha(uaTs), beta(uaTs);
+    std::vector<Ts, decltype(uaTs)> alpha(uaTs), beta(uaTs);
 
     m.resize(group_count);
     n.resize(group_count);
@@ -91,12 +90,8 @@ int test(device* dev, oneapi::math::layout layout, int64_t group_count) {
     alpha.resize(group_count);
     beta.resize(group_count);
 
-    int64_t i, tmp;
-    int64_t j, idx = 0;
     int64_t total_batch_count = 0;
-    int64_t size_a = 0, size_b = 0, size_c = 0;
-
-    for (i = 0; i < group_count; i++) {
+    for (int64_t i = 0; i < group_count; i++) {
         group_size[i] = 1 + std::rand() % 20;
         m[i] = 1 + std::rand() % 500;
         n[i] = 1 + std::rand() % 500;
@@ -106,23 +101,8 @@ int test(device* dev, oneapi::math::layout layout, int64_t group_count) {
         ldc[i] = std::max(m[i], n[i]);
         alpha[i] = rand_scalar<Ts>();
         beta[i] = rand_scalar<Ts>();
-        if ((std::is_same<Ts, std::complex<float>>::value) ||
-            (std::is_same<Ts, std::complex<double>>::value)) {
-            tmp = std::rand() % 3;
-            if (tmp == 2)
-                transa[i] = oneapi::math::transpose::conjtrans;
-            else
-                transa[i] = (oneapi::math::transpose)tmp;
-            tmp = std::rand() % 3;
-            if (tmp == 2)
-                transb[i] = oneapi::math::transpose::conjtrans;
-            else
-                transb[i] = (oneapi::math::transpose)tmp;
-        }
-        else {
-            transa[i] = (oneapi::math::transpose)(std::rand() % 2);
-            transb[i] = (oneapi::math::transpose)(std::rand() % 2);
-        }
+        transa[i] = (oneapi::math::transpose)(std::rand() % 2);
+        transb[i] = (oneapi::math::transpose)(std::rand() % 2);
         total_batch_count += group_size[i];
     }
 
@@ -130,10 +110,10 @@ int test(device* dev, oneapi::math::layout layout, int64_t group_count) {
     auto uaTbp = usm_allocator<Tb*, usm::alloc::shared, 64>(cxt, *dev);
     auto uaTcp = usm_allocator<Tc*, usm::alloc::shared, 64>(cxt, *dev);
     auto uaTsp = usm_allocator<Ts*, usm::alloc::shared, 64>(cxt, *dev);
-    vector<Ta*, decltype(uaTap)> a_array(uaTap);
-    vector<Tb*, decltype(uaTbp)> b_array(uaTbp);
-    vector<Tc*, decltype(uaTcp)> c_array(uaTcp), c_cast_ref_array(uaTcp);
-    vector<Ts*, decltype(uaTsp)> a_ref_array(uaTsp), b_ref_array(uaTsp), c_ref_array(uaTsp);
+    std::vector<Ta*, decltype(uaTap)> a_array(uaTap);
+    std::vector<Tb*, decltype(uaTbp)> b_array(uaTbp);
+    std::vector<Tc*, decltype(uaTcp)> c_array(uaTcp), c_cast_ref_array(uaTcp);
+    std::vector<Ts*, decltype(uaTsp)> a_ref_array(uaTsp), b_ref_array(uaTsp), c_ref_array(uaTsp);
     a_array.resize(total_batch_count);
     b_array.resize(total_batch_count);
     c_array.resize(total_batch_count);
@@ -142,8 +122,9 @@ int test(device* dev, oneapi::math::layout layout, int64_t group_count) {
     c_cast_ref_array.resize(total_batch_count);
     c_ref_array.resize(total_batch_count);
 
-    idx = 0;
-    for (i = 0; i < group_count; i++) {
+    size_t idx = 0;
+    int64_t size_a = 0, size_b = 0, size_c = 0;
+    for (int64_t i = 0; i < group_count; i++) {
         switch (layout) {
             case oneapi::math::layout::col_major:
                 size_a = lda[i] * ((transa[i] == oneapi::math::transpose::nontrans) ? k[i] : m[i]);
@@ -157,7 +138,7 @@ int test(device* dev, oneapi::math::layout layout, int64_t group_count) {
                 break;
             default: break;
         }
-        for (j = 0; j < group_size[i]; j++) {
+        for (int64_t j = 0; j < group_size[i]; j++) {
             a_array[idx] = (Ta*)oneapi::math::malloc_shared(64, sizeof(Ta) * size_a, *dev, cxt);
             b_array[idx] = (Tb*)oneapi::math::malloc_shared(64, sizeof(Tb) * size_b, *dev, cxt);
             c_array[idx] = (Tc*)oneapi::math::malloc_shared(64, sizeof(Tc) * size_c, *dev, cxt);
@@ -207,8 +188,8 @@ int test(device* dev, oneapi::math::layout layout, int64_t group_count) {
         oneapi::math::aligned_free(transb_ref);
         oneapi::math::aligned_free(group_size_ref);
         idx = 0;
-        for (i = 0; i < group_count; i++) {
-            for (j = 0; j < group_size[i]; j++) {
+        for (int64_t i = 0; i < group_count; i++) {
+            for (int64_t j = 0; j < group_size[i]; j++) {
                 oneapi::math::free_shared(a_array[idx], cxt);
                 oneapi::math::free_shared(b_array[idx], cxt);
                 oneapi::math::free_shared(c_array[idx], cxt);
@@ -221,75 +202,78 @@ int test(device* dev, oneapi::math::layout layout, int64_t group_count) {
         }
         return false;
     }
-    idx = 0;
-    for (i = 0; i < group_count; i++) {
-        transa_ref[i] = convert_to_cblas_trans(transa[i]);
-        transb_ref[i] = convert_to_cblas_trans(transb[i]);
-        m_ref[i] = (int)m[i];
-        n_ref[i] = (int)n[i];
-        k_ref[i] = (int)k[i];
-        lda_ref[i] = (int)lda[i];
-        ldb_ref[i] = (int)ldb[i];
-        ldc_ref[i] = (int)ldc[i];
-        group_size_ref[i] = (int)group_size[i];
-        for (j = 0; j < group_size_ref[i]; j++) {
-            ::gemm(convert_to_cblas_layout(layout), transa_ref[i], transb_ref[i],
-                   (const int*)&m_ref[i], (const int*)&n_ref[i], (const int*)&k_ref[i],
-                   (const fp_ref*)&alpha[i], (const fp_ref*)a_ref_array[idx],
-                   (const int*)&lda_ref[i], (const fp_ref*)b_ref_array[idx],
-                   (const int*)&ldb_ref[i], (const fp_ref*)&beta[i], (fp_ref*)c_ref_array[idx],
-                   (const int*)&ldc_ref[i]);
-            idx++;
+    for (unsigned node = 0; node < graph_nodes; node++) {
+        idx = 0;
+        for (int64_t i = 0; i < group_count; i++) {
+            transa_ref[i] = convert_to_cblas_trans(transa[i]);
+            transb_ref[i] = convert_to_cblas_trans(transb[i]);
+            m_ref[i] = (int)m[i];
+            n_ref[i] = (int)n[i];
+            k_ref[i] = (int)k[i];
+            lda_ref[i] = (int)lda[i];
+            ldb_ref[i] = (int)ldb[i];
+            ldc_ref[i] = (int)ldc[i];
+            group_size_ref[i] = (int)group_size[i];
+            for (int64_t j = 0; j < group_size_ref[i]; j++) {
+                ::gemm(convert_to_cblas_layout(layout), transa_ref[i], transb_ref[i],
+                       (const int*)&m_ref[i], (const int*)&n_ref[i], (const int*)&k_ref[i],
+                       (const fp_ref*)&alpha[i], (const fp_ref*)a_ref_array[idx],
+                       (const int*)&lda_ref[i], (const fp_ref*)b_ref_array[idx],
+                       (const int*)&ldb_ref[i], (const fp_ref*)&beta[i], (fp_ref*)c_ref_array[idx],
+                       (const int*)&ldc_ref[i]);
+                idx++;
+            }
         }
     }
 
-    // Call DPC++ GEMM_BATCH.
-
+    // Being recording oneMath operations to a graph
+    namespace sycl_exp = sycl::ext::oneapi::experimental;
+    auto graph = sycl_exp::command_graph(main_queue);
+    graph.begin_recording(main_queue);
     try {
+        for (unsigned node = 0; node < graph_nodes; node++) {
 #ifdef CALL_RT_API
-        switch (layout) {
-            case oneapi::math::layout::col_major:
-                done = oneapi::math::blas::column_major::gemm_batch(
-                    main_queue, &transa[0], &transb[0], &m[0], &n[0], &k[0], &alpha[0],
-                    (const Ta**)&a_array[0], &lda[0], (const Tb**)&b_array[0], &ldb[0], &beta[0],
-                    &c_array[0], &ldc[0], group_count, &group_size[0], dependencies);
-                break;
-            case oneapi::math::layout::row_major:
-                done = oneapi::math::blas::row_major::gemm_batch(
-                    main_queue, &transa[0], &transb[0], &m[0], &n[0], &k[0], &alpha[0],
-                    (const Ta**)&a_array[0], &lda[0], (const Tb**)&b_array[0], &ldb[0], &beta[0],
-                    &c_array[0], &ldc[0], group_count, &group_size[0], dependencies);
-                break;
-            default: break;
-        }
-        done.wait_and_throw();
+            switch (layout) {
+                case oneapi::math::layout::col_major:
+                    oneapi::math::blas::column_major::gemm_batch(
+                        main_queue, &transa[0], &transb[0], &m[0], &n[0], &k[0], &alpha[0],
+                        (const Ta**)&a_array[0], &lda[0], (const Tb**)&b_array[0], &ldb[0],
+                        &beta[0], &c_array[0], &ldc[0], group_count, &group_size[0]);
+                    break;
+                case oneapi::math::layout::row_major:
+                    oneapi::math::blas::row_major::gemm_batch(
+                        main_queue, &transa[0], &transb[0], &m[0], &n[0], &k[0], &alpha[0],
+                        (const Ta**)&a_array[0], &lda[0], (const Tb**)&b_array[0], &ldb[0],
+                        &beta[0], &c_array[0], &ldc[0], group_count, &group_size[0]);
+                    break;
+                default: break;
+            }
 #else
-        switch (layout) {
-            case oneapi::math::layout::col_major:
-                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::math::blas::column_major::gemm_batch,
-                                        &transa[0], &transb[0], &m[0], &n[0], &k[0], &alpha[0],
-                                        (const Ta**)&a_array[0], &lda[0], (const Tb**)&b_array[0],
-                                        &ldb[0], &beta[0], &c_array[0], &ldc[0], group_count,
-                                        &group_size[0], dependencies);
-                break;
-            case oneapi::math::layout::row_major:
-                TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::math::blas::row_major::gemm_batch,
-                                        &transa[0], &transb[0], &m[0], &n[0], &k[0], &alpha[0],
-                                        (const Ta**)&a_array[0], &lda[0], (const Ta**)&b_array[0],
-                                        &ldb[0], &beta[0], &c_array[0], &ldc[0], group_count,
-                                        &group_size[0], dependencies);
-                break;
-            default: break;
-        }
-        main_queue.wait_and_throw();
+            switch (layout) {
+                case oneapi::math::layout::col_major:
+                    TEST_RUN_BLAS_CT_SELECT(
+                        main_queue, oneapi::math::blas::column_major::gemm_batch, &transa[0],
+                        &transb[0], &m[0], &n[0], &k[0], &alpha[0], (const Ta**)&a_array[0],
+                        &lda[0], (const Tb**)&b_array[0], &ldb[0], &beta[0], &c_array[0], &ldc[0],
+                        group_count, &group_size[0]);
+                    break;
+                case oneapi::math::layout::row_major:
+                    TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::math::blas::row_major::gemm_batch,
+                                            &transa[0], &transb[0], &m[0], &n[0], &k[0], &alpha[0],
+                                            (const Ta**)&a_array[0], &lda[0],
+                                            (const Ta**)&b_array[0], &ldb[0], &beta[0], &c_array[0],
+                                            &ldc[0], group_count, &group_size[0]);
+                    break;
+                default: break;
+            }
 #endif
+        }
     }
     catch (exception const& e) {
         std::cout << "Caught synchronous SYCL exception during GEMM_BATCH:\n"
                   << e.what() << std::endl;
         print_error_code(e);
     }
-
     catch (const oneapi::math::unimplemented& e) {
         oneapi::math::aligned_free(m_ref);
         oneapi::math::aligned_free(n_ref);
@@ -301,8 +285,8 @@ int test(device* dev, oneapi::math::layout layout, int64_t group_count) {
         oneapi::math::aligned_free(transb_ref);
         oneapi::math::aligned_free(group_size_ref);
         idx = 0;
-        for (i = 0; i < group_count; i++) {
-            for (j = 0; j < group_size[i]; j++) {
+        for (int64_t i = 0; i < group_count; i++) {
+            for (int64_t j = 0; j < group_size[i]; j++) {
                 oneapi::math::free_shared(a_array[idx], cxt);
                 oneapi::math::free_shared(b_array[idx], cxt);
                 oneapi::math::free_shared(c_array[idx], cxt);
@@ -315,22 +299,22 @@ int test(device* dev, oneapi::math::layout layout, int64_t group_count) {
         }
         return test_skipped;
     }
-
     catch (const std::runtime_error& error) {
         std::cout << "Error raised during execution of GEMM_BATCH:\n" << error.what() << std::endl;
     }
 
+    // End recording of sycl queue and create executable graph
+    graph.end_recording(main_queue);
+    auto exec_graph = graph.finalize();
+
+    // Submit graph to execute and wait for completion
+    main_queue.ext_oneapi_graph(exec_graph).wait_and_throw();
+
     bool good = true;
-    // Compare the results of reference implementation and DPC++ implementation.
-    int tol_scalar = 10;
-
     idx = 0;
-    for (i = 0; i < group_count; i++) {
-        for (j = 0; j < group_size[i]; j++) {
-            int error_mag = tol_scalar * k[i];
-            if (std::is_same_v<Tc, int32_t>)
-                error_mag = 1;
-
+    for (int64_t i = 0; i < group_count; i++) {
+        const int error_mag = 10 * k[i];
+        for (int64_t j = 0; j < group_size[i]; j++) {
             copy_matrix(c_ref_array[idx], layout, oneapi::math::transpose::nontrans, m[i], n[i],
                         ldc[i], c_cast_ref_array[idx]);
             good = good && check_almost_equal_matrix(c_array[idx], c_cast_ref_array[idx], layout,
@@ -348,8 +332,8 @@ int test(device* dev, oneapi::math::layout layout, int64_t group_count) {
     oneapi::math::aligned_free(transb_ref);
     oneapi::math::aligned_free(group_size_ref);
     idx = 0;
-    for (i = 0; i < group_count; i++) {
-        for (j = 0; j < group_size[i]; j++) {
+    for (int64_t i = 0; i < group_count; i++) {
+        for (int64_t j = 0; j < group_size[i]; j++) {
             oneapi::math::free_shared(a_array[idx], cxt);
             oneapi::math::free_shared(b_array[idx], cxt);
             oneapi::math::free_shared(c_array[idx], cxt);
@@ -363,57 +347,30 @@ int test(device* dev, oneapi::math::layout layout, int64_t group_count) {
 
     return (int)good;
 }
-
-class GemmBatchUsmTests
-        : public ::testing::TestWithParam<std::tuple<sycl::device*, oneapi::math::layout>> {};
-
-TEST_P(GemmBatchUsmTests, RealHalfPrecision) {
-    EXPECT_TRUEORSKIP((test<sycl::half, sycl::half, sycl::half, sycl::half>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), 5)));
+#else // ifdef SYCL_EXT_ONEAPI_GRAPH
+template <typename Ta, typename Tb, typename Tc, typename Ts>
+int test(device*, oneapi::math::layout, int64_t, size_t) {
+    // Skip test if graph recording variant and device doesn't support sycl_ext_oneapi_graph
+    return 1;
 }
+#endif
 
-TEST_P(GemmBatchUsmTests, HalfHalfFloatPrecision) {
-    EXPECT_TRUEORSKIP((test<sycl::half, sycl::half, float, float>(std::get<0>(GetParam()),
-                                                                  std::get<1>(GetParam()), 5)));
+struct GraphGemmBatchUsmTests
+        : public ::testing::TestWithParam<std::tuple<sycl::device*, oneapi::math::layout>> {
+    virtual void SetUp() override {
+        // Skip test if graph recording variant and device doesn't support sycl_ext_oneapi_graph
+        CHECK_GRAPH_ON_DEVICE(std::get<0>(GetParam()));
+    }
+};
+
+TEST_P(GraphGemmBatchUsmTests, RealSinglePrecision) {
+    sycl::device* dev = std::get<0>(GetParam());
+    oneapi::math::layout layout = std::get<1>(GetParam());
+    const int64_t group_count = 5;
+    const unsigned graph_nodes = 3;
+    EXPECT_TRUEORSKIP((test<float, float, float, float>(dev, layout, group_count, graph_nodes)));
 }
-
-TEST_P(GemmBatchUsmTests, Int8Int8SinglePrecision) {
-    EXPECT_TRUEORSKIP((test<std::int8_t, std::int8_t, float, float>(std::get<0>(GetParam()),
-                                                                    std::get<1>(GetParam()), 5)));
-}
-
-TEST_P(GemmBatchUsmTests, Int8Int8Int32Precision) {
-    EXPECT_TRUEORSKIP((test<std::int8_t, std::int8_t, std::int32_t, float>(
-        std::get<0>(GetParam()), std::get<1>(GetParam()), 5)));
-}
-
-TEST_P(GemmBatchUsmTests, RealSinglePrecision) {
-    EXPECT_TRUEORSKIP(
-        (test<float, float, float, float>(std::get<0>(GetParam()), std::get<1>(GetParam()), 5)));
-}
-
-TEST_P(GemmBatchUsmTests, RealDoublePrecision) {
-    CHECK_DOUBLE_ON_DEVICE(std::get<0>(GetParam()));
-
-    EXPECT_TRUEORSKIP((
-        test<double, double, double, double>(std::get<0>(GetParam()), std::get<1>(GetParam()), 5)));
-}
-
-TEST_P(GemmBatchUsmTests, ComplexSinglePrecision) {
-    EXPECT_TRUEORSKIP(
-        (test<std::complex<float>, std::complex<float>, std::complex<float>, std::complex<float>>(
-            std::get<0>(GetParam()), std::get<1>(GetParam()), 5)));
-}
-
-TEST_P(GemmBatchUsmTests, ComplexDoublePrecision) {
-    CHECK_DOUBLE_ON_DEVICE(std::get<0>(GetParam()));
-
-    EXPECT_TRUEORSKIP(
-        (test<std::complex<double>, std::complex<double>, std::complex<double>,
-              std::complex<double>>(std::get<0>(GetParam()), std::get<1>(GetParam()), 5)));
-}
-
-INSTANTIATE_TEST_SUITE_P(GemmBatchUsmTestSuite, GemmBatchUsmTests,
+INSTANTIATE_TEST_SUITE_P(GraphGemmBatchUsmTestSuite, GraphGemmBatchUsmTests,
                          ::testing::Combine(testing::ValuesIn(devices),
                                             testing::Values(oneapi::math::layout::col_major,
                                                             oneapi::math::layout::row_major)),

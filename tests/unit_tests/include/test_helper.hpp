@@ -336,24 +336,6 @@ public:
     }
 };
 
-class LayoutGraphDeviceNamePrint {
-public:
-    std::string operator()(
-        testing::TestParamInfo<std::tuple<sycl::device*, oneapi::math::layout, bool>> dev) const {
-        std::string layout_name = std::get<1>(dev.param) == oneapi::math::layout::col_major
-                                      ? "Column_Major"
-                                      : "Row_Major";
-        std::string dev_name = std::get<0>(dev.param)->get_info<sycl::info::device::name>();
-        for (std::string::size_type i = 0; i < dev_name.size(); ++i) {
-            if (!isalnum(dev_name[i]))
-                dev_name[i] = '_';
-        }
-        std::string using_graphs = std::get<2>(dev.param) ? "Graph_" : "";
-        std::string info_name = using_graphs.append((layout_name.append("_")).append(dev_name));
-        return info_name;
-    }
-};
-
 /* to accommodate Windows and Linux differences between alligned_alloc and
    _aligned_malloc calls use oneapi::math::aligned_alloc and oneapi::math::aligned_free instead */
 namespace oneapi {
