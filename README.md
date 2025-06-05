@@ -481,7 +481,7 @@ Supported compilers include:
     - Intel(R) Arc(TM) A-Series Graphics
     - Intel(R) Data Center GPU Max Series
     - NVIDIA(R) A100 and H100 (Linux* only)
-    - AMD(R) GPUs see [here](https://github.com/RadeonOpenCompute/ROCm#hardware-and-software-support) tested on AMD Instinct™ MI210
+    - AMD(R) GPUs see [here](https://rocm.docs.amd.com/projects/install-on-linux/en/latest/reference/system-requirements.html) tested on AMD Instinct™ MI210
     - Other SYCL devices can be used, but are not supported
     
 ---
