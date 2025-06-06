@@ -602,15 +602,13 @@ Product | Supported Version | License
 ---
 
 ## Documentation
-- [Contents](https://uxlfoundation.github.io/oneMath/)
-- [About](https://uxlfoundation.github.io/oneMath/introduction.html)
+- [oneMath Specification](https://oneapi-spec.uxlfoundation.org/specifications/oneapi/latest/elements/onemath/source/)
 - Get Started
   - [Selecting a Compiler](https://uxlfoundation.github.io/oneMath/selecting_a_compiler.html)
   - [Building the Project with DPC++](https://uxlfoundation.github.io/oneMath/building_the_project_with_dpcpp.html)
   - [Building the Project with AdaptiveCpp](https://uxlfoundation.github.io/oneMath/building_the_project_with_adaptivecpp.html)
 - Developer Reference
-  - [oneMath Defined Datatypes](https://uxlfoundation.github.io/oneMath/onemath-datatypes.html)
-  - [Dense Linear Algebra](https://uxlfoundation.github.io/oneMath/domains/dense_linear_algebra.html)
+  - [Sparse Linear Algebra](https://uxlfoundation.github.io/oneMath/domains/sparse_linear_algebra.html)
 - [Integrating a Third-Party Library](https://uxlfoundation.github.io/oneMath/create_new_backend.html)
 
 ---
