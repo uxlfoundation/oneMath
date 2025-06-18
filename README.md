@@ -609,7 +609,7 @@ Product | Supported Version | License
   - [Building the Project with AdaptiveCpp](https://uxlfoundation.github.io/oneMath/building_the_project_with_adaptivecpp.html)
 - Developer Reference
   - [Sparse Linear Algebra](https://uxlfoundation.github.io/oneMath/domains/sparse_linear_algebra.html)
-- [Integrating a Third-Party Library](https://uxlfoundation.github.io/oneMath/create_new_backend.html)
+  - [Integrating a Third-Party Library](https://uxlfoundation.github.io/oneMath/create_new_backend.html)
 
 ---
 
