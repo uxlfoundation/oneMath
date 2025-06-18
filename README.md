@@ -607,6 +607,8 @@ Product | Supported Version | License
   - [Selecting a Compiler](https://uxlfoundation.github.io/oneMath/selecting_a_compiler.html)
   - [Building the Project with DPC++](https://uxlfoundation.github.io/oneMath/building_the_project_with_dpcpp.html)
   - [Building the Project with AdaptiveCpp](https://uxlfoundation.github.io/oneMath/building_the_project_with_adaptivecpp.html)
+  - [Building and Running Tests](https://uxlfoundation.github.io/oneMath/building_and_running_tests.html)
+  - [Using oneMath in your project with CMake](https://uxlfoundation.github.io/oneMath/using_onemath_with_cmake.html)
 - Developer Reference
   - [Sparse Linear Algebra](https://uxlfoundation.github.io/oneMath/domains/sparse_linear_algebra.html)
   - [Integrating a Third-Party Library](https://uxlfoundation.github.io/oneMath/create_new_backend.html)
