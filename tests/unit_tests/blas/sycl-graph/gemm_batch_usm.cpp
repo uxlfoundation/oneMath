@@ -358,8 +358,18 @@ int test(device*, oneapi::math::layout, int64_t, size_t) {
 struct GraphGemmBatchUsmTests
         : public ::testing::TestWithParam<std::tuple<sycl::device*, oneapi::math::layout>> {
     virtual void SetUp() override {
+        auto device = std::get<0>(GetParam());
+        if (device->get_backend() == sycl::backend::opencl) {
+            GTEST_SKIP() << "Test not yet supported on OpenCL";
+        }
+#if SYCL_EXT_ONEAPI_BACKEND_HIP
+        if (device->get_backend() == sycl::backend::ext_oneapi_hip) {
+            GTEST_SKIP() << "Test not yet supported on HIP";
+        }
+#endif
+
         // Skip test if graph recording variant and device doesn't support sycl_ext_oneapi_graph
-        CHECK_GRAPH_ON_DEVICE(std::get<0>(GetParam()));
+        CHECK_GRAPH_ON_DEVICE(device);
     }
 };
 
