@@ -1,0 +1,341 @@
+diff -Naur config.orig/templates/clang/llvm/clang_llvm_switches.dat config/templates/clang/llvm/clang_llvm_switches.dat
+--- config.orig/templates/clang/llvm/clang_llvm_switches.dat	2024-12-19 11:37:23.246903941 -0800
++++ config/templates/clang/llvm/clang_llvm_switches.dat	2024-12-19 11:40:32.106018314 -0800
+@@ -13,6 +13,7 @@
+ {"c",oa_dash_dash|oa_copy|oa_copy_c_only},
+ {"c++",oa_dash_dash|oa_copy|oa_copy_cxx_only},
+ {"coverity_source",oa_dash|oa_equal|oa_copy},
++{"coverity_c_suffixes_are_cxx", oa_dash|oa_copy},
+ {"objc",oa_dash_dash|oa_copy},
+ {"objc++",oa_dash_dash|oa_copy},
+ {"ffixed-point-in-cpp",oa_dash|oa_copy},
+diff -Naur config.orig/templates/clang/llvm/compiler-compat-clang-common.h config/templates/clang/llvm/compiler-compat-clang-common.h
+--- config.orig/templates/clang/llvm/compiler-compat-clang-common.h	2024-12-19 11:37:23.247903958 -0800
++++ config/templates/clang/llvm/compiler-compat-clang-common.h	2024-12-19 11:37:23.264904238 -0800
+@@ -20581,3 +20581,12 @@
+ /* Added in android r27 (based on clang 18.0), renamed by clang 18.1 */
+ /* } */
+ #endif
++
++#if defined(_MSC_EXTENSIONS)
++// Workaround for a crash in cov-internal-emit-clang that occurs when
++// a template parameter that was initialized with a _uuidof or __uuidof
++// expression is referenced.
++extern const struct _GUID coverity_guid;
++#define __uuidof(X) coverity_guid
++#define _uuidof(X) coverity_guid
++#endif
+diff -Naur config.orig/templates/intel_oneapi_linux/compiler-compat-intel-oneapi-linux-common.h config/templates/intel_oneapi_linux/compiler-compat-intel-oneapi-linux-common.h
+--- config.orig/templates/intel_oneapi_linux/compiler-compat-intel-oneapi-linux-common.h	2024-12-19 11:37:23.253904057 -0800
++++ config/templates/intel_oneapi_linux/compiler-compat-intel-oneapi-linux-common.h	2024-12-19 11:38:31.283025888 -0800
+@@ -79,3 +79,8 @@
+ int __builtin_isnanf (float);
+ int __builtin_isnanl (long double);
+ #endif // __clang_major__ == 14
++
++#if defined(COVERITY_EXTENDED_FLOAT_TYPES)
++// Support for the Intel _Quad type enabled by '-Xclang --extended_float_types'
++#define _Quad __float128
++#endif
+diff -Naur config.orig/templates/intel_oneapi_linux/intel_oneapi_linux_compilers.cpp config/templates/intel_oneapi_linux/intel_oneapi_linux_compilers.cpp
+--- config.orig/templates/intel_oneapi_linux/intel_oneapi_linux_compilers.cpp	2024-12-19 11:37:23.253904057 -0800
++++ config/templates/intel_oneapi_linux/intel_oneapi_linux_compilers.cpp	2024-12-19 11:40:32.107018331 -0800
+@@ -83,6 +83,47 @@
+                    mopt.extra_arg == "treelang")
+         {
+             out.push_back("-coverity_source=skip");
++        } else if (mopt.extra_arg == "ALDERLAKE"                ||
++                   mopt.extra_arg == "AMBERLAKE"                ||
++                   mopt.extra_arg == "BROADWELL"                ||
++                   mopt.extra_arg == "CANNONLAKE"               ||
++                   mopt.extra_arg == "CASCADELAKE"              ||
++                   mopt.extra_arg == "COFFEELAKE"               ||
++                   mopt.extra_arg == "COOPERLAKE"               ||
++                   mopt.extra_arg == "GOLDMONT"                 ||
++                   mopt.extra_arg == "GOLDMONT-PLUS"            ||
++                   mopt.extra_arg == "HASWELL"                  ||
++                   mopt.extra_arg == "ICELAKE"                  ||
++                   mopt.extra_arg == "ICELAKE-CLIENT"           ||
++                   mopt.extra_arg == "ICELAKE-SERVER"           ||
++                   mopt.extra_arg == "IVYBRIDGE"                ||
++                   mopt.extra_arg == "KABYLAKE"                 ||
++                   mopt.extra_arg == "ROCKETLAKE"               ||
++                   mopt.extra_arg == "SANDYBRIDGE"              ||
++                   mopt.extra_arg == "SAPPHIRERAPIDS"           ||
++                   mopt.extra_arg == "SILVERMONT"               ||
++                   mopt.extra_arg == "SKYLAKE"                  ||
++                   mopt.extra_arg == "SKYLAKE-AVX512"           ||
++                   mopt.extra_arg == "TIGERLAKE"                ||
++                   mopt.extra_arg == "TREMONT"                  ||
++                   mopt.extra_arg == "WHISKEYLAKE"              ||
++                   mopt.extra_arg == "COMMON-AVX512"            ||
++                   mopt.extra_arg == "CORE-AVX512"              ||
++                   mopt.extra_arg == "CORE-AVX2"                ||
++                   mopt.extra_arg == "CORE-AVX-I"               ||
++                   mopt.extra_arg == "AVX"                      ||
++                   mopt.extra_arg == "SSE4.2"                   ||
++                   mopt.extra_arg == "SSE4.1"                   ||
++                   mopt.extra_arg == "ATOM_SSE4.2"              ||
++                   mopt.extra_arg == "ATOM_SSSE3"               ||
++                   mopt.extra_arg == "SSSE3"                    ||
++                   mopt.extra_arg == "SSE3"                     ||
++                   mopt.extra_arg == "SSE2") {
++            // Ignore. These arguments may be present for Intel'x icx compiler
++            // where they are used to specify a target instruction set rather
++            // than a source language. Since they affect predefined macros,
++            // these forms of the option are separately specified as
++            // oa_required in the switch definition file.
+         } else {
+             cerr << "[Warning] Skipping unrecognized source language type: '-x "
+                  << mopt.extra_arg << "'" << endl;
+diff -Naur config.orig/templates/intel_oneapi_linux/intel_oneapi_linux_preprocessor_switches.dat config/templates/intel_oneapi_linux/intel_oneapi_linux_preprocessor_switches.dat
+--- config.orig/templates/intel_oneapi_linux/intel_oneapi_linux_preprocessor_switches.dat	2024-12-19 11:37:23.253904057 -0800
++++ config/templates/intel_oneapi_linux/intel_oneapi_linux_preprocessor_switches.dat	2024-12-19 11:38:31.283025888 -0800
+@@ -21,3 +21,4 @@
+ {"setup-static-analyzer", oa_dash|oa_copy|oa_required},
+ {"stack-protector", oa_dash|oa_unattached|oa_copy|oa_required},
+ {"undef", oa_dash|oa_copy|oa_required},
++{"extended_float_types", oa_dash_dash|oa_required|oa_map, "DCOVERITY_EXTENDED_FLOAT_TYPES", oa_dash|oa_discard_prefix},
+diff -Naur config.orig/templates/intel_oneapi_linux/intel_oneapi_linux_switches.dat config/templates/intel_oneapi_linux/intel_oneapi_linux_switches.dat
+--- config.orig/templates/intel_oneapi_linux/intel_oneapi_linux_switches.dat	2024-12-19 11:37:23.253904057 -0800
++++ config/templates/intel_oneapi_linux/intel_oneapi_linux_switches.dat	2024-12-19 11:41:06.506585595 -0800
+@@ -11,7 +11,11 @@
+ {"Kc++", oa_dash},
+ {"Qinstall", oa_dash|oa_attached|oa_required},
+ {"Qlocation,", oa_dash|oa_attached|oa_required},
+-{"Qoption,", oa_dash|oa_attached|oa_required},
++{"Qoption,", oa_dash|oa_attached},
++{"Qoption,c,", oa_dash|oa_attached|oa_split","|oa_alternate_table, "preprocessor", oa_append},
++{"Qoption,cpp,", oa_dash|oa_attached|oa_split","|oa_alternate_table, "preprocessor", oa_append},
++{"Rdebug-disables-optimization", oa_dash},
++{"Rno-debug-disables-optimization", oa_dash},
+ {"Wdeprecated", oa_dash|oa_map, "coverity_cxx_switch,-D__DEPRECATED", oa_dash},
+ {"Wno-deprecated", oa_dash|oa_map, "coverity_cxx_switch,-U__DEPRECATED", oa_dash},
+ {"Wno-sycl-strict", oa_dash},
+@@ -162,3 +166,40 @@
+ {"w4", oa_dash},
+ {"w5", oa_dash},
+ {"watch", oa_dash|oa_equal},
++{"wr", oa_dash|oa_attached},
++{"xALDERLAKE", oa_dash|oa_custom|oa_required},
++{"xAMBERLAKE", oa_dash|oa_custom|oa_required},
++{"xBROADWELL", oa_dash|oa_custom|oa_required},
++{"xCANNONLAKE", oa_dash|oa_custom|oa_required},
++{"xCASCADELAKE", oa_dash|oa_custom|oa_required},
++{"xCOFFEELAKE", oa_dash|oa_custom|oa_required},
++{"xCOOPERLAKE", oa_dash|oa_custom|oa_required},
++{"xGOLDMONT", oa_dash|oa_custom|oa_required},
++{"xGOLDMONT-PLUS", oa_dash|oa_custom|oa_required},
++{"xHASWELL", oa_dash|oa_custom|oa_required},
++{"xICELAKE", oa_dash|oa_custom|oa_required},
++{"xICELAKE-CLIENT", oa_dash|oa_custom|oa_required},
++{"xICELAKE-SERVER", oa_dash|oa_custom|oa_required},
++{"xIVYBRIDGE", oa_dash|oa_custom|oa_required},
++{"xKABYLAKE", oa_dash|oa_custom|oa_required},
++{"xROCKETLAKE", oa_dash|oa_custom|oa_required},
++{"xSANDYBRIDGE", oa_dash|oa_custom|oa_required},
++{"xSAPPHIRERAPIDS", oa_dash|oa_custom|oa_required},
++{"xSILVERMONT", oa_dash|oa_custom|oa_required},
++{"xSKYLAKE", oa_dash|oa_custom|oa_required},
++{"xSKYLAKE-AVX512", oa_dash|oa_custom|oa_required},
++{"xTIGERLAKE", oa_dash|oa_custom|oa_required},
++{"xTREMONT", oa_dash|oa_custom|oa_required},
++{"xWHISKEYLAKE", oa_dash|oa_custom|oa_required},
++{"xCOMMON-AVX512", oa_dash|oa_custom|oa_required},
++{"xCORE-AVX512", oa_dash|oa_custom|oa_required},
++{"xCORE-AVX2", oa_dash|oa_custom|oa_required},
++{"xCORE-AVX-I", oa_dash|oa_custom|oa_required},
++{"xAVX", oa_dash|oa_custom|oa_required},
++{"xSSE4.2", oa_dash|oa_custom|oa_required},
++{"xSSE4.1", oa_dash|oa_custom|oa_required},
++{"xATOM_SSE4.2", oa_dash|oa_custom|oa_required},
++{"xATOM_SSSE3", oa_dash|oa_custom|oa_required},
++{"xSSSE3", oa_dash|oa_custom|oa_required},
++{"xSSE3", oa_dash|oa_custom|oa_required},
++{"xSSE2", oa_dash|oa_custom|oa_required},
+diff -Naur config.orig/templates/intel_oneapi_linux/nosycl/intel_oneapi_linux_nosycl_config.xml config/templates/intel_oneapi_linux/nosycl/intel_oneapi_linux_nosycl_config.xml
+--- config.orig/templates/intel_oneapi_linux/nosycl/intel_oneapi_linux_nosycl_config.xml	2024-12-19 11:37:23.253904057 -0800
++++ config/templates/intel_oneapi_linux/nosycl/intel_oneapi_linux_nosycl_config.xml	2024-12-19 11:40:32.107018331 -0800
+@@ -195,12 +195,15 @@
+ 
+         <pre_trans>
+           <options>
+-            <intern_trans>intel_oneapi_linux_nosycl_pre_translate</intern_trans>
++            <extern_trans>
++              <extern_trans_path>$CONFIGDIR$/templates/intel_oneapi_linux/nosycl_translator</extern_trans_path>
++            </extern_trans>
+           </options>
+         </pre_trans>
+ 
+         <prepend_arg>-fdeclspec</prepend_arg>
+         <prepend_arg>-fpack-struct=16</prepend_arg>
++        <prepend_arg>-mavx512fp16</prepend_arg>
+       </options>
+ 
+     </build>
+diff -Naur config.orig/templates/intel_oneapi_linux/sycl/compiler-compat-intel-oneapi-linux-sycl.h config/templates/intel_oneapi_linux/sycl/compiler-compat-intel-oneapi-linux-sycl.h
+--- config.orig/templates/intel_oneapi_linux/sycl/compiler-compat-intel-oneapi-linux-sycl.h	2024-12-19 11:37:23.253904057 -0800
++++ config/templates/intel_oneapi_linux/sycl/compiler-compat-intel-oneapi-linux-sycl.h	2024-12-19 11:37:48.168314907 -0800
+@@ -3,7 +3,6 @@
+ // For device side.
+ #ifdef __SYCL_DEVICE_ONLY__
+ 
+-#define _Float16 __fp16
+ typedef void* __ocl_event_t;
+ typedef void* __ocl_sampler_t;
+ class __ocl_image1d_ro_t;
+diff -Naur config.orig/templates/intel_oneapi_linux/sycl/intel_oneapi_linux_sycl_config.xml config/templates/intel_oneapi_linux/sycl/intel_oneapi_linux_sycl_config.xml
+--- config.orig/templates/intel_oneapi_linux/sycl/intel_oneapi_linux_sycl_config.xml	2024-12-19 11:37:23.253904057 -0800
++++ config/templates/intel_oneapi_linux/sycl/intel_oneapi_linux_sycl_config.xml	2024-12-19 11:40:32.107018331 -0800
+@@ -297,11 +297,14 @@
+ 
+         <pre_trans>
+           <options>
+-            <intern_trans>intel_oneapi_linux_sycl_pre_translate</intern_trans>
++            <extern_trans>
++              <extern_trans_path>$CONFIGDIR$/templates/intel_oneapi_linux/sycl_translator</extern_trans_path>
++            </extern_trans>
+           </options>
+         </pre_trans>
+ 
+         <prepend_arg>-fpack-struct=16</prepend_arg>
++        <prepend_arg>-mavx512fp16</prepend_arg>
+ 
+         <option_group>
+           <applies_to>intel_icx_host:linux_sycl,intel_icpx_host:linux_sycl,intel_dpcpp_host:linux_sycl</applies_to>
+diff -Naur config.orig/templates/intel_oneapi_windows/compiler-compat-intel-oneapi-windows-common.h config/templates/intel_oneapi_windows/compiler-compat-intel-oneapi-windows-common.h
+--- config.orig/templates/intel_oneapi_windows/compiler-compat-intel-oneapi-windows-common.h	2024-12-19 11:37:23.253904057 -0800
++++ config/templates/intel_oneapi_windows/compiler-compat-intel-oneapi-windows-common.h	2024-12-19 11:39:17.034780355 -0800
+@@ -79,3 +79,64 @@
+ int __builtin_isnanf (float);
+ int __builtin_isnanl (long double);
+ #endif // __clang_major__ == 14
++
++#if defined(__SIZEOF_FLOAT128__)
++// Support for the __float128 type is enabled by default in C and when the
++// Clang --extended_float_types option is enabled for C++.
++// The __SIZEOF_FLOAT128__ macro is used as a proxy for when the __float128
++// type is expected to be available.
++#if defined(__cplusplus)
++// In C++, a unique type is needed for function overloading and template
++// specialization.
++struct coverity_float128 {
++  coverity_float128();
++  template<typename T>
++  coverity_float128(T);
++  operator bool() const;
++  friend bool operator==(coverity_float128, coverity_float128);
++  friend bool operator!=(coverity_float128, coverity_float128);
++  friend bool operator<(coverity_float128, coverity_float128);
++  friend bool operator<=(coverity_float128, coverity_float128);
++  friend bool operator>(coverity_float128, coverity_float128);
++  friend bool operator>=(coverity_float128, coverity_float128);
++  friend coverity_float128 operator!(coverity_float128);
++  friend coverity_float128 operator+(coverity_float128);
++  friend coverity_float128 operator-(coverity_float128);
++  friend coverity_float128 operator~(coverity_float128);
++  friend coverity_float128 operator++(coverity_float128);
++  friend coverity_float128 operator++(coverity_float128, int);
++  friend coverity_float128 operator--(coverity_float128);
++  friend coverity_float128 operator--(coverity_float128, int);
++  friend coverity_float128 operator+(coverity_float128, coverity_float128);
++  friend coverity_float128 operator-(coverity_float128, coverity_float128);
++  friend coverity_float128 operator*(coverity_float128, coverity_float128);
++  friend coverity_float128 operator/(coverity_float128, coverity_float128);
++  friend coverity_float128 operator%(coverity_float128, coverity_float128);
++  friend coverity_float128 operator&(coverity_float128, coverity_float128);
++  friend coverity_float128 operator|(coverity_float128, coverity_float128);
++  friend coverity_float128 operator^(coverity_float128, coverity_float128);
++  friend coverity_float128 operator<<(coverity_float128, int);
++  friend coverity_float128 operator>>(coverity_float128, int);
++  friend coverity_float128 operator+=(coverity_float128, coverity_float128);
++  friend coverity_float128 operator-=(coverity_float128, coverity_float128);
++  friend coverity_float128 operator*=(coverity_float128, coverity_float128);
++  friend coverity_float128 operator/=(coverity_float128, coverity_float128);
++  friend coverity_float128 operator%=(coverity_float128, coverity_float128);
++  friend coverity_float128 operator&=(coverity_float128, coverity_float128);
++  friend coverity_float128 operator|=(coverity_float128, coverity_float128);
++  friend coverity_float128 operator^=(coverity_float128, coverity_float128);
++  friend coverity_float128 operator<<=(coverity_float128, int);
++  friend coverity_float128 operator>>=(coverity_float128, int);
++};
++#define __float128 coverity_float128
++#else
++// In C, just alias another type. Failures may still occur if __float128
++// is used in a _Generic expression.
++#define __float128 long double
++#endif
++#endif
++
++#if defined(COVERITY_EXTENDED_FLOAT_TYPES)
++// Support for the Intel _Quad type enabled by '-Xclang --extended_float_types'
++#define _Quad __float128
++#endif
+diff -Naur config.orig/templates/intel_oneapi_windows/intel_oneapi_windows_switches.dat config/templates/intel_oneapi_windows/intel_oneapi_windows_switches.dat
+--- config.orig/templates/intel_oneapi_windows/intel_oneapi_windows_switches.dat	2024-12-19 11:37:23.253904057 -0800
++++ config/templates/intel_oneapi_windows/intel_oneapi_windows_switches.dat	2024-12-19 11:38:15.614767511 -0800
+@@ -42,6 +42,8 @@
+ {"Qbranches-within-32B-boundaries", oa_dash|oa_slash},
+ {"Qbranches-within-32B-boundaries-", oa_dash|oa_slash},
+ {"Qcf-protection", oa_dash|oa_slash|oa_map, "D__CET__=3", oa_dash},
++{"Qcf-protection:", oa_dash|oa_slash|oa_attached|oa_required},
++{"Qcf-protection=", oa_dash|oa_slash|oa_attached|oa_required},
+ {"Qcommon", oa_dash|oa_slash},
+ {"Qcommon-", oa_dash|oa_slash},
+ {"Qconditional-branch:", oa_dash|oa_slash|oa_attached},
+@@ -56,6 +58,7 @@
+ {"Qfnalign", oa_dash|oa_slash},
+ {"Qfnalign-", oa_dash|oa_slash},
+ {"Qfp-speculation:", oa_dash|oa_slash|oa_attached|oa_required},
++{"Qfp-speculation=", oa_dash|oa_slash|oa_attached|oa_required},
+ {"Qfreestanding", oa_dash|oa_slash|oa_map, "D__STDC_HOSTED__=0", oa_dash},
+ {"Qftz", oa_dash|oa_slash},
+ {"Qftz-", oa_dash|oa_slash},
+@@ -121,7 +124,9 @@
+ {"Qopt-multiple-gather-scatter-by-shuffles-", oa_dash|oa_slash},
+ {"Qopt-report", oa_dash|oa_slash|oa_equal|oa_optional|oa_required},
+ {"Qopt-report:", oa_dash|oa_slash|oa_attached},
+-{"Qoption,", oa_dash|oa_slash|oa_attached|oa_required},
++{"Qoption,", oa_dash|oa_slash|oa_attached},
++{"Qoption,c,", oa_dash|oa_slash|oa_attached|oa_split","|oa_alternate_table, "preprocessor", oa_append},
++{"Qoption,cpp,", oa_dash|oa_slash|oa_attached|oa_split","|oa_alternate_table, "preprocessor", oa_append},
+ {"Qoverride-limits", oa_dash|oa_slash},
+ {"Qparallel-source-info-", oa_dash|oa_slash},
+ {"Qpatchable-addresses", oa_dash|oa_slash},
+diff -Naur config.orig/templates/intel_oneapi_windows/nosycl/intel_oneapi_windows_nosycl_config.xml config/templates/intel_oneapi_windows/nosycl/intel_oneapi_windows_nosycl_config.xml
+--- config.orig/templates/intel_oneapi_windows/nosycl/intel_oneapi_windows_nosycl_config.xml	2024-12-19 11:37:23.253904057 -0800
++++ config/templates/intel_oneapi_windows/nosycl/intel_oneapi_windows_nosycl_config.xml	2024-12-19 11:38:24.156908375 -0800
+@@ -168,6 +170,14 @@
+               <replace>@(.*)</replace>
+               <with>--coverity_resp_file=$1</with>
+             </replace_arg_regex>
++            <replace_arg_regex>
++              <replace>/Qstd=(.*)</replace>
++              <with>/Qstd:$1</with>
++            </replace_arg_regex>
++            <replace_arg_regex>
++              <replace>-Qstd=(.*)</replace>
++              <with>-Qstd:$1</with>
++            </replace_arg_regex>
+             <response_file_strip_poundsign_comments>true</response_file_strip_poundsign_comments>
+           </options>
+         </expand>
+@@ -180,6 +190,7 @@
+ 
+         <prepend_arg>-fms-extensions</prepend_arg>
+         <prepend_arg>-fpack-struct=16</prepend_arg>
++        <prepend_arg>-mavx512fp16</prepend_arg>
+         <!-- Workaround for __builtin_bit_cast(_To, __from),
+              when /Qstd:gnu++98 or /Qstd:gnu++03 is in command line,
+              and _To has no default constructor. -->
+diff -Naur config.orig/templates/intel_oneapi_windows/sycl/compiler-compat-intel-oneapi-windows-sycl.h config/templates/intel_oneapi_windows/sycl/compiler-compat-intel-oneapi-windows-sycl.h
+--- config.orig/templates/intel_oneapi_windows/sycl/compiler-compat-intel-oneapi-windows-sycl.h	2024-12-19 11:37:23.253904057 -0800
++++ config/templates/intel_oneapi_windows/sycl/compiler-compat-intel-oneapi-windows-sycl.h	2024-12-19 11:37:48.168314907 -0800
+@@ -3,7 +3,6 @@
+ // For device side.
+ #ifdef __SYCL_DEVICE_ONLY__
+ 
+-#define _Float16 __fp16
+ typedef void* __ocl_event_t;
+ typedef void* __ocl_sampler_t;
+ class __ocl_image1d_ro_t;
