@@ -330,7 +330,7 @@ Supported compilers include:
             <td align="center">Dynamic, Static</td>
         </tr>
         <tr>
-            <td rowspan=9 align="center">DFT</td>
+            <td rowspan=10 align="center">DFT</td>
             <td rowspan=2 align="center">x86 CPU</td>
             <td align="center">Intel(R) oneMKL</td>
             <td align="center">Intel DPC++</td>
@@ -339,6 +339,12 @@ Supported compilers include:
         <tr>
             <td align="center">portFFT (<a href="https://github.com/codeplaysoftware/portFFT#supported-configurations">limited API support</a>)</td>
             <td align="center">Intel DPC++</td>
+            <td align="center">Dynamic, Static</td>
+        </tr>
+        <tr>
+            <td align="center">aarch64 CPU</td>
+            <td align="center">Arm Performance Libraries</td>
+            <td align="center">Open DPC++</br>AdaptiveCpp</td>
             <td align="center">Dynamic, Static</td>
         </tr>
         <tr>
