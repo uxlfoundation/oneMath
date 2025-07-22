@@ -50,7 +50,8 @@ int DFT_Test<precision, domain>::test_out_of_place_real_real_USM() {
         try {
             commit_descriptor(descriptor, sycl_queue);
         }
-        catch (...) { //BACKWARD_SCALE not supported, go with 1 and scale at check
+        catch (oneapi::math::unimplemented&) {
+            //BACKWARD_SCALE not supported, go with 1 and scale at check
             descriptor.set_value(oneapi::math::dft::config_param::BACKWARD_SCALE, 1.f);
             commit_descriptor(descriptor, sycl_queue);
             scale_at_check = true;
@@ -131,7 +132,8 @@ int DFT_Test<precision, domain>::test_out_of_place_real_real_buffer() {
         try {
             commit_descriptor(descriptor, sycl_queue);
         }
-        catch (...) { //BACKWARD_SCALE not supported, go with 1 and scale at check
+        catch (oneapi::math::unimplemented&) {
+            //BACKWARD_SCALE not supported, go with 1 and scale at check
             descriptor.set_value(oneapi::math::dft::config_param::BACKWARD_SCALE, 1.f);
             commit_descriptor(descriptor, sycl_queue);
             scale_at_check = true;
