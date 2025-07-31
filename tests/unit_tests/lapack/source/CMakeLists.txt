@@ -86,7 +86,7 @@ if(BUILD_SHARED_LIBS)
       PUBLIC ${CMAKE_BINARY_DIR}/bin
       $<$<BOOL:${LAPACKE_FOUND}>:${LAPACKE_INCLUDE}>
   )
-  if (USE_ADD_SYCL_TO_TARGET_INTEGRATION)
+  if(USE_ADD_SYCL_TO_TARGET_INTEGRATION)
     add_sycl_to_target(TARGET lapack_source_rt SOURCES ${LAPACK_SOURCES})
   else()
     target_link_libraries(lapack_source_rt PUBLIC ONEMATH::SYCL::SYCL)
@@ -103,8 +103,8 @@ target_include_directories(lapack_source_ct
     PUBLIC ${CMAKE_BINARY_DIR}/bin
     $<$<BOOL:${LAPACKE_FOUND}>:${LAPACKE_INCLUDE}>
 )
-if (USE_ADD_SYCL_TO_TARGET_INTEGRATION)
-	add_sycl_to_target(TARGET lapack_source_ct SOURCES ${LAPACK_SOURCES})
+if(USE_ADD_SYCL_TO_TARGET_INTEGRATION)
+  add_sycl_to_target(TARGET lapack_source_ct SOURCES ${LAPACK_SOURCES})
 else()
   target_link_libraries(lapack_source_ct PUBLIC ONEMATH::SYCL::SYCL)
 endif()

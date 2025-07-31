@@ -24,10 +24,7 @@ if(("blas" IN_LIST TEST_TARGET_DOMAINS) OR ("lapack" IN_LIST TEST_TARGET_DOMAINS
   if(NOT CBLAS_FOUND)
     # TODO: add list of tests without Netlib dependency
     message(WARNING "Netlib CBLAS headers or libraries are not found, BLAS/LAPACK unit tests will be skipped")
-    list(REMOVE_ITEM TEST_TARGET_DOMAINS "blas")
-    if  ("lapack" IN_LIST TEST_TARGET_DOMAINS)
-      list(REMOVE_ITEM TEST_TARGET_DOMAINS "lapack")
-    endif()
+    list(REMOVE_ITEM TEST_TARGET_DOMAINS "blas" "lapack")
   endif()
 endif()
 

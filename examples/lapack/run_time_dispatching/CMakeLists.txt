@@ -46,7 +46,7 @@ set(EXAMPLE_TARGET example_lapack_getrs_usm)
 add_executable(${EXAMPLE_TARGET} getrs_usm.cpp)
 
 # May be needed to compile source files with SYCL kernels
-if (USE_ADD_SYCL_TO_TARGET_INTEGRATION)
+if(USE_ADD_SYCL_TO_TARGET_INTEGRATION)
   add_sycl_to_target(TARGET ${EXAMPLE_TARGET} SOURCES getrs_usm.cpp)
 endif()
 
