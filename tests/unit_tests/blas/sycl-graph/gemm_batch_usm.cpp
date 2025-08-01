@@ -368,6 +368,14 @@ struct GraphGemmBatchUsmTests
         }
 #endif
 
+#if SYCL_EXT_ONEAPI_BACKEND_LEVEL_ZERO
+        // https://github.com/uxlfoundation/oneMath/issues/703
+        // Failing tests reported on PVC that needs investigated
+        if (device->get_backend() == sycl::backend::ext_oneapi_level_zero) {
+            GTEST_SKIP() << "Test disabled on Level-Zero";
+        }
+#endif
+
         // Skip test if graph recording variant and device doesn't support sycl_ext_oneapi_graph
         CHECK_GRAPH_ON_DEVICE(device);
     }
