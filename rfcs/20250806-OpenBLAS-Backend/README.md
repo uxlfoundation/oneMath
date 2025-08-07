@@ -22,7 +22,7 @@ Users will face reduced performance, limited portability, and continued reliance
 
 ### What is the timeline?
 
-Implementation, build system integration, and testing are targeted for completion within 6 months, with initial focus on BLAS functionality and support across ParaS, AdaptiveCpp, and DPCPP Compilers.
+Implementation, build system integration, and testing are targeted for completion within 6 months, with initial focus on BLAS functionality and support across ParaS, AdaptiveCpp, and DPC++ Compilers.
 
 
 ## Outline
