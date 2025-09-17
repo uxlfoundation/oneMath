@@ -43,6 +43,15 @@ target_include_directories(${LIB_OBJ}
 
 target_compile_options(${LIB_OBJ} PRIVATE ${ONEMATH_BUILD_COPT})
 
+if(NOT ${ONEMATH_SYCL_IMPLEMENTATION} STREQUAL "adaptivecpp")
+  if(DEFINED CUDA_TARGETS)
+    target_compile_options(ONEMATH::SYCL::SYCL INTERFACE
+      -Xsycl-target-backend --cuda-gpu-arch=${CUDA_TARGETS})
+    target_link_options(ONEMATH::SYCL::SYCL INTERFACE
+      -Xsycl-target-backend --cuda-gpu-arch=${CUDA_TARGETS})
+  endif()
+endif()
+
 if (${CMAKE_VERSION} VERSION_LESS "3.17.0")
   find_package(CUDA 12.2 REQUIRED)
   target_include_directories(${LIB_OBJ} PRIVATE ${CUDA_INCLUDE_DIRS})

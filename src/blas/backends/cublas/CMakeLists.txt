@@ -42,11 +42,14 @@ target_include_directories(${LIB_OBJ}
 target_compile_options(${LIB_OBJ} PRIVATE ${ONEMATH_BUILD_COPT})
 
 if(NOT ${ONEMATH_SYCL_IMPLEMENTATION} STREQUAL "adaptivecpp")
+  if(DEFINED CUDA_TARGETS)
     target_compile_options(ONEMATH::SYCL::SYCL INTERFACE
-          -fsycl-targets=nvptx64-nvidia-cuda -fsycl-unnamed-lambda)
+      -Xsycl-target-backend --cuda-gpu-arch=${CUDA_TARGETS})
     target_link_options(ONEMATH::SYCL::SYCL INTERFACE
-          -fsycl-targets=nvptx64-nvidia-cuda)
+      -Xsycl-target-backend --cuda-gpu-arch=${CUDA_TARGETS})
+  endif()
 endif()
+
 target_link_libraries(${LIB_OBJ} PUBLIC ONEMATH::SYCL::SYCL ONEMATH::cuBLAS::cuBLAS)
 target_compile_features(${LIB_OBJ} PUBLIC cxx_std_11)
 set_target_properties(${LIB_OBJ} PROPERTIES

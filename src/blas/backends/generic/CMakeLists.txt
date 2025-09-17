@@ -82,11 +82,11 @@ if(GENERIC_BLAS_TUNING_TARGET)
         -fsycl-targets=nvptx64-nvidia-cuda -fsycl-unnamed-lambda)
       target_link_options(ONEMATH::SYCL::SYCL INTERFACE
         -fsycl-targets=nvptx64-nvidia-cuda)
-      if(DEFINED CUDA_TARGET)
+      if(DEFINED CUDA_TARGETS)
         target_compile_options(ONEMATH::SYCL::SYCL INTERFACE
-          -Xsycl-target-backend --cuda-gpu-arch=${CUDA_TARGET})
+          -Xsycl-target-backend --cuda-gpu-arch=${CUDA_TARGETS})
         target_link_options(ONEMATH::SYCL::SYCL INTERFACE
-          -Xsycl-target-backend --cuda-gpu-arch=${CUDA_TARGET})
+          -Xsycl-target-backend --cuda-gpu-arch=${CUDA_TARGETS})
       endif()
     else()
       message(WARNING "Compiler is not supported."

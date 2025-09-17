@@ -70,6 +70,7 @@ option(ENABLE_CUSPARSE_BACKEND "Enable the cuSPARSE backend for the SPARSE_BLAS 
 option(ENABLE_ROCSPARSE_BACKEND "Enable the rocSPARSE backend for the SPARSE_BLAS interface" OFF)
 
 set(ONEMATH_SYCL_IMPLEMENTATION "dpc++" CACHE STRING "Name of the SYCL compiler")
+set(CUDA_TARGETS "" CACHE STRING "Target CUDA architectures")
 set(HIP_TARGETS "" CACHE STRING "Target HIP architectures")
 
 ## Testing
