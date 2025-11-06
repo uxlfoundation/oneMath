@@ -55,13 +55,14 @@ jobs:
 
       - name: Install Intel compiler
         run: |
-          wget --progress=dot:giga https://registrationcenter-download.intel.com/akdlm/IRC_NAS/39c79383-66bf-4f44-a6dd-14366e34e255/intel-dpcpp-cpp-compiler-2025.2.0.527_offline.sh
-          sudo bash intel-dpcpp-cpp-compiler-2025.2.0.527_offline.sh -s -a -s --action install --eula accept
+          wget --progress=dot:giga https://registrationcenter-download.intel.com/akdlm/IRC_NAS/5adfc398-db78-488c-b98f-78461b3c5760/intel-dpcpp-cpp-compiler-2025.3.1.16_offline.sh
+          sudo bash intel-dpcpp-cpp-compiler-2025.3.1.16_offline.sh -s -a -s --action install --eula accept
+
 
       - name: Install Intel oneMKL
         run: |
-          wget --progress=dot:giga https://registrationcenter-download.intel.com/akdlm/IRC_NAS/47c7d946-fca1-441a-b0df-b094e3f045ea/intel-onemkl-2025.2.0.629_offline.sh
-          sudo bash intel-onemkl-2025.2.0.629_offline.sh -s -a -s --action install --eula accept
+          wget --progress=dot:giga https://registrationcenter-download.intel.com/akdlm/IRC_NAS/2ad98b49-1fb2-4294-ab3d-6889b434ebd3/intel-onemkl-2025.3.0.462_offline.sh
+          sudo bash intel-onemkl-2025.3.0.462_offline.sh -s -a -s --action install --eula accept
 
       - name: Restore netlib from cache
         id: cache-lapack
