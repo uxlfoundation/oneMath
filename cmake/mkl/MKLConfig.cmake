@@ -56,7 +56,12 @@
 # ENABLE_CDFT:             Enables cluster DFT library in MKL::MKL
 # ENABLE_SCALAPACK:        Enables cluster LAPACK library in MKL::MKL
 # ENABLE_OMP_OFFLOAD:      Enables OpenMP Offload functionality in MKL::MKL
-# ENABLE_TRY_SYCL_COMPILE: Enables compiling a test program that calls a oneMKL DPC++ API
+# ENABLE_TRY_SYCL_COMPILE: Enables compiling a test program that calls a oneMKL SYCL API
+#-----------------------------------
+# Special options (AUTO by default)
+#-----------------------------------
+# ENABLE_SYCL_COMPILER:    Enables or disables treating the C++ compiler as a SYCL compiler.
+#                          By default, the compiler will be checked if it is a SYCL compiler.
 #
 #==================
 # Output parameters
@@ -150,13 +155,16 @@ foreach(lang ${languages})
 endforeach()
 list(REMOVE_DUPLICATES CURR_LANGS)
 
-option(ENABLE_BLAS95           "Enables BLAS Fortran95 API"                    OFF)
-option(ENABLE_LAPACK95         "Enables LAPACK Fortran95 API"                  OFF)
-option(ENABLE_BLACS            "Enables cluster BLAS library"                  OFF)
-option(ENABLE_CDFT             "Enables cluster DFT library"                   OFF)
-option(ENABLE_SCALAPACK        "Enables cluster LAPACK library"                OFF)
-option(ENABLE_OMP_OFFLOAD      "Enables OpenMP Offload functionality"          OFF)
-option(ENABLE_TRY_SYCL_COMPILE "Enables compiling a oneMKL DPC++ test program" OFF)
+option(ENABLE_BLAS95           "Enables BLAS Fortran95 API"                   OFF)
+option(ENABLE_LAPACK95         "Enables LAPACK Fortran95 API"                 OFF)
+option(ENABLE_BLACS            "Enables cluster BLAS library"                 OFF)
+option(ENABLE_CDFT             "Enables cluster DFT library"                  OFF)
+option(ENABLE_SCALAPACK        "Enables cluster LAPACK library"               OFF)
+option(ENABLE_OMP_OFFLOAD      "Enables OpenMP Offload functionality"         OFF)
+option(ENABLE_TRY_SYCL_COMPILE "Enables compiling a oneMKL SYCL test program" OFF)
+
+set(ENABLE_SYCL_COMPILER AUTO CACHE STRING "Enable SYCL compiler support")
+set_property(CACHE ENABLE_SYCL_COMPILER PROPERTY STRINGS AUTO ON OFF)
 
 # Use MPI if any of these are enabled
 if(ENABLE_BLACS OR ENABLE_CDFT OR ENABLE_SCALAPACK)
@@ -225,11 +233,38 @@ if(CMAKE_Fortran_COMPILER)
 endif()
 
 # Determine Compiler Family
-if(CXX_COMPILER_NAME STREQUAL "dpcpp" OR CXX_COMPILER_NAME STREQUAL "dpcpp.exe"
-    OR CXX_COMPILER_NAME STREQUAL "icpx" OR CXX_COMPILER_NAME STREQUAL "icx.exe"
-    OR CXX_COMPILER_NAME STREQUAL "mpiicpx" OR CXX_COMPILER_NAME STREQUAL "mpiicx.bat")
-  set(SYCL_COMPILER ON)
-endif()
+if(ENABLE_SYCL_COMPILER STREQUAL "AUTO")  # default
+  # Check Intel oneAPI Compiler binary name for SYCL support
+  if(CXX_COMPILER_NAME STREQUAL "dpcpp" OR CXX_COMPILER_NAME STREQUAL "dpcpp.exe"
+      OR CXX_COMPILER_NAME STREQUAL "icpx" OR CXX_COMPILER_NAME STREQUAL "icx.exe"
+      OR CXX_COMPILER_NAME STREQUAL "mpiicpx" OR CXX_COMPILER_NAME STREQUAL "mpiicx.bat")
+    set(SYCL_COMPILER ON)
+  else()  # Non-Intel oneAPI Compilers
+    # Slower but robust check for SYCL support in non-Intel oneAPI compilers
+    if("CXX" IN_LIST CURR_LANGS AND
+        (NOT CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND NOT CMAKE_CXX_COMPILER_ID STREQUAL "MSVC"))
+      include(CheckCXXCompilerFlag)
+      include(CheckIncludeFileCXX)
+      # Check SYCL flag support by the compiler
+      check_cxx_compiler_flag("-fsycl" COMPILER_FSYCL_SUPPORT)
+      if(COMPILER_FSYCL_SUPPORT)
+        # Check SYCL header support by the compiler
+        CHECK_INCLUDE_FILE_CXX("sycl/sycl.hpp" SYCL_SYCL_HPP "-fsycl")
+        if(NOT SYCL_SYCL_HPP)
+          CHECK_INCLUDE_FILE_CXX("CL/sycl.hpp" SYCL_CL_HPP "-fsycl")
+        endif()
+        if(SYCL_SYCL_HPP OR SYCL_CL_HPP)
+          set(SYCL_COMPILER ON)
+        endif()
+      endif() # COMPILER_FSYCL_SUPPORT
+    endif() # CXX IN_LIST CURR_LANGS
+  endif() # CXX_COMPILER_NAME
+elseif(ENABLE_SYCL_COMPILER)
+    # Using the "ON" option with a non-SYCL compiler may lead to unexpected behavior.
+    set(SYCL_COMPILER ON)
+else()
+  set(SYCL_COMPILER OFF)
+endif() # ENABLE_SYCL_COMPILER
 if(C_COMPILER_NAME MATCHES "^clang" OR CXX_COMPILER_NAME MATCHES "^clang")
   set(CLANG_COMPILER ON)
 endif()
@@ -364,6 +399,15 @@ else()
 endif()
 define_param(MKL_LINK DEFAULT_MKL_LINK MKL_LINK_LIST)
 check_required_vars(MKL_LINK)
+
+if(MKL_LINK STREQUAL "static" AND ENABLE_OMP_OFFLOAD)
+  mkl_message(WARNING "oneMKL SYCL static library is deprecated and will be removed in the oneMKL 2026.0 release")
+elseif(MKL_SYCL_LINK AND MKL_SYCL_LINK STREQUAL "static")
+  mkl_message(STATUS "oneMKL SYCL static library is deprecated and will be removed in the oneMKL 2026.0 release")
+  add_custom_target(MKL_SYCL_STATIC_MESSAGE
+                    COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --red
+                    "Warning: oneMKL SYCL static library is deprecated and will be removed in the oneMKL 2026.0 release")
+endif()
 
 # Define MKL_INTERFACE
 if(SYCL_COMPILER)
@@ -793,24 +837,24 @@ foreach(lib ${MKL_REQUESTED_LIBRARIES})
     endif()
     string(TOUPPER ${MKL_SYCL_DOMAIN} MKL_SYCL_DOMAIN)
     if(MKL_SYCL_DOMAIN STREQUAL "DFT")
-      mkl_message(STATUS "Could NOT find MKL ${lib} for targets MKL::MKL_SYCL::${MKL_SYCL_DOMAIN} and MKL::MKL_SYCL_DISTRIBUTED_DFT")
+      mkl_message(STATUS "Could NOT find ${lib} for targets MKL::MKL_SYCL::${MKL_SYCL_DOMAIN} and MKL::MKL_SYCL_DISTRIBUTED_DFT")
     else()
-      mkl_message(STATUS "Could NOT find MKL ${lib} for target MKL::MKL_SYCL::${MKL_SYCL_DOMAIN}")
+      mkl_message(STATUS "Could NOT find ${lib} for target MKL::MKL_SYCL::${MKL_SYCL_DOMAIN}")
     endif()
   else()
     if(NOT USE_MPI AND (${lib} MATCHES "mkl_scalapack" OR ${lib} MATCHES "mkl_blacs" OR ${lib} MATCHES "mkl_cdft" OR ${lib} STREQUAL "mkl_sycl_distributed_dft")
             AND ${${lib}_file} STREQUAL "${lib}_file-NOTFOUND")
       if(${lib} MATCHES "mkl_scalapack")
-        mkl_message(STATUS "Could NOT find MKL ${lib} for target MKL::MKL_SCALAPACK")
+        mkl_message(STATUS "Could NOT find ${lib} for target MKL::MKL_SCALAPACK")
       endif()
       if(${lib} MATCHES "mkl_cdft")
-        mkl_message(STATUS "Could NOT find MKL ${lib} for target MKL::MKL_CDFT")
+        mkl_message(STATUS "Could NOT find ${lib} for target MKL::MKL_CDFT")
       endif()
       if(${lib} MATCHES "mkl_blacs")
-        mkl_message(STATUS "Could NOT find MKL ${lib} for targets MKL::MKL_SCALAPACK, MKL::MKL_CDFT, and MKL::MKL_BLACS")
+        mkl_message(STATUS "Could NOT find ${lib} for targets MKL::MKL_SCALAPACK, MKL::MKL_CDFT, and MKL::MKL_BLACS")
       endif()
       if(${lib} STREQUAL "mkl_sycl_distributed_dft")
-        mkl_message(STATUS "Could NOT find MKL ${lib} for target MKL::MKL_SYCL_DISTRIBUTED_DFT")
+        mkl_message(STATUS "Could NOT find ${lib} for target MKL::MKL_SYCL_DISTRIBUTED_DFT")
       endif()
     else()
       check_required_vars(${lib}_file)
@@ -1027,6 +1071,7 @@ if(SYCL_COMPILER)
   if(NOT TARGET MKL::MKL_SYCL)
     add_library(MKL::MKL_SYCL INTERFACE IMPORTED GLOBAL)
     add_library(MKL::MKL_DPCPP ALIAS MKL::MKL_SYCL)
+    add_dependencies(MKL::MKL_SYCL MKL_SYCL_STATIC_MESSAGE)
   endif()
   target_compile_options(MKL::MKL_SYCL INTERFACE $<$<COMPILE_LANGUAGE:CXX>:${MKL_SYCL_COPT}>)
   target_link_libraries(MKL::MKL_SYCL INTERFACE ${MKL_SYCL_LINK_LINE} ${MKL_SYCL_THREAD_LIB} ${MKL_SYCL_SUPP_LINK})
@@ -1039,6 +1084,7 @@ if(SYCL_COMPILER)
     endif()
     string(TOUPPER ${MKL_SYCL_DOMAIN} MKL_SYCL_DOMAIN)
     add_library(MKL::MKL_SYCL::${MKL_SYCL_DOMAIN} INTERFACE IMPORTED GLOBAL)
+    add_dependencies(MKL::MKL_SYCL::${MKL_SYCL_DOMAIN} MKL_SYCL_STATIC_MESSAGE)
     target_compile_options(MKL::MKL_SYCL::${MKL_SYCL_DOMAIN} INTERFACE $<$<COMPILE_LANGUAGE:CXX>:${MKL_SYCL_COPT}>)
     # Only dynamic link has domain specific libraries
     # Domain specific targets still use mkl_sycl for static
@@ -1279,7 +1325,7 @@ if(ENABLE_TRY_SYCL_COMPILE AND "CXX" IN_LIST CURR_LANGS AND SYCL_COMPILER AND MK
   unset(CMAKE_REQUIRED_LIBRARIES)
   if(NOT MKL_TRY_SYCL_COMPILE)
     mkl_not_found_and_return("The SYCL compiler \"${CMAKE_CXX_COMPILER}\" is not able to \
-                              compile a simple test program that calls a oneMKL DPC++ API. \
+                              compile a simple test program that calls a oneMKL SYCL API. \
                               See \"CMakeError.log\" for details. Besides environment issues, \
                               this could be caused by a compiler version that is incompatible \
                               with oneMKL ${${CMAKE_FIND_PACKAGE_NAME}_VERSION}.")
