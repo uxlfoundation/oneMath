@@ -25,4 +25,4 @@ sphinxcontrib-qthelp==1.0.7
 sphinxcontrib-serializinghtml==1.1.10
 tomli==2.0.1
 typing_extensions==4.11.0
-urllib3==2.5.0
+urllib3==2.6.0
