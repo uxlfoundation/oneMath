@@ -11,7 +11,7 @@ Jinja2==3.1.6
 MarkupSafe==2.1.5
 packaging==24.0
 pydata-sphinx-theme==0.15.2
-Pygments==2.18.0
+Pygments==2.20.0
 requests==2.32.4
 snowballstemmer==2.2.0
 soupsieve==2.5
