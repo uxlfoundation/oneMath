@@ -53,6 +53,24 @@ inline void backend_selector_precondition<backend::netlib>(sycl::queue& queue) {
 }
 
 template <>
+inline void backend_selector_precondition<backend::openblas>(sycl::queue& queue) {
+#ifndef ONEMATH_DISABLE_PREDICATES
+#ifdef __ADAPTIVECPP__ 
+    if (!(queue.is_host() || queue.get_device().is_cpu())) {
+#else
+    if (!queue.get_device().is_cpu()) {
+#endif
+        throw unsupported_device("",
+                                 "backend_selector<backend::" + backend_map[backend::openblas] + ">",
+                                 queue.get_device());
+    }
+#endif
+}
+
+
+
+
+template <>
 inline void backend_selector_precondition<backend::mklcpu>(sycl::queue& queue) {
 #ifndef ONEMATH_DISABLE_PREDICATES
 #ifdef __ADAPTIVECPP__

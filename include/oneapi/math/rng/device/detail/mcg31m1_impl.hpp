@@ -56,8 +56,8 @@ constexpr sycl::vec<std::uint64_t, VecSize> select_vector_a_mcg31m1() {
               UINT64_C(650347998) });
 }
 
-// AdaptiveCpp doesn't support constexpr sycl::vec constructor
-// that's why in case of AdaptiveCpp backend sycl::vec is created as a local variable
+// hipSYCL (AdaptiveCpp) doesn't support constexpr sycl::vec constructor
+// that's why in case of hipSYCL backend sycl::vec is created as a local variable
 #ifndef __ADAPTIVECPP__
 template <std::uint64_t VecSize>
 struct mcg31m1_vector_a {
@@ -160,7 +160,7 @@ static inline sycl::vec<std::uint32_t, VecSize> generate(
 #ifndef __ADAPTIVECPP__
     res = custom_mod(mcg31m1_vector_a<VecSize>::vector_a * x);
 #else
-    // a workaround for AdaptiveCpp
+    // a workaround for hipSYCL (AdaptiveCpp)
     res = custom_mod(select_vector_a_mcg31m1<VecSize>() * x);
 #endif
     state.s =

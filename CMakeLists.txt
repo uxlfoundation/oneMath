@@ -39,7 +39,6 @@ option(ENABLE_MKLCPU_BACKEND "Enable the Intel oneMKL CPU backend for supported 
 option(ENABLE_MKLGPU_BACKEND "Enable the Intel oneMKL GPU backend for supported interfaces" ON)
 if(ENABLE_MKLCPU_BACKEND)
   option(ENABLE_MKLCPU_THREAD_TBB "Enable the use of Intel TBB with the oneMath CPU backend" ON)
-  option(ENABLE_MKLCPU_THREAD_OMP "Enable the use of Intel OpenMP with the oneMath CPU backend" OFF)
 endif()
 
 option(ENABLE_ARMPL_BACKEND "Enable the ArmPl backend for BLAS/LAPACK interface" OFF)
@@ -51,6 +50,7 @@ endif()
 option(ENABLE_CUBLAS_BACKEND "Enable the cuBLAS backend for the BLAS interface" OFF)
 option(ENABLE_ROCBLAS_BACKEND "Enable the rocBLAS backend for the BLAS interface" OFF)
 option(ENABLE_NETLIB_BACKEND "Enable the Netlib backend for the BLAS interface" OFF)
+option(ENABLE_OPENBLAS_BACKEND "Enable the OpenBLAS backend for the BLAS interface" OFF)
 option(ENABLE_GENERIC_BLAS_BACKEND "Enable the generic BLAS backend for the BLAS interface. Cannot be used with other BLAS backends." OFF)
 
 # rand
@@ -95,6 +95,7 @@ if(ENABLE_MKLCPU_BACKEND
         OR ENABLE_CUBLAS_BACKEND
         OR ENABLE_ROCBLAS_BACKEND
         OR ENABLE_NETLIB_BACKEND
+		OR ENABLE_OPENBLAS_BACKEND
         OR ENABLE_GENERIC_BLAS_BACKEND
         OR ENABLE_ARMPL_BACKEND)
   list(APPEND DOMAINS_LIST "blas")
@@ -133,6 +134,7 @@ if(ENABLE_GENERIC_BLAS_BACKEND
 		OR ENABLE_MKLGPU_BACKEND
 		OR ENABLE_CUBLAS_BACKEND
 		OR ENABLE_ROCBLAS_BACKEND
+		OR ENABLE_OPENBLAS_BACKEND
 		OR ENABLE_NETLIB_BACKEND))
 	message(FATAL_ERROR "ENABLE_GENERIC_BLAS_BACKEND cannot be enabled at the same time as other BLAS backends.")
 endif()
@@ -257,12 +259,14 @@ if(ENABLE_MKLGPU_BACKEND OR ENABLE_MKLCPU_BACKEND)
   set(MKL_INTERFACE ilp64)
   if(ENABLE_MKLCPU_THREAD_TBB)
     set(MKL_THREADING tbb_thread)
-  elseif(ENABLE_MKLCPU_THREAD_OMP)
-    set(MKL_THREADING intel_thread)
   else()
     set(MKL_THREADING sequential)
   endif()
-  set(MKL_LINK dynamic)
+  if(BUILD_SHARED_LIBS AND NOT WIN32)
+    set(MKL_LINK dynamic)
+  else()
+    set(MKL_LINK static)
+  endif()
   # Enable SYCL API
   set(DPCPP_COMPILER ON)
   set(SYCL_COMPILER ON)
@@ -319,8 +323,6 @@ endif()
 if(DEFINED REF_BLAS_ROOT OR DEFINED REF_LAPACK_ROOT)
     find_file(ONEMATH_REF_BLAS_LIBNAME NAMES blas.dll libblas.so HINTS ${REF_BLAS_ROOT} ${REF_LAPACK_ROOT} PATH_SUFFIXES lib lib64)
     find_file(ONEMATH_REF_CBLAS_LIBNAME NAMES cblas.dll libcblas.so HINTS ${REF_BLAS_ROOT} ${REF_LAPACK_ROOT} PATH_SUFFIXES lib lib64)
-    find_file(ONEMATH_REF_LAPACKE_LIBNAME NAMES lapacke64.dll liblapacke64.so HINTS ${REF_LAPACK_ROOT} PATH_SUFFIXES lib lib64)
-    find_file(ONEMATH_REF_LAPACK_LIBNAME NAMES lapack64.dll liblapack64.so HINTS ${REF_LAPACK_ROOT} PATH_SUFFIXES lib lib64)
 endif()
 
 # Add source directory and output to bin/

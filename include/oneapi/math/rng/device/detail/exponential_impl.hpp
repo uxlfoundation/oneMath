@@ -82,7 +82,7 @@ protected:
 #ifndef __ADAPTIVECPP__
             res = sycl::fmax(res, a_);
 #else
-            // a workaround for AdaptiveCpp
+            // a workaround for hipSYCL (AdaptiveCpp)
             if constexpr (EngineType::vec_size == 1) {
                 res = std::fmax(res, a_);
             }
@@ -105,7 +105,7 @@ protected:
 #ifndef __ADAPTIVECPP__
             res = sycl::fmax(res, a_);
 #else
-            // a workaround for AdaptiveCpp
+            // a workaround for hipSYCL (AdaptiveCpp)
             if constexpr (EngineType::vec_size == 1) {
                 res = std::fmax(res, a_);
             }

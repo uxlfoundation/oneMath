@@ -19,6 +19,7 @@
 
 // Buffer APIs
 
+
 ONEMATH_EXPORT void gemm(sycl::queue& queue, oneapi::math::transpose transa,
                          oneapi::math::transpose transb, std::int64_t m, std::int64_t n,
                          std::int64_t k, float alpha, sycl::buffer<float, 1>& a, std::int64_t lda,

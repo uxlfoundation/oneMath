@@ -82,7 +82,7 @@
 #endif
 
 #if defined(ONEMATH_ENABLE_MKLCPU_BACKEND) || defined(ONEMATH_ENABLE_NETLIB_BACKEND) || \
-    defined(ONEMATH_ENABLE_ARMPL_BACKEND)
+    defined(ONEMATH_ENABLE_OPENBLAS_BACKEND) || defined(ONEMATH_ENABLE_ARMPL_BACKEND) 
 #ifdef ONEMATH_ENABLE_MKLCPU_BACKEND
 #define TEST_RUN_INTELCPU_SELECT_NO_ARGS(q, func) \
     func(oneapi::math::backend_selector<oneapi::math::backend::mklcpu>{ q })
@@ -90,7 +90,10 @@
     func(oneapi::math::backend_selector<oneapi::math::backend::mklcpu>{ q }, __VA_ARGS__)
 #elif defined(ONEMATH_ENABLE_NETLIB_BACKEND)
 #define TEST_RUN_INTELCPU_SELECT(q, func, ...) \
-    func(oneapi::math::backend_selector<oneapi::math::backend::netlib>{ q }, __VA_ARGS__)
+    func(oneapi::math::backend_selector<oneapi::math::backend::netlib>{ q }, __VA_ARGS__)     
+#elif defined(ONEMATH_ENABLE_OPENBLAS_BACKEND)
+#define TEST_RUN_INTELCPU_SELECT(q, func, ...) \
+   func(oneapi::math::backend_selector<oneapi::math::backend::openblas>{ q }, __VA_ARGS__)    
 #elif defined(ONEMATH_ENABLE_ARMPL_BACKEND)
 #define TEST_RUN_INTELCPU_SELECT_NO_ARGS(q, func) \
     func(oneapi::math::backend_selector<oneapi::math::backend::armpl>{ q })

@@ -53,6 +53,10 @@ static std::map<domain, std::map<device, std::vector<const char*>>> libraries = 
 #ifdef ONEMATH_ENABLE_NETLIB_BACKEND
               LIB_NAME("blas_netlib"),
 #endif
+#ifdef ONEMATH_ENABLE_OPENBLAS_BACKEND
+              LIB_NAME("blas_openblas"),
+#endif
+
 #ifdef ONEMATH_ENABLE_GENERIC_BLAS_BACKEND_INTEL_CPU
               LIB_NAME("blas_generic"),
 #endif
@@ -64,6 +68,9 @@ static std::map<domain, std::map<device, std::vector<const char*>>> libraries = 
 #endif
 #ifdef ONEMATH_ENABLE_NETLIB_BACKEND
               LIB_NAME("blas_netlib")
+#endif
+#ifdef ONEMATH_ENABLE_OPENBLAS_BACKEND
+              LIB_NAME("blas_openblas")
 #endif
           } },
         { device::intelgpu,
@@ -108,12 +115,6 @@ static std::map<domain, std::map<device, std::vector<const char*>>> libraries = 
 #endif
 #ifdef ONEMATH_ENABLE_PORTFFT_BACKEND
                   LIB_NAME("dft_portfft")
-#endif
-          } },
-        { device::aarch64cpu,
-          {
-#ifdef ONEMATH_ENABLE_ARMPL_BACKEND
-              LIB_NAME("dft_armpl"),
 #endif
           } },
         { device::intelgpu,

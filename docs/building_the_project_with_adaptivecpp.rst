@@ -104,10 +104,7 @@ The most important supported build options are:
      - False     
    * - ENABLE_MKLCPU_THREAD_TBB
      - True, False
-     - True
-   * - ENABLE_MKLCPU_THREAD_OMP
-     - True, False
-     - False
+     - True      
    * - BUILD_FUNCTIONAL_TESTS
      - True, False
      - True      

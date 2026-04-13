@@ -17,63 +17,46 @@
 * SPDX-License-Identifier: Apache-2.0
 *******************************************************************************/
 
-#ifndef _ONEMATH_BLAS_HPP_
-#define _ONEMATH_BLAS_HPP_
+#ifndef _ONEMATH_BLAS_OPENBLAS_HPP_
+#define _ONEMATH_BLAS_OPENBLAS_HPP_
 
 #if __has_include(<sycl/sycl.hpp>)
 #include <sycl/sycl.hpp>
 #else
 #include <CL/sycl.hpp>
 #endif
+
 #include <complex>
 #include <cstdint>
 
-#include "oneapi/math/detail/config.hpp"
 #include "oneapi/math/types.hpp"
 
-#include "oneapi/math/detail/get_device_id.hpp"
-
-#include "oneapi/math/blas/detail/blas_loader.hpp"
-#ifdef ONEMATH_ENABLE_CUBLAS_BACKEND
-#include "oneapi/math/blas/detail/cublas/blas_ct.hpp"
-#endif
-#ifdef ONEMATH_ENABLE_ROCBLAS_BACKEND
-#include "oneapi/math/blas/detail/rocblas/blas_ct.hpp"
-#endif
-#ifdef ONEMATH_ENABLE_MKLCPU_BACKEND
-#include "oneapi/math/blas/detail/mklcpu/blas_ct.hpp"
-#endif
-#ifdef ONEMATH_ENABLE_MKLGPU_BACKEND
-#include "oneapi/math/blas/detail/mklgpu/blas_ct.hpp"
-#endif
-#ifdef ONEMATH_ENABLE_NETLIB_BACKEND
-#include "oneapi/math/blas/detail/netlib/blas_ct.hpp"
-#endif
-#ifdef ONEMATH_ENABLE_OPENBLAS_BACKEND
-#include "oneapi/math/blas/detail/openblas/blas_ct.hpp"
-#endif
-#ifdef ONEMATH_ENABLE_ARMPL_BACKEND
-#include "oneapi/math/blas/detail/armpl/blas_ct.hpp"
-#endif
-#ifdef ONEMATH_ENABLE_GENERIC_BLAS_BACKEND
-#include "oneapi/math/blas/detail/generic/blas_ct.hpp"
-#endif
+#include "oneapi/math/detail/export.hpp"
 
 namespace oneapi {
 namespace math {
+
+using oneapi::math::transpose;
+using oneapi::math::uplo;
+using oneapi::math::side;
+using oneapi::math::diag;
+using oneapi::math::offset;
+
 namespace blas {
+namespace openblas {
 namespace column_major {
 
-#include "blas.hxx"
+#include "oneapi/math/blas/detail/onemath_blas_backends.hxx"
 
 } //namespace column_major
 namespace row_major {
 
-#include "blas.hxx"
+#include "oneapi/math/blas/detail/onemath_blas_backends.hxx"
 
 } //namespace row_major
+} //namespace openblas
 } //namespace blas
 } //namespace math
 } //namespace oneapi
 
-#endif //_ONEMATH_BLAS_LOADER_HPP_
+#endif //_ONEMATH_BLAS_OPENBLAS_HPP_

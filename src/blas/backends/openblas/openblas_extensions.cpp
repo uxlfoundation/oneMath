@@ -1,5 +1,5 @@
 /*******************************************************************************
-* Copyright 2025 SiPearl
+* Copyright 2020-2021 Intel Corporation
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -17,22 +17,35 @@
 * SPDX-License-Identifier: Apache-2.0
 *******************************************************************************/
 
-#pragma once
-
+#if __has_include(<sycl/sycl.hpp>)
 #include <sycl/sycl.hpp>
+#else
+#include <CL/sycl.hpp>
+#endif
 
-#include <complex>
-#include <cstdint>
+#include "openblas_common.hpp"
+#include "oneapi/math/blas/detail/openblas/onemath_blas_openblas.hpp"
+#include "oneapi/math/exceptions.hpp"
 
-#include "oneapi/math/types.hpp"
 namespace oneapi {
 namespace math {
-namespace lapack {
-namespace armpl {
+namespace blas {
+namespace openblas {
+namespace column_major {
 
-#include "onemath_lapack_armpl.hxx"
+#define COLUMN_MAJOR
+#include "openblas_extensions.cxx"
+#undef COLUMN_MAJOR
 
-} // namespace armpl
-} // namespace lapack
+} // namespace column_major
+namespace row_major {
+
+#define ROW_MAJOR
+#include "openblas_extensions.cxx"
+#undef ROW_MAJOR
+
+} // namespace row_major
+} // namespace openblas
+} // namespace blas
 } // namespace math
 } // namespace oneapi

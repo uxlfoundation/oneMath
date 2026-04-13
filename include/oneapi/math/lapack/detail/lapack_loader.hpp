@@ -33,6 +33,7 @@
 #include "oneapi/math/detail/export.hpp"
 #include "oneapi/math/detail/get_device_id.hpp"
 
+
 namespace oneapi {
 namespace math {
 namespace lapack {

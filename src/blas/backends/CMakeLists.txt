@@ -28,6 +28,10 @@ if(ENABLE_NETLIB_BACKEND)
   add_subdirectory(netlib)
 endif()
 
+if(ENABLE_OPENBLAS_BACKEND)
+  add_subdirectory(openblas)
+endif()
+
 if(ENABLE_MKLGPU_BACKEND)
   add_subdirectory(mklgpu)
 endif()

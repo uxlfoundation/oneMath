@@ -220,7 +220,7 @@ protected:
                 res = sycl::fmax(res, a_);
                 res = sycl::fmin(res, b_);
 #else
-                // a workaround for AdaptiveCpp
+                // a workaround for hipSYCL (AdaptiveCpp)
                 if constexpr (EngineType::vec_size == 1) {
                     res = sycl::fmax(res, a_);
                     res = sycl::fmin(res, b_);
@@ -298,7 +298,7 @@ protected:
                 res = sycl::fmax(res, a_);
                 res = sycl::fmin(res, b_);
 #else
-                // a workaround for AdaptiveCpp
+                // a workaround for hipSYCL (AdaptiveCpp)
                 if constexpr (EngineType::vec_size == 1) {
                     res = sycl::fmax(res, a_);
                     res = sycl::fmin(res, b_);
