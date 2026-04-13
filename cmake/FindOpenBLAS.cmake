@@ -1,28 +1,25 @@
 #===============================================================================
-#  FindOpenBLAS.cmake
+# Copyright 2020-2023 Intel Corporation
 #
-#  Finds OpenBLAS library and headers.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-#  Result variables:
+# http://www.apache.org/licenses/LICENSE-2.0
 #
-#    OpenBLAS_FOUND
-#    OPENBLAS_LIBRARY
-#    OPENBLAS_INCLUDE
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions
+# and limitations under the License.
 #
-#  Imported target:
 #
-#    ONEMATH::OPENBLAS::OPENBLAS
-#
+# SPDX-License-Identifier: Apache-2.0
 #===============================================================================
 
 include_guard()
 include(FindPackageHandleStandardArgs)
 
-# ------------------------------------------------------------------------------
-# User hints
-# ------------------------------------------------------------------------------
-
-# Highest priority: OPENBLAS_DIR
 if(DEFINED OPENBLAS_DIR)
     set(_OPENBLAS_HINTS ${OPENBLAS_DIR})
 elseif(DEFINED ENV{OPENBLAS_DIR})
@@ -31,9 +28,6 @@ elseif(CMAKE_PREFIX_PATH)
     set(_OPENBLAS_HINTS ${CMAKE_PREFIX_PATH})
 endif()
 
-# ------------------------------------------------------------------------------
-# Find library
-# ------------------------------------------------------------------------------
 
 find_library(OPENBLAS_LIBRARY
     NAMES openblas libopenblas
@@ -41,19 +35,11 @@ find_library(OPENBLAS_LIBRARY
     PATH_SUFFIXES lib lib64
 )
 
-# ------------------------------------------------------------------------------
-# Find include directory
-# ------------------------------------------------------------------------------
-
 find_path(OPENBLAS_INCLUDE
     NAMES cblas.h
     HINTS ${_OPENBLAS_HINTS}
     PATH_SUFFIXES include include/openblas
 )
-
-# ------------------------------------------------------------------------------
-# Handle result
-# ------------------------------------------------------------------------------
 
 find_package_handle_standard_args(OpenBLAS
     REQUIRED_VARS OPENBLAS_LIBRARY OPENBLAS_INCLUDE
@@ -66,9 +52,6 @@ if(OpenBLAS_FOUND)
         DIRECTORY
     )
 
-    # ----------------------------------------------------------
-    # Create imported target
-    # ----------------------------------------------------------
     add_library(ONEMATH::OPENBLAS::OPENBLAS UNKNOWN IMPORTED)
 
     set_target_properties(ONEMATH::OPENBLAS::OPENBLAS PROPERTIES
@@ -76,9 +59,6 @@ if(OpenBLAS_FOUND)
         INTERFACE_INCLUDE_DIRECTORIES ${OPENBLAS_INCLUDE}
     )
 
-    # ----------------------------------------------------------
-    # RPATH handling (Linux)
-    # ----------------------------------------------------------
     if(UNIX AND OPENBLAS_LIB_DIR)
         set_target_properties(ONEMATH::OPENBLAS::OPENBLAS PROPERTIES
             INTERFACE_LINK_OPTIONS "-Wl,-rpath,${OPENBLAS_LIB_DIR}"
