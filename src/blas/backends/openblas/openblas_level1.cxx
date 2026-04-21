@@ -117,11 +117,8 @@ void axpy(sycl::queue& queue, int64_t n, std::complex<double> alpha,
     });
 }
 
-void axpby(sycl::queue&, int64_t n, float alpha,
-           sycl::buffer<float, 1>& x, int64_t incx,
-           float beta,
-           sycl::buffer<float, 1>& y, int64_t incy)
-{
+void axpby(sycl::queue&, int64_t n, float alpha, sycl::buffer<float, 1>& x, int64_t incx,
+           float beta, sycl::buffer<float, 1>& y, int64_t incy) {
     auto x_acc = x.get_access<sycl::access::mode::read>();
     auto y_acc = y.get_access<sycl::access::mode::read_write>();
 
@@ -135,11 +132,8 @@ void axpby(sycl::queue&, int64_t n, float alpha,
     cblas_saxpby(N, alpha, X, incX, beta, Y, incY);
 }
 
-void axpby(sycl::queue&, int64_t n, double alpha,
-           sycl::buffer<double, 1>& x, int64_t incx,
-           double beta,
-           sycl::buffer<double, 1>& y, int64_t incy)
-{
+void axpby(sycl::queue&, int64_t n, double alpha, sycl::buffer<double, 1>& x, int64_t incx,
+           double beta, sycl::buffer<double, 1>& y, int64_t incy) {
     auto x_acc = x.get_access<sycl::access::mode::read>();
     auto y_acc = y.get_access<sycl::access::mode::read_write>();
 
@@ -154,10 +148,8 @@ void axpby(sycl::queue&, int64_t n, double alpha,
 }
 
 void axpby(sycl::queue&, int64_t n, std::complex<float> alpha,
-           sycl::buffer<std::complex<float>, 1>& x, int64_t incx,
-           std::complex<float> beta,
-           sycl::buffer<std::complex<float>, 1>& y, int64_t incy)
-{
+           sycl::buffer<std::complex<float>, 1>& x, int64_t incx, std::complex<float> beta,
+           sycl::buffer<std::complex<float>, 1>& y, int64_t incy) {
     auto x_acc = x.get_access<sycl::access::mode::read>();
     auto y_acc = y.get_access<sycl::access::mode::read_write>();
 
@@ -168,18 +160,13 @@ void axpby(sycl::queue&, int64_t n, std::complex<float> alpha,
     blasint incX = (blasint)incx;
     blasint incY = (blasint)incy;
 
-    cblas_caxpby(N,
-                 static_cast<const void*>(&alpha),
-                 X, incX,
-                 static_cast<const void*>(&beta),
-                 Y, incY);
+    cblas_caxpby(N, static_cast<const void*>(&alpha), X, incX, static_cast<const void*>(&beta), Y, 
+			     incY);
 }
 
 void axpby(sycl::queue&, int64_t n, std::complex<double> alpha,
-           sycl::buffer<std::complex<double>, 1>& x, int64_t incx,
-           std::complex<double> beta,
-           sycl::buffer<std::complex<double>, 1>& y, int64_t incy)
-{
+           sycl::buffer<std::complex<double>, 1>& x, int64_t incx, std::complex<double> beta,
+           sycl::buffer<std::complex<double>, 1>& y, int64_t incy) {
     auto x_acc = x.get_access<sycl::access::mode::read>();
     auto y_acc = y.get_access<sycl::access::mode::read_write>();
 
@@ -190,11 +177,8 @@ void axpby(sycl::queue&, int64_t n, std::complex<double> alpha,
     blasint incX = (blasint)incx;
     blasint incY = (blasint)incy;
 
-    cblas_zaxpby(N,
-                 static_cast<const void*>(&alpha),
-                 X, incX,
-                 static_cast<const void*>(&beta),
-                 Y, incY);
+    cblas_zaxpby(N, static_cast<const void*>(&alpha), X, incX, static_cast<const void*>(&beta), Y,
+		       	incY);
 }
 
 void copy(sycl::queue& queue, int64_t n, sycl::buffer<float, 1>& x, int64_t incx,
@@ -586,72 +570,50 @@ void rotg(sycl::queue& queue, sycl::buffer<double, 1>& a, sycl::buffer<double, 1
     });
 }
 
-void rotg(sycl::queue& queue,
-          sycl::buffer<std::complex<float>, 1>& a,
-          sycl::buffer<std::complex<float>, 1>& b,
-          sycl::buffer<float, 1>& c,
-          sycl::buffer<std::complex<float>, 1>& s)
-{
+void rotg(sycl::queue& queue, sycl::buffer<std::complex<float>, 1>& a,
+          sycl::buffer<std::complex<float>, 1>& b, sycl::buffer<float, 1>& c,
+          sycl::buffer<std::complex<float>, 1>& s) {
     queue.submit([&](sycl::handler& cgh) {
-
         auto accessor_a = a.get_access<sycl::access::mode::read_write>(cgh);
         auto accessor_b = b.get_access<sycl::access::mode::read>(cgh);
         auto accessor_c = c.get_access<sycl::access::mode::read_write>(cgh);
         auto accessor_s = s.get_access<sycl::access::mode::read_write>(cgh);
 
         host_task<class openblas_crotg>(cgh, [=]() {
-
             ::cblas_crotg(
-                const_cast<void*>(
-                    reinterpret_cast<const void*>(accessor_a.GET_MULTI_PTR)
-                ),
-                const_cast<void*>(
-                    reinterpret_cast<const void*>(accessor_b.GET_MULTI_PTR)
-                ),
+                const_cast<void*>(reinterpret_cast<const void*>(accessor_a.GET_MULTI_PTR)),
+                const_cast<void*>(reinterpret_cast<const void*>(accessor_b.GET_MULTI_PTR)),
                 accessor_c.GET_MULTI_PTR,
-                const_cast<void*>(
-                    reinterpret_cast<const void*>(accessor_s.GET_MULTI_PTR)
-                )
-            );
-
+                const_cast<void*>(reinterpret_cast<const void*>(accessor_s.GET_MULTI_PTR)));
         });
     });
 }
 
-void rotg(sycl::queue& queue,
-          sycl::buffer<std::complex<double>, 1>& a,
-          sycl::buffer<std::complex<double>, 1>& b,
-          sycl::buffer<double, 1>& c,
-          sycl::buffer<std::complex<double>, 1>& s)
-{
+void rotg(sycl::queue& queue, sycl::buffer<std::complex<double>, 1>& a,
+          sycl::buffer<std::complex<double>, 1>& b, sycl::buffer<double, 1>& c,
+          sycl::buffer<std::complex<double>, 1>& s) {
     queue.submit([&](sycl::handler& cgh) {
-
         auto accessor_a = a.get_access<sycl::access::mode::read_write>(cgh);
         auto accessor_b = b.get_access<sycl::access::mode::read>(cgh);
         auto accessor_c = c.get_access<sycl::access::mode::read_write>(cgh);
         auto accessor_s = s.get_access<sycl::access::mode::read_write>(cgh);
 
         host_task<class openblas_zrotg>(cgh, [=]() {
+            void* a_ptr = 
+			    const_cast<void*>(reinterpret_cast<const void*>(accessor_a.GET_MULTI_PTR));
 
-            void* a_ptr = const_cast<void*>(
-                reinterpret_cast<const void*>(accessor_a.GET_MULTI_PTR)
-            );
-
-            void* b_ptr = const_cast<void*>(
-                reinterpret_cast<const void*>(accessor_b.GET_MULTI_PTR)
-            );
+            void* b_ptr = 
+			    const_cast<void*>(reinterpret_cast<const void*>(accessor_b.GET_MULTI_PTR));
 
             double* c_ptr = accessor_c.GET_MULTI_PTR;
 
-            void* s_ptr = const_cast<void*>(
-                reinterpret_cast<const void*>(accessor_s.GET_MULTI_PTR)
-            );
+            void* s_ptr = 
+			    const_cast<void*>(reinterpret_cast<const void*>(accessor_s.GET_MULTI_PTR));
 
             ::cblas_zrotg(a_ptr, b_ptr, c_ptr, s_ptr);
         });
     });
 }
-
 
 void rotm(sycl::queue& queue, int64_t n, sycl::buffer<float, 1>& x, int64_t incx,
           sycl::buffer<float, 1>& y, int64_t incy, sycl::buffer<float, 1>& param) {
@@ -1076,11 +1038,8 @@ sycl::event dot(sycl::queue& queue, int64_t n, const double* x, int64_t incx, co
     return done;
 }
 
-sycl::event dot(sycl::queue& queue, int64_t n,
-                const float* x, int64_t incx,
-                const float* y, int64_t incy,
-                double* result,
-                const std::vector<sycl::event>& dependencies) {
+sycl::event dot(sycl::queue& queue, int64_t n, const float* x, int64_t incx, const float* y, 
+		        int64_t incy, double* result, const std::vector<sycl::event>& dependencies) {
     return queue.submit([&](sycl::handler& cgh) {
         for (const auto& dep : dependencies) {
             cgh.depends_on(dep);
@@ -1092,8 +1051,7 @@ sycl::event dot(sycl::queue& queue, int64_t n,
             int64_t iy = (incy > 0) ? 0 : (1 - n) * incy;
 
             for (int64_t i = 0; i < n; ++i) {
-                sum += static_cast<double>(x[ix]) *
-                       static_cast<double>(y[iy]);
+                sum += static_cast<double>(x[ix]) * static_cast<double>(y[iy]);
                 ix += incx;
                 iy += incy;
             }
@@ -1151,10 +1109,8 @@ sycl::event dotc(sycl::queue& queue, int64_t n, const std::complex<double>* x, i
     });
 }
 
-sycl::event dotu(sycl::queue& queue, int64_t n,
-                 const std::complex<float>* x, int64_t incx,
-                 const std::complex<float>* y, int64_t incy,
-                 std::complex<float>* result,
+sycl::event dotu(sycl::queue& queue, int64_t n, const std::complex<float>* x, int64_t incx,
+                 const std::complex<float>* y, int64_t incy, std::complex<float>* result,
                  const std::vector<sycl::event>& dependencies) {
     return queue.submit([&](sycl::handler& cgh) {
         for (const auto& dep : dependencies) {
@@ -1176,10 +1132,8 @@ sycl::event dotu(sycl::queue& queue, int64_t n,
         });
     });
 }
-sycl::event dotu(sycl::queue& queue, int64_t n,
-                 const std::complex<double>* x, int64_t incx,
-                 const std::complex<double>* y, int64_t incy,
-                 std::complex<double>* result,
+sycl::event dotu(sycl::queue& queue, int64_t n, const std::complex<double>* x, int64_t incx,
+                 const std::complex<double>* y, int64_t incy, std::complex<double>* result,
                  const std::vector<sycl::event>& dependencies) {
     return queue.submit([&](sycl::handler& cgh) {
         for (const auto& dep : dependencies) {
@@ -1531,8 +1485,8 @@ sycl::event rotmg(sycl::queue& queue, float* d1, float* d2, float* x1, float y1,
         for (int64_t i = 0; i < num_events; i++) {
             cgh.depends_on(dependencies[i]);
         }
-        host_task<class openblas_srotmg_usm>(cgh,
-                                           [=]() { ::cblas_srotmg(d1, d2, x1, (float)y1, param); });
+        host_task<class openblas_srotmg_usm>(
+			cgh, [=]() { ::cblas_srotmg(d1, d2, x1, (float)y1, param); });
     });
     return done;
 }

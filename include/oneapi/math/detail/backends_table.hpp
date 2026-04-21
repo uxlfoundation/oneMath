@@ -56,7 +56,7 @@ static std::map<domain, std::map<device, std::vector<const char*>>> libraries = 
 #ifdef ONEMATH_ENABLE_OPENBLAS_BACKEND
               LIB_NAME("blas_openblas"),
 #endif
-			  
+
 #ifdef ONEMATH_ENABLE_GENERIC_BLAS_BACKEND_INTEL_CPU
               LIB_NAME("blas_generic"),
 #endif
@@ -72,7 +72,7 @@ static std::map<domain, std::map<device, std::vector<const char*>>> libraries = 
 #ifdef ONEMATH_ENABLE_OPENBLAS_BACKEND
               LIB_NAME("blas_openblas")
 #endif
-				  
+		  
           } },
         { device::intelgpu,
           {

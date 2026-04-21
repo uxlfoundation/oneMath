@@ -43,7 +43,6 @@ inline double abs_val(std::complex<double> val) {
     return std::abs(val.real()) + std::abs(val.imag());
 }
 
-
 namespace oneapi {
 namespace math {
 namespace blas {

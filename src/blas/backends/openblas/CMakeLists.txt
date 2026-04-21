@@ -17,7 +17,6 @@
 # SPDX-License-Identifier: Apache-2.0
 #===============================================================================
 
-
 set(LIB_NAME onemath_blas_openblas)
 set(LIB_OBJ ${LIB_NAME}_obj)
 
@@ -58,7 +57,6 @@ target_compile_options(${LIB_OBJ}
   PRIVATE ${ONEMATH_BUILD_COPT}
 )
 
-
 target_link_libraries(${LIB_OBJ}
   PUBLIC
       ONEMATH::SYCL::SYCL
@@ -97,4 +95,3 @@ install(TARGETS ${LIB_NAME}
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
 )
-

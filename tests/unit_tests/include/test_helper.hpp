@@ -82,7 +82,7 @@
 #endif
 
 #if defined(ONEMATH_ENABLE_MKLCPU_BACKEND) || defined(ONEMATH_ENABLE_NETLIB_BACKEND) || \
-   defined(ONEMATH_ENABLE_OPENBLAS_BACKEND) ||  defined(ONEMATH_ENABLE_ARMPL_BACKEND)
+    defined(ONEMATH_ENABLE_OPENBLAS_BACKEND) ||  defined(ONEMATH_ENABLE_ARMPL_BACKEND)
 #ifdef ONEMATH_ENABLE_MKLCPU_BACKEND
 #define TEST_RUN_INTELCPU_SELECT_NO_ARGS(q, func) \
     func(oneapi::math::backend_selector<oneapi::math::backend::mklcpu>{ q })

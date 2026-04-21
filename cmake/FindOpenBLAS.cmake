@@ -28,7 +28,6 @@ elseif(CMAKE_PREFIX_PATH)
     set(_OPENBLAS_HINTS ${CMAKE_PREFIX_PATH})
 endif()
 
-
 find_library(OPENBLAS_LIBRARY
     NAMES openblas libopenblas
     HINTS ${_OPENBLAS_HINTS}
@@ -71,4 +70,3 @@ mark_as_advanced(
     OPENBLAS_LIBRARY
     OPENBLAS_INCLUDE
 )
-
