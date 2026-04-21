@@ -39,7 +39,7 @@ target_include_directories(${LIB_OBJ}
 target_compile_options(${LIB_OBJ} PRIVATE ${ONEMATH_BUILD_COPT})
 
 if(TARGET MKL::MKL_SYCL::LAPACK)
-  target_link_libraries(${LIB_OBJ} PUBLIC ONEMATH::SYCL::SYCL MKL::MKL_SYCL::LAPACK)
+  target_link_libraries(${LIB_OBJ} PUBLIC ONEMATH::SYCL::SYCL MKL::MKL_SYCL::LAPACK MKL::MKL_SYCL::BLAS)
 else()
   target_link_libraries(${LIB_OBJ} PUBLIC ONEMATH::SYCL::SYCL MKL::MKL_DPCPP)
 endif()

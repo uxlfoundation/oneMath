@@ -23,8 +23,8 @@ add_compile_definitions(
   ONEMATH_REF_CBLAS_LIBNAME="${ONEMATH_REF_CBLAS_LIBNAME}")
 
 if(ENABLE_OPENBLAS_BACKEND)
-  message(STATUS "Adding OpenBLAS include directory to BLAS unit tests")
-  include_directories(${OPENBLAS_INCLUDE})
+	message(STATUS "Adding OpenBLAS include directory to BLAS unit tests")
+	include_directories(${OPENBLAS_INCLUDE})
 endif()
 
 add_subdirectory(level1)

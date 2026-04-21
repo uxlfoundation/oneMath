@@ -37,7 +37,6 @@
 #define AMD_ID 1022
 #endif
 
-
 namespace oneapi {
 namespace math {
 

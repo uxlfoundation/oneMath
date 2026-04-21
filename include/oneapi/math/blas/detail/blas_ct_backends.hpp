@@ -54,7 +54,6 @@ namespace column_major {
 #define BACKEND openblas
 #include "blas_ct_backends.hxx"
 #undef BACKEND
-
 #define BACKEND armpl
 #include "blas_ct_backends.hxx"
 #undef BACKEND

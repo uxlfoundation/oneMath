@@ -17,8 +17,8 @@
 # SPDX-License-Identifier: Apache-2.0
 #===============================================================================
 add_compile_definitions(
-	ONEMATH_REF_LAPACK_LIBNAME="${LAPACK64_file}"
-	ONEMATH_REF_LAPACKE_LIBNAME="${LAPACKE64_file}"
+	ONEMATH_REF_LAPACK_LIBNAME="${ONEMATH_REF_LAPACK_LIBNAME}"
+	ONEMATH_REF_LAPACKE_LIBNAME="${ONEMATH_REF_LAPACKE_LIBNAME}"
 	ONEMATH_REF_CBLAS_LIBNAME="${ONEMATH_REF_CBLAS_LIBNAME}")
 add_subdirectory(source)
 add_subdirectory(common)

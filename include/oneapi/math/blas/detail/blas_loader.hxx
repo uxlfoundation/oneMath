@@ -19,7 +19,6 @@
 
 // Buffer APIs
 
-
 ONEMATH_EXPORT void herk(oneapi::math::device libkey, sycl::queue& queue, uplo upper_lower,
                          transpose trans, std::int64_t n, std::int64_t k, float alpha,
                          sycl::buffer<std::complex<float>, 1>& a, std::int64_t lda, float beta,

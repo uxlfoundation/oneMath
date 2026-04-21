@@ -1,13 +1,26 @@
 #===============================================================================
-# OpenBLAS Backend for oneMath BLAS
+# Copyright 2020-2021 Intel Corporation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions
+# and limitations under the License.
+#
+#
+# SPDX-License-Identifier: Apache-2.0
 #===============================================================================
+
 
 set(LIB_NAME onemath_blas_openblas)
 set(LIB_OBJ ${LIB_NAME}_obj)
 
-# ------------------------------------------------------------------------------
-# Find OpenBLAS (uses custom FindOpenBLAS.cmake)
-# ------------------------------------------------------------------------------
 find_package(OpenBLAS REQUIRED)
 
 set(SOURCES
@@ -20,27 +33,15 @@ set(SOURCES
   $<$<BOOL:${BUILD_SHARED_LIBS}>:openblas_wrappers.cpp>
 )
 
-# ------------------------------------------------------------------------------
-# Create libraries
-# ------------------------------------------------------------------------------
-
 add_library(${LIB_NAME})
 add_deprecated_library(${LIB_NAME})
 
 add_library(${LIB_OBJ} OBJECT ${SOURCES})
 add_dependencies(onemath_backend_libs_blas ${LIB_NAME})
 
-# ------------------------------------------------------------------------------
-# SYCL integration
-# ------------------------------------------------------------------------------
-
 if (USE_ADD_SYCL_TO_TARGET_INTEGRATION)
   add_sycl_to_target(TARGET ${LIB_OBJ} SOURCES ${SOURCES})
 endif()
-
-# ------------------------------------------------------------------------------
-# Include directories
-# ------------------------------------------------------------------------------
 
 target_include_directories(${LIB_OBJ}
   PUBLIC
@@ -53,17 +54,10 @@ target_include_directories(${LIB_OBJ}
       ${ONEMATH_GENERATED_INCLUDE_PATH}
 )
 
-# ------------------------------------------------------------------------------
-# Compile options
-# ------------------------------------------------------------------------------
-
 target_compile_options(${LIB_OBJ}
   PRIVATE ${ONEMATH_BUILD_COPT}
 )
 
-# ------------------------------------------------------------------------------
-# Link OpenBLAS properly (via imported target)
-# ------------------------------------------------------------------------------
 
 target_link_libraries(${LIB_OBJ}
   PUBLIC
@@ -74,10 +68,6 @@ target_link_libraries(${LIB_OBJ}
 set_target_properties(${LIB_OBJ} PROPERTIES
   POSITION_INDEPENDENT_CODE ON
 )
-
-# ------------------------------------------------------------------------------
-# Link object library into main backend lib
-# ------------------------------------------------------------------------------
 
 target_link_libraries(${LIB_NAME}
   PRIVATE ${LIB_OBJ}
@@ -97,15 +87,7 @@ set_target_properties(${LIB_NAME} PROPERTIES
   SOVERSION ${PROJECT_VERSION_MAJOR}
 )
 
-# ------------------------------------------------------------------------------
-# RPATH handling
-# ------------------------------------------------------------------------------
-
 list(APPEND CMAKE_BUILD_RPATH $<TARGET_FILE_DIR:${LIB_NAME}>)
-
-# ------------------------------------------------------------------------------
-# Install
-# ------------------------------------------------------------------------------
 
 install(TARGETS ${LIB_OBJ} EXPORT oneMathTargets)
 

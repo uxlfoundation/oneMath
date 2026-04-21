@@ -980,11 +980,6 @@ if(NOT MKL_THREADING STREQUAL "tbb_thread" AND MKL_THREADING MATCHES "_thread")
              "windows/compiler/lib/${MKL_ARCH}_win"
              "../compiler/lib/${MKL_ARCH}_lin" "../compiler/lib/${MKL_ARCH}_win"
              "../compiler/lib/${MKL_ARCH}" "../compiler/lib" "compiler/lib"
-             "../../compiler/latest/lib"
-             "../../compiler/latest/linux/compiler/lib/${MKL_ARCH}"
-             "../../compiler/latest/linux/compiler/lib/${MKL_ARCH}_lin"
-             "../../compiler/latest/windows/compiler/lib/${MKL_ARCH}"
-             "../../compiler/latest/windows/compiler/lib/${MKL_ARCH}_win"
       NO_DEFAULT_PATH)
     if(WIN32)
       set(OMP_DLLNAME ${LIB_PREFIX}${MKL_OMP_LIB}.dll)
@@ -995,11 +990,6 @@ if(NOT MKL_THREADING STREQUAL "tbb_thread" AND MKL_THREADING MATCHES "_thread")
               "redist/${MKL_ARCH}"
               "redist/${MKL_ARCH}_win" "redist/${MKL_ARCH}_win/compiler"
               "../redist/${MKL_ARCH}/compiler" "../compiler/lib"
-              "../../compiler/latest/bin"
-              "../../compiler/latest/windows/redist/${MKL_ARCH}_win"
-              "../../compiler/latest/windows/redist/${MKL_ARCH}_win/compiler"
-              "../../compiler/latest/windows/compiler/redist/${MKL_ARCH}_win"
-              "../../compiler/latest/windows/compiler/redist/${MKL_ARCH}_win/compiler"
         NO_DEFAULT_PATH)
       if(MKL_LINK STREQUAL "sdl" AND NOT OMP_DLL_DIR)
         mkl_message(WARNING "${OMP_DLLNAME} not found. MKL_ENV will not contain paths for ${OMP_DLLNAME}.")

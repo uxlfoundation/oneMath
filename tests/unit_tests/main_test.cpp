@@ -112,8 +112,8 @@ int main(int argc, char** argv) {
                     if (unique_devices.find(dev.get_info<sycl::info::device::name>()) ==
                         unique_devices.end()) {
                         unique_devices.insert(dev.get_info<sycl::info::device::name>());
-#if !defined(ONEMATH_ENABLE_MKLCPU_BACKEND) &&  \
-    !defined(ONEMATH_ENABLE_OPENBLAS_BACKEND) &&                                         \
+#if !defined(ONEMATH_ENABLE_MKLCPU_BACKEND) &&                                             \
+	!defined(ONEMATH_ENABLE_OPENBLAS_BACKEND) &&                                           \
     !defined(ONEMATH_ENABLE_GENERIC_BLAS_BACKEND_INTEL_CPU) &&                             \
     !defined(ONEMATH_ENABLE_PORTFFT_BACKEND) && !defined(ONEMATH_ENABLE_NETLIB_BACKEND) && \
     !defined(ONEMATH_ENABLE_ARMPL_BACKEND)
