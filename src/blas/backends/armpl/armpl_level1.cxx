@@ -347,7 +347,8 @@ void scal(sycl::queue& queue, int64_t n, T alpha, sycl::buffer<U, 1>& x, int64_t
     queue.submit([&](sycl::handler& cgh) {
         auto accessor_x = x.template get_access<sycl::access::mode::read_write>(cgh);
         host_task<class armpl_kernel_scal>(cgh, [=]() {
-            cblas_func(n, cast_to_void_if_complex(alpha), accessor_x.GET_MULTI_PTR, incx);
+            cblas_func(n, cast_to_void_if_complex(alpha), accessor_x.GET_MULTI_PTR,
+                       (const int)std::abs(incx));
         });
     });
 }
