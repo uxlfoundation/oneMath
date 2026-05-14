@@ -67,7 +67,7 @@ static std::map<domain, std::map<device, std::vector<const char*>>> libraries = 
               LIB_NAME("blas_armpl"),
 #endif
 #ifdef ONEMATH_ENABLE_NETLIB_BACKEND
-              LIB_NAME("blas_netlib")
+              LIB_NAME("blas_netlib"),
 #endif
 #ifdef ONEMATH_ENABLE_OPENBLAS_BACKEND
               LIB_NAME("blas_openblas")
