@@ -68,68 +68,68 @@ void trmv(backend_selector<backend::openblas> selector, uplo upper_lower, transp
           diag unit_diag, std::int64_t n, sycl::buffer<float, 1>& a, std::int64_t lda,
           sycl::buffer<float, 1>& x, std::int64_t incx) {
     oneapi::math::blas::openblas::MAJOR::trmv(selector.get_queue(), upper_lower, trans, unit_diag,
-		                                      n, a, lda, x, incx);
+                                              n, a, lda, x, incx);
 }
 
 void trmv(backend_selector<backend::openblas> selector, uplo upper_lower, transpose trans,
           diag unit_diag, std::int64_t n, sycl::buffer<double, 1>& a, std::int64_t lda,
           sycl::buffer<double, 1>& x, std::int64_t incx) {
-    oneapi::math::blas::openblas::MAJOR::trmv(selector.get_queue(), upper_lower, trans, unit_diag, 
-			                                  n, a, lda, x, incx);
+    oneapi::math::blas::openblas::MAJOR::trmv(selector.get_queue(), upper_lower, trans, unit_diag,
+                                              n, a, lda, x, incx);
 }
 
 void trmv(backend_selector<backend::openblas> selector, uplo upper_lower, transpose trans,
           diag unit_diag, std::int64_t n, sycl::buffer<std::complex<float>, 1>& a, std::int64_t lda,
           sycl::buffer<std::complex<float>, 1>& x, std::int64_t incx) {
     oneapi::math::blas::openblas::MAJOR::trmv(selector.get_queue(), upper_lower, trans, unit_diag,
-		                                      n, a, lda, x, incx);
+                                              n, a, lda, x, incx);
 }
 
 void trmv(backend_selector<backend::openblas> selector, uplo upper_lower, transpose trans,
           diag unit_diag, std::int64_t n, sycl::buffer<std::complex<double>, 1>& a,
           std::int64_t lda, sycl::buffer<std::complex<double>, 1>& x, std::int64_t incx) {
     oneapi::math::blas::openblas::MAJOR::trmv(selector.get_queue(), upper_lower, trans, unit_diag,
-		                                      n, a, lda, x, incx);
+                                              n, a, lda, x, incx);
 }
 
 void tpmv(backend_selector<backend::openblas> selector, uplo upper_lower, transpose trans,
           diag unit_diag, std::int64_t n, sycl::buffer<float, 1>& a, sycl::buffer<float, 1>& x,
           std::int64_t incx) {
     oneapi::math::blas::openblas::MAJOR::tpmv(selector.get_queue(), upper_lower, trans, unit_diag,
-		                                      n, a, x, incx);
+                                              n, a, x, incx);
 }
 
 void tpmv(backend_selector<backend::openblas> selector, uplo upper_lower, transpose trans,
           diag unit_diag, std::int64_t n, sycl::buffer<double, 1>& a, sycl::buffer<double, 1>& x,
           std::int64_t incx) {
     oneapi::math::blas::openblas::MAJOR::tpmv(selector.get_queue(), upper_lower, trans, unit_diag,
-		          	                          n, a, x, incx);
+                                              n, a, x, incx);
 }
 
 void tpmv(backend_selector<backend::openblas> selector, uplo upper_lower, transpose trans,
           diag unit_diag, std::int64_t n, sycl::buffer<std::complex<float>, 1>& a,
           sycl::buffer<std::complex<float>, 1>& x, std::int64_t incx) {
     oneapi::math::blas::openblas::MAJOR::tpmv(selector.get_queue(), upper_lower, trans, unit_diag,
-		                                      n, a, x, incx);
+                                              n, a, x, incx);
 }
 
 void tpmv(backend_selector<backend::openblas> selector, uplo upper_lower, transpose trans,
           diag unit_diag, std::int64_t n, sycl::buffer<std::complex<double>, 1>& a,
           sycl::buffer<std::complex<double>, 1>& x, std::int64_t incx) {
     oneapi::math::blas::openblas::MAJOR::tpmv(selector.get_queue(), upper_lower, trans, unit_diag,
-		                                      n, a, x, incx);
+                                              n, a, x, incx);
 }
 
-void spr(backend_selector<backend::openblas> selector, uplo upper_lower, std::int64_t n, 
-		 float alpha, sycl::buffer<float, 1>& x, std::int64_t incx, sycl::buffer<float, 1>& a) {
+void spr(backend_selector<backend::openblas> selector, uplo upper_lower, std::int64_t n,
+         float alpha, sycl::buffer<float, 1>& x, std::int64_t incx, sycl::buffer<float, 1>& a) {
     oneapi::math::blas::openblas::MAJOR::spr(selector.get_queue(), upper_lower, n, alpha, x, incx,
-		                                 	 a);
+                                             a);
 }
 
-void spr(backend_selector<backend::openblas> selector, uplo upper_lower, std::int64_t n, 
-		 double alpha, sycl::buffer<double, 1>& x, std::int64_t incx, sycl::buffer<double, 1>& a) {
-    oneapi::math::blas::openblas::MAJOR::spr(selector.get_queue(), upper_lower, n, alpha, x, incx, 
-			                                 a);
+void spr(backend_selector<backend::openblas> selector, uplo upper_lower, std::int64_t n,
+         double alpha, sycl::buffer<double, 1>& x, std::int64_t incx, sycl::buffer<double, 1>& a) {
+    oneapi::math::blas::openblas::MAJOR::spr(selector.get_queue(), upper_lower, n, alpha, x, incx,
+                                             a);
 }
 
 void gemm_batch(backend_selector<backend::openblas> selector, transpose transa, transpose transb,
@@ -293,15 +293,15 @@ void her2(backend_selector<backend::openblas> selector, uplo upper_lower, std::i
           sycl::buffer<std::complex<float>, 1>& y, std::int64_t incy,
           sycl::buffer<std::complex<float>, 1>& a, std::int64_t lda) {
     oneapi::math::blas::openblas::MAJOR::her2(selector.get_queue(), upper_lower, n, alpha, x, incx,
-		                                      y, incy, a, lda);
+                                              y, incy, a, lda);
 }
 
 void her2(backend_selector<backend::openblas> selector, uplo upper_lower, std::int64_t n,
           std::complex<double> alpha, sycl::buffer<std::complex<double>, 1>& x, std::int64_t incx,
           sycl::buffer<std::complex<double>, 1>& y, std::int64_t incy,
           sycl::buffer<std::complex<double>, 1>& a, std::int64_t lda) {
-    oneapi::math::blas::openblas::MAJOR::her2(selector.get_queue(), upper_lower, n, alpha, x, incx, 
-			                                  y, incy, a, lda);
+    oneapi::math::blas::openblas::MAJOR::her2(selector.get_queue(), upper_lower, n, alpha, x, incx,
+                                              y, incy, a, lda);
 }
 
 void hbmv(backend_selector<backend::openblas> selector, uplo upper_lower, std::int64_t n,
@@ -309,7 +309,7 @@ void hbmv(backend_selector<backend::openblas> selector, uplo upper_lower, std::i
           std::int64_t lda, sycl::buffer<std::complex<float>, 1>& x, std::int64_t incx,
           std::complex<float> beta, sycl::buffer<std::complex<float>, 1>& y, std::int64_t incy) {
     oneapi::math::blas::openblas::MAJOR::hbmv(selector.get_queue(), upper_lower, n, k, alpha, a,
-		                                      lda, x, incx, beta, y, incy);
+                                              lda, x, incx, beta, y, incy);
 }
 
 void hbmv(backend_selector<backend::openblas> selector, uplo upper_lower, std::int64_t n,
@@ -317,7 +317,7 @@ void hbmv(backend_selector<backend::openblas> selector, uplo upper_lower, std::i
           std::int64_t lda, sycl::buffer<std::complex<double>, 1>& x, std::int64_t incx,
           std::complex<double> beta, sycl::buffer<std::complex<double>, 1>& y, std::int64_t incy) {
     oneapi::math::blas::openblas::MAJOR::hbmv(selector.get_queue(), upper_lower, n, k, alpha, a,
-		                                      lda, x, incx, beta, y, incy);
+                                              lda, x, incx, beta, y, incy);
 }
 
 void rot(backend_selector<backend::openblas> selector, std::int64_t n,
@@ -371,7 +371,7 @@ void axpy_batch(backend_selector<backend::openblas> selector, std::int64_t n, fl
                 sycl::buffer<float, 1>& y, std::int64_t incy, std::int64_t stridey,
                 std::int64_t batch_size) {
     oneapi::math::blas::openblas::MAJOR::axpy_batch(selector.get_queue(), n, alpha, x, incx,
-		                                         	stridex, y, incy, stridey, batch_size);
+                                                    stridex, y, incy, stridey, batch_size);
 }
 
 void axpy_batch(backend_selector<backend::openblas> selector, std::int64_t n, double alpha,
@@ -379,7 +379,7 @@ void axpy_batch(backend_selector<backend::openblas> selector, std::int64_t n, do
                 sycl::buffer<double, 1>& y, std::int64_t incy, std::int64_t stridey,
                 std::int64_t batch_size) {
     oneapi::math::blas::openblas::MAJOR::axpy_batch(selector.get_queue(), n, alpha, x, incx,
-		                                        	stridex, y, incy, stridey, batch_size);
+                                                    stridex, y, incy, stridey, batch_size);
 }
 
 void axpy_batch(backend_selector<backend::openblas> selector, std::int64_t n,
@@ -387,15 +387,15 @@ void axpy_batch(backend_selector<backend::openblas> selector, std::int64_t n,
                 std::int64_t incx, std::int64_t stridex, sycl::buffer<std::complex<float>, 1>& y,
                 std::int64_t incy, std::int64_t stridey, std::int64_t batch_size) {
     oneapi::math::blas::openblas::MAJOR::axpy_batch(selector.get_queue(), n, alpha, x, incx,
-		                                        	stridex, y, incy, stridey, batch_size);
+                                                    stridex, y, incy, stridey, batch_size);
 }
 
 void axpy_batch(backend_selector<backend::openblas> selector, std::int64_t n,
                 std::complex<double> alpha, sycl::buffer<std::complex<double>, 1>& x,
                 std::int64_t incx, std::int64_t stridex, sycl::buffer<std::complex<double>, 1>& y,
                 std::int64_t incy, std::int64_t stridey, std::int64_t batch_size) {
-    oneapi::math::blas::openblas::MAJOR::axpy_batch(selector.get_queue(), n, alpha, x, incx, 
-			                                        stridex, y, incy, stridey, batch_size);
+    oneapi::math::blas::openblas::MAJOR::axpy_batch(selector.get_queue(), n, alpha, x, incx,
+                                                    stridex, y, incy, stridey, batch_size);
 }
 
 void axpby(backend_selector<backend::openblas> selector, std::int64_t n, float alpha,
@@ -438,7 +438,7 @@ void gerc(backend_selector<backend::openblas> selector, std::int64_t m, std::int
           sycl::buffer<std::complex<float>, 1>& y, std::int64_t incy,
           sycl::buffer<std::complex<float>, 1>& a, std::int64_t lda) {
     oneapi::math::blas::openblas::MAJOR::gerc(selector.get_queue(), m, n, alpha, x, incx, y, incy,
-		                                      a, lda);
+                                              a, lda);
 }
 
 void gerc(backend_selector<backend::openblas> selector, std::int64_t m, std::int64_t n,
@@ -446,7 +446,7 @@ void gerc(backend_selector<backend::openblas> selector, std::int64_t m, std::int
           sycl::buffer<std::complex<double>, 1>& y, std::int64_t incy,
           sycl::buffer<std::complex<double>, 1>& a, std::int64_t lda) {
     oneapi::math::blas::openblas::MAJOR::gerc(selector.get_queue(), m, n, alpha, x, incx, y, incy,
-		                                      a, lda);
+                                              a, lda);
 }
 
 void syr2k(backend_selector<backend::openblas> selector, uplo upper_lower, transpose trans,
@@ -454,15 +454,15 @@ void syr2k(backend_selector<backend::openblas> selector, uplo upper_lower, trans
            sycl::buffer<float, 1>& b, std::int64_t ldb, float beta, sycl::buffer<float, 1>& c,
            std::int64_t ldc) {
     oneapi::math::blas::openblas::MAJOR::syr2k(selector.get_queue(), upper_lower, trans, n, k,
-		                                       alpha, a, lda, b, ldb, beta, c, ldc);
+                                               alpha, a, lda, b, ldb, beta, c, ldc);
 }
 
 void syr2k(backend_selector<backend::openblas> selector, uplo upper_lower, transpose trans,
            std::int64_t n, std::int64_t k, double alpha, sycl::buffer<double, 1>& a,
            std::int64_t lda, sycl::buffer<double, 1>& b, std::int64_t ldb, double beta,
            sycl::buffer<double, 1>& c, std::int64_t ldc) {
-    oneapi::math::blas::openblas::MAJOR::syr2k(selector.get_queue(), upper_lower, trans, n, k, 
-			                                   alpha, a, lda, b, ldb, beta, c, ldc);
+    oneapi::math::blas::openblas::MAJOR::syr2k(selector.get_queue(), upper_lower, trans, n, k,
+                                               alpha, a, lda, b, ldb, beta, c, ldc);
 }
 
 void syr2k(backend_selector<backend::openblas> selector, uplo upper_lower, transpose trans,
@@ -471,7 +471,7 @@ void syr2k(backend_selector<backend::openblas> selector, uplo upper_lower, trans
            sycl::buffer<std::complex<float>, 1>& b, std::int64_t ldb, std::complex<float> beta,
            sycl::buffer<std::complex<float>, 1>& c, std::int64_t ldc) {
     oneapi::math::blas::openblas::MAJOR::syr2k(selector.get_queue(), upper_lower, trans, n, k,
-		                          	           alpha, a, lda, b, ldb, beta, c, ldc);
+                                               alpha, a, lda, b, ldb, beta, c, ldc);
 }
 
 void syr2k(backend_selector<backend::openblas> selector, uplo upper_lower, transpose trans,
@@ -480,7 +480,7 @@ void syr2k(backend_selector<backend::openblas> selector, uplo upper_lower, trans
            sycl::buffer<std::complex<double>, 1>& b, std::int64_t ldb, std::complex<double> beta,
            sycl::buffer<std::complex<double>, 1>& c, std::int64_t ldc) {
     oneapi::math::blas::openblas::MAJOR::syr2k(selector.get_queue(), upper_lower, trans, n, k,
-		                      	               alpha, a, lda, b, ldb, beta, c, ldc);
+                                               alpha, a, lda, b, ldb, beta, c, ldc);
 }
 
 void gemv(backend_selector<backend::openblas> selector, transpose trans, std::int64_t m,
@@ -520,9 +520,9 @@ void gemv_batch(backend_selector<backend::openblas> selector, transpose trans, s
                 std::int64_t stridea, sycl::buffer<float, 1>& x, std::int64_t incx,
                 std::int64_t stridex, float beta, sycl::buffer<float, 1>& y, std::int64_t incy,
                 std::int64_t stridey, std::int64_t batch_size) {
-    oneapi::math::blas::openblas::MAJOR::gemv_batch(selector.get_queue(), trans, m, n, alpha, a, 
-			                                        lda, stridea, x, incx, stridex, beta, y, incy, 
-													stridey, batch_size);
+    oneapi::math::blas::openblas::MAJOR::gemv_batch(selector.get_queue(), trans, m, n, alpha, a,
+                                                    lda, stridea, x, incx, stridex, beta, y, incy,
+                                                    stridey, batch_size);
 }
 
 void gemv_batch(backend_selector<backend::openblas> selector, transpose trans, std::int64_t m,
@@ -531,8 +531,8 @@ void gemv_batch(backend_selector<backend::openblas> selector, transpose trans, s
                 std::int64_t stridex, double beta, sycl::buffer<double, 1>& y, std::int64_t incy,
                 std::int64_t stridey, std::int64_t batch_size) {
     oneapi::math::blas::openblas::MAJOR::gemv_batch(selector.get_queue(), trans, m, n, alpha, a,
-		                                        	lda, stridea, x, incx, stridex, beta, y, incy,
-												    stridey, batch_size);
+                                                    lda, stridea, x, incx, stridex, beta, y, incy,
+                                                    stridey, batch_size);
 }
 
 void gemv_batch(backend_selector<backend::openblas> selector, transpose trans, std::int64_t m,
@@ -542,8 +542,8 @@ void gemv_batch(backend_selector<backend::openblas> selector, transpose trans, s
                 sycl::buffer<std::complex<float>, 1>& y, std::int64_t incy, std::int64_t stridey,
                 std::int64_t batch_size) {
     oneapi::math::blas::openblas::MAJOR::gemv_batch(selector.get_queue(), trans, m, n, alpha, a,
-		                                        	lda, stridea, x, incx, stridex, beta, y, incy,
-												    stridey, batch_size);
+                                                    lda, stridea, x, incx, stridex, beta, y, incy,
+                                                    stridey, batch_size);
 }
 
 void gemv_batch(backend_selector<backend::openblas> selector, transpose trans, std::int64_t m,
@@ -553,8 +553,8 @@ void gemv_batch(backend_selector<backend::openblas> selector, transpose trans, s
                 std::complex<double> beta, sycl::buffer<std::complex<double>, 1>& y,
                 std::int64_t incy, std::int64_t stridey, std::int64_t batch_size) {
     oneapi::math::blas::openblas::MAJOR::gemv_batch(selector.get_queue(), trans, m, n, alpha, a,
-		                                        	lda, stridea, x, incx, stridex, beta, y, incy,
-												   	stridey, batch_size);
+                                                    lda, stridea, x, incx, stridex, beta, y, incy,
+                                                    stridey, batch_size);
 }
 
 void dgmm_batch(backend_selector<backend::openblas> selector, side left_right, std::int64_t m,
@@ -597,32 +597,32 @@ void dgmm_batch(backend_selector<backend::openblas> selector, side left_right, s
                                                     batch_size);
 }
 
-void her(backend_selector<backend::openblas> selector, uplo upper_lower, std::int64_t n, 
-		 float alpha, sycl::buffer<std::complex<float>, 1>& x, std::int64_t incx,
+void her(backend_selector<backend::openblas> selector, uplo upper_lower, std::int64_t n,
+         float alpha, sycl::buffer<std::complex<float>, 1>& x, std::int64_t incx,
          sycl::buffer<std::complex<float>, 1>& a, std::int64_t lda) {
     oneapi::math::blas::openblas::MAJOR::her(selector.get_queue(), upper_lower, n, alpha, x, incx,
-		                                     a, lda);
+                                             a, lda);
 }
 
 void her(backend_selector<backend::openblas> selector, uplo upper_lower, std::int64_t n,
-	     double alpha, sycl::buffer<std::complex<double>, 1>& x, std::int64_t incx,
+         double alpha, sycl::buffer<std::complex<double>, 1>& x, std::int64_t incx,
          sycl::buffer<std::complex<double>, 1>& a, std::int64_t lda) {
     oneapi::math::blas::openblas::MAJOR::her(selector.get_queue(), upper_lower, n, alpha, x, incx,
-		                                     a, lda);
+                                             a, lda);
 }
 
 void hpr(backend_selector<backend::openblas> selector, uplo upper_lower, std::int64_t n,
-	     float alpha, sycl::buffer<std::complex<float>, 1>& x, std::int64_t incx,
+         float alpha, sycl::buffer<std::complex<float>, 1>& x, std::int64_t incx,
          sycl::buffer<std::complex<float>, 1>& a) {
-    oneapi::math::blas::openblas::MAJOR::hpr(selector.get_queue(), upper_lower, n, alpha, x, incx, 
-			                                 a);
+    oneapi::math::blas::openblas::MAJOR::hpr(selector.get_queue(), upper_lower, n, alpha, x, incx,
+                                             a);
 }
 
-void hpr(backend_selector<backend::openblas> selector, uplo upper_lower, std::int64_t n, 
-		 double alpha, sycl::buffer<std::complex<double>, 1>& x, std::int64_t incx,
+void hpr(backend_selector<backend::openblas> selector, uplo upper_lower, std::int64_t n,
+         double alpha, sycl::buffer<std::complex<double>, 1>& x, std::int64_t incx,
          sycl::buffer<std::complex<double>, 1>& a) {
-    oneapi::math::blas::openblas::MAJOR::hpr(selector.get_queue(), upper_lower, n, alpha, x, incx, 
-			                                 a);
+    oneapi::math::blas::openblas::MAJOR::hpr(selector.get_queue(), upper_lower, n, alpha, x, incx,
+                                             a);
 }
 
 void iamin(backend_selector<backend::openblas> selector, std::int64_t n, sycl::buffer<float, 1>& x,
@@ -654,7 +654,7 @@ void hpmv(backend_selector<backend::openblas> selector, uplo upper_lower, std::i
           sycl::buffer<std::complex<float>, 1>& x, std::int64_t incx, std::complex<float> beta,
           sycl::buffer<std::complex<float>, 1>& y, std::int64_t incy) {
     oneapi::math::blas::openblas::MAJOR::hpmv(selector.get_queue(), upper_lower, n, alpha, a, x,
-		                                      incx, beta, y, incy);
+                                              incx, beta, y, incy);
 }
 
 void hpmv(backend_selector<backend::openblas> selector, uplo upper_lower, std::int64_t n,
@@ -662,21 +662,21 @@ void hpmv(backend_selector<backend::openblas> selector, uplo upper_lower, std::i
           sycl::buffer<std::complex<double>, 1>& x, std::int64_t incx, std::complex<double> beta,
           sycl::buffer<std::complex<double>, 1>& y, std::int64_t incy) {
     oneapi::math::blas::openblas::MAJOR::hpmv(selector.get_queue(), upper_lower, n, alpha, a, x,
-		                         	          incx, beta, y, incy);
+                                              incx, beta, y, incy);
 }
 
 void spmv(backend_selector<backend::openblas> selector, uplo upper_lower, std::int64_t n,
-	      float alpha, sycl::buffer<float, 1>& a, sycl::buffer<float, 1>& x, std::int64_t incx, 
-		  float beta, sycl::buffer<float, 1>& y, std::int64_t incy) {
+          float alpha, sycl::buffer<float, 1>& a, sycl::buffer<float, 1>& x, std::int64_t incx,
+          float beta, sycl::buffer<float, 1>& y, std::int64_t incy) {
     oneapi::math::blas::openblas::MAJOR::spmv(selector.get_queue(), upper_lower, n, alpha, a, x,
-		                                      incx, beta, y, incy);
+                                              incx, beta, y, incy);
 }
 
 void spmv(backend_selector<backend::openblas> selector, uplo upper_lower, std::int64_t n,
           double alpha, sycl::buffer<double, 1>& a, sycl::buffer<double, 1>& x, std::int64_t incx,
           double beta, sycl::buffer<double, 1>& y, std::int64_t incy) {
-    oneapi::math::blas::openblas::MAJOR::spmv(selector.get_queue(), upper_lower, n, alpha, a, x, 
-			                                  incx, beta, y, incy);
+    oneapi::math::blas::openblas::MAJOR::spmv(selector.get_queue(), upper_lower, n, alpha, a, x,
+                                              incx, beta, y, incy);
 }
 
 void gemm_bias(backend_selector<backend::openblas> selector, transpose transa, transpose transb,
@@ -685,8 +685,8 @@ void gemm_bias(backend_selector<backend::openblas> selector, transpose transa, t
                std::int64_t ldb, uint8_t bo, float beta, sycl::buffer<int32_t, 1>& c,
                std::int64_t ldc, sycl::buffer<int32_t, 1>& co) {
     oneapi::math::blas::openblas::MAJOR::gemm_bias(selector.get_queue(), transa, transb, offsetc, m,
-                                                   n, k, alpha, a, lda, ao, b, ldb, bo, beta, c, 
-												   ldc, co);
+                                                   n, k, alpha, a, lda, ao, b, ldb, bo, beta, c,
+                                                   ldc, co);
 }
 
 void gemm_bias(backend_selector<backend::openblas> selector, transpose transa, transpose transb,
@@ -695,8 +695,8 @@ void gemm_bias(backend_selector<backend::openblas> selector, transpose transa, t
                std::int64_t ldb, int8_t bo, float beta, sycl::buffer<int32_t, 1>& c,
                std::int64_t ldc, sycl::buffer<int32_t, 1>& co) {
     oneapi::math::blas::openblas::MAJOR::gemm_bias(selector.get_queue(), transa, transb, offsetc, m,
-                                                   n, k, alpha, a, lda, ao, b, ldb, bo, beta, c, 
-												   ldc, co);
+                                                   n, k, alpha, a, lda, ao, b, ldb, bo, beta, c,
+                                                   ldc, co);
 }
 
 void gemm_bias(backend_selector<backend::openblas> selector, transpose transa, transpose transb,
@@ -705,8 +705,8 @@ void gemm_bias(backend_selector<backend::openblas> selector, transpose transa, t
                sycl::buffer<int8_t, 1>& b, std::int64_t ldb, int8_t bo, float beta,
                sycl::buffer<int32_t, 1>& c, std::int64_t ldc, sycl::buffer<int32_t, 1>& co) {
     oneapi::math::blas::openblas::MAJOR::gemm_bias(selector.get_queue(), transa, transb, offsetc, m,
-                                                   n, k, alpha, a, lda, ao, b, ldb, bo, beta, c, 
-												   ldc, co);
+                                                   n, k, alpha, a, lda, ao, b, ldb, bo, beta, c,
+                                                   ldc, co);
 }
 
 void gemm_bias(backend_selector<backend::openblas> selector, transpose transa, transpose transb,
@@ -715,8 +715,8 @@ void gemm_bias(backend_selector<backend::openblas> selector, transpose transa, t
                sycl::buffer<uint8_t, 1>& b, std::int64_t ldb, uint8_t bo, float beta,
                sycl::buffer<int32_t, 1>& c, std::int64_t ldc, sycl::buffer<int32_t, 1>& co) {
     oneapi::math::blas::openblas::MAJOR::gemm_bias(selector.get_queue(), transa, transb, offsetc, m,
-                                                   n, k, alpha, a, lda, ao, b, ldb, bo, beta, c, 
-												   ldc, co);
+                                                   n, k, alpha, a, lda, ao, b, ldb, bo, beta, c,
+                                                   ldc, co);
 }
 
 void swap(backend_selector<backend::openblas> selector, std::int64_t n, sycl::buffer<float, 1>& x,
@@ -745,8 +745,8 @@ void geru(backend_selector<backend::openblas> selector, std::int64_t m, std::int
           std::complex<float> alpha, sycl::buffer<std::complex<float>, 1>& x, std::int64_t incx,
           sycl::buffer<std::complex<float>, 1>& y, std::int64_t incy,
           sycl::buffer<std::complex<float>, 1>& a, std::int64_t lda) {
-    oneapi::math::blas::openblas::MAJOR::geru(selector.get_queue(), m, n, alpha, x, incx, y, incy, 
-			                                  a, lda);
+    oneapi::math::blas::openblas::MAJOR::geru(selector.get_queue(), m, n, alpha, x, incx, y, incy,
+                                              a, lda);
 }
 
 void geru(backend_selector<backend::openblas> selector, std::int64_t m, std::int64_t n,
@@ -754,7 +754,7 @@ void geru(backend_selector<backend::openblas> selector, std::int64_t m, std::int
           sycl::buffer<std::complex<double>, 1>& y, std::int64_t incy,
           sycl::buffer<std::complex<double>, 1>& a, std::int64_t lda) {
     oneapi::math::blas::openblas::MAJOR::geru(selector.get_queue(), m, n, alpha, x, incx, y, incy,
-		                                      a, lda);
+                                              a, lda);
 }
 
 void nrm2(backend_selector<backend::openblas> selector, std::int64_t n,
@@ -784,7 +784,7 @@ void gemm(backend_selector<backend::openblas> selector, transpose transa, transp
           std::int64_t lda, sycl::buffer<float, 1>& b, std::int64_t ldb, float beta,
           sycl::buffer<float, 1>& c, std::int64_t ldc) {
     oneapi::math::blas::openblas::MAJOR::gemm(selector.get_queue(), transa, transb, m, n, k, alpha,
-		                                    a, lda, b, ldb, beta, c, ldc);
+                                              a, lda, b, ldb, beta, c, ldc);
 }
 
 void gemm(backend_selector<backend::openblas> selector, transpose transa, transpose transb,
@@ -792,7 +792,7 @@ void gemm(backend_selector<backend::openblas> selector, transpose transa, transp
           std::int64_t lda, sycl::buffer<double, 1>& b, std::int64_t ldb, double beta,
           sycl::buffer<double, 1>& c, std::int64_t ldc) {
     oneapi::math::blas::openblas::MAJOR::gemm(selector.get_queue(), transa, transb, m, n, k, alpha,
-		                                      a, lda, b, ldb, beta, c, ldc);
+                                              a, lda, b, ldb, beta, c, ldc);
 }
 
 void gemm(backend_selector<backend::openblas> selector, transpose transa, transpose transb,
@@ -801,7 +801,7 @@ void gemm(backend_selector<backend::openblas> selector, transpose transa, transp
           sycl::buffer<std::complex<float>, 1>& b, std::int64_t ldb, std::complex<float> beta,
           sycl::buffer<std::complex<float>, 1>& c, std::int64_t ldc) {
     oneapi::math::blas::openblas::MAJOR::gemm(selector.get_queue(), transa, transb, m, n, k, alpha,
-		                                      a, lda, b, ldb, beta, c, ldc);
+                                              a, lda, b, ldb, beta, c, ldc);
 }
 
 void gemm(backend_selector<backend::openblas> selector, transpose transa, transpose transb,
@@ -810,7 +810,7 @@ void gemm(backend_selector<backend::openblas> selector, transpose transa, transp
           sycl::buffer<std::complex<double>, 1>& b, std::int64_t ldb, std::complex<double> beta,
           sycl::buffer<std::complex<double>, 1>& c, std::int64_t ldc) {
     oneapi::math::blas::openblas::MAJOR::gemm(selector.get_queue(), transa, transb, m, n, k, alpha,
-		                                    a, lda, b, ldb, beta, c, ldc);
+                                              a, lda, b, ldb, beta, c, ldc);
 }
 
 void gemm(backend_selector<backend::openblas> selector, transpose transa, transpose transb,
@@ -818,7 +818,7 @@ void gemm(backend_selector<backend::openblas> selector, transpose transa, transp
           sycl::buffer<sycl::half, 1>& a, std::int64_t lda, sycl::buffer<sycl::half, 1>& b,
           std::int64_t ldb, sycl::half beta, sycl::buffer<sycl::half, 1>& c, std::int64_t ldc) {
     oneapi::math::blas::openblas::MAJOR::gemm(selector.get_queue(), transa, transb, m, n, k, alpha,
-		                                      a, lda, b, ldb, beta, c, ldc);
+                                              a, lda, b, ldb, beta, c, ldc);
 }
 
 void gemm(backend_selector<backend::openblas> selector, transpose transa, transpose transb,
@@ -826,29 +826,29 @@ void gemm(backend_selector<backend::openblas> selector, transpose transa, transp
           sycl::buffer<sycl::half, 1>& a, std::int64_t lda, sycl::buffer<sycl::half, 1>& b,
           std::int64_t ldb, float beta, sycl::buffer<float, 1>& c, std::int64_t ldc) {
     oneapi::math::blas::openblas::MAJOR::gemm(selector.get_queue(), transa, transb, m, n, k, alpha,
-		                                      a, lda, b, ldb, beta, c, ldc);
+                                              a, lda, b, ldb, beta, c, ldc);
 }
 
 void gemm(backend_selector<backend::openblas> selector, transpose transa, transpose transb,
           std::int64_t m, std::int64_t n, std::int64_t k, float alpha, sycl::buffer<bfloat16, 1>& a,
           std::int64_t lda, sycl::buffer<bfloat16, 1>& b, std::int64_t ldb, float beta,
           sycl::buffer<float, 1>& c, std::int64_t ldc) {
-    oneapi::math::blas::openblas::MAJOR::gemm(selector.get_queue(), transa, transb, m, n, k, alpha, 
-			                                  a, lda, b, ldb, beta, c, ldc);
+    oneapi::math::blas::openblas::MAJOR::gemm(selector.get_queue(), transa, transb, m, n, k, alpha,
+                                              a, lda, b, ldb, beta, c, ldc);
 }
 
 void syr2(backend_selector<backend::openblas> selector, uplo upper_lower, std::int64_t n,
-	      float alpha, sycl::buffer<float, 1>& x, std::int64_t incx, sycl::buffer<float, 1>& y,
+          float alpha, sycl::buffer<float, 1>& x, std::int64_t incx, sycl::buffer<float, 1>& y,
           std::int64_t incy, sycl::buffer<float, 1>& a, std::int64_t lda) {
     oneapi::math::blas::openblas::MAJOR::syr2(selector.get_queue(), upper_lower, n, alpha, x, incx,
-		                                      y, incy, a, lda);
+                                              y, incy, a, lda);
 }
 
 void syr2(backend_selector<backend::openblas> selector, uplo upper_lower, std::int64_t n,
           double alpha, sycl::buffer<double, 1>& x, std::int64_t incx, sycl::buffer<double, 1>& y,
           std::int64_t incy, sycl::buffer<double, 1>& a, std::int64_t lda) {
-    oneapi::math::blas::openblas::MAJOR::syr2(selector.get_queue(), upper_lower, n, alpha, x, incx, 
-			                                  y, incy, a, lda);
+    oneapi::math::blas::openblas::MAJOR::syr2(selector.get_queue(), upper_lower, n, alpha, x, incx,
+                                              y, incy, a, lda);
 }
 
 void ger(backend_selector<backend::openblas> selector, std::int64_t m, std::int64_t n, float alpha,
@@ -933,8 +933,8 @@ void hpr2(backend_selector<backend::openblas> selector, uplo upper_lower, std::i
           std::complex<float> alpha, sycl::buffer<std::complex<float>, 1>& x, std::int64_t incx,
           sycl::buffer<std::complex<float>, 1>& y, std::int64_t incy,
           sycl::buffer<std::complex<float>, 1>& a) {
-    oneapi::math::blas::openblas::MAJOR::hpr2(selector.get_queue(), upper_lower, n, alpha, x, incx, 
-			                                  y, incy, a);
+    oneapi::math::blas::openblas::MAJOR::hpr2(selector.get_queue(), upper_lower, n, alpha, x, incx,
+                                              y, incy, a);
 }
 
 void hpr2(backend_selector<backend::openblas> selector, uplo upper_lower, std::int64_t n,
@@ -942,7 +942,7 @@ void hpr2(backend_selector<backend::openblas> selector, uplo upper_lower, std::i
           sycl::buffer<std::complex<double>, 1>& y, std::int64_t incy,
           sycl::buffer<std::complex<double>, 1>& a) {
     oneapi::math::blas::openblas::MAJOR::hpr2(selector.get_queue(), upper_lower, n, alpha, x, incx,
-		                                      y, incy, a);
+                                              y, incy, a);
 }
 
 void gbmv(backend_selector<backend::openblas> selector, transpose trans, std::int64_t m,
@@ -982,29 +982,29 @@ void gbmv(backend_selector<backend::openblas> selector, transpose trans, std::in
 void tbmv(backend_selector<backend::openblas> selector, uplo upper_lower, transpose trans,
           diag unit_diag, std::int64_t n, std::int64_t k, sycl::buffer<float, 1>& a,
           std::int64_t lda, sycl::buffer<float, 1>& x, std::int64_t incx) {
-    oneapi::math::blas::openblas::MAJOR::tbmv(selector.get_queue(), upper_lower, trans, unit_diag, n,
-                                            k, a, lda, x, incx);
+    oneapi::math::blas::openblas::MAJOR::tbmv(selector.get_queue(), upper_lower, trans, unit_diag,
+                                              n, k, a, lda, x, incx);
 }
 
 void tbmv(backend_selector<backend::openblas> selector, uplo upper_lower, transpose trans,
           diag unit_diag, std::int64_t n, std::int64_t k, sycl::buffer<double, 1>& a,
           std::int64_t lda, sycl::buffer<double, 1>& x, std::int64_t incx) {
     oneapi::math::blas::openblas::MAJOR::tbmv(selector.get_queue(), upper_lower, trans, unit_diag,
-		                                      n, k, a, lda, x, incx);
+                                              n, k, a, lda, x, incx);
 }
 
 void tbmv(backend_selector<backend::openblas> selector, uplo upper_lower, transpose trans,
           diag unit_diag, std::int64_t n, std::int64_t k, sycl::buffer<std::complex<float>, 1>& a,
           std::int64_t lda, sycl::buffer<std::complex<float>, 1>& x, std::int64_t incx) {
     oneapi::math::blas::openblas::MAJOR::tbmv(selector.get_queue(), upper_lower, trans, unit_diag,
-		                                    n, k, a, lda, x, incx);
+                                              n, k, a, lda, x, incx);
 }
 
 void tbmv(backend_selector<backend::openblas> selector, uplo upper_lower, transpose trans,
           diag unit_diag, std::int64_t n, std::int64_t k, sycl::buffer<std::complex<double>, 1>& a,
           std::int64_t lda, sycl::buffer<std::complex<double>, 1>& x, std::int64_t incx) {
     oneapi::math::blas::openblas::MAJOR::tbmv(selector.get_queue(), upper_lower, trans, unit_diag,
-		                                    n, k, a, lda, x, incx);
+                                              n, k, a, lda, x, incx);
 }
 
 void symm(backend_selector<backend::openblas> selector, side left_right, uplo upper_lower,
@@ -1056,17 +1056,17 @@ void dotc(backend_selector<backend::openblas> selector, std::int64_t n,
 }
 
 void syr(backend_selector<backend::openblas> selector, uplo upper_lower, std::int64_t n,
-	     float alpha, sycl::buffer<float, 1>& x, std::int64_t incx, sycl::buffer<float, 1>& a,
+         float alpha, sycl::buffer<float, 1>& x, std::int64_t incx, sycl::buffer<float, 1>& a,
          std::int64_t lda) {
     oneapi::math::blas::openblas::MAJOR::syr(selector.get_queue(), upper_lower, n, alpha, x, incx,
-		                                     a, lda);
+                                             a, lda);
 }
 
-void syr(backend_selector<backend::openblas> selector, uplo upper_lower, std::int64_t n, double alpha,
-         sycl::buffer<double, 1>& x, std::int64_t incx, sycl::buffer<double, 1>& a,
+void syr(backend_selector<backend::openblas> selector, uplo upper_lower, std::int64_t n,
+         double alpha, sycl::buffer<double, 1>& x, std::int64_t incx, sycl::buffer<double, 1>& a,
          std::int64_t lda) {
     oneapi::math::blas::openblas::MAJOR::syr(selector.get_queue(), upper_lower, n, alpha, x, incx,
-		                                  	 a, lda);
+                                             a, lda);
 }
 
 void trmm(backend_selector<backend::openblas> selector, side left_right, uplo upper_lower,
@@ -1116,57 +1116,57 @@ void rotmg(backend_selector<backend::openblas> selector, sycl::buffer<double, 1>
 void tpsv(backend_selector<backend::openblas> selector, uplo upper_lower, transpose trans,
           diag unit_diag, std::int64_t n, sycl::buffer<float, 1>& a, sycl::buffer<float, 1>& x,
           std::int64_t incx) {
-    oneapi::math::blas::openblas::MAJOR::tpsv(selector.get_queue(), upper_lower, trans, unit_diag, 
-			                                  n, a, x, incx);
+    oneapi::math::blas::openblas::MAJOR::tpsv(selector.get_queue(), upper_lower, trans, unit_diag,
+                                              n, a, x, incx);
 }
 
 void tpsv(backend_selector<backend::openblas> selector, uplo upper_lower, transpose trans,
           diag unit_diag, std::int64_t n, sycl::buffer<double, 1>& a, sycl::buffer<double, 1>& x,
           std::int64_t incx) {
     oneapi::math::blas::openblas::MAJOR::tpsv(selector.get_queue(), upper_lower, trans, unit_diag,
-		                                      n, a, x, incx);
+                                              n, a, x, incx);
 }
 
 void tpsv(backend_selector<backend::openblas> selector, uplo upper_lower, transpose trans,
           diag unit_diag, std::int64_t n, sycl::buffer<std::complex<float>, 1>& a,
           sycl::buffer<std::complex<float>, 1>& x, std::int64_t incx) {
     oneapi::math::blas::openblas::MAJOR::tpsv(selector.get_queue(), upper_lower, trans, unit_diag,
-		                                      n, a, x, incx);
+                                              n, a, x, incx);
 }
 
 void tpsv(backend_selector<backend::openblas> selector, uplo upper_lower, transpose trans,
           diag unit_diag, std::int64_t n, sycl::buffer<std::complex<double>, 1>& a,
           sycl::buffer<std::complex<double>, 1>& x, std::int64_t incx) {
-    oneapi::math::blas::openblas::MAJOR::tpsv(selector.get_queue(), upper_lower, trans, unit_diag, 
-			                                  n, a, x, incx);
+    oneapi::math::blas::openblas::MAJOR::tpsv(selector.get_queue(), upper_lower, trans, unit_diag,
+                                              n, a, x, incx);
 }
 
 void trsv(backend_selector<backend::openblas> selector, uplo upper_lower, transpose trans,
           diag unit_diag, std::int64_t n, sycl::buffer<float, 1>& a, std::int64_t lda,
           sycl::buffer<float, 1>& x, std::int64_t incx) {
     oneapi::math::blas::openblas::MAJOR::trsv(selector.get_queue(), upper_lower, trans, unit_diag,
-		                                    n, a, lda, x, incx);
+                                              n, a, lda, x, incx);
 }
 
 void trsv(backend_selector<backend::openblas> selector, uplo upper_lower, transpose trans,
           diag unit_diag, std::int64_t n, sycl::buffer<double, 1>& a, std::int64_t lda,
           sycl::buffer<double, 1>& x, std::int64_t incx) {
     oneapi::math::blas::openblas::MAJOR::trsv(selector.get_queue(), upper_lower, trans, unit_diag,
-		                                      n, a, lda, x, incx);
+                                              n, a, lda, x, incx);
 }
 
 void trsv(backend_selector<backend::openblas> selector, uplo upper_lower, transpose trans,
           diag unit_diag, std::int64_t n, sycl::buffer<std::complex<float>, 1>& a, std::int64_t lda,
           sycl::buffer<std::complex<float>, 1>& x, std::int64_t incx) {
     oneapi::math::blas::openblas::MAJOR::trsv(selector.get_queue(), upper_lower, trans, unit_diag,
-		                                      n, a, lda, x, incx);
+                                              n, a, lda, x, incx);
 }
 
 void trsv(backend_selector<backend::openblas> selector, uplo upper_lower, transpose trans,
           diag unit_diag, std::int64_t n, sycl::buffer<std::complex<double>, 1>& a,
           std::int64_t lda, sycl::buffer<std::complex<double>, 1>& x, std::int64_t incx) {
     oneapi::math::blas::openblas::MAJOR::trsv(selector.get_queue(), upper_lower, trans, unit_diag,
-		                                      n, a, lda, x, incx);
+                                              n, a, lda, x, incx);
 }
 
 void copy(backend_selector<backend::openblas> selector, std::int64_t n, sycl::buffer<float, 1>& x,
@@ -1228,7 +1228,7 @@ void hemv(backend_selector<backend::openblas> selector, uplo upper_lower, std::i
           sycl::buffer<std::complex<float>, 1>& x, std::int64_t incx, std::complex<float> beta,
           sycl::buffer<std::complex<float>, 1>& y, std::int64_t incy) {
     oneapi::math::blas::openblas::MAJOR::hemv(selector.get_queue(), upper_lower, n, alpha, a, lda,
-		                                      x, incx, beta, y, incy);
+                                              x, incx, beta, y, incy);
 }
 
 void hemv(backend_selector<backend::openblas> selector, uplo upper_lower, std::int64_t n,
@@ -1236,7 +1236,7 @@ void hemv(backend_selector<backend::openblas> selector, uplo upper_lower, std::i
           sycl::buffer<std::complex<double>, 1>& x, std::int64_t incx, std::complex<double> beta,
           sycl::buffer<std::complex<double>, 1>& y, std::int64_t incy) {
     oneapi::math::blas::openblas::MAJOR::hemv(selector.get_queue(), upper_lower, n, alpha, a, lda,
-		                                 	  x, incx, beta, y, incy);
+                                              x, incx, beta, y, incy);
 }
 
 void gemmt(backend_selector<backend::openblas> selector, uplo upper_lower, transpose transa,
@@ -1299,58 +1299,58 @@ void sbmv(backend_selector<backend::openblas> selector, uplo upper_lower, std::i
           std::int64_t k, float alpha, sycl::buffer<float, 1>& a, std::int64_t lda,
           sycl::buffer<float, 1>& x, std::int64_t incx, float beta, sycl::buffer<float, 1>& y,
           std::int64_t incy) {
-    oneapi::math::blas::openblas::MAJOR::sbmv(selector.get_queue(), upper_lower, n, k, alpha, a, 
-			                                  lda, x, incx, beta, y, incy);
+    oneapi::math::blas::openblas::MAJOR::sbmv(selector.get_queue(), upper_lower, n, k, alpha, a,
+                                              lda, x, incx, beta, y, incy);
 }
 
 void sbmv(backend_selector<backend::openblas> selector, uplo upper_lower, std::int64_t n,
           std::int64_t k, double alpha, sycl::buffer<double, 1>& a, std::int64_t lda,
           sycl::buffer<double, 1>& x, std::int64_t incx, double beta, sycl::buffer<double, 1>& y,
           std::int64_t incy) {
-    oneapi::math::blas::openblas::MAJOR::sbmv(selector.get_queue(), upper_lower, n, k, alpha, a, 
-			                                  lda, x, incx, beta, y, incy);
+    oneapi::math::blas::openblas::MAJOR::sbmv(selector.get_queue(), upper_lower, n, k, alpha, a,
+                                              lda, x, incx, beta, y, incy);
 }
 
 void tbsv(backend_selector<backend::openblas> selector, uplo upper_lower, transpose trans,
           diag unit_diag, std::int64_t n, std::int64_t k, sycl::buffer<float, 1>& a,
           std::int64_t lda, sycl::buffer<float, 1>& x, std::int64_t incx) {
     oneapi::math::blas::openblas::MAJOR::tbsv(selector.get_queue(), upper_lower, trans, unit_diag,
-		                                      n, k, a, lda, x, incx);
+                                              n, k, a, lda, x, incx);
 }
 
 void tbsv(backend_selector<backend::openblas> selector, uplo upper_lower, transpose trans,
           diag unit_diag, std::int64_t n, std::int64_t k, sycl::buffer<double, 1>& a,
           std::int64_t lda, sycl::buffer<double, 1>& x, std::int64_t incx) {
     oneapi::math::blas::openblas::MAJOR::tbsv(selector.get_queue(), upper_lower, trans, unit_diag,
-		                         	          n, k, a, lda, x, incx);
+                                              n, k, a, lda, x, incx);
 }
 
 void tbsv(backend_selector<backend::openblas> selector, uplo upper_lower, transpose trans,
           diag unit_diag, std::int64_t n, std::int64_t k, sycl::buffer<std::complex<float>, 1>& a,
           std::int64_t lda, sycl::buffer<std::complex<float>, 1>& x, std::int64_t incx) {
     oneapi::math::blas::openblas::MAJOR::tbsv(selector.get_queue(), upper_lower, trans, unit_diag,
-		                                	  n, k, a, lda, x, incx);
+                                              n, k, a, lda, x, incx);
 }
 
 void tbsv(backend_selector<backend::openblas> selector, uplo upper_lower, transpose trans,
           diag unit_diag, std::int64_t n, std::int64_t k, sycl::buffer<std::complex<double>, 1>& a,
           std::int64_t lda, sycl::buffer<std::complex<double>, 1>& x, std::int64_t incx) {
-    oneapi::math::blas::openblas::MAJOR::tbsv(selector.get_queue(), upper_lower, trans, unit_diag, 
-			                                  n, k, a, lda, x, incx);
+    oneapi::math::blas::openblas::MAJOR::tbsv(selector.get_queue(), upper_lower, trans, unit_diag,
+                                              n, k, a, lda, x, incx);
 }
 
-void spr2(backend_selector<backend::openblas> selector, uplo upper_lower, std::int64_t n, 
-		  float alpha, sycl::buffer<float, 1>& x, std::int64_t incx, sycl::buffer<float, 1>& y,
+void spr2(backend_selector<backend::openblas> selector, uplo upper_lower, std::int64_t n,
+          float alpha, sycl::buffer<float, 1>& x, std::int64_t incx, sycl::buffer<float, 1>& y,
           std::int64_t incy, sycl::buffer<float, 1>& a) {
-    oneapi::math::blas::openblas::MAJOR::spr2(selector.get_queue(), upper_lower, n, alpha, x, incx, 
-			                                  y, incy, a);
+    oneapi::math::blas::openblas::MAJOR::spr2(selector.get_queue(), upper_lower, n, alpha, x, incx,
+                                              y, incy, a);
 }
 
 void spr2(backend_selector<backend::openblas> selector, uplo upper_lower, std::int64_t n,
           double alpha, sycl::buffer<double, 1>& x, std::int64_t incx, sycl::buffer<double, 1>& y,
           std::int64_t incy, sycl::buffer<double, 1>& a) {
-    oneapi::math::blas::openblas::MAJOR::spr2(selector.get_queue(), upper_lower, n, alpha, x, incx, 
-			                                  y, incy, a);
+    oneapi::math::blas::openblas::MAJOR::spr2(selector.get_queue(), upper_lower, n, alpha, x, incx,
+                                              y, incy, a);
 }
 
 void iamax(backend_selector<backend::openblas> selector, std::int64_t n, sycl::buffer<float, 1>& x,
@@ -1453,7 +1453,7 @@ void her2k(backend_selector<backend::openblas> selector, uplo upper_lower, trans
            sycl::buffer<std::complex<float>, 1>& b, std::int64_t ldb, float beta,
            sycl::buffer<std::complex<float>, 1>& c, std::int64_t ldc) {
     oneapi::math::blas::openblas::MAJOR::her2k(selector.get_queue(), upper_lower, trans, n, k,
-		                                 	   alpha, a, lda, b, ldb, beta, c, ldc);
+                                               alpha, a, lda, b, ldb, beta, c, ldc);
 }
 
 void her2k(backend_selector<backend::openblas> selector, uplo upper_lower, transpose trans,
@@ -1461,8 +1461,8 @@ void her2k(backend_selector<backend::openblas> selector, uplo upper_lower, trans
            sycl::buffer<std::complex<double>, 1>& a, std::int64_t lda,
            sycl::buffer<std::complex<double>, 1>& b, std::int64_t ldb, double beta,
            sycl::buffer<std::complex<double>, 1>& c, std::int64_t ldc) {
-    oneapi::math::blas::openblas::MAJOR::her2k(selector.get_queue(), upper_lower, trans, n, k, 
-			                                   alpha, a, lda, b, ldb, beta, c, ldc);
+    oneapi::math::blas::openblas::MAJOR::her2k(selector.get_queue(), upper_lower, trans, n, k,
+                                               alpha, a, lda, b, ldb, beta, c, ldc);
 }
 
 void rotg(backend_selector<backend::openblas> selector, sycl::buffer<float, 1>& a,
@@ -1488,17 +1488,17 @@ void rotg(backend_selector<backend::openblas> selector, sycl::buffer<std::comple
 }
 
 void symv(backend_selector<backend::openblas> selector, uplo upper_lower, std::int64_t n,
-	      float alpha, sycl::buffer<float, 1>& a, std::int64_t lda, sycl::buffer<float, 1>& x,
-		  std::int64_t incx, float beta, sycl::buffer<float, 1>& y, std::int64_t incy) {
-    oneapi::math::blas::openblas::MAJOR::symv(selector.get_queue(), upper_lower, n, alpha, a, lda, 
-			                                  x, incx, beta, y, incy);
+          float alpha, sycl::buffer<float, 1>& a, std::int64_t lda, sycl::buffer<float, 1>& x,
+          std::int64_t incx, float beta, sycl::buffer<float, 1>& y, std::int64_t incy) {
+    oneapi::math::blas::openblas::MAJOR::symv(selector.get_queue(), upper_lower, n, alpha, a, lda,
+                                              x, incx, beta, y, incy);
 }
 
 void symv(backend_selector<backend::openblas> selector, uplo upper_lower, std::int64_t n,
           double alpha, sycl::buffer<double, 1>& a, std::int64_t lda, sycl::buffer<double, 1>& x,
           std::int64_t incx, double beta, sycl::buffer<double, 1>& y, std::int64_t incy) {
-    oneapi::math::blas::openblas::MAJOR::symv(selector.get_queue(), upper_lower, n, alpha, a, lda, 
-			                                  x, incx, beta, y, incy);
+    oneapi::math::blas::openblas::MAJOR::symv(selector.get_queue(), upper_lower, n, alpha, a, lda,
+                                              x, incx, beta, y, incy);
 }
 
 void omatcopy_batch(backend_selector<backend::openblas> selector, transpose trans, std::int64_t m,
@@ -1506,7 +1506,7 @@ void omatcopy_batch(backend_selector<backend::openblas> selector, transpose tran
                     std::int64_t stride_a, sycl::buffer<float, 1>& b, std::int64_t ldb,
                     std::int64_t stride_b, std::int64_t batch_size) {
     oneapi::math::blas::openblas::MAJOR::omatcopy_batch(
-		selector.get_queue(), trans, m, n, alpha, a, lda, stride_a, b, ldb, stride_b, batch_size);
+        selector.get_queue(), trans, m, n, alpha, a, lda, stride_a, b, ldb, stride_b, batch_size);
 }
 
 void omatcopy_batch(backend_selector<backend::openblas> selector, transpose trans, std::int64_t m,
@@ -1514,7 +1514,7 @@ void omatcopy_batch(backend_selector<backend::openblas> selector, transpose tran
                     std::int64_t stride_a, sycl::buffer<double, 1>& b, std::int64_t ldb,
                     std::int64_t stride_b, std::int64_t batch_size) {
     oneapi::math::blas::openblas::MAJOR::omatcopy_batch(
-	    selector.get_queue(), trans, m, n, alpha, a, lda, stride_a, b, ldb, stride_b, batch_size);
+        selector.get_queue(), trans, m, n, alpha, a, lda, stride_a, b, ldb, stride_b, batch_size);
 }
 
 void omatcopy_batch(backend_selector<backend::openblas> selector, transpose trans, std::int64_t m,
@@ -1523,7 +1523,7 @@ void omatcopy_batch(backend_selector<backend::openblas> selector, transpose tran
                     std::int64_t stride_a, sycl::buffer<std::complex<float>, 1>& b,
                     std::int64_t ldb, std::int64_t stride_b, std::int64_t batch_size) {
     oneapi::math::blas::openblas::MAJOR::omatcopy_batch(
-		selector.get_queue(), trans, m, n, alpha, a, lda, stride_a, b, ldb, stride_b, batch_size);
+        selector.get_queue(), trans, m, n, alpha, a, lda, stride_a, b, ldb, stride_b, batch_size);
 }
 
 void omatcopy_batch(backend_selector<backend::openblas> selector, transpose trans, std::int64_t m,
@@ -1532,21 +1532,21 @@ void omatcopy_batch(backend_selector<backend::openblas> selector, transpose tran
                     std::int64_t stride_a, sycl::buffer<std::complex<double>, 1>& b,
                     std::int64_t ldb, std::int64_t stride_b, std::int64_t batch_size) {
     oneapi::math::blas::openblas::MAJOR::omatcopy_batch(
-		selector.get_queue(), trans, m, n, alpha, a, lda, stride_a, b, ldb, stride_b, batch_size);
+        selector.get_queue(), trans, m, n, alpha, a, lda, stride_a, b, ldb, stride_b, batch_size);
 }
 
 void imatcopy_batch(backend_selector<backend::openblas> selector, transpose trans, std::int64_t m,
                     std::int64_t n, float alpha, sycl::buffer<float, 1>& ab, std::int64_t lda,
                     std::int64_t ldb, std::int64_t stride, std::int64_t batch_size) {
     oneapi::math::blas::openblas::MAJOR::imatcopy_batch(selector.get_queue(), trans, m, n, alpha,
-		                                            	ab, lda, ldb, stride, batch_size);
+                                                        ab, lda, ldb, stride, batch_size);
 }
 
 void imatcopy_batch(backend_selector<backend::openblas> selector, transpose trans, std::int64_t m,
                     std::int64_t n, double alpha, sycl::buffer<double, 1>& ab, std::int64_t lda,
                     std::int64_t ldb, std::int64_t stride, std::int64_t batch_size) {
     oneapi::math::blas::openblas::MAJOR::imatcopy_batch(selector.get_queue(), trans, m, n, alpha,
-		                                             	ab, lda, ldb, stride, batch_size);
+                                                        ab, lda, ldb, stride, batch_size);
 }
 
 void imatcopy_batch(backend_selector<backend::openblas> selector, transpose trans, std::int64_t m,
@@ -1554,15 +1554,15 @@ void imatcopy_batch(backend_selector<backend::openblas> selector, transpose tran
                     sycl::buffer<std::complex<float>, 1>& ab, std::int64_t lda, std::int64_t ldb,
                     std::int64_t stride, std::int64_t batch_size) {
     oneapi::math::blas::openblas::MAJOR::imatcopy_batch(selector.get_queue(), trans, m, n, alpha,
-		                                            	ab, lda, ldb, stride, batch_size);
+                                                        ab, lda, ldb, stride, batch_size);
 }
 
 void imatcopy_batch(backend_selector<backend::openblas> selector, transpose trans, std::int64_t m,
                     std::int64_t n, std::complex<double> alpha,
                     sycl::buffer<std::complex<double>, 1>& ab, std::int64_t lda, std::int64_t ldb,
                     std::int64_t stride, std::int64_t batch_size) {
-    oneapi::math::blas::openblas::MAJOR::imatcopy_batch(selector.get_queue(), trans, m, n, alpha, 
-			                                            ab, lda, ldb, stride, batch_size);
+    oneapi::math::blas::openblas::MAJOR::imatcopy_batch(selector.get_queue(), trans, m, n, alpha,
+                                                        ab, lda, ldb, stride, batch_size);
 }
 
 void omatadd_batch(backend_selector<backend::openblas> selector, transpose transa, transpose transb,
@@ -1611,29 +1611,29 @@ void omatadd_batch(backend_selector<backend::openblas> selector, transpose trans
 void omatcopy(backend_selector<backend::openblas> selector, transpose trans, std::int64_t m,
               std::int64_t n, float alpha, sycl::buffer<float, 1>& a, std::int64_t lda,
               sycl::buffer<float, 1>& b, std::int64_t ldb) {
-    oneapi::math::blas::openblas::MAJOR::omatcopy(selector.get_queue(), trans, m, n, alpha, a, lda, 
-			                                      b, ldb);
+    oneapi::math::blas::openblas::MAJOR::omatcopy(selector.get_queue(), trans, m, n, alpha, a, lda,
+                                                  b, ldb);
 }
 
 void omatcopy(backend_selector<backend::openblas> selector, transpose trans, std::int64_t m,
               std::int64_t n, double alpha, sycl::buffer<double, 1>& a, std::int64_t lda,
               sycl::buffer<double, 1>& b, std::int64_t ldb) {
-    oneapi::math::blas::openblas::MAJOR::omatcopy(selector.get_queue(), trans, m, n, alpha, a, lda, 
-			                                      b, ldb);
+    oneapi::math::blas::openblas::MAJOR::omatcopy(selector.get_queue(), trans, m, n, alpha, a, lda,
+                                                  b, ldb);
 }
 
 void omatcopy(backend_selector<backend::openblas> selector, transpose trans, std::int64_t m,
               std::int64_t n, std::complex<float> alpha, sycl::buffer<std::complex<float>, 1>& a,
               std::int64_t lda, sycl::buffer<std::complex<float>, 1>& b, std::int64_t ldb) {
     oneapi::math::blas::openblas::MAJOR::omatcopy(selector.get_queue(), trans, m, n, alpha, a, lda,
-		                                          b, ldb);
+                                                  b, ldb);
 }
 
 void omatcopy(backend_selector<backend::openblas> selector, transpose trans, std::int64_t m,
               std::int64_t n, std::complex<double> alpha, sycl::buffer<std::complex<double>, 1>& a,
               std::int64_t lda, sycl::buffer<std::complex<double>, 1>& b, std::int64_t ldb) {
     oneapi::math::blas::openblas::MAJOR::omatcopy(selector.get_queue(), trans, m, n, alpha, a, lda,
-		                                          b, ldb);
+                                                  b, ldb);
 }
 
 void omatcopy2(backend_selector<backend::openblas> selector, transpose trans, std::int64_t m,
@@ -1701,7 +1701,7 @@ void omatadd(backend_selector<backend::openblas> selector, transpose transa, tra
              std::int64_t lda, float beta, sycl::buffer<float, 1>& b, std::int64_t ldb,
              sycl::buffer<float, 1>& c, std::int64_t ldc) {
     oneapi::math::blas::openblas::MAJOR::omatadd(selector.get_queue(), transa, transb, m, n, alpha,
-		                                      	 a, lda, beta, b, ldb, c, ldc);
+                                                 a, lda, beta, b, ldb, c, ldc);
 }
 
 void omatadd(backend_selector<backend::openblas> selector, transpose transa, transpose transb,
@@ -1709,7 +1709,7 @@ void omatadd(backend_selector<backend::openblas> selector, transpose transa, tra
              std::int64_t lda, double beta, sycl::buffer<double, 1>& b, std::int64_t ldb,
              sycl::buffer<double, 1>& c, std::int64_t ldc) {
     oneapi::math::blas::openblas::MAJOR::omatadd(selector.get_queue(), transa, transb, m, n, alpha,
-		                                         a, lda, beta, b, ldb, c, ldc);
+                                                 a, lda, beta, b, ldb, c, ldc);
 }
 
 void omatadd(backend_selector<backend::openblas> selector, transpose transa, transpose transb,
@@ -1718,7 +1718,7 @@ void omatadd(backend_selector<backend::openblas> selector, transpose transa, tra
              sycl::buffer<std::complex<float>, 1>& b, std::int64_t ldb,
              sycl::buffer<std::complex<float>, 1>& c, std::int64_t ldc) {
     oneapi::math::blas::openblas::MAJOR::omatadd(selector.get_queue(), transa, transb, m, n, alpha,
-		                                         a, lda, beta, b, ldb, c, ldc);
+                                                 a, lda, beta, b, ldb, c, ldc);
 }
 
 void omatadd(backend_selector<backend::openblas> selector, transpose transa, transpose transb,
@@ -1727,7 +1727,7 @@ void omatadd(backend_selector<backend::openblas> selector, transpose transa, tra
              sycl::buffer<std::complex<double>, 1>& b, std::int64_t ldb,
              sycl::buffer<std::complex<double>, 1>& c, std::int64_t ldc) {
     oneapi::math::blas::openblas::MAJOR::omatadd(selector.get_queue(), transa, transb, m, n, alpha,
-		                                         a, lda, beta, b, ldb, c, ldc);
+                                                 a, lda, beta, b, ldb, c, ldc);
 }
 
 // USM APIs
@@ -1736,7 +1736,7 @@ sycl::event syr2(backend_selector<backend::openblas> selector, uplo upper_lower,
                  float alpha, const float* x, std::int64_t incx, const float* y, std::int64_t incy,
                  float* a, std::int64_t lda, const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::openblas::MAJOR::syr2(
-			selector.get_queue(), upper_lower, n, alpha, x, incx, y, incy, a, lda, dependencies);
+        selector.get_queue(), upper_lower, n, alpha, x, incx, y, incy, a, lda, dependencies);
     return done;
 }
 
@@ -1745,12 +1745,12 @@ sycl::event syr2(backend_selector<backend::openblas> selector, uplo upper_lower,
                  std::int64_t incy, double* a, std::int64_t lda,
                  const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::openblas::MAJOR::syr2(
-			selector.get_queue(), upper_lower, n, alpha, x, incx, y, incy, a, lda, dependencies);
+        selector.get_queue(), upper_lower, n, alpha, x, incx, y, incy, a, lda, dependencies);
     return done;
 }
 
-sycl::event scal(backend_selector<backend::openblas> selector, std::int64_t n, float alpha, 
-		         float* x, std::int64_t incx, const std::vector<sycl::event>& dependencies) {
+sycl::event scal(backend_selector<backend::openblas> selector, std::int64_t n, float alpha,
+                 float* x, std::int64_t incx, const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::openblas::MAJOR::scal(selector.get_queue(), n, alpha, x, incx,
                                                           dependencies);
     return done;
@@ -1866,16 +1866,16 @@ sycl::event tpmv(backend_selector<backend::openblas> selector, uplo upper_lower,
 sycl::event spr(backend_selector<backend::openblas> selector, uplo upper_lower, std::int64_t n,
                 float alpha, const float* x, std::int64_t incx, float* a,
                 const std::vector<sycl::event>& dependencies) {
-    auto done = oneapi::math::blas::openblas::MAJOR::spr(selector.get_queue(), upper_lower, n, 
-			                                             alpha, x, incx, a, dependencies);
+    auto done = oneapi::math::blas::openblas::MAJOR::spr(selector.get_queue(), upper_lower, n,
+                                                         alpha, x, incx, a, dependencies);
     return done;
 }
 
 sycl::event spr(backend_selector<backend::openblas> selector, uplo upper_lower, std::int64_t n,
                 double alpha, const double* x, std::int64_t incx, double* a,
                 const std::vector<sycl::event>& dependencies) {
-    auto done = oneapi::math::blas::openblas::MAJOR::spr(selector.get_queue(), upper_lower, n, 
-			                                             alpha, x, incx, a, dependencies);
+    auto done = oneapi::math::blas::openblas::MAJOR::spr(selector.get_queue(), upper_lower, n,
+                                                         alpha, x, incx, a, dependencies);
     return done;
 }
 
@@ -1885,7 +1885,7 @@ sycl::event hpmv(backend_selector<backend::openblas> selector, uplo upper_lower,
                  std::complex<float>* y, std::int64_t incy,
                  const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::openblas::MAJOR::hpmv(
-		selector.get_queue(), upper_lower, n, alpha, a, x, incx, beta, y, incy, dependencies);
+        selector.get_queue(), upper_lower, n, alpha, a, x, incx, beta, y, incy, dependencies);
     return done;
 }
 
@@ -1895,7 +1895,7 @@ sycl::event hpmv(backend_selector<backend::openblas> selector, uplo upper_lower,
                  std::complex<double>* y, std::int64_t incy,
                  const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::openblas::MAJOR::hpmv(
-		selector.get_queue(), upper_lower, n, alpha, a, x, incx, beta, y, incy, dependencies);
+        selector.get_queue(), upper_lower, n, alpha, a, x, incx, beta, y, incy, dependencies);
     return done;
 }
 
@@ -2034,7 +2034,7 @@ sycl::event her2(backend_selector<backend::openblas> selector, uplo upper_lower,
                  const std::complex<float>* y, std::int64_t incy, std::complex<float>* a,
                  std::int64_t lda, const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::openblas::MAJOR::her2(
-		selector.get_queue(), upper_lower, n, alpha, x, incx, y, incy, a, lda, dependencies);
+        selector.get_queue(), upper_lower, n, alpha, x, incx, y, incy, a, lda, dependencies);
     return done;
 }
 
@@ -2043,7 +2043,7 @@ sycl::event her2(backend_selector<backend::openblas> selector, uplo upper_lower,
                  const std::complex<double>* y, std::int64_t incy, std::complex<double>* a,
                  std::int64_t lda, const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::openblas::MAJOR::her2(
-		selector.get_queue(), upper_lower, n, alpha, x, incx, y, incy, a, lda, dependencies);
+        selector.get_queue(), upper_lower, n, alpha, x, incx, y, incy, a, lda, dependencies);
     return done;
 }
 
@@ -2069,20 +2069,20 @@ sycl::event hbmv(backend_selector<backend::openblas> selector, uplo upper_lower,
     return done;
 }
 
-sycl::event rot(backend_selector<backend::openblas> selector, std::int64_t n, 
-		        std::complex<float>* x, std::int64_t incx, std::complex<float>* y,
-			   	std::int64_t incy, float c, float s, const std::vector<sycl::event>& dependencies) {
-    auto done = oneapi::math::blas::openblas::MAJOR::rot(selector.get_queue(), n, x, incx, y, incy, 
-			                                             c, s, dependencies);
+sycl::event rot(backend_selector<backend::openblas> selector, std::int64_t n,
+                std::complex<float>* x, std::int64_t incx, std::complex<float>* y,
+                std::int64_t incy, float c, float s, const std::vector<sycl::event>& dependencies) {
+    auto done = oneapi::math::blas::openblas::MAJOR::rot(selector.get_queue(), n, x, incx, y, incy,
+                                                         c, s, dependencies);
     return done;
 }
 
-sycl::event rot(backend_selector<backend::openblas> selector, std::int64_t n, 
-		        std::complex<double>* x, std::int64_t incx, std::complex<double>* y, 
-				std::int64_t incy, double c, double s,
+sycl::event rot(backend_selector<backend::openblas> selector, std::int64_t n,
+                std::complex<double>* x, std::int64_t incx, std::complex<double>* y,
+                std::int64_t incy, double c, double s,
                 const std::vector<sycl::event>& dependencies) {
-    auto done = oneapi::math::blas::openblas::MAJOR::rot(selector.get_queue(), n, x, incx, y, incy, 
-			                                             c, s, dependencies);
+    auto done = oneapi::math::blas::openblas::MAJOR::rot(selector.get_queue(), n, x, incx, y, incy,
+                                                         c, s, dependencies);
     return done;
 }
 
@@ -2090,31 +2090,31 @@ sycl::event rot(backend_selector<backend::openblas> selector, std::int64_t n, fl
                 std::int64_t incx, float* y, std::int64_t incy, float c, float s,
                 const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::openblas::MAJOR::rot(selector.get_queue(), n, x, incx, y, incy,
-		                                              	 c, s, dependencies);
+                                                         c, s, dependencies);
     return done;
 }
 
 sycl::event rot(backend_selector<backend::openblas> selector, std::int64_t n, double* x,
                 std::int64_t incx, double* y, std::int64_t incy, double c, double s,
                 const std::vector<sycl::event>& dependencies) {
-    auto done = oneapi::math::blas::openblas::MAJOR::rot(selector.get_queue(), n, x, incx, y, incy, 
-			                                             c, s, dependencies);
+    auto done = oneapi::math::blas::openblas::MAJOR::rot(selector.get_queue(), n, x, incx, y, incy,
+                                                         c, s, dependencies);
     return done;
 }
 
 sycl::event axpy(backend_selector<backend::openblas> selector, std::int64_t n, float alpha,
                  const float* x, std::int64_t incx, float* y, std::int64_t incy,
                  const std::vector<sycl::event>& dependencies) {
-    auto done = oneapi::math::blas::openblas::MAJOR::axpy(selector.get_queue(), n, alpha, x, incx, 
-			                                              y, incy, dependencies);
+    auto done = oneapi::math::blas::openblas::MAJOR::axpy(selector.get_queue(), n, alpha, x, incx,
+                                                          y, incy, dependencies);
     return done;
 }
 
 sycl::event axpy(backend_selector<backend::openblas> selector, std::int64_t n, double alpha,
                  const double* x, std::int64_t incx, double* y, std::int64_t incy,
                  const std::vector<sycl::event>& dependencies) {
-    auto done = oneapi::math::blas::openblas::MAJOR::axpy(selector.get_queue(), n, alpha, x, incx, 
-			                                              y, incy, dependencies);
+    auto done = oneapi::math::blas::openblas::MAJOR::axpy(selector.get_queue(), n, alpha, x, incx,
+                                                          y, incy, dependencies);
     return done;
 }
 
@@ -2122,8 +2122,8 @@ sycl::event axpy(backend_selector<backend::openblas> selector, std::int64_t n,
                  std::complex<float> alpha, const std::complex<float>* x, std::int64_t incx,
                  std::complex<float>* y, std::int64_t incy,
                  const std::vector<sycl::event>& dependencies) {
-    auto done = oneapi::math::blas::openblas::MAJOR::axpy(selector.get_queue(), n, alpha, x, incx, 
-			                                              y, incy, dependencies);
+    auto done = oneapi::math::blas::openblas::MAJOR::axpy(selector.get_queue(), n, alpha, x, incx,
+                                                          y, incy, dependencies);
     return done;
 }
 
@@ -2131,8 +2131,8 @@ sycl::event axpy(backend_selector<backend::openblas> selector, std::int64_t n,
                  std::complex<double> alpha, const std::complex<double>* x, std::int64_t incx,
                  std::complex<double>* y, std::int64_t incy,
                  const std::vector<sycl::event>& dependencies) {
-    auto done = oneapi::math::blas::openblas::MAJOR::axpy(selector.get_queue(), n, alpha, x, incx, 
-			                                              y, incy, dependencies);
+    auto done = oneapi::math::blas::openblas::MAJOR::axpy(selector.get_queue(), n, alpha, x, incx,
+                                                          y, incy, dependencies);
     return done;
 }
 
@@ -2254,8 +2254,8 @@ sycl::event gerc(backend_selector<backend::openblas> selector, std::int64_t m, s
                  std::complex<float> alpha, const std::complex<float>* x, std::int64_t incx,
                  const std::complex<float>* y, std::int64_t incy, std::complex<float>* a,
                  std::int64_t lda, const std::vector<sycl::event>& dependencies) {
-    auto done = oneapi::math::blas::openblas::MAJOR::gerc(selector.get_queue(), m, n, alpha, x, 
-			                                              incx, y, incy, a, lda, dependencies);
+    auto done = oneapi::math::blas::openblas::MAJOR::gerc(selector.get_queue(), m, n, alpha, x,
+                                                          incx, y, incy, a, lda, dependencies);
     return done;
 }
 
@@ -2263,8 +2263,8 @@ sycl::event gerc(backend_selector<backend::openblas> selector, std::int64_t m, s
                  std::complex<double> alpha, const std::complex<double>* x, std::int64_t incx,
                  const std::complex<double>* y, std::int64_t incy, std::complex<double>* a,
                  std::int64_t lda, const std::vector<sycl::event>& dependencies) {
-    auto done = oneapi::math::blas::openblas::MAJOR::gerc(selector.get_queue(), m, n, alpha, x, 
-			                                              incx, y, incy, a, lda, dependencies);
+    auto done = oneapi::math::blas::openblas::MAJOR::gerc(selector.get_queue(), m, n, alpha, x,
+                                                          incx, y, incy, a, lda, dependencies);
     return done;
 }
 
@@ -2273,8 +2273,8 @@ sycl::event syr2k(backend_selector<backend::openblas> selector, uplo upper_lower
                   const float* b, std::int64_t ldb, float beta, float* c, std::int64_t ldc,
                   const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::openblas::MAJOR::syr2k(selector.get_queue(), upper_lower, trans,
-		                                                   n, k, alpha, a, lda, b, ldb, beta, c, 
-														   ldc, dependencies);
+                                                           n, k, alpha, a, lda, b, ldb, beta, c,
+                                                           ldc, dependencies);
     return done;
 }
 
@@ -2283,8 +2283,8 @@ sycl::event syr2k(backend_selector<backend::openblas> selector, uplo upper_lower
                   const double* b, std::int64_t ldb, double beta, double* c, std::int64_t ldc,
                   const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::openblas::MAJOR::syr2k(selector.get_queue(), upper_lower, trans,
-		                                                n, k, alpha, a, lda, b, ldb, beta, c, 
-														ldc, dependencies);
+                                                           n, k, alpha, a, lda, b, ldb, beta, c,
+                                                           ldc, dependencies);
     return done;
 }
 
@@ -2294,8 +2294,8 @@ sycl::event syr2k(backend_selector<backend::openblas> selector, uplo upper_lower
                   std::int64_t ldb, std::complex<float> beta, std::complex<float>* c,
                   std::int64_t ldc, const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::openblas::MAJOR::syr2k(selector.get_queue(), upper_lower, trans,
-		                                                   n, k, alpha, a, lda, b, ldb, beta, c, 
-														   ldc, dependencies);
+                                                           n, k, alpha, a, lda, b, ldb, beta, c,
+                                                           ldc, dependencies);
     return done;
 }
 
@@ -2305,8 +2305,8 @@ sycl::event syr2k(backend_selector<backend::openblas> selector, uplo upper_lower
                   std::int64_t ldb, std::complex<double> beta, std::complex<double>* c,
                   std::int64_t ldc, const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::openblas::MAJOR::syr2k(selector.get_queue(), upper_lower, trans,
-		                                                   n, k, alpha, a, lda, b, ldb, beta, c, 
-														   ldc, dependencies);
+                                                           n, k, alpha, a, lda, b, ldb, beta, c,
+                                                           ldc, dependencies);
     return done;
 }
 
@@ -2315,7 +2315,7 @@ sycl::event gemv(backend_selector<backend::openblas> selector, transpose trans, 
                  std::int64_t incx, float beta, float* y, std::int64_t incy,
                  const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::openblas::MAJOR::gemv(
-		selector.get_queue(), trans, m, n, alpha, a, lda, x, incx, beta, y, incy, dependencies);
+        selector.get_queue(), trans, m, n, alpha, a, lda, x, incx, beta, y, incy, dependencies);
     return done;
 }
 
@@ -2324,7 +2324,7 @@ sycl::event gemv(backend_selector<backend::openblas> selector, transpose trans, 
                  std::int64_t incx, double beta, double* y, std::int64_t incy,
                  const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::openblas::MAJOR::gemv(
-		selector.get_queue(), trans, m, n, alpha, a, lda, x, incx, beta, y, incy, dependencies);
+        selector.get_queue(), trans, m, n, alpha, a, lda, x, incx, beta, y, incy, dependencies);
     return done;
 }
 
@@ -2334,7 +2334,7 @@ sycl::event gemv(backend_selector<backend::openblas> selector, transpose trans, 
                  std::complex<float> beta, std::complex<float>* y, std::int64_t incy,
                  const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::openblas::MAJOR::gemv(
-		selector.get_queue(), trans, m, n, alpha, a, lda, x, incx, beta, y, incy, dependencies);
+        selector.get_queue(), trans, m, n, alpha, a, lda, x, incx, beta, y, incy, dependencies);
     return done;
 }
 
@@ -2344,13 +2344,13 @@ sycl::event gemv(backend_selector<backend::openblas> selector, transpose trans, 
                  std::complex<double> beta, std::complex<double>* y, std::int64_t incy,
                  const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::openblas::MAJOR::gemv(
-		selector.get_queue(), trans, m, n, alpha, a, lda, x, incx, beta, y, incy, dependencies);
+        selector.get_queue(), trans, m, n, alpha, a, lda, x, incx, beta, y, incy, dependencies);
     return done;
 }
 
 sycl::event gemv_batch(backend_selector<backend::openblas> selector, transpose trans,
-	                   std::int64_t m, std::int64_t n, float alpha, const float* a, 
-					   std::int64_t lda, std::int64_t stridea, const float* x, std::int64_t incx,
+                       std::int64_t m, std::int64_t n, float alpha, const float* a,
+                       std::int64_t lda, std::int64_t stridea, const float* x, std::int64_t incx,
                        std::int64_t stridex, float beta, float* y, std::int64_t incy,
                        std::int64_t stridey, std::int64_t batch_size,
                        const std::vector<sycl::event>& dependencies) {
@@ -2360,9 +2360,9 @@ sycl::event gemv_batch(backend_selector<backend::openblas> selector, transpose t
     return done;
 }
 
-sycl::event gemv_batch(backend_selector<backend::openblas> selector, transpose trans, 
-		               std::int64_t m, std::int64_t n, double alpha, const double* a,
-					   std::int64_t lda, std::int64_t stridea, const double* x, std::int64_t incx,
+sycl::event gemv_batch(backend_selector<backend::openblas> selector, transpose trans,
+                       std::int64_t m, std::int64_t n, double alpha, const double* a,
+                       std::int64_t lda, std::int64_t stridea, const double* x, std::int64_t incx,
                        std::int64_t stridex, double beta, double* y, std::int64_t incy,
                        std::int64_t stridey, std::int64_t batch_size,
                        const std::vector<sycl::event>& dependencies) {
@@ -2372,26 +2372,26 @@ sycl::event gemv_batch(backend_selector<backend::openblas> selector, transpose t
     return done;
 }
 
-sycl::event gemv_batch(backend_selector<backend::openblas> selector, transpose trans, 
-		               std::int64_t m, std::int64_t n, std::complex<float> alpha,
-					   const std::complex<float>* a, std::int64_t lda, std::int64_t stridea, 
-					   const std::complex<float>* x, std::int64_t incx, std::int64_t stridex,
-					   std::complex<float> beta, std::complex<float>* y, std::int64_t incy,
-					   std::int64_t stridey, std::int64_t batch_size, 
-					   const std::vector<sycl::event>& dependencies) {
+sycl::event gemv_batch(backend_selector<backend::openblas> selector, transpose trans,
+                       std::int64_t m, std::int64_t n, std::complex<float> alpha,
+                       const std::complex<float>* a, std::int64_t lda, std::int64_t stridea,
+                       const std::complex<float>* x, std::int64_t incx, std::int64_t stridex,
+                       std::complex<float> beta, std::complex<float>* y, std::int64_t incy,
+                       std::int64_t stridey, std::int64_t batch_size,
+                       const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::openblas::MAJOR::gemv_batch(
         selector.get_queue(), trans, m, n, alpha, a, lda, stridea, x, incx, stridex, beta, y, incy,
         stridey, batch_size, dependencies);
     return done;
 }
 
-sycl::event gemv_batch(backend_selector<backend::openblas> selector, transpose trans, 
-		               std::int64_t m, std::int64_t n, std::complex<double> alpha, 
-					   const std::complex<double>* a, std::int64_t lda, std::int64_t stridea,
-					   const std::complex<double>* x, std::int64_t incx, std::int64_t stridex,
-					   std::complex<double> beta, std::complex<double>* y, std::int64_t incy,
-					   std::int64_t stridey, std::int64_t batch_size,
-					   const std::vector<sycl::event>& dependencies) {
+sycl::event gemv_batch(backend_selector<backend::openblas> selector, transpose trans,
+                       std::int64_t m, std::int64_t n, std::complex<double> alpha,
+                       const std::complex<double>* a, std::int64_t lda, std::int64_t stridea,
+                       const std::complex<double>* x, std::int64_t incx, std::int64_t stridex,
+                       std::complex<double> beta, std::complex<double>* y, std::int64_t incy,
+                       std::int64_t stridey, std::int64_t batch_size,
+                       const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::openblas::MAJOR::gemv_batch(
         selector.get_queue(), trans, m, n, alpha, a, lda, stridea, x, incx, stridex, beta, y, incy,
         stridey, batch_size, dependencies);
@@ -2445,11 +2445,11 @@ sycl::event gemv_batch(backend_selector<backend::openblas> selector, transpose* 
     return done;
 }
 
-sycl::event dgmm_batch(backend_selector<backend::openblas> selector, side left_right, 
-		               std::int64_t m, std::int64_t n, const float* a, std::int64_t lda, 
-					   std::int64_t stridea, const float* x, std::int64_t incx, 
-					   std::int64_t stridex, float* c, std::int64_t ldc, std::int64_t stridec,
-					   std::int64_t batch_size, const std::vector<sycl::event>& dependencies) {
+sycl::event dgmm_batch(backend_selector<backend::openblas> selector, side left_right,
+                       std::int64_t m, std::int64_t n, const float* a, std::int64_t lda,
+                       std::int64_t stridea, const float* x, std::int64_t incx,
+                       std::int64_t stridex, float* c, std::int64_t ldc, std::int64_t stridec,
+                       std::int64_t batch_size, const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::openblas::MAJOR::dgmm_batch(
         selector.get_queue(), left_right, m, n, a, lda, stridea, x, incx, stridex, c, ldc, stridec,
         batch_size, dependencies);
@@ -2457,21 +2457,21 @@ sycl::event dgmm_batch(backend_selector<backend::openblas> selector, side left_r
 }
 
 sycl::event dgmm_batch(backend_selector<backend::openblas> selector, side left_right,
-	                   std::int64_t m, std::int64_t n, const double* a, std::int64_t lda, 
-					   std::int64_t stridea, const double* x, std::int64_t incx,
-					   std::int64_t stridex, double* c, std::int64_t ldc, std::int64_t stridec, 
-					   std::int64_t batch_size, const std::vector<sycl::event>& dependencies) {
+                       std::int64_t m, std::int64_t n, const double* a, std::int64_t lda,
+                       std::int64_t stridea, const double* x, std::int64_t incx,
+                       std::int64_t stridex, double* c, std::int64_t ldc, std::int64_t stridec,
+                       std::int64_t batch_size, const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::openblas::MAJOR::dgmm_batch(
         selector.get_queue(), left_right, m, n, a, lda, stridea, x, incx, stridex, c, ldc, stridec,
         batch_size, dependencies);
     return done;
 }
 
-sycl::event dgmm_batch(backend_selector<backend::openblas> selector, side left_right, 
-		               std::int64_t m, std::int64_t n, const std::complex<float>* a, 
-					   std::int64_t lda, std::int64_t stridea, const std::complex<float>* x, 
-					   std::int64_t incx, std::int64_t stridex, std::complex<float>* c, 
-					   std::int64_t ldc, std::int64_t stridec, std::int64_t batch_size,
+sycl::event dgmm_batch(backend_selector<backend::openblas> selector, side left_right,
+                       std::int64_t m, std::int64_t n, const std::complex<float>* a,
+                       std::int64_t lda, std::int64_t stridea, const std::complex<float>* x,
+                       std::int64_t incx, std::int64_t stridex, std::complex<float>* c,
+                       std::int64_t ldc, std::int64_t stridec, std::int64_t batch_size,
                        const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::openblas::MAJOR::dgmm_batch(
         selector.get_queue(), left_right, m, n, a, lda, stridea, x, incx, stridex, c, ldc, stridec,
@@ -2479,11 +2479,11 @@ sycl::event dgmm_batch(backend_selector<backend::openblas> selector, side left_r
     return done;
 }
 
-sycl::event dgmm_batch(backend_selector<backend::openblas> selector, side left_right, 
-		               std::int64_t m, std::int64_t n, const std::complex<double>* a, 
-					   std::int64_t lda, std::int64_t stridea, const std::complex<double>* x, 
-					   std::int64_t incx, std::int64_t stridex, std::complex<double>* c, 
-					   std::int64_t ldc, std::int64_t stridec, std::int64_t batch_size,
+sycl::event dgmm_batch(backend_selector<backend::openblas> selector, side left_right,
+                       std::int64_t m, std::int64_t n, const std::complex<double>* a,
+                       std::int64_t lda, std::int64_t stridea, const std::complex<double>* x,
+                       std::int64_t incx, std::int64_t stridex, std::complex<double>* c,
+                       std::int64_t ldc, std::int64_t stridec, std::int64_t batch_size,
                        const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::openblas::MAJOR::dgmm_batch(
         selector.get_queue(), left_right, m, n, a, lda, stridea, x, incx, stridex, c, ldc, stridec,
@@ -2539,8 +2539,8 @@ sycl::event her(backend_selector<backend::openblas> selector, uplo upper_lower, 
                 float alpha, const std::complex<float>* x, std::int64_t incx,
                 std::complex<float>* a, std::int64_t lda,
                 const std::vector<sycl::event>& dependencies) {
-    auto done = oneapi::math::blas::openblas::MAJOR::her(selector.get_queue(), upper_lower, n, 
-			                                             alpha, x, incx, a, lda, dependencies);
+    auto done = oneapi::math::blas::openblas::MAJOR::her(selector.get_queue(), upper_lower, n,
+                                                         alpha, x, incx, a, lda, dependencies);
     return done;
 }
 
@@ -2549,7 +2549,7 @@ sycl::event her(backend_selector<backend::openblas> selector, uplo upper_lower, 
                 std::complex<double>* a, std::int64_t lda,
                 const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::openblas::MAJOR::her(selector.get_queue(), upper_lower, n,
-		                                                 alpha, x, incx, a, lda, dependencies);
+                                                         alpha, x, incx, a, lda, dependencies);
     return done;
 }
 
@@ -2557,15 +2557,15 @@ sycl::event hpr(backend_selector<backend::openblas> selector, uplo upper_lower, 
                 float alpha, const std::complex<float>* x, std::int64_t incx,
                 std::complex<float>* a, const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::openblas::MAJOR::hpr(selector.get_queue(), upper_lower, n,
-		                                                 alpha, x, incx, a, dependencies);
+                                                         alpha, x, incx, a, dependencies);
     return done;
 }
 
 sycl::event hpr(backend_selector<backend::openblas> selector, uplo upper_lower, std::int64_t n,
                 double alpha, const std::complex<double>* x, std::int64_t incx,
                 std::complex<double>* a, const std::vector<sycl::event>& dependencies) {
-    auto done = oneapi::math::blas::openblas::MAJOR::hpr(selector.get_queue(), upper_lower, n, 
-			                                             alpha, x, incx, a, dependencies);
+    auto done = oneapi::math::blas::openblas::MAJOR::hpr(selector.get_queue(), upper_lower, n,
+                                                         alpha, x, incx, a, dependencies);
     return done;
 }
 
@@ -2801,7 +2801,7 @@ sycl::event spmv(backend_selector<backend::openblas> selector, uplo upper_lower,
                  float alpha, const float* a, const float* x, std::int64_t incx, float beta,
                  float* y, std::int64_t incy, const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::openblas::MAJOR::spmv(
-		selector.get_queue(), upper_lower, n, alpha, a, x, incx, beta, y, incy, dependencies);
+        selector.get_queue(), upper_lower, n, alpha, a, x, incx, beta, y, incy, dependencies);
     return done;
 }
 
@@ -2809,7 +2809,7 @@ sycl::event spmv(backend_selector<backend::openblas> selector, uplo upper_lower,
                  double alpha, const double* a, const double* x, std::int64_t incx, double beta,
                  double* y, std::int64_t incy, const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::openblas::MAJOR::spmv(
-		selector.get_queue(), upper_lower, n, alpha, a, x, incx, beta, y, incy, dependencies);
+        selector.get_queue(), upper_lower, n, alpha, a, x, incx, beta, y, incy, dependencies);
     return done;
 }
 
@@ -2829,9 +2829,9 @@ sycl::event swap(backend_selector<backend::openblas> selector, std::int64_t n, d
     return done;
 }
 
-sycl::event swap(backend_selector<backend::openblas> selector, std::int64_t n, 
-		         std::complex<float>* x, std::int64_t incx, std::complex<float>* y, 
-				 std::int64_t incy, const std::vector<sycl::event>& dependencies) {
+sycl::event swap(backend_selector<backend::openblas> selector, std::int64_t n,
+                 std::complex<float>* x, std::int64_t incx, std::complex<float>* y,
+                 std::int64_t incy, const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::openblas::MAJOR::swap(selector.get_queue(), n, x, incx, y, incy,
                                                           dependencies);
     return done;
@@ -2850,7 +2850,7 @@ sycl::event geru(backend_selector<backend::openblas> selector, std::int64_t m, s
                  const std::complex<float>* y, std::int64_t incy, std::complex<float>* a,
                  std::int64_t lda, const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::openblas::MAJOR::geru(selector.get_queue(), m, n, alpha, x,
-		                                      	          incx, y, incy, a, lda, dependencies);
+                                                          incx, y, incy, a, lda, dependencies);
     return done;
 }
 
@@ -2859,7 +2859,7 @@ sycl::event geru(backend_selector<backend::openblas> selector, std::int64_t m, s
                  const std::complex<double>* y, std::int64_t incy, std::complex<double>* a,
                  std::int64_t lda, const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::openblas::MAJOR::geru(selector.get_queue(), m, n, alpha, x,
-		                                                  incx, y, incy, a, lda, dependencies);
+                                                          incx, y, incy, a, lda, dependencies);
     return done;
 }
 
@@ -2897,10 +2897,9 @@ sycl::event gemm(backend_selector<backend::openblas> selector, transpose transa,
                  std::int64_t m, std::int64_t n, std::int64_t k, float alpha, const float* a,
                  std::int64_t lda, const float* b, std::int64_t ldb, float beta, float* c,
                  std::int64_t ldc, const std::vector<sycl::event>& dependencies) {
-    auto done =
-        oneapi::math::blas::openblas::MAJOR::gemm(selector.get_queue(), transa, transb, m,
-			                            	      n, k, alpha, a, lda, b, ldb, beta, c, ldc,
-												  dependencies);
+    auto done = oneapi::math::blas::openblas::MAJOR::gemm(selector.get_queue(), transa, transb, m,
+                                                          n, k, alpha, a, lda, b, ldb, beta, c, ldc,
+                                                          dependencies);
     return done;
 }
 
@@ -2908,10 +2907,9 @@ sycl::event gemm(backend_selector<backend::openblas> selector, transpose transa,
                  std::int64_t m, std::int64_t n, std::int64_t k, double alpha, const double* a,
                  std::int64_t lda, const double* b, std::int64_t ldb, double beta, double* c,
                  std::int64_t ldc, const std::vector<sycl::event>& dependencies) {
-    auto done =
-        oneapi::math::blas::openblas::MAJOR::gemm(selector.get_queue(), transa, transb, m,
-			                                      n, k, alpha, a, lda, b, ldb, beta, c, ldc,
-												  dependencies);
+    auto done = oneapi::math::blas::openblas::MAJOR::gemm(selector.get_queue(), transa, transb, m,
+                                                          n, k, alpha, a, lda, b, ldb, beta, c, ldc,
+                                                          dependencies);
     return done;
 }
 
@@ -2920,10 +2918,9 @@ sycl::event gemm(backend_selector<backend::openblas> selector, transpose transa,
                  const std::complex<float>* a, std::int64_t lda, const std::complex<float>* b,
                  std::int64_t ldb, std::complex<float> beta, std::complex<float>* c,
                  std::int64_t ldc, const std::vector<sycl::event>& dependencies) {
-    auto done =
-        oneapi::math::blas::openblas::MAJOR::gemm(selector.get_queue(), transa, transb, m,
-			                                      n, k, alpha, a, lda, b, ldb, beta, c, ldc, 
-												  dependencies);
+    auto done = oneapi::math::blas::openblas::MAJOR::gemm(selector.get_queue(), transa, transb, m,
+                                                          n, k, alpha, a, lda, b, ldb, beta, c, ldc,
+                                                          dependencies);
     return done;
 }
 
@@ -2932,10 +2929,9 @@ sycl::event gemm(backend_selector<backend::openblas> selector, transpose transa,
                  const std::complex<double>* a, std::int64_t lda, const std::complex<double>* b,
                  std::int64_t ldb, std::complex<double> beta, std::complex<double>* c,
                  std::int64_t ldc, const std::vector<sycl::event>& dependencies) {
-    auto done =
-        oneapi::math::blas::openblas::MAJOR::gemm(selector.get_queue(), transa, transb, m,
-			                                      n, k, alpha, a, lda, b, ldb, beta, c, ldc,
-												  dependencies);
+    auto done = oneapi::math::blas::openblas::MAJOR::gemm(selector.get_queue(), transa, transb, m,
+                                                          n, k, alpha, a, lda, b, ldb, beta, c, ldc,
+                                                          dependencies);
     return done;
 }
 
@@ -2944,10 +2940,9 @@ sycl::event gemm(backend_selector<backend::openblas> selector, transpose transa,
                  const sycl::half* a, std::int64_t lda, const sycl::half* b, std::int64_t ldb,
                  sycl::half beta, sycl::half* c, std::int64_t ldc,
                  const std::vector<sycl::event>& dependencies) {
-    auto done =
-        oneapi::math::blas::openblas::MAJOR::gemm(selector.get_queue(), transa, transb, m,
-			                                      n, k, alpha, a, lda, b, ldb, beta, c, ldc,
-												  dependencies);
+    auto done = oneapi::math::blas::openblas::MAJOR::gemm(selector.get_queue(), transa, transb, m,
+                                                          n, k, alpha, a, lda, b, ldb, beta, c, ldc,
+                                                          dependencies);
     return done;
 }
 
@@ -2955,10 +2950,9 @@ sycl::event gemm(backend_selector<backend::openblas> selector, transpose transa,
                  std::int64_t m, std::int64_t n, std::int64_t k, float alpha, const sycl::half* a,
                  std::int64_t lda, const sycl::half* b, std::int64_t ldb, float beta, float* c,
                  std::int64_t ldc, const std::vector<sycl::event>& dependencies) {
-    auto done =
-        oneapi::math::blas::openblas::MAJOR::gemm(selector.get_queue(), transa, transb, m,
-			                                      n, k, alpha, a, lda, b, ldb, beta, c, ldc,
-												  dependencies);
+    auto done = oneapi::math::blas::openblas::MAJOR::gemm(selector.get_queue(), transa, transb, m,
+                                                          n, k, alpha, a, lda, b, ldb, beta, c, ldc,
+                                                          dependencies);
     return done;
 }
 
@@ -2966,10 +2960,9 @@ sycl::event gemm(backend_selector<backend::openblas> selector, transpose transa,
                  std::int64_t m, std::int64_t n, std::int64_t k, float alpha, const bfloat16* a,
                  std::int64_t lda, const bfloat16* b, std::int64_t ldb, float beta, float* c,
                  std::int64_t ldc, const std::vector<sycl::event>& dependencies) {
-    auto done =
-        oneapi::math::blas::openblas::MAJOR::gemm(selector.get_queue(), transa, transb, m,
-			                              	      n, k, alpha, a, lda, b, ldb, beta, c, ldc,
-												  dependencies);
+    auto done = oneapi::math::blas::openblas::MAJOR::gemm(selector.get_queue(), transa, transb, m,
+                                                          n, k, alpha, a, lda, b, ldb, beta, c, ldc,
+                                                          dependencies);
     return done;
 }
 
@@ -3061,8 +3054,8 @@ sycl::event trsm(backend_selector<backend::openblas> selector, side left_right, 
                  const float* a, std::int64_t lda, float* b, std::int64_t ldb,
                  const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::openblas::MAJOR::trsm(selector.get_queue(), left_right,
-                                                          upper_lower, trans, unit_diag, m, n, alpha,
-                                                          a, lda, b, ldb, dependencies);
+                                                          upper_lower, trans, unit_diag, m, n,
+                                                          alpha, a, lda, b, ldb, dependencies);
     return done;
 }
 
@@ -3071,8 +3064,8 @@ sycl::event trsm(backend_selector<backend::openblas> selector, side left_right, 
                  const double* a, std::int64_t lda, double* b, std::int64_t ldb,
                  const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::openblas::MAJOR::trsm(selector.get_queue(), left_right,
-                                                          upper_lower, trans, unit_diag, m, n, alpha,
-                                                          a, lda, b, ldb, dependencies);
+                                                          upper_lower, trans, unit_diag, m, n,
+                                                          alpha, a, lda, b, ldb, dependencies);
     return done;
 }
 
@@ -3082,8 +3075,8 @@ sycl::event trsm(backend_selector<backend::openblas> selector, side left_right, 
                  std::complex<float>* b, std::int64_t ldb,
                  const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::openblas::MAJOR::trsm(selector.get_queue(), left_right,
-                                                          upper_lower, trans, unit_diag, m, n, alpha,
-                                                          a, lda, b, ldb, dependencies);
+                                                          upper_lower, trans, unit_diag, m, n,
+                                                          alpha, a, lda, b, ldb, dependencies);
     return done;
 }
 
@@ -3093,8 +3086,8 @@ sycl::event trsm(backend_selector<backend::openblas> selector, side left_right, 
                  std::complex<double>* b, std::int64_t ldb,
                  const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::openblas::MAJOR::trsm(selector.get_queue(), left_right,
-                                                          upper_lower, trans, unit_diag, m, n, alpha,
-                                                          a, lda, b, ldb, dependencies);
+                                                          upper_lower, trans, unit_diag, m, n,
+                                                          alpha, a, lda, b, ldb, dependencies);
     return done;
 }
 
@@ -3213,10 +3206,9 @@ sycl::event hemm(backend_selector<backend::openblas> selector, side left_right, 
                  const std::complex<float>* a, std::int64_t lda, const std::complex<float>* b,
                  std::int64_t ldb, std::complex<float> beta, std::complex<float>* c,
                  std::int64_t ldc, const std::vector<sycl::event>& dependencies) {
-    auto done =
-        oneapi::math::blas::openblas::MAJOR::hemm(selector.get_queue(), left_right,
-			                                  	  upper_lower, m, n, alpha, a, lda, b, ldb,
-												  beta, c, ldc, dependencies);
+    auto done = oneapi::math::blas::openblas::MAJOR::hemm(selector.get_queue(), left_right,
+                                                          upper_lower, m, n, alpha, a, lda, b, ldb,
+                                                          beta, c, ldc, dependencies);
     return done;
 }
 
@@ -3225,10 +3217,9 @@ sycl::event hemm(backend_selector<backend::openblas> selector, side left_right, 
                  const std::complex<double>* a, std::int64_t lda, const std::complex<double>* b,
                  std::int64_t ldb, std::complex<double> beta, std::complex<double>* c,
                  std::int64_t ldc, const std::vector<sycl::event>& dependencies) {
-    auto done =
-        oneapi::math::blas::openblas::MAJOR::hemm(selector.get_queue(), left_right,
-			                                      upper_lower, m, n, alpha, a, lda, b, ldb, 
-												  beta, c, ldc, dependencies);
+    auto done = oneapi::math::blas::openblas::MAJOR::hemm(selector.get_queue(), left_right,
+                                                          upper_lower, m, n, alpha, a, lda, b, ldb,
+                                                          beta, c, ldc, dependencies);
     return done;
 }
 
@@ -3237,7 +3228,7 @@ sycl::event hpr2(backend_selector<backend::openblas> selector, uplo upper_lower,
                  const std::complex<float>* y, std::int64_t incy, std::complex<float>* a,
                  const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::openblas::MAJOR::hpr2(selector.get_queue(), upper_lower, n,
-		                                          	      alpha, x, incx, y, incy, a, dependencies);
+                                                          alpha, x, incx, y, incy, a, dependencies);
     return done;
 }
 
@@ -3246,7 +3237,7 @@ sycl::event hpr2(backend_selector<backend::openblas> selector, uplo upper_lower,
                  const std::complex<double>* y, std::int64_t incy, std::complex<double>* a,
                  const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::openblas::MAJOR::hpr2(selector.get_queue(), upper_lower, n,
-		                                                  alpha, x, incx, y, incy, a, dependencies);
+                                                          alpha, x, incx, y, incy, a, dependencies);
     return done;
 }
 
@@ -3256,7 +3247,7 @@ sycl::event gbmv(backend_selector<backend::openblas> selector, transpose trans, 
                  std::int64_t incy, const std::vector<sycl::event>& dependencies) {
     auto done =
         oneapi::math::blas::openblas::MAJOR::gbmv(selector.get_queue(), trans, m, n, kl, ku, alpha,
-			                    	              a, lda, x, incx, beta, y, incy, dependencies);
+                                                  a, lda, x, incx, beta, y, incy, dependencies);
     return done;
 }
 
@@ -3266,7 +3257,7 @@ sycl::event gbmv(backend_selector<backend::openblas> selector, transpose trans, 
                  std::int64_t incy, const std::vector<sycl::event>& dependencies) {
     auto done =
         oneapi::math::blas::openblas::MAJOR::gbmv(selector.get_queue(), trans, m, n, kl, ku, alpha,
-			            	                      a, lda, x, incx, beta, y, incy, dependencies);
+                                                  a, lda, x, incx, beta, y, incy, dependencies);
     return done;
 }
 
@@ -3277,7 +3268,7 @@ sycl::event gbmv(backend_selector<backend::openblas> selector, transpose trans, 
                  std::int64_t incy, const std::vector<sycl::event>& dependencies) {
     auto done =
         oneapi::math::blas::openblas::MAJOR::gbmv(selector.get_queue(), trans, m, n, kl, ku, alpha,
-			                                  	  a, lda, x, incx, beta, y, incy, dependencies);
+                                                  a, lda, x, incx, beta, y, incy, dependencies);
     return done;
 }
 
@@ -3288,7 +3279,7 @@ sycl::event gbmv(backend_selector<backend::openblas> selector, transpose trans, 
                  std::int64_t incy, const std::vector<sycl::event>& dependencies) {
     auto done =
         oneapi::math::blas::openblas::MAJOR::gbmv(selector.get_queue(), trans, m, n, kl, ku, alpha,
-			   	                                  a, lda, x, incx, beta, y, incy, dependencies);
+                                                  a, lda, x, incx, beta, y, incy, dependencies);
     return done;
 }
 
@@ -3330,9 +3321,9 @@ sycl::event symm(backend_selector<backend::openblas> selector, side left_right, 
                  std::int64_t m, std::int64_t n, float alpha, const float* a, std::int64_t lda,
                  const float* b, std::int64_t ldb, float beta, float* c, std::int64_t ldc,
                  const std::vector<sycl::event>& dependencies) {
-    auto done = oneapi::math::blas::openblas::MAJOR::symm(selector.get_queue(), left_right, 
-			                                              upper_lower, m, n, alpha, a, lda, b, ldb,
-														  beta, c, ldc, dependencies);
+    auto done = oneapi::math::blas::openblas::MAJOR::symm(selector.get_queue(), left_right,
+                                                          upper_lower, m, n, alpha, a, lda, b, ldb,
+                                                          beta, c, ldc, dependencies);
     return done;
 }
 
@@ -3340,9 +3331,9 @@ sycl::event symm(backend_selector<backend::openblas> selector, side left_right, 
                  std::int64_t m, std::int64_t n, double alpha, const double* a, std::int64_t lda,
                  const double* b, std::int64_t ldb, double beta, double* c, std::int64_t ldc,
                  const std::vector<sycl::event>& dependencies) {
-    auto done = oneapi::math::blas::openblas::MAJOR::symm(selector.get_queue(), left_right, 
-			                                              upper_lower, m, n, alpha, a, lda, b, ldb, 
-														  beta, c, ldc, dependencies);
+    auto done = oneapi::math::blas::openblas::MAJOR::symm(selector.get_queue(), left_right,
+                                                          upper_lower, m, n, alpha, a, lda, b, ldb,
+                                                          beta, c, ldc, dependencies);
     return done;
 }
 
@@ -3351,9 +3342,9 @@ sycl::event symm(backend_selector<backend::openblas> selector, side left_right, 
                  const std::complex<float>* a, std::int64_t lda, const std::complex<float>* b,
                  std::int64_t ldb, std::complex<float> beta, std::complex<float>* c,
                  std::int64_t ldc, const std::vector<sycl::event>& dependencies) {
-    auto done = oneapi::math::blas::openblas::MAJOR::symm(selector.get_queue(), left_right, 
-			                                              upper_lower, m, n, alpha, a, lda, b, ldb,
-														  beta, c, ldc, dependencies);
+    auto done = oneapi::math::blas::openblas::MAJOR::symm(selector.get_queue(), left_right,
+                                                          upper_lower, m, n, alpha, a, lda, b, ldb,
+                                                          beta, c, ldc, dependencies);
     return done;
 }
 
@@ -3362,9 +3353,9 @@ sycl::event symm(backend_selector<backend::openblas> selector, side left_right, 
                  const std::complex<double>* a, std::int64_t lda, const std::complex<double>* b,
                  std::int64_t ldb, std::complex<double> beta, std::complex<double>* c,
                  std::int64_t ldc, const std::vector<sycl::event>& dependencies) {
-    auto done = oneapi::math::blas::openblas::MAJOR::symm(selector.get_queue(), left_right, 
-			                                              upper_lower, m, n, alpha, a, lda, b, ldb, 
-														  beta, c, ldc, dependencies);
+    auto done = oneapi::math::blas::openblas::MAJOR::symm(selector.get_queue(), left_right,
+                                                          upper_lower, m, n, alpha, a, lda, b, ldb,
+                                                          beta, c, ldc, dependencies);
     return done;
 }
 
@@ -3389,16 +3380,16 @@ sycl::event dotc(backend_selector<backend::openblas> selector, std::int64_t n,
 sycl::event syr(backend_selector<backend::openblas> selector, uplo upper_lower, std::int64_t n,
                 float alpha, const float* x, std::int64_t incx, float* a, std::int64_t lda,
                 const std::vector<sycl::event>& dependencies) {
-    auto done = oneapi::math::blas::openblas::MAJOR::syr(selector.get_queue(), upper_lower, n, 
-			                                             alpha, x, incx, a, lda, dependencies);
+    auto done = oneapi::math::blas::openblas::MAJOR::syr(selector.get_queue(), upper_lower, n,
+                                                         alpha, x, incx, a, lda, dependencies);
     return done;
 }
 
 sycl::event syr(backend_selector<backend::openblas> selector, uplo upper_lower, std::int64_t n,
                 double alpha, const double* x, std::int64_t incx, double* a, std::int64_t lda,
                 const std::vector<sycl::event>& dependencies) {
-    auto done = oneapi::math::blas::openblas::MAJOR::syr(selector.get_queue(), upper_lower, n, 
-			                                             alpha, x, incx, a, lda, dependencies);
+    auto done = oneapi::math::blas::openblas::MAJOR::syr(selector.get_queue(), upper_lower, n,
+                                                         alpha, x, incx, a, lda, dependencies);
     return done;
 }
 
@@ -3407,8 +3398,8 @@ sycl::event trmm(backend_selector<backend::openblas> selector, side left_right, 
                  const float* a, std::int64_t lda, float* b, std::int64_t ldb,
                  const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::openblas::MAJOR::trmm(selector.get_queue(), left_right,
-                                                          upper_lower, trans, unit_diag, m, n, alpha,
-                                                          a, lda, b, ldb, dependencies);
+                                                          upper_lower, trans, unit_diag, m, n,
+                                                          alpha, a, lda, b, ldb, dependencies);
     return done;
 }
 
@@ -3417,8 +3408,8 @@ sycl::event trmm(backend_selector<backend::openblas> selector, side left_right, 
                  const double* a, std::int64_t lda, double* b, std::int64_t ldb,
                  const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::openblas::MAJOR::trmm(selector.get_queue(), left_right,
-                                                          upper_lower, trans, unit_diag, m, n, alpha,
-                                                          a, lda, b, ldb, dependencies);
+                                                          upper_lower, trans, unit_diag, m, n,
+                                                          alpha, a, lda, b, ldb, dependencies);
     return done;
 }
 
@@ -3428,8 +3419,8 @@ sycl::event trmm(backend_selector<backend::openblas> selector, side left_right, 
                  std::complex<float>* b, std::int64_t ldb,
                  const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::openblas::MAJOR::trmm(selector.get_queue(), left_right,
-                                                          upper_lower, trans, unit_diag, m, n, alpha,
-                                                          a, lda, b, ldb, dependencies);
+                                                          upper_lower, trans, unit_diag, m, n,
+                                                          alpha, a, lda, b, ldb, dependencies);
     return done;
 }
 
@@ -3439,8 +3430,8 @@ sycl::event trmm(backend_selector<backend::openblas> selector, side left_right, 
                  std::complex<double>* b, std::int64_t ldb,
                  const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::openblas::MAJOR::trmm(selector.get_queue(), left_right,
-                                                          upper_lower, trans, unit_diag, m, n, alpha,
-                                                          a, lda, b, ldb, dependencies);
+                                                          upper_lower, trans, unit_diag, m, n,
+                                                          alpha, a, lda, b, ldb, dependencies);
     return done;
 }
 
@@ -3558,10 +3549,10 @@ sycl::event copy(backend_selector<backend::openblas> selector, std::int64_t n,
     return done;
 }
 
-sycl::event copy_batch(backend_selector<backend::openblas> selector, std::int64_t* n, 
-		               const float** x, std::int64_t* incx, float** y, std::int64_t* incy,
-					   std::int64_t group_count, std::int64_t* group_size,
-					   const std::vector<sycl::event>& dependencies) {
+sycl::event copy_batch(backend_selector<backend::openblas> selector, std::int64_t* n,
+                       const float** x, std::int64_t* incx, float** y, std::int64_t* incy,
+                       std::int64_t group_count, std::int64_t* group_size,
+                       const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::openblas::MAJOR::copy_batch(
         selector.get_queue(), n, x, incx, y, incy, group_count, group_size, dependencies);
     return done;
@@ -3603,9 +3594,9 @@ sycl::event copy_batch(backend_selector<backend::openblas> selector, std::int64_
     return done;
 }
 
-sycl::event copy_batch(backend_selector<backend::openblas> selector, std::int64_t n, 
-		               const double* x, std::int64_t incx, std::int64_t stridex, double* y, 
-					   std::int64_t incy, std::int64_t stridey, std::int64_t batch_size,
+sycl::event copy_batch(backend_selector<backend::openblas> selector, std::int64_t n,
+                       const double* x, std::int64_t incx, std::int64_t stridex, double* y,
+                       std::int64_t incy, std::int64_t stridey, std::int64_t batch_size,
                        const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::openblas::MAJOR::copy_batch(
         selector.get_queue(), n, x, incx, stridex, y, incy, stridey, batch_size, dependencies);
@@ -3655,8 +3646,8 @@ sycl::event gemmt(backend_selector<backend::openblas> selector, uplo upper_lower
                   std::int64_t lda, const float* b, std::int64_t ldb, float beta, float* c,
                   std::int64_t ldc, const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::openblas::MAJOR::gemmt(selector.get_queue(), upper_lower,
-		                                                   transa, transb, n, k, alpha, a, lda, b, 
-														   ldb, beta, c, ldc, dependencies);
+                                                           transa, transb, n, k, alpha, a, lda, b,
+                                                           ldb, beta, c, ldc, dependencies);
     return done;
 }
 
@@ -3664,9 +3655,9 @@ sycl::event gemmt(backend_selector<backend::openblas> selector, uplo upper_lower
                   transpose transb, std::int64_t n, std::int64_t k, double alpha, const double* a,
                   std::int64_t lda, const double* b, std::int64_t ldb, double beta, double* c,
                   std::int64_t ldc, const std::vector<sycl::event>& dependencies) {
-    auto done = oneapi::math::blas::openblas::MAJOR::gemmt(selector.get_queue(), upper_lower, 
-			                                               transa, transb, n, k, alpha, a, lda, b, 
-														   ldb, beta, c, ldc, dependencies);
+    auto done = oneapi::math::blas::openblas::MAJOR::gemmt(selector.get_queue(), upper_lower,
+                                                           transa, transb, n, k, alpha, a, lda, b,
+                                                           ldb, beta, c, ldc, dependencies);
     return done;
 }
 
@@ -3675,9 +3666,9 @@ sycl::event gemmt(backend_selector<backend::openblas> selector, uplo upper_lower
                   const std::complex<float>* a, std::int64_t lda, const std::complex<float>* b,
                   std::int64_t ldb, std::complex<float> beta, std::complex<float>* c,
                   std::int64_t ldc, const std::vector<sycl::event>& dependencies) {
-    auto done = oneapi::math::blas::openblas::MAJOR::gemmt(selector.get_queue(), upper_lower, 
-			                                               transa, transb, n, k, alpha, a, lda, b, 
-														   ldb, beta, c, ldc, dependencies);
+    auto done = oneapi::math::blas::openblas::MAJOR::gemmt(selector.get_queue(), upper_lower,
+                                                           transa, transb, n, k, alpha, a, lda, b,
+                                                           ldb, beta, c, ldc, dependencies);
     return done;
 }
 
@@ -3686,9 +3677,9 @@ sycl::event gemmt(backend_selector<backend::openblas> selector, uplo upper_lower
                   const std::complex<double>* a, std::int64_t lda, const std::complex<double>* b,
                   std::int64_t ldb, std::complex<double> beta, std::complex<double>* c,
                   std::int64_t ldc, const std::vector<sycl::event>& dependencies) {
-    auto done = oneapi::math::blas::openblas::MAJOR::gemmt(selector.get_queue(), upper_lower, 
-			                                               transa, transb, n, k, alpha, a, lda, b, 
-														   ldb, beta, c, ldc, dependencies);
+    auto done = oneapi::math::blas::openblas::MAJOR::gemmt(selector.get_queue(), upper_lower,
+                                                           transa, transb, n, k, alpha, a, lda, b,
+                                                           ldb, beta, c, ldc, dependencies);
     return done;
 }
 
@@ -3779,8 +3770,8 @@ sycl::event tbsv(backend_selector<backend::openblas> selector, uplo upper_lower,
 sycl::event spr2(backend_selector<backend::openblas> selector, uplo upper_lower, std::int64_t n,
                  float alpha, const float* x, std::int64_t incx, const float* y, std::int64_t incy,
                  float* a, const std::vector<sycl::event>& dependencies) {
-    auto done = oneapi::math::blas::openblas::MAJOR::spr2(selector.get_queue(), upper_lower, n, 
-			                                              alpha, x, incx, y, incy, a, dependencies);
+    auto done = oneapi::math::blas::openblas::MAJOR::spr2(selector.get_queue(), upper_lower, n,
+                                                          alpha, x, incx, y, incy, a, dependencies);
     return done;
 }
 
@@ -3788,7 +3779,7 @@ sycl::event spr2(backend_selector<backend::openblas> selector, uplo upper_lower,
                  double alpha, const double* x, std::int64_t incx, const double* y,
                  std::int64_t incy, double* a, const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::openblas::MAJOR::spr2(selector.get_queue(), upper_lower, n,
-		                                                  alpha, x, incx, y, incy, a, dependencies);
+                                                          alpha, x, incx, y, incy, a, dependencies);
     return done;
 }
 
@@ -3840,8 +3831,8 @@ sycl::event rotm(backend_selector<backend::openblas> selector, std::int64_t n, d
     return done;
 }
 
-sycl::event rotg(backend_selector<backend::openblas> selector, float* a, float* b, float* c, 
-		         float* s, const std::vector<sycl::event>& dependencies) {
+sycl::event rotg(backend_selector<backend::openblas> selector, float* a, float* b, float* c,
+                 float* s, const std::vector<sycl::event>& dependencies) {
     auto done =
         oneapi::math::blas::openblas::MAJOR::rotg(selector.get_queue(), a, b, c, s, dependencies);
     return done;
@@ -3883,9 +3874,9 @@ sycl::event her2k(backend_selector<backend::openblas> selector, uplo upper_lower
                   const std::complex<float>* a, std::int64_t lda, const std::complex<float>* b,
                   std::int64_t ldb, float beta, std::complex<float>* c, std::int64_t ldc,
                   const std::vector<sycl::event>& dependencies) {
-    auto done = oneapi::math::blas::openblas::MAJOR::her2k(selector.get_queue(), upper_lower, trans, 
-			                                               n, k, alpha, a, lda, b, ldb, beta, c, 
-														   ldc, dependencies);
+    auto done = oneapi::math::blas::openblas::MAJOR::her2k(selector.get_queue(), upper_lower, trans,
+                                                           n, k, alpha, a, lda, b, ldb, beta, c,
+                                                           ldc, dependencies);
     return done;
 }
 
@@ -3894,9 +3885,9 @@ sycl::event her2k(backend_selector<backend::openblas> selector, uplo upper_lower
                   const std::complex<double>* a, std::int64_t lda, const std::complex<double>* b,
                   std::int64_t ldb, double beta, std::complex<double>* c, std::int64_t ldc,
                   const std::vector<sycl::event>& dependencies) {
-    auto done = oneapi::math::blas::openblas::MAJOR::her2k(selector.get_queue(), upper_lower, trans, 
-			                                               n, k, alpha, a, lda, b, ldb, beta, c, 
-														   ldc, dependencies);
+    auto done = oneapi::math::blas::openblas::MAJOR::her2k(selector.get_queue(), upper_lower, trans,
+                                                           n, k, alpha, a, lda, b, ldb, beta, c,
+                                                           ldc, dependencies);
     return done;
 }
 
@@ -4181,44 +4172,44 @@ sycl::event imatcopy(backend_selector<backend::openblas> selector, transpose tra
 }
 
 sycl::event omatadd(backend_selector<backend::openblas> selector, transpose transa,
-	      	        transpose transb, std::int64_t m, std::int64_t n, float alpha, const float* a, 
-					std::int64_t lda, float beta, const float* b, std::int64_t ldb, float* c, 
-					std::int64_t ldc, const std::vector<sycl::event>& dependencies) {
+                    transpose transb, std::int64_t m, std::int64_t n, float alpha, const float* a,
+                    std::int64_t lda, float beta, const float* b, std::int64_t ldb, float* c,
+                    std::int64_t ldc, const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::openblas::MAJOR::omatadd(selector.get_queue(), transa, transb,
-		                                                     m, n, alpha, a, lda, beta, b, ldb, c, 
-															 ldc, dependencies);
+                                                             m, n, alpha, a, lda, beta, b, ldb, c,
+                                                             ldc, dependencies);
     return done;
 }
 
-sycl::event omatadd(backend_selector<backend::openblas> selector, transpose transa, 
-		            transpose transb, std::int64_t m, std::int64_t n, double alpha, const double* a, 
-					std::int64_t lda, double beta, const double* b, std::int64_t ldb, double* c, 
-					std::int64_t ldc, const std::vector<sycl::event>& dependencies) {
-    auto done = oneapi::math::blas::openblas::MAJOR::omatadd(selector.get_queue(), transa, transb, 
-			                                                 m, n, alpha, a, lda, beta, b, ldb, c, 
-															 ldc, dependencies);
+sycl::event omatadd(backend_selector<backend::openblas> selector, transpose transa,
+                    transpose transb, std::int64_t m, std::int64_t n, double alpha, const double* a,
+                    std::int64_t lda, double beta, const double* b, std::int64_t ldb, double* c,
+                    std::int64_t ldc, const std::vector<sycl::event>& dependencies) {
+    auto done = oneapi::math::blas::openblas::MAJOR::omatadd(selector.get_queue(), transa, transb,
+                                                             m, n, alpha, a, lda, beta, b, ldb, c,
+                                                             ldc, dependencies);
     return done;
 }
 
-sycl::event omatadd(backend_selector<backend::openblas> selector, transpose transa, 
-		            transpose transb, std::int64_t m, std::int64_t n, std::complex<float> alpha,
+sycl::event omatadd(backend_selector<backend::openblas> selector, transpose transa,
+                    transpose transb, std::int64_t m, std::int64_t n, std::complex<float> alpha,
                     const std::complex<float>* a, std::int64_t lda, std::complex<float> beta,
                     const std::complex<float>* b, std::int64_t ldb, std::complex<float>* c,
                     std::int64_t ldc, const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::openblas::MAJOR::omatadd(selector.get_queue(), transa, transb,
-		                                                  	 m, n, alpha, a, lda, beta, b, ldb, c, 
-															 ldc, dependencies);
+                                                             m, n, alpha, a, lda, beta, b, ldb, c,
+                                                             ldc, dependencies);
     return done;
 }
 
-sycl::event omatadd(backend_selector<backend::openblas> selector, transpose transa, 
-		            transpose transb, std::int64_t m, std::int64_t n, std::complex<double> alpha,
+sycl::event omatadd(backend_selector<backend::openblas> selector, transpose transa,
+                    transpose transb, std::int64_t m, std::int64_t n, std::complex<double> alpha,
                     const std::complex<double>* a, std::int64_t lda, std::complex<double> beta,
                     const std::complex<double>* b, std::int64_t ldb, std::complex<double>* c,
                     std::int64_t ldc, const std::vector<sycl::event>& dependencies) {
-    auto done = oneapi::math::blas::openblas::MAJOR::omatadd(selector.get_queue(), transa, transb, 
-			                                                 m, n, alpha, a, lda, beta, b, ldb, c, 
-															 ldc, dependencies);
+    auto done = oneapi::math::blas::openblas::MAJOR::omatadd(selector.get_queue(), transa, transb,
+                                                             m, n, alpha, a, lda, beta, b, ldb, c,
+                                                             ldc, dependencies);
     return done;
 }
 
@@ -4271,8 +4262,8 @@ sycl::event imatcopy_batch(backend_selector<backend::openblas> selector, transpo
                            std::int64_t* lda, std::int64_t* ldb, std::int64_t group_count,
                            std::int64_t* groupsize, const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::openblas::MAJOR::imatcopy_batch(
-		selector.get_queue(), trans, m, n, alpha, ab, lda, ldb, group_count, groupsize, 
-		dependencies);
+        selector.get_queue(), trans, m, n, alpha, ab, lda, ldb, group_count, groupsize,
+        dependencies);
     return done;
 }
 
@@ -4281,8 +4272,8 @@ sycl::event imatcopy_batch(backend_selector<backend::openblas> selector, transpo
                            std::int64_t* lda, std::int64_t* ldb, std::int64_t group_count,
                            std::int64_t* groupsize, const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::openblas::MAJOR::imatcopy_batch(
-		selector.get_queue(), trans, m, n, alpha, ab, lda, ldb, group_count, groupsize, 
-		dependencies);
+        selector.get_queue(), trans, m, n, alpha, ab, lda, ldb, group_count, groupsize,
+        dependencies);
     return done;
 }
 
@@ -4292,8 +4283,8 @@ sycl::event imatcopy_batch(backend_selector<backend::openblas> selector, transpo
                            std::int64_t group_count, std::int64_t* groupsize,
                            const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::openblas::MAJOR::imatcopy_batch(
-		selector.get_queue(), trans, m, n, alpha, ab, lda, ldb, group_count, groupsize, 
-		dependencies);
+        selector.get_queue(), trans, m, n, alpha, ab, lda, ldb, group_count, groupsize,
+        dependencies);
     return done;
 }
 
@@ -4303,7 +4294,7 @@ sycl::event imatcopy_batch(backend_selector<backend::openblas> selector, transpo
                            std::int64_t group_count, std::int64_t* groupsize,
                            const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::openblas::MAJOR::imatcopy_batch(
-		selector.get_queue(), trans, m, n, alpha, ab, lda, ldb, group_count, groupsize, 
-		dependencies);
+        selector.get_queue(), trans, m, n, alpha, ab, lda, ldb, group_count, groupsize,
+        dependencies);
     return done;
 }

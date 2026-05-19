@@ -34,7 +34,7 @@ enum class backend {
     cusolver,
     curand,
     netlib,
-	openblas,
+    openblas,
     armpl,
     rocblas,
     rocrand,

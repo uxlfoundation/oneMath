@@ -72,7 +72,7 @@ static std::map<domain, std::map<device, std::vector<const char*>>> libraries = 
 #ifdef ONEMATH_ENABLE_OPENBLAS_BACKEND
               LIB_NAME("blas_openblas")
 #endif
-		  
+
           } },
         { device::intelgpu,
           {

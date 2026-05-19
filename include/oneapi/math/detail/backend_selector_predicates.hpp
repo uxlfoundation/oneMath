@@ -61,7 +61,7 @@ inline void backend_selector_precondition<backend::openblas>(sycl::queue& queue)
     if (!queue.get_device().is_cpu()) {
 #endif
         throw unsupported_device(
-			"", "backend_selector<backend::" + backend_map[backend::openblas] + ">",
+            "", "backend_selector<backend::" + backend_map[backend::openblas] + ">",
             queue.get_device());
     }
 #endif

@@ -160,8 +160,8 @@ void axpby(sycl::queue&, int64_t n, std::complex<float> alpha,
     blasint incX = (blasint)incx;
     blasint incY = (blasint)incy;
 
-    cblas_caxpby(N, static_cast<const void*>(&alpha), X, incX, static_cast<const void*>(&beta), Y, 
-			     incY);
+    cblas_caxpby(N, static_cast<const void*>(&alpha), X, incX, static_cast<const void*>(&beta), Y,
+                 incY);
 }
 
 void axpby(sycl::queue&, int64_t n, std::complex<double> alpha,
@@ -178,7 +178,7 @@ void axpby(sycl::queue&, int64_t n, std::complex<double> alpha,
     blasint incY = (blasint)incy;
 
     cblas_zaxpby(N, static_cast<const void*>(&alpha), X, incX, static_cast<const void*>(&beta), Y,
-		       	incY);
+                 incY);
 }
 
 void copy(sycl::queue& queue, int64_t n, sycl::buffer<float, 1>& x, int64_t incx,
@@ -599,16 +599,16 @@ void rotg(sycl::queue& queue, sycl::buffer<std::complex<double>, 1>& a,
         auto accessor_s = s.get_access<sycl::access::mode::read_write>(cgh);
 
         host_task<class openblas_zrotg>(cgh, [=]() {
-            void* a_ptr = 
-			    const_cast<void*>(reinterpret_cast<const void*>(accessor_a.GET_MULTI_PTR));
+            void* a_ptr =
+                const_cast<void*>(reinterpret_cast<const void*>(accessor_a.GET_MULTI_PTR));
 
-            void* b_ptr = 
-			    const_cast<void*>(reinterpret_cast<const void*>(accessor_b.GET_MULTI_PTR));
+            void* b_ptr =
+                const_cast<void*>(reinterpret_cast<const void*>(accessor_b.GET_MULTI_PTR));
 
             double* c_ptr = accessor_c.GET_MULTI_PTR;
 
-            void* s_ptr = 
-			    const_cast<void*>(reinterpret_cast<const void*>(accessor_s.GET_MULTI_PTR));
+            void* s_ptr =
+                const_cast<void*>(reinterpret_cast<const void*>(accessor_s.GET_MULTI_PTR));
 
             ::cblas_zrotg(a_ptr, b_ptr, c_ptr, s_ptr);
         });
@@ -1038,8 +1038,8 @@ sycl::event dot(sycl::queue& queue, int64_t n, const double* x, int64_t incx, co
     return done;
 }
 
-sycl::event dot(sycl::queue& queue, int64_t n, const float* x, int64_t incx, const float* y, 
-		        int64_t incy, double* result, const std::vector<sycl::event>& dependencies) {
+sycl::event dot(sycl::queue& queue, int64_t n, const float* x, int64_t incx, const float* y,
+                int64_t incy, double* result, const std::vector<sycl::event>& dependencies) {
     return queue.submit([&](sycl::handler& cgh) {
         for (const auto& dep : dependencies) {
             cgh.depends_on(dep);
@@ -1486,7 +1486,7 @@ sycl::event rotmg(sycl::queue& queue, float* d1, float* d2, float* x1, float y1,
             cgh.depends_on(dependencies[i]);
         }
         host_task<class openblas_srotmg_usm>(
-			cgh, [=]() { ::cblas_srotmg(d1, d2, x1, (float)y1, param); });
+            cgh, [=]() { ::cblas_srotmg(d1, d2, x1, (float)y1, param); });
     });
     return done;
 }
