@@ -33,3 +33,9 @@ Contents
 
    domains/sparse_linear_algebra.rst
    create_new_backend.rst
+
+.. toctree::
+   :caption: Specification
+   :maxdepth: 2
+
+   spec/index.rst
