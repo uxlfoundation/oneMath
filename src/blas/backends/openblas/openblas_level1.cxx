@@ -117,68 +117,60 @@ void axpy(sycl::queue& queue, int64_t n, std::complex<double> alpha,
     });
 }
 
-void axpby(sycl::queue&, int64_t n, float alpha, sycl::buffer<float, 1>& x, int64_t incx,
+void axpby(sycl::queue& queue, int64_t n, float alpha, sycl::buffer<float, 1>& x, int64_t incx,
            float beta, sycl::buffer<float, 1>& y, int64_t incy) {
-    auto x_acc = x.get_access<sycl::access::mode::read>();
-    auto y_acc = y.get_access<sycl::access::mode::read_write>();
+    queue.submit([&](sycl::handler& cgh) {
+        auto accessor_x = x.get_access<sycl::access::mode::read>(cgh);
+        auto accessor_y = y.get_access<sycl::access::mode::read_write>(cgh);
 
-    const float* X = x_acc.get_pointer();
-    float* Y = y_acc.get_pointer();
-
-    blasint N = (blasint)n;
-    blasint incX = (blasint)incx;
-    blasint incY = (blasint)incy;
-
-    cblas_saxpby(N, alpha, X, incX, beta, Y, incY);
+        host_task<class openblas_saxpby>(cgh, [=]() {
+            ::cblas_saxpby((blasint)n, alpha, accessor_x.GET_MULTI_PTR, (blasint)incx, beta,
+                           accessor_y.GET_MULTI_PTR, (blasint)incy);
+        });
+    });
 }
 
-void axpby(sycl::queue&, int64_t n, double alpha, sycl::buffer<double, 1>& x, int64_t incx,
+void axpby(sycl::queue& queue, int64_t n, double alpha, sycl::buffer<double, 1>& x, int64_t incx,
            double beta, sycl::buffer<double, 1>& y, int64_t incy) {
-    auto x_acc = x.get_access<sycl::access::mode::read>();
-    auto y_acc = y.get_access<sycl::access::mode::read_write>();
+    queue.submit([&](sycl::handler& cgh) {
+        auto accessor_x = x.get_access<sycl::access::mode::read>(cgh);
+        auto accessor_y = y.get_access<sycl::access::mode::read_write>(cgh);
 
-    const double* X = x_acc.get_pointer();
-    double* Y = y_acc.get_pointer();
-
-    blasint N = (blasint)n;
-    blasint incX = (blasint)incx;
-    blasint incY = (blasint)incy;
-
-    cblas_daxpby(N, alpha, X, incX, beta, Y, incY);
+        host_task<class openblas_daxpby>(cgh, [=]() {
+            ::cblas_daxpby((blasint)n, alpha, accessor_x.GET_MULTI_PTR, (blasint)incx, beta,
+                           accessor_y.GET_MULTI_PTR, (blasint)incy);
+        });
+    });
 }
 
-void axpby(sycl::queue&, int64_t n, std::complex<float> alpha,
+void axpby(sycl::queue& queue, int64_t n, std::complex<float> alpha,
            sycl::buffer<std::complex<float>, 1>& x, int64_t incx, std::complex<float> beta,
            sycl::buffer<std::complex<float>, 1>& y, int64_t incy) {
-    auto x_acc = x.get_access<sycl::access::mode::read>();
-    auto y_acc = y.get_access<sycl::access::mode::read_write>();
+    queue.submit([&](sycl::handler& cgh) {
+        auto accessor_x = x.get_access<sycl::access::mode::read>(cgh);
+        auto accessor_y = y.get_access<sycl::access::mode::read_write>(cgh);
 
-    const void* X = static_cast<const void*>(x_acc.get_pointer());
-    void* Y = static_cast<void*>(y_acc.get_pointer());
-
-    blasint N = (blasint)n;
-    blasint incX = (blasint)incx;
-    blasint incY = (blasint)incy;
-
-    cblas_caxpby(N, static_cast<const void*>(&alpha), X, incX, static_cast<const void*>(&beta), Y,
-                 incY);
+        host_task<class openblas_caxpby>(cgh, [=]() {
+            ::cblas_caxpby((blasint)n, static_cast<const void*>(&alpha), accessor_x.GET_MULTI_PTR,
+                           (blasint)incx, static_cast<const void*>(&beta), accessor_y.GET_MULTI_PTR,
+                           (blasint)incy);
+        });
+    });
 }
 
-void axpby(sycl::queue&, int64_t n, std::complex<double> alpha,
+void axpby(sycl::queue& queue, int64_t n, std::complex<double> alpha,
            sycl::buffer<std::complex<double>, 1>& x, int64_t incx, std::complex<double> beta,
            sycl::buffer<std::complex<double>, 1>& y, int64_t incy) {
-    auto x_acc = x.get_access<sycl::access::mode::read>();
-    auto y_acc = y.get_access<sycl::access::mode::read_write>();
+    queue.submit([&](sycl::handler& cgh) {
+        auto accessor_x = x.get_access<sycl::access::mode::read>(cgh);
+        auto accessor_y = y.get_access<sycl::access::mode::read_write>(cgh);
 
-    const void* X = static_cast<const void*>(x_acc.get_pointer());
-    void* Y = static_cast<void*>(y_acc.get_pointer());
-
-    blasint N = (blasint)n;
-    blasint incX = (blasint)incx;
-    blasint incY = (blasint)incy;
-
-    cblas_zaxpby(N, static_cast<const void*>(&alpha), X, incX, static_cast<const void*>(&beta), Y,
-                 incY);
+        host_task<class openblas_zaxpby>(cgh, [=]() {
+            ::cblas_zaxpby((blasint)n, static_cast<const void*>(&alpha), accessor_x.GET_MULTI_PTR,
+                           (blasint)incx, static_cast<const void*>(&beta), accessor_y.GET_MULTI_PTR,
+                           (blasint)incy);
+        });
+    });
 }
 
 void copy(sycl::queue& queue, int64_t n, sycl::buffer<float, 1>& x, int64_t incx,

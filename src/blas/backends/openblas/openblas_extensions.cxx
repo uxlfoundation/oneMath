@@ -19,6 +19,18 @@
 
 // Buffer APIs
 
+static CBLAS_TRANSPOSE get_cblas_transpose(transpose trans) {
+    if (trans == transpose::nontrans) {
+        return CblasNoTrans;
+    }
+    else if (trans == transpose::trans) {
+        return CblasTrans;
+    }
+    else {
+        return CblasConjTrans;
+    }
+}
+
 void gemm_bias(sycl::queue& queue, transpose transa, transpose transb, offset offsetc, int64_t m,
                int64_t n, int64_t k, float alpha, sycl::buffer<int8_t, 1>& a, int64_t lda,
                int8_t ao, sycl::buffer<int8_t, 1>& b, int64_t ldb, int8_t bo, float beta,
@@ -115,106 +127,104 @@ void gemmt(sycl::queue& queue, uplo upper_lower, transpose transa, transpose tra
 #endif
 }
 
-void omatcopy(sycl::queue&, transpose trans, int64_t m, int64_t n, float alpha,
+void omatcopy(sycl::queue& queue, transpose trans, int64_t m, int64_t n, float alpha,
               sycl::buffer<float, 1>& a, int64_t lda, sycl::buffer<float, 1>& b, int64_t ldb) {
-    auto a_acc = a.get_access<sycl::access::mode::read>();
-    auto b_acc = b.get_access<sycl::access::mode::write>();
+    queue.submit([&](sycl::handler& cgh) {
+        auto a_acc = a.get_access<sycl::access::mode::read>(cgh);
+        auto b_acc = b.get_access<sycl::access::mode::write>(cgh);
 
-    const float* A = a_acc.get_pointer();
-    float* B = b_acc.get_pointer();
-
-    CBLAS_TRANSPOSE t = (trans == transpose::nontrans) ? CblasNoTrans : CblasTrans;
+        host_task<class openblas_somatcopy>(cgh, [=]() {
+            const float* A = a_acc.GET_MULTI_PTR;
+            float* B = b_acc.GET_MULTI_PTR;
+            CBLAS_TRANSPOSE t = get_cblas_transpose(trans);
 
 #ifdef COLUMN_MAJOR
-    cblas_somatcopy(CblasColMajor, t, m, n, alpha, A, lda, B, ldb);
+            ::cblas_somatcopy(CblasColMajor, t, (blasint)m, (blasint)n, alpha, A, (blasint)lda, B,
+                              (blasint)ldb);
 #endif
 
 #ifdef ROW_MAJOR
-    cblas_somatcopy(CblasRowMajor, t, m, n, alpha, A, lda, B, ldb);
+            ::cblas_somatcopy(CblasRowMajor, t, (blasint)m, (blasint)n, alpha, A, (blasint)lda, B,
+                              (blasint)ldb);
 #endif
+        });
+    });
 }
 
-void omatcopy(sycl::queue&, transpose trans, int64_t m, int64_t n, double alpha,
+void omatcopy(sycl::queue& queue, transpose trans, int64_t m, int64_t n, double alpha,
               sycl::buffer<double, 1>& a, int64_t lda, sycl::buffer<double, 1>& b, int64_t ldb) {
-    auto a_acc = a.get_access<sycl::access::mode::read>();
-    auto b_acc = b.get_access<sycl::access::mode::write>();
+    queue.submit([&](sycl::handler& cgh) {
+        auto a_acc = a.get_access<sycl::access::mode::read>(cgh);
+        auto b_acc = b.get_access<sycl::access::mode::write>(cgh);
 
-    const double* A = a_acc.get_pointer();
-    double* B = b_acc.get_pointer();
-
-    CBLAS_TRANSPOSE t = (trans == transpose::nontrans) ? CblasNoTrans : CblasTrans;
+        host_task<class openblas_domatcopy>(cgh, [=]() {
+            const double* A = a_acc.GET_MULTI_PTR;
+            double* B = b_acc.GET_MULTI_PTR;
+            CBLAS_TRANSPOSE t = get_cblas_transpose(trans);
 
 #ifdef COLUMN_MAJOR
-    cblas_domatcopy(CblasColMajor, t, m, n, alpha, A, lda, B, ldb);
+            ::cblas_domatcopy(CblasColMajor, t, (blasint)m, (blasint)n, alpha, A, (blasint)lda, B,
+                              (blasint)ldb);
 #endif
 
 #ifdef ROW_MAJOR
-    cblas_domatcopy(CblasRowMajor, t, m, n, alpha, A, lda, B, ldb);
+            ::cblas_domatcopy(CblasRowMajor, t, (blasint)m, (blasint)n, alpha, A, (blasint)lda, B,
+                              (blasint)ldb);
 #endif
+        });
+    });
 }
 
-void omatcopy(sycl::queue&, transpose trans, int64_t m, int64_t n, std::complex<float> alpha,
+void omatcopy(sycl::queue& queue, transpose trans, int64_t m, int64_t n, std::complex<float> alpha,
               sycl::buffer<std::complex<float>, 1>& a, int64_t lda,
               sycl::buffer<std::complex<float>, 1>& b, int64_t ldb) {
-    auto a_acc = a.get_access<sycl::access::mode::read>();
-    auto b_acc = b.get_access<sycl::access::mode::write>();
+    queue.submit([&](sycl::handler& cgh) {
+        auto a_acc = a.get_access<sycl::access::mode::read>(cgh);
+        auto b_acc = b.get_access<sycl::access::mode::write>(cgh);
 
-    const float* A = reinterpret_cast<const float*>(a_acc.get_pointer());
-    float* B = reinterpret_cast<float*>(b_acc.get_pointer());
-    const float* alpha_ptr = reinterpret_cast<const float*>(&alpha);
-
-    CBLAS_TRANSPOSE t;
-    if (trans == transpose::nontrans) {
-        t = CblasNoTrans;
-    }
-    else if (trans == transpose::trans) {
-        t = CblasTrans;
-    }
-    else {
-        t = CblasConjTrans;
-    }
+        host_task<class openblas_comatcopy>(cgh, [=]() {
+            const float* A = reinterpret_cast<const float*>(a_acc.GET_MULTI_PTR);
+            float* B = reinterpret_cast<float*>(b_acc.GET_MULTI_PTR);
+            const float* alpha_ptr = reinterpret_cast<const float*>(&alpha);
+            CBLAS_TRANSPOSE t = get_cblas_transpose(trans);
 
 #ifdef COLUMN_MAJOR
-    cblas_comatcopy(CblasColMajor, t, (blasint)m, (blasint)n, alpha_ptr, A, (blasint)lda, B,
-                    (blasint)ldb);
+            ::cblas_comatcopy(CblasColMajor, t, (blasint)m, (blasint)n, alpha_ptr, A, (blasint)lda,
+                              B, (blasint)ldb);
 #endif
 
 #ifdef ROW_MAJOR
-    cblas_comatcopy(CblasRowMajor, t, (blasint)m, (blasint)n, alpha_ptr, A, (blasint)lda, B,
-                    (blasint)ldb);
+            ::cblas_comatcopy(CblasRowMajor, t, (blasint)m, (blasint)n, alpha_ptr, A, (blasint)lda,
+                              B, (blasint)ldb);
 #endif
+        });
+    });
 }
 
-void omatcopy(sycl::queue&, transpose trans, int64_t m, int64_t n, std::complex<double> alpha,
+void omatcopy(sycl::queue& queue, transpose trans, int64_t m, int64_t n, std::complex<double> alpha,
               sycl::buffer<std::complex<double>, 1>& a, int64_t lda,
               sycl::buffer<std::complex<double>, 1>& b, int64_t ldb) {
-    auto a_acc = a.get_access<sycl::access::mode::read>();
-    auto b_acc = b.get_access<sycl::access::mode::write>();
+    queue.submit([&](sycl::handler& cgh) {
+        auto a_acc = a.get_access<sycl::access::mode::read>(cgh);
+        auto b_acc = b.get_access<sycl::access::mode::write>(cgh);
 
-    const double* A = reinterpret_cast<const double*>(a_acc.get_pointer());
-    double* B = reinterpret_cast<double*>(b_acc.get_pointer());
-    const double* alpha_ptr = reinterpret_cast<const double*>(&alpha);
-
-    CBLAS_TRANSPOSE t;
-    if (trans == transpose::nontrans) {
-        t = CblasNoTrans;
-    }
-    else if (trans == transpose::trans) {
-        t = CblasTrans;
-    }
-    else {
-        t = CblasConjTrans;
-    }
+        host_task<class openblas_zomatcopy>(cgh, [=]() {
+            const double* A = reinterpret_cast<const double*>(a_acc.GET_MULTI_PTR);
+            double* B = reinterpret_cast<double*>(b_acc.GET_MULTI_PTR);
+            const double* alpha_ptr = reinterpret_cast<const double*>(&alpha);
+            CBLAS_TRANSPOSE t = get_cblas_transpose(trans);
 
 #ifdef COLUMN_MAJOR
-    cblas_zomatcopy(CblasColMajor, t, (blasint)m, (blasint)n, alpha_ptr, A, (blasint)lda, B,
-                    (blasint)ldb);
+            ::cblas_zomatcopy(CblasColMajor, t, (blasint)m, (blasint)n, alpha_ptr, A, (blasint)lda,
+                              B, (blasint)ldb);
 #endif
 
 #ifdef ROW_MAJOR
-    cblas_zomatcopy(CblasRowMajor, t, (blasint)m, (blasint)n, alpha_ptr, A, (blasint)lda, B,
-                    (blasint)ldb);
+            ::cblas_zomatcopy(CblasRowMajor, t, (blasint)m, (blasint)n, alpha_ptr, A, (blasint)lda,
+                              B, (blasint)ldb);
 #endif
+        });
+    });
 }
 
 void omatcopy2(sycl::queue& queue, transpose trans, int64_t m, int64_t n, float alpha,
@@ -262,72 +272,94 @@ void omatcopy2(sycl::queue& queue, transpose trans, int64_t m, int64_t n,
 #endif
 }
 
-void imatcopy(sycl::queue&, transpose trans, int64_t m, int64_t n, float alpha,
+void imatcopy(sycl::queue& queue, transpose trans, int64_t m, int64_t n, float alpha,
               sycl::buffer<float, 1>& ab, int64_t lda, int64_t ldb) {
-    auto acc = ab.get_access<sycl::access::mode::read_write>();
-    float* A = acc.get_pointer();
+    queue.submit([&](sycl::handler& cgh) {
+        auto acc = ab.get_access<sycl::access::mode::read_write>(cgh);
 
-    CBLAS_TRANSPOSE t = (trans == transpose::nontrans) ? CblasNoTrans : CblasTrans;
+        host_task<class openblas_simatcopy>(cgh, [=]() {
+            float* A = acc.GET_MULTI_PTR;
+            CBLAS_TRANSPOSE t = get_cblas_transpose(trans);
 
 #ifdef COLUMN_MAJOR
-    cblas_simatcopy(CblasColMajor, t, m, n, alpha, A, lda, ldb);
+            ::cblas_simatcopy(CblasColMajor, t, (blasint)m, (blasint)n, alpha, A, (blasint)lda,
+                              (blasint)ldb);
 #endif
 
 #ifdef ROW_MAJOR
-    cblas_simatcopy(CblasRowMajor, t, m, n, alpha, A, lda, ldb);
+            ::cblas_simatcopy(CblasRowMajor, t, (blasint)m, (blasint)n, alpha, A, (blasint)lda,
+                              (blasint)ldb);
 #endif
+        });
+    });
 }
 
-void imatcopy(sycl::queue&, transpose trans, int64_t m, int64_t n, double alpha,
+void imatcopy(sycl::queue& queue, transpose trans, int64_t m, int64_t n, double alpha,
               sycl::buffer<double, 1>& ab, int64_t lda, int64_t ldb) {
-    auto acc = ab.get_access<sycl::access::mode::read_write>();
-    double* A = acc.get_pointer();
+    queue.submit([&](sycl::handler& cgh) {
+        auto acc = ab.get_access<sycl::access::mode::read_write>(cgh);
 
-    CBLAS_TRANSPOSE t = (trans == transpose::nontrans) ? CblasNoTrans : CblasTrans;
+        host_task<class openblas_dimatcopy>(cgh, [=]() {
+            double* A = acc.GET_MULTI_PTR;
+            CBLAS_TRANSPOSE t = get_cblas_transpose(trans);
 
 #ifdef COLUMN_MAJOR
-    cblas_dimatcopy(CblasColMajor, t, m, n, alpha, A, lda, ldb);
+            ::cblas_dimatcopy(CblasColMajor, t, (blasint)m, (blasint)n, alpha, A, (blasint)lda,
+                              (blasint)ldb);
 #endif
 
 #ifdef ROW_MAJOR
-    cblas_dimatcopy(CblasRowMajor, t, m, n, alpha, A, lda, ldb);
+            ::cblas_dimatcopy(CblasRowMajor, t, (blasint)m, (blasint)n, alpha, A, (blasint)lda,
+                              (blasint)ldb);
 #endif
+        });
+    });
 }
 
-void imatcopy(sycl::queue&, transpose trans, int64_t m, int64_t n, std::complex<float> alpha,
+void imatcopy(sycl::queue& queue, transpose trans, int64_t m, int64_t n, std::complex<float> alpha,
               sycl::buffer<std::complex<float>, 1>& ab, int64_t lda, int64_t ldb) {
-    auto acc = ab.get_access<sycl::access::mode::read_write>();
+    queue.submit([&](sycl::handler& cgh) {
+        auto acc = ab.get_access<sycl::access::mode::read_write>(cgh);
 
-    float* A = reinterpret_cast<float*>(acc.get_pointer());
-    const float* alpha_ptr = reinterpret_cast<const float*>(&alpha);
-
-    CBLAS_TRANSPOSE t = (trans == transpose::nontrans) ? CblasNoTrans : CblasTrans;
+        host_task<class openblas_cimatcopy>(cgh, [=]() {
+            float* A = reinterpret_cast<float*>(acc.GET_MULTI_PTR);
+            const float* alpha_ptr = reinterpret_cast<const float*>(&alpha);
+            CBLAS_TRANSPOSE t = get_cblas_transpose(trans);
 
 #ifdef COLUMN_MAJOR
-    cblas_cimatcopy(CblasColMajor, t, m, n, alpha_ptr, A, lda, ldb);
+            ::cblas_cimatcopy(CblasColMajor, t, (blasint)m, (blasint)n, alpha_ptr, A, (blasint)lda,
+                              (blasint)ldb);
 #endif
 
 #ifdef ROW_MAJOR
-    cblas_cimatcopy(CblasRowMajor, t, m, n, alpha_ptr, A, lda, ldb);
+            ::cblas_cimatcopy(CblasRowMajor, t, (blasint)m, (blasint)n, alpha_ptr, A, (blasint)lda,
+                              (blasint)ldb);
 #endif
+        });
+    });
 }
 
-void imatcopy(sycl::queue&, transpose trans, int64_t m, int64_t n, std::complex<double> alpha,
+void imatcopy(sycl::queue& queue, transpose trans, int64_t m, int64_t n, std::complex<double> alpha,
               sycl::buffer<std::complex<double>, 1>& ab, int64_t lda, int64_t ldb) {
-    auto acc = ab.get_access<sycl::access::mode::read_write>();
+    queue.submit([&](sycl::handler& cgh) {
+        auto acc = ab.get_access<sycl::access::mode::read_write>(cgh);
 
-    double* A = reinterpret_cast<double*>(acc.get_pointer());
-    const double* alpha_ptr = reinterpret_cast<const double*>(&alpha);
-
-    CBLAS_TRANSPOSE t = (trans == transpose::nontrans) ? CblasNoTrans : CblasTrans;
+        host_task<class openblas_zimatcopy>(cgh, [=]() {
+            double* A = reinterpret_cast<double*>(acc.GET_MULTI_PTR);
+            const double* alpha_ptr = reinterpret_cast<const double*>(&alpha);
+            CBLAS_TRANSPOSE t = get_cblas_transpose(trans);
 
 #ifdef COLUMN_MAJOR
-    cblas_zimatcopy(CblasColMajor, t, m, n, alpha_ptr, A, lda, ldb);
+            ::cblas_zimatcopy(CblasColMajor, t, (blasint)m, (blasint)n, alpha_ptr, A, (blasint)lda,
+                              (blasint)ldb);
 #endif
 
 #ifdef ROW_MAJOR
-    cblas_zimatcopy(CblasRowMajor, t, m, n, alpha_ptr, A, lda, ldb);
+            ::cblas_zimatcopy(CblasRowMajor, t, (blasint)m, (blasint)n, alpha_ptr, A, (blasint)lda,
+                              (blasint)ldb);
 #endif
+        });
+    });
 }
 
 void omatadd(sycl::queue& queue, transpose transa, transpose transb, int64_t m, int64_t n,

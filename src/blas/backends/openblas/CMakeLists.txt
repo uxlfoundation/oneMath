@@ -45,8 +45,8 @@ endif()
 target_include_directories(${LIB_OBJ}
   PUBLIC
       ${ONEMATH_INCLUDE_DIRS}
-      ${OPENBLAS_INCLUDE}           
   PRIVATE
+      ${OPENBLAS_INCLUDE}           
       ${PROJECT_SOURCE_DIR}/src/include
       ${PROJECT_SOURCE_DIR}/src
       ${CMAKE_BINARY_DIR}/bin

@@ -17,8 +17,8 @@
 * SPDX-License-Identifier: Apache-2.0
 *******************************************************************************/
 
-#ifndef _NETLIB_COMMON_HPP_
-#define _NETLIB_COMMON_HPP_
+#ifndef _OPENBLAS_COMMON_HPP_
+#define _OPENBLAS_COMMON_HPP_
 
 #if __has_include(<sycl/sycl.hpp>)
 #include <sycl/sycl.hpp>
@@ -100,4 +100,4 @@ static inline void host_task(H& cgh, F f) {
 } // namespace math
 } // namespace oneapi
 
-#endif //_NETLIB_COMMON_HPP_
+#endif //_OPENBLAS_COMMON_HPP_

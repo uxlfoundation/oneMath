@@ -210,155 +210,171 @@ void dgmm_batch(sycl::queue& queue, side left_right, int64_t m, int64_t n,
 #endif
 }
 
-void gemm_batch(sycl::queue&, transpose transa, transpose transb, int64_t m, int64_t n, int64_t k,
-                float alpha, sycl::buffer<float, 1>& a, int64_t lda, int64_t stride_a,
+void gemm_batch(sycl::queue& queue, transpose transa, transpose transb, int64_t m, int64_t n,
+                int64_t k, float alpha, sycl::buffer<float, 1>& a, int64_t lda, int64_t stride_a,
                 sycl::buffer<float, 1>& b, int64_t ldb, int64_t stride_b, float beta,
                 sycl::buffer<float, 1>& c, int64_t ldc, int64_t stride_c, int64_t batch_size) {
-    auto a_acc = a.get_access<sycl::access::mode::read>();
-    auto b_acc = b.get_access<sycl::access::mode::read>();
-    auto c_acc = c.get_access<sycl::access::mode::read_write>();
+    queue.submit([&](sycl::handler& cgh) {
+        auto a_acc = a.get_access<sycl::access::mode::read>(cgh);
+        auto b_acc = b.get_access<sycl::access::mode::read>(cgh);
+        auto c_acc = c.get_access<sycl::access::mode::read_write>(cgh);
 
-    const float* A0 = a_acc.get_pointer();
-    const float* B0 = b_acc.get_pointer();
-    float* C0 = c_acc.get_pointer();
+        host_task<class openblas_sgemm_batch>(cgh, [=]() {
+            const float* A0 = a_acc.GET_MULTI_PTR;
+            const float* B0 = b_acc.GET_MULTI_PTR;
+            float* C0 = c_acc.GET_MULTI_PTR;
 
-    CBLAS_TRANSPOSE tA = (transa == transpose::nontrans)
-                             ? CblasNoTrans
-                             : ((transa == transpose::trans) ? CblasTrans : CblasConjTrans);
-    CBLAS_TRANSPOSE tB = (transb == transpose::nontrans)
-                             ? CblasNoTrans
-                             : ((transb == transpose::trans) ? CblasTrans : CblasConjTrans);
+            CBLAS_TRANSPOSE tA = (transa == transpose::nontrans)
+                                     ? CblasNoTrans
+                                     : ((transa == transpose::trans) ? CblasTrans : CblasConjTrans);
+            CBLAS_TRANSPOSE tB = (transb == transpose::nontrans)
+                                     ? CblasNoTrans
+                                     : ((transb == transpose::trans) ? CblasTrans : CblasConjTrans);
 
 #ifdef COLUMN_MAJOR
-    constexpr CBLAS_ORDER order = CblasColMajor;
+            constexpr CBLAS_ORDER order = CblasColMajor;
 #endif
 #ifdef ROW_MAJOR
-    constexpr CBLAS_ORDER order = CblasRowMajor;
+            constexpr CBLAS_ORDER order = CblasRowMajor;
 #endif
 
-    for (int64_t i = 0; i < batch_size; ++i) {
-        const float* A = A0 + i * stride_a;
-        const float* B = B0 + i * stride_b;
-        float* C = C0 + i * stride_c;
+            for (int64_t i = 0; i < batch_size; ++i) {
+                const float* A = A0 + i * stride_a;
+                const float* B = B0 + i * stride_b;
+                float* C = C0 + i * stride_c;
 
-        cblas_sgemm(order, tA, tB, (blasint)m, (blasint)n, (blasint)k, alpha, A, (blasint)lda, B,
-                    (blasint)ldb, beta, C, (blasint)ldc);
-    }
+                ::cblas_sgemm(order, tA, tB, (blasint)m, (blasint)n, (blasint)k, alpha, A,
+                              (blasint)lda, B, (blasint)ldb, beta, C, (blasint)ldc);
+            }
+        });
+    });
 }
 
-void gemm_batch(sycl::queue&, transpose transa, transpose transb, int64_t m, int64_t n, int64_t k,
-                double alpha, sycl::buffer<double, 1>& a, int64_t lda, int64_t stride_a,
+void gemm_batch(sycl::queue& queue, transpose transa, transpose transb, int64_t m, int64_t n,
+                int64_t k, double alpha, sycl::buffer<double, 1>& a, int64_t lda, int64_t stride_a,
                 sycl::buffer<double, 1>& b, int64_t ldb, int64_t stride_b, double beta,
                 sycl::buffer<double, 1>& c, int64_t ldc, int64_t stride_c, int64_t batch_size) {
-    auto a_acc = a.get_access<sycl::access::mode::read>();
-    auto b_acc = b.get_access<sycl::access::mode::read>();
-    auto c_acc = c.get_access<sycl::access::mode::read_write>();
+    queue.submit([&](sycl::handler& cgh) {
+        auto a_acc = a.get_access<sycl::access::mode::read>(cgh);
+        auto b_acc = b.get_access<sycl::access::mode::read>(cgh);
+        auto c_acc = c.get_access<sycl::access::mode::read_write>(cgh);
 
-    const double* A0 = a_acc.get_pointer();
-    const double* B0 = b_acc.get_pointer();
-    double* C0 = c_acc.get_pointer();
+        host_task<class openblas_dgemm_batch>(cgh, [=]() {
+            const double* A0 = a_acc.GET_MULTI_PTR;
+            const double* B0 = b_acc.GET_MULTI_PTR;
+            double* C0 = c_acc.GET_MULTI_PTR;
 
-    CBLAS_TRANSPOSE tA = (transa == transpose::nontrans)
-                             ? CblasNoTrans
-                             : ((transa == transpose::trans) ? CblasTrans : CblasConjTrans);
-    CBLAS_TRANSPOSE tB = (transb == transpose::nontrans)
-                             ? CblasNoTrans
-                             : ((transb == transpose::trans) ? CblasTrans : CblasConjTrans);
+            CBLAS_TRANSPOSE tA = (transa == transpose::nontrans)
+                                     ? CblasNoTrans
+                                     : ((transa == transpose::trans) ? CblasTrans : CblasConjTrans);
+            CBLAS_TRANSPOSE tB = (transb == transpose::nontrans)
+                                     ? CblasNoTrans
+                                     : ((transb == transpose::trans) ? CblasTrans : CblasConjTrans);
 
 #ifdef COLUMN_MAJOR
-    constexpr CBLAS_ORDER order = CblasColMajor;
+            constexpr CBLAS_ORDER order = CblasColMajor;
 #endif
 #ifdef ROW_MAJOR
-    constexpr CBLAS_ORDER order = CblasRowMajor;
+            constexpr CBLAS_ORDER order = CblasRowMajor;
 #endif
 
-    for (int64_t i = 0; i < batch_size; ++i) {
-        const double* A = A0 + i * stride_a;
-        const double* B = B0 + i * stride_b;
-        double* C = C0 + i * stride_c;
+            for (int64_t i = 0; i < batch_size; ++i) {
+                const double* A = A0 + i * stride_a;
+                const double* B = B0 + i * stride_b;
+                double* C = C0 + i * stride_c;
 
-        cblas_dgemm(order, tA, tB, (blasint)m, (blasint)n, (blasint)k, alpha, A, (blasint)lda, B,
-                    (blasint)ldb, beta, C, (blasint)ldc);
-    }
+                ::cblas_dgemm(order, tA, tB, (blasint)m, (blasint)n, (blasint)k, alpha, A,
+                              (blasint)lda, B, (blasint)ldb, beta, C, (blasint)ldc);
+            }
+        });
+    });
 }
 
-void gemm_batch(sycl::queue&, transpose transa, transpose transb, int64_t m, int64_t n, int64_t k,
-                std::complex<float> alpha, sycl::buffer<std::complex<float>, 1>& a, int64_t lda,
-                int64_t stride_a, sycl::buffer<std::complex<float>, 1>& b, int64_t ldb,
+void gemm_batch(sycl::queue& queue, transpose transa, transpose transb, int64_t m, int64_t n,
+                int64_t k, std::complex<float> alpha, sycl::buffer<std::complex<float>, 1>& a,
+                int64_t lda, int64_t stride_a, sycl::buffer<std::complex<float>, 1>& b, int64_t ldb,
                 int64_t stride_b, std::complex<float> beta, sycl::buffer<std::complex<float>, 1>& c,
                 int64_t ldc, int64_t stride_c, int64_t batch_size) {
-    auto a_acc = a.get_access<sycl::access::mode::read>();
-    auto b_acc = b.get_access<sycl::access::mode::read>();
-    auto c_acc = c.get_access<sycl::access::mode::read_write>();
+    queue.submit([&](sycl::handler& cgh) {
+        auto a_acc = a.get_access<sycl::access::mode::read>(cgh);
+        auto b_acc = b.get_access<sycl::access::mode::read>(cgh);
+        auto c_acc = c.get_access<sycl::access::mode::read_write>(cgh);
 
-    const std::complex<float>* A0 = a_acc.get_pointer();
-    const std::complex<float>* B0 = b_acc.get_pointer();
-    std::complex<float>* C0 = c_acc.get_pointer();
+        host_task<class openblas_cgemm_batch>(cgh, [=]() {
+            const std::complex<float>* A0 = a_acc.GET_MULTI_PTR;
+            const std::complex<float>* B0 = b_acc.GET_MULTI_PTR;
+            std::complex<float>* C0 = c_acc.GET_MULTI_PTR;
 
-    CBLAS_TRANSPOSE tA = (transa == transpose::nontrans)
-                             ? CblasNoTrans
-                             : ((transa == transpose::trans) ? CblasTrans : CblasConjTrans);
-    CBLAS_TRANSPOSE tB = (transb == transpose::nontrans)
-                             ? CblasNoTrans
-                             : ((transb == transpose::trans) ? CblasTrans : CblasConjTrans);
+            CBLAS_TRANSPOSE tA = (transa == transpose::nontrans)
+                                     ? CblasNoTrans
+                                     : ((transa == transpose::trans) ? CblasTrans : CblasConjTrans);
+            CBLAS_TRANSPOSE tB = (transb == transpose::nontrans)
+                                     ? CblasNoTrans
+                                     : ((transb == transpose::trans) ? CblasTrans : CblasConjTrans);
 
 #ifdef COLUMN_MAJOR
-    constexpr CBLAS_ORDER order = CblasColMajor;
+            constexpr CBLAS_ORDER order = CblasColMajor;
 #endif
 #ifdef ROW_MAJOR
-    constexpr CBLAS_ORDER order = CblasRowMajor;
+            constexpr CBLAS_ORDER order = CblasRowMajor;
 #endif
 
-    for (int64_t i = 0; i < batch_size; ++i) {
-        const std::complex<float>* A = A0 + i * stride_a;
-        const std::complex<float>* B = B0 + i * stride_b;
-        std::complex<float>* C = C0 + i * stride_c;
+            for (int64_t i = 0; i < batch_size; ++i) {
+                const std::complex<float>* A = A0 + i * stride_a;
+                const std::complex<float>* B = B0 + i * stride_b;
+                std::complex<float>* C = C0 + i * stride_c;
 
-        cblas_cgemm(order, tA, tB, (blasint)m, (blasint)n, (blasint)k,
-                    static_cast<const void*>(&alpha), static_cast<const void*>(A), (blasint)lda,
-                    static_cast<const void*>(B), (blasint)ldb, static_cast<const void*>(&beta),
-                    static_cast<void*>(C), (blasint)ldc);
-    }
+                ::cblas_cgemm(order, tA, tB, (blasint)m, (blasint)n, (blasint)k,
+                              static_cast<const void*>(&alpha), static_cast<const void*>(A),
+                              (blasint)lda, static_cast<const void*>(B), (blasint)ldb,
+                              static_cast<const void*>(&beta), static_cast<void*>(C), (blasint)ldc);
+            }
+        });
+    });
 }
 
-void gemm_batch(sycl::queue&, transpose transa, transpose transb, int64_t m, int64_t n, int64_t k,
-                std::complex<double> alpha, sycl::buffer<std::complex<double>, 1>& a, int64_t lda,
-                int64_t stride_a, sycl::buffer<std::complex<double>, 1>& b, int64_t ldb,
-                int64_t stride_b, std::complex<double> beta,
+void gemm_batch(sycl::queue& queue, transpose transa, transpose transb, int64_t m, int64_t n,
+                int64_t k, std::complex<double> alpha, sycl::buffer<std::complex<double>, 1>& a,
+                int64_t lda, int64_t stride_a, sycl::buffer<std::complex<double>, 1>& b,
+                int64_t ldb, int64_t stride_b, std::complex<double> beta,
                 sycl::buffer<std::complex<double>, 1>& c, int64_t ldc, int64_t stride_c,
                 int64_t batch_size) {
-    auto a_acc = a.get_access<sycl::access::mode::read>();
-    auto b_acc = b.get_access<sycl::access::mode::read>();
-    auto c_acc = c.get_access<sycl::access::mode::read_write>();
+    queue.submit([&](sycl::handler& cgh) {
+        auto a_acc = a.get_access<sycl::access::mode::read>(cgh);
+        auto b_acc = b.get_access<sycl::access::mode::read>(cgh);
+        auto c_acc = c.get_access<sycl::access::mode::read_write>(cgh);
 
-    const std::complex<double>* A0 = a_acc.get_pointer();
-    const std::complex<double>* B0 = b_acc.get_pointer();
-    std::complex<double>* C0 = c_acc.get_pointer();
+        host_task<class openblas_zgemm_batch>(cgh, [=]() {
+            const std::complex<double>* A0 = a_acc.GET_MULTI_PTR;
+            const std::complex<double>* B0 = b_acc.GET_MULTI_PTR;
+            std::complex<double>* C0 = c_acc.GET_MULTI_PTR;
 
-    CBLAS_TRANSPOSE tA = (transa == transpose::nontrans)
-                             ? CblasNoTrans
-                             : ((transa == transpose::trans) ? CblasTrans : CblasConjTrans);
-    CBLAS_TRANSPOSE tB = (transb == transpose::nontrans)
-                             ? CblasNoTrans
-                             : ((transb == transpose::trans) ? CblasTrans : CblasConjTrans);
+            CBLAS_TRANSPOSE tA = (transa == transpose::nontrans)
+                                     ? CblasNoTrans
+                                     : ((transa == transpose::trans) ? CblasTrans : CblasConjTrans);
+            CBLAS_TRANSPOSE tB = (transb == transpose::nontrans)
+                                     ? CblasNoTrans
+                                     : ((transb == transpose::trans) ? CblasTrans : CblasConjTrans);
 
 #ifdef COLUMN_MAJOR
-    constexpr CBLAS_ORDER order = CblasColMajor;
+            constexpr CBLAS_ORDER order = CblasColMajor;
 #endif
 #ifdef ROW_MAJOR
-    constexpr CBLAS_ORDER order = CblasRowMajor;
+            constexpr CBLAS_ORDER order = CblasRowMajor;
 #endif
 
-    for (int64_t i = 0; i < batch_size; ++i) {
-        const std::complex<double>* A = A0 + i * stride_a;
-        const std::complex<double>* B = B0 + i * stride_b;
-        std::complex<double>* C = C0 + i * stride_c;
+            for (int64_t i = 0; i < batch_size; ++i) {
+                const std::complex<double>* A = A0 + i * stride_a;
+                const std::complex<double>* B = B0 + i * stride_b;
+                std::complex<double>* C = C0 + i * stride_c;
 
-        cblas_zgemm(order, tA, tB, (blasint)m, (blasint)n, (blasint)k,
-                    static_cast<const void*>(&alpha), static_cast<const void*>(A), (blasint)lda,
-                    static_cast<const void*>(B), (blasint)ldb, static_cast<const void*>(&beta),
-                    static_cast<void*>(C), (blasint)ldc);
-    }
+                ::cblas_zgemm(order, tA, tB, (blasint)m, (blasint)n, (blasint)k,
+                              static_cast<const void*>(&alpha), static_cast<const void*>(A),
+                              (blasint)lda, static_cast<const void*>(B), (blasint)ldb,
+                              static_cast<const void*>(&beta), static_cast<void*>(C), (blasint)ldc);
+            }
+        });
+    });
 }
 
 void gemm_batch(sycl::queue& queue, transpose transa, transpose transb, int64_t m, int64_t n,
