@@ -17,3 +17,6 @@
 
 # Build
 build*/
+
+# Generated from conf.py.in by CMake
+docs/conf.py
