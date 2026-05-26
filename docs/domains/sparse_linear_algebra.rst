@@ -1,10 +1,9 @@
-.. _onemath_sparse_linear_algebra:
+.. _onemath_sparse_linear_algebra_developer_reference:
 
 Sparse Linear Algebra
 =====================
 
-See the latest specification for the sparse domain `here
-<https://oneapi-spec.uxlfoundation.org/specifications/oneapi/latest/elements/onemath/source/domains/spblas/spblas>`_.
+See the :ref:`Sparse BLAS specification <onemath_spblas>` for the full API reference.
 
 This page documents implementation specific or backend specific details of the
 sparse domain.
