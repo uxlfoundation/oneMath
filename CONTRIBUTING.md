@@ -31,7 +31,7 @@ oneMath focuses on the following criteria:
 
 3. *Complexity*: Functionality that is not trivial to implement directly or by combining existing primitives.
 
-For the new API to become a part of the open source project, it should be accepted as part of [oneMath spec](https://oneapi-spec.uxlfoundation.org/specifications/oneapi/latest/elements/onemath/source/).
+For the new API to become a part of the open source project, it should be accepted as part of [oneMath spec](https://uxlfoundation.github.io/oneMath/spec).
 
 
 ### Request for Comments Process
