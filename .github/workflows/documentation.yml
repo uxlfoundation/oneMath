@@ -54,6 +54,10 @@ jobs:
         cd gh-pages
         touch .nojekyll
         git add .
+        if git diff --cached --quiet; then
+          echo "No documentation changes to publish"
+          exit 0
+        fi
         git config --global user.name "GitHub Actions"
         git config --global user.email github-actions@github.com
         git commit -m "Update documentation"
