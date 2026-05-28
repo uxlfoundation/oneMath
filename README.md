@@ -5,7 +5,7 @@
 [![OpenSSF
 Scorecard](https://api.securityscorecards.dev/projects/github.com/uxlfoundation/oneMath/badge)](https://securityscorecards.dev/viewer/?uri=github.com%2Fuxlfoundation%2FoneMath)
 
-oneMath is an open-source implementation of the [oneMath specification](https://oneapi-spec.uxlfoundation.org/specifications/oneapi/latest/elements/onemath/source/). It can work with multiple devices using multiple libraries (backends) underneath. The oneMath project was previously referred to as oneMKL Interfaces.
+oneMath is an open-source implementation of the [oneMath specification](https://uxlfoundation.github.io/oneMath/spec). It can work with multiple devices using multiple libraries (backends) underneath. The oneMath project was previously referred to as oneMKL Interfaces.
 
 oneMath is part of the [UXL Foundation](http://www.uxlfoundation.org).
 <br/><br/>
@@ -608,7 +608,7 @@ Product | Supported Version | License
 ---
 
 ## Documentation
-- [oneMath Specification](https://oneapi-spec.uxlfoundation.org/specifications/oneapi/latest/elements/onemath/source/)
+- [oneMath Specification](https://uxlfoundation.github.io/oneMath/spec)
 - Get Started
   - [Selecting a Compiler](https://uxlfoundation.github.io/oneMath/selecting_a_compiler.html)
   - [Building the Project with DPC++](https://uxlfoundation.github.io/oneMath/building_the_project_with_dpcpp.html)
@@ -631,7 +631,7 @@ You can also join the mailing lists for the [UXL Foundation](https://lists.uxlfo
 
 ## Contributing
 
-You can contribute to this project and also contribute to [the specification for this project](https://oneapi-spec.uxlfoundation.org/specifications/oneapi/latest/elements/onemath/source/). Please read the [CONTRIBUTING](CONTRIBUTING.md) page for more information. You can also contact oneMath developers and maintainers via [UXL Foundation Slack](https://slack-invite.uxlfoundation.org/) using [#onemath](https://uxlfoundation.slack.com/archives/onemath) channel.
+You can contribute to this project and also contribute to [the specification for this project](https://uxlfoundation.github.io/oneMath/spec). Please read the [CONTRIBUTING](CONTRIBUTING.md) page for more information. You can also contact oneMath developers and maintainers via [UXL Foundation Slack](https://slack-invite.uxlfoundation.org/) using [#onemath](https://uxlfoundation.slack.com/archives/onemath) channel.
 
 You can find the oneMath release schedule and works already in progress towards future milestones in GitHub's [Milestones](https://github.com/uxlfoundation/oneMath/milestones) section. If you are looking for a specific task to start, consider selecting from issues that are marked with the [help wanted](https://github.com/uxlfoundation/oneMath/labels/help%20wanted) label.
 
@@ -648,12 +648,12 @@ Distributed under the Apache license 2.0. See [LICENSE](LICENSE) for more inform
 ### oneMath
 
 **Q: What is the difference between the following items?**
-   - The [oneAPI Specification for oneMath](https://oneapi-spec.uxlfoundation.org/specifications/oneapi/latest/elements/onemath/source/)
+   - The [oneAPI Specification for oneMath](https://uxlfoundation.github.io/oneMath/spec)
    - The [oneAPI Math Library (oneMath)](https://github.com/uxlfoundation/oneMath) project
    - The [Intel(R) oneAPI Math Kernel Library (oneMKL)](https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onemkl.html) Product
 
 **A:**
-- The [oneAPI Specification for oneMath](https://oneapi-spec.uxlfoundation.org/specifications/oneapi/latest/elements/onemath/source/) defines the SYCL interfaces for performance math library functions. The oneMath specification can evolve faster and more frequently than implementations of the specification.
+- The [oneAPI Specification for oneMath](https://uxlfoundation.github.io/oneMath/spec) defines the SYCL interfaces for performance math library functions. The oneMath specification can evolve faster and more frequently than implementations of the specification.
 
 - The [oneAPI Math Library (oneMath)](https://github.com/uxlfoundation/oneMath) project is an open source implementation of the specification. The project goal is to demonstrate how the SYCL interfaces documented in the oneMath specification can be implemented for any math library and work for any target hardware. While the implementation provided here may not yet be the full implementation of the specification, the goal is to build it out over time. We encourage the community to contribute to this project and help to extend support to multiple hardware targets and other math libraries.
 
