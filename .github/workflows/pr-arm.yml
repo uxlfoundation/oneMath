@@ -10,7 +10,7 @@ on:
 
 env:
   CTEST_OUTPUT_ON_FAILURE: 1
-  LAPACK_VERSION: 3.12.0
+  LAPACK_VERSION: 3.12.1
   DPCPP_VERSION: 6.1.0
 
 jobs:
@@ -77,9 +77,8 @@ jobs:
     - name: Install ArmPL
       if: steps.domain_check.outputs.result == 'true'
       run: |
-        . /etc/os-release
-        curl "https://developer.arm.com/packages/arm-toolchains:${NAME,,}-${VERSION_ID/%.*/}/${VERSION_CODENAME}/Release.key" | sudo tee /etc/apt/trusted.gpg.d/developer-arm-com.asc
-        echo "deb https://developer.arm.com/packages/arm-toolchains:${NAME,,}-${VERSION_ID/%.*/}/${VERSION_CODENAME}/ ./" | sudo tee /etc/apt/sources.list.d/developer-arm-com.list
+        curl -O https://developer.arm.com/packages/arm-toolchains/ubuntu/pool/arm-toolchains-repository_2-1~noble_all.deb
+        sudo dpkg -i arm-toolchains-repository_2-1~noble_all.deb
         sudo apt update
         sudo apt install -y arm-performance-libraries
     - name: Configure/Build for a domain
