@@ -14,7 +14,7 @@ pydata-sphinx-theme==0.15.2
 Pygments==2.20.0
 requests==2.33.0
 snowballstemmer==2.2.0
-soupsieve==2.5
+soupsieve==2.8.4
 Sphinx==7.3.7
 sphinx-book-theme==1.1.2
 sphinxcontrib-applehelp==1.0.8
