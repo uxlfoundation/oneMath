@@ -77,8 +77,8 @@ jobs:
     - name: Install ArmPL
       if: steps.domain_check.outputs.result == 'true'
       run: |
-        curl -O https://developer.arm.com/packages/arm-toolchains/ubuntu/pool/arm-toolchains-repository_2-1~noble_all.deb
-        sudo dpkg -i arm-toolchains-repository_2-1~noble_all.deb
+        curl -O https://developer.arm.com/packages/arm-toolchains/ubuntu/pool/arm-toolchains-repository_2-2~noble_all.deb
+        sudo dpkg -i arm-toolchains-repository_2-2~noble_all.deb
         sudo apt update
         sudo apt install -y arm-performance-libraries
     - name: Configure/Build for a domain
