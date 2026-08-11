@@ -3816,7 +3816,7 @@ sycl::event iamax(backend_selector<backend::openblas> selector, std::int64_t n,
 }
 
 sycl::event rotm(backend_selector<backend::openblas> selector, std::int64_t n, float* x,
-                 std::int64_t incx, float* y, std::int64_t incy, float* param,
+                 std::int64_t incx, float* y, std::int64_t incy, const float* param,
                  const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::openblas::MAJOR::rotm(selector.get_queue(), n, x, incx, y, incy,
                                                           param, dependencies);
@@ -3824,7 +3824,7 @@ sycl::event rotm(backend_selector<backend::openblas> selector, std::int64_t n, f
 }
 
 sycl::event rotm(backend_selector<backend::openblas> selector, std::int64_t n, double* x,
-                 std::int64_t incx, double* y, std::int64_t incy, double* param,
+                 std::int64_t incx, double* y, std::int64_t incy, const double* param,
                  const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::openblas::MAJOR::rotm(selector.get_queue(), n, x, incx, y, incy,
                                                           param, dependencies);

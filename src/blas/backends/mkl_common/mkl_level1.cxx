@@ -820,13 +820,15 @@ sycl::event rotg(sycl::queue& queue, std::complex<double>* a, std::complex<doubl
 }
 
 sycl::event rotm(sycl::queue& queue, std::int64_t n, float* x, std::int64_t incx, float* y,
-                 std::int64_t incy, float* param, const std::vector<sycl::event>& dependencies) {
+                 std::int64_t incy, const float* param,
+                 const std::vector<sycl::event>& dependencies) {
     RETHROW_ONEMKL_EXCEPTIONS_RET(
         blas_major::rotm(queue, n, x, incx, y, incy, param, dependencies));
 }
 
 sycl::event rotm(sycl::queue& queue, std::int64_t n, double* x, std::int64_t incx, double* y,
-                 std::int64_t incy, double* param, const std::vector<sycl::event>& dependencies) {
+                 std::int64_t incy, const double* param,
+                 const std::vector<sycl::event>& dependencies) {
     RETHROW_ONEMKL_EXCEPTIONS_RET(
         blas_major::rotm(queue, n, x, incx, y, incy, param, dependencies));
 }

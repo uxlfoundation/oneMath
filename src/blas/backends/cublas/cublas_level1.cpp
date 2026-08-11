@@ -829,7 +829,7 @@ ROTG_LAUNCHER_USM(std::complex<double>, double, cublasZrotg)
 
 template <typename Func, typename T>
 inline sycl::event rotm(const char* func_name, Func func, sycl::queue& queue, int64_t n, T* x,
-                        int64_t incx, T* y, int64_t incy, T* param,
+                        int64_t incx, T* y, int64_t incy, const T* param,
                         const std::vector<sycl::event>& dependencies) {
     using cuDataType = typename CudaEquivalentType<T>::Type;
     overflow_check(n, incx, incy);
@@ -842,7 +842,7 @@ inline sycl::event rotm(const char* func_name, Func func, sycl::queue& queue, in
             auto handle = sc.get_handle();
             auto x_ = reinterpret_cast<cuDataType*>(x);
             auto y_ = reinterpret_cast<cuDataType*>(y);
-            auto param_ = reinterpret_cast<cuDataType*>(param);
+            auto param_ = reinterpret_cast<const cuDataType*>(param);
             cublasStatus_t err;
             cublas_native_named_func(func_name, func, err, handle, n, x_, incx, y_, incy, param_);
         });
@@ -852,7 +852,7 @@ inline sycl::event rotm(const char* func_name, Func func, sycl::queue& queue, in
 
 #define ROTM_LAUNCHER_USM(TYPE, CUBLAS_ROUTINE)                                                   \
     sycl::event rotm(sycl::queue& queue, int64_t n, TYPE* x, int64_t incx, TYPE* y, int64_t incy, \
-                     TYPE* param, const std::vector<sycl::event>& dependencies) {                 \
+                     const TYPE* param, const std::vector<sycl::event>& dependencies) {           \
         return rotm(#CUBLAS_ROUTINE, CUBLAS_ROUTINE, queue, n, x, incx, y, incy, param,           \
                     dependencies);                                                                \
     }
@@ -1696,14 +1696,14 @@ ROTG_LAUNCHER_USM(std::complex<double>, double, cublasZrotg)
 
 template <typename Func, typename T>
 inline sycl::event rotm(const char* func_name, Func func, sycl::queue& queue, int64_t n, T* x,
-                        int64_t incx, T* y, int64_t incy, T* param,
+                        int64_t incx, T* y, int64_t incy, const T* param,
                         const std::vector<sycl::event>& dependencies) {
     throw unimplemented("blas", "rotm", "for row_major layout");
 }
 
 #define ROTM_LAUNCHER_USM(TYPE, CUBLAS_ROUTINE)                                                   \
     sycl::event rotm(sycl::queue& queue, int64_t n, TYPE* x, int64_t incx, TYPE* y, int64_t incy, \
-                     TYPE* param, const std::vector<sycl::event>& dependencies) {                 \
+                     const TYPE* param, const std::vector<sycl::event>& dependencies) {           \
         return rotm(#CUBLAS_ROUTINE, CUBLAS_ROUTINE, queue, n, x, incx, y, incy, param,           \
                     dependencies);                                                                \
     }

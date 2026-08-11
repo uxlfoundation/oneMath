@@ -2183,14 +2183,14 @@ sycl::event rotg(oneapi::math::device libkey, sycl::queue& queue, std::complex<d
 }
 
 sycl::event rotm(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n, float* x,
-                 std::int64_t incx, float* y, std::int64_t incy, float* param,
+                 std::int64_t incx, float* y, std::int64_t incy, const float* param,
                  const std::vector<sycl::event>& dependencies) {
     return function_tables[{ libkey, queue }].column_major_srotm_usm_sycl(
         queue, n, x, incx, y, incy, param, dependencies);
 }
 
 sycl::event rotm(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n, double* x,
-                 std::int64_t incx, double* y, std::int64_t incy, double* param,
+                 std::int64_t incx, double* y, std::int64_t incy, const double* param,
                  const std::vector<sycl::event>& dependencies) {
     return function_tables[{ libkey, queue }].column_major_drotm_usm_sycl(
         queue, n, x, incx, y, incy, param, dependencies);
@@ -6165,14 +6165,14 @@ sycl::event rotg(oneapi::math::device libkey, sycl::queue& queue, std::complex<d
 }
 
 sycl::event rotm(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n, float* x,
-                 std::int64_t incx, float* y, std::int64_t incy, float* param,
+                 std::int64_t incx, float* y, std::int64_t incy, const float* param,
                  const std::vector<sycl::event>& dependencies) {
     return function_tables[{ libkey, queue }].row_major_srotm_usm_sycl(queue, n, x, incx, y, incy,
                                                                        param, dependencies);
 }
 
 sycl::event rotm(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n, double* x,
-                 std::int64_t incx, double* y, std::int64_t incy, double* param,
+                 std::int64_t incx, double* y, std::int64_t incy, const double* param,
                  const std::vector<sycl::event>& dependencies) {
     return function_tables[{ libkey, queue }].row_major_drotm_usm_sycl(queue, n, x, incx, y, incy,
                                                                        param, dependencies);

@@ -1365,11 +1365,11 @@ typedef struct {
                                                const std::vector<sycl::event>& dependencies);
     sycl::event (*column_major_srotm_usm_sycl)(sycl::queue& queue, std::int64_t n, float* x,
                                                std::int64_t incx, float* y, std::int64_t incy,
-                                               float* param,
+                                               const float* param,
                                                const std::vector<sycl::event>& dependencies);
     sycl::event (*column_major_drotm_usm_sycl)(sycl::queue& queue, std::int64_t n, double* x,
                                                std::int64_t incx, double* y, std::int64_t incy,
-                                               double* param,
+                                               const double* param,
                                                const std::vector<sycl::event>& dependencies);
     sycl::event (*column_major_srotmg_usm_sycl)(sycl::queue& queue, float* d1, float* d2, float* x1,
                                                 float y1, float* param,
@@ -3833,11 +3833,11 @@ typedef struct {
                                             const std::vector<sycl::event>& dependencies);
     sycl::event (*row_major_srotm_usm_sycl)(sycl::queue& queue, std::int64_t n, float* x,
                                             std::int64_t incx, float* y, std::int64_t incy,
-                                            float* param,
+                                            const float* param,
                                             const std::vector<sycl::event>& dependencies);
     sycl::event (*row_major_drotm_usm_sycl)(sycl::queue& queue, std::int64_t n, double* x,
                                             std::int64_t incx, double* y, std::int64_t incy,
-                                            double* param,
+                                            const double* param,
                                             const std::vector<sycl::event>& dependencies);
     sycl::event (*row_major_srotmg_usm_sycl)(sycl::queue& queue, float* d1, float* d2, float* x1,
                                              float y1, float* param,

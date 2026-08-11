@@ -2331,10 +2331,12 @@ ONEMATH_EXPORT sycl::event spr2(oneapi::math::device libkey, sycl::queue& queue,
 
 ONEMATH_EXPORT sycl::event rotm(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
                                 float* x, std::int64_t incx, float* y, std::int64_t incy,
-                                float* param, const std::vector<sycl::event>& dependencies = {});
+                                const float* param,
+                                const std::vector<sycl::event>& dependencies = {});
 ONEMATH_EXPORT sycl::event rotm(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
                                 double* x, std::int64_t incx, double* y, std::int64_t incy,
-                                double* param, const std::vector<sycl::event>& dependencies = {});
+                                const double* param,
+                                const std::vector<sycl::event>& dependencies = {});
 
 ONEMATH_EXPORT sycl::event dot(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
                                const float* x, std::int64_t incx, const float* y, std::int64_t incy,

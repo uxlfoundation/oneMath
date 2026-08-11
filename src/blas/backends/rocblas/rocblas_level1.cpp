@@ -840,7 +840,8 @@ ROTG_LAUNCHER_USM(std::complex<double>, double, rocblas_zrotg)
 
 template <typename Func, typename T>
 inline sycl::event rotm(Func func, sycl::queue& queue, int64_t n, T* x, int64_t incx, T* y,
-                        int64_t incy, T* param, const std::vector<sycl::event>& dependencies) {
+                        int64_t incy, const T* param,
+                        const std::vector<sycl::event>& dependencies) {
     using rocDataType = typename RocEquivalentType<T>::Type;
     overflow_check(n, incx, incy);
 
@@ -851,7 +852,7 @@ inline sycl::event rotm(Func func, sycl::queue& queue, int64_t n, T* x, int64_t 
 
             auto x_ = reinterpret_cast<rocDataType*>(x);
             auto y_ = reinterpret_cast<rocDataType*>(y);
-            auto param_ = reinterpret_cast<rocDataType*>(param);
+            auto param_ = reinterpret_cast<const rocDataType*>(param);
             rocblas_status err;
             rocblas_native_func(func, err, handle, n, x_, incx, y_, incy, param_);
         });
@@ -862,7 +863,7 @@ inline sycl::event rotm(Func func, sycl::queue& queue, int64_t n, T* x, int64_t 
 
 #define ROTM_LAUNCHER_USM(TYPE, ROCBLAS_ROUTINE)                                                  \
     sycl::event rotm(sycl::queue& queue, int64_t n, TYPE* x, int64_t incx, TYPE* y, int64_t incy, \
-                     TYPE* param, const std::vector<sycl::event>& dependencies) {                 \
+                     const TYPE* param, const std::vector<sycl::event>& dependencies) {           \
         return rotm(ROCBLAS_ROUTINE, queue, n, x, incx, y, incy, param, dependencies);            \
     }
 
@@ -1608,13 +1609,14 @@ ROTG_LAUNCHER_USM(std::complex<double>, double, rocblas_zrotg)
 
 template <typename Func, typename T>
 inline sycl::event rotm(Func func, sycl::queue& queue, int64_t n, T* x, int64_t incx, T* y,
-                        int64_t incy, T* param, const std::vector<sycl::event>& dependencies) {
+                        int64_t incy, const T* param,
+                        const std::vector<sycl::event>& dependencies) {
     return column_major::rotm(func, queue, n, x, incx, y, incy, param, dependencies);
 }
 
 #define ROTM_LAUNCHER_USM(TYPE, ROCBLAS_ROUTINE)                                                  \
     sycl::event rotm(sycl::queue& queue, int64_t n, TYPE* x, int64_t incx, TYPE* y, int64_t incy, \
-                     TYPE* param, const std::vector<sycl::event>& dependencies) {                 \
+                     const TYPE* param, const std::vector<sycl::event>& dependencies) {           \
         return rotm(ROCBLAS_ROUTINE, queue, n, x, incx, y, incy, param, dependencies);            \
     }
 

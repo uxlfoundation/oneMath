@@ -2592,11 +2592,13 @@ static inline sycl::event iamax(backend_selector<backend::BACKEND> selector, std
 
 static inline sycl::event rotm(backend_selector<backend::BACKEND> selector, std::int64_t n,
                                float* x, std::int64_t incx, float* y, std::int64_t incy,
-                               float* param, const std::vector<sycl::event>& dependencies = {});
+                               const float* param,
+                               const std::vector<sycl::event>& dependencies = {});
 
 static inline sycl::event rotm(backend_selector<backend::BACKEND> selector, std::int64_t n,
                                double* x, std::int64_t incx, double* y, std::int64_t incy,
-                               double* param, const std::vector<sycl::event>& dependencies = {});
+                               const double* param,
+                               const std::vector<sycl::event>& dependencies = {});
 
 static inline sycl::event rotg(backend_selector<backend::BACKEND> selector, float* a, float* b,
                                float* c, float* s,

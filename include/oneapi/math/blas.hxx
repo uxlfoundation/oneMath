@@ -3102,14 +3102,14 @@ static inline sycl::event rotg(sycl::queue& queue, std::complex<double>* a, std:
 }
 
 static inline sycl::event rotm(sycl::queue& queue, std::int64_t n, float* x, std::int64_t incx,
-                               float* y, std::int64_t incy, float* param,
+                               float* y, std::int64_t incy, const float* param,
                                const std::vector<sycl::event>& dependencies = {}) {
     auto done = detail::rotm(get_device_id(queue), queue, n, x, incx, y, incy, param, dependencies);
     return done;
 }
 
 static inline sycl::event rotm(sycl::queue& queue, std::int64_t n, double* x, std::int64_t incx,
-                               double* y, std::int64_t incy, double* param,
+                               double* y, std::int64_t incy, const double* param,
                                const std::vector<sycl::event>& dependencies = {}) {
     auto done = detail::rotm(get_device_id(queue), queue, n, x, incx, y, incy, param, dependencies);
     return done;

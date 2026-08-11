@@ -400,7 +400,8 @@ sycl::event rotg(sycl::queue& queue, std::complex<real_t>* a, std::complex<real_
 }
 
 sycl::event rotm(sycl::queue& queue, std::int64_t n, real_t* x, std::int64_t incx, real_t* y,
-                 std::int64_t incy, real_t* param, const std::vector<sycl::event>& dependencies) {
+                 std::int64_t incy, const real_t* param,
+                 const std::vector<sycl::event>& dependencies) {
     CALL_GENERIC_BLAS_USM_FN(::blas::_rotm, queue, n, x, incx, y, incy, param, dependencies);
 }
 
