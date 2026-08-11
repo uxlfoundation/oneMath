@@ -86,16 +86,23 @@ int test(device* dev, oneapi::math::layout layout, int N, int incx, int incy, fp
 
     // Call DPC++ ROTM.
 
+    // param is a read-only input, so it is passed through a const pointer. This
+    // ensures the const-correct USM rotm API (uxlfoundation/oneMath#592) is
+    // exercised: a mutable pointer would also compile against the old
+    // non-const signature, whereas a const pointer enforces the fixed
+    // signature at compile time for both the RT and CT dispatch paths.
+    const fp* param_ptr = param.data();
+
     try {
 #ifdef CALL_RT_API
         switch (layout) {
             case oneapi::math::layout::col_major:
                 done = oneapi::math::blas::column_major::rotm(
-                    main_queue, N, x.data(), incx, y.data(), incy, param.data(), dependencies);
+                    main_queue, N, x.data(), incx, y.data(), incy, param_ptr, dependencies);
                 break;
             case oneapi::math::layout::row_major:
                 done = oneapi::math::blas::row_major::rotm(main_queue, N, x.data(), incx, y.data(),
-                                                           incy, param.data(), dependencies);
+                                                           incy, param_ptr, dependencies);
                 break;
             default: break;
         }
@@ -104,11 +111,11 @@ int test(device* dev, oneapi::math::layout layout, int N, int incx, int incy, fp
         switch (layout) {
             case oneapi::math::layout::col_major:
                 TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::math::blas::column_major::rotm, N,
-                                        x.data(), incx, y.data(), incy, param.data(), dependencies);
+                                        x.data(), incx, y.data(), incy, param_ptr, dependencies);
                 break;
             case oneapi::math::layout::row_major:
                 TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::math::blas::row_major::rotm, N,
-                                        x.data(), incx, y.data(), incy, param.data(), dependencies);
+                                        x.data(), incx, y.data(), incy, param_ptr, dependencies);
                 break;
             default: break;
         }
