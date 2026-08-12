@@ -19,7 +19,9 @@
 
 #Build object from all test sources
 # TODO: add list of tests without Netlib dependency
-set(LAPACK_SOURCES)
+set(LAPACK_SOURCES
+    "geqrf_orgqr_diagonal.cpp"
+)
 
 set(LAPACK_SOURCES_W_LAPACKE
     "gebrd.cpp"
