@@ -314,6 +314,14 @@ static inline void gemm(sycl::queue& queue, transpose transa, transpose transb, 
                  c, ldc);
 }
 
+static inline void gemm(sycl::queue& queue, transpose transa, transpose transb, std::int64_t m,
+                        std::int64_t n, std::int64_t k, float alpha, sycl::buffer<bfloat16, 1>& a,
+                        std::int64_t lda, sycl::buffer<bfloat16, 1>& b, std::int64_t ldb,
+                        float beta, sycl::buffer<bfloat16, 1>& c, std::int64_t ldc) {
+    detail::gemm(get_device_id(queue), queue, transa, transb, m, n, k, alpha, a, lda, b, ldb, beta,
+                 c, ldc);
+}
+
 static inline void gemm_batch(sycl::queue& queue, transpose transa, transpose transb,
                               std::int64_t m, std::int64_t n, std::int64_t k, float alpha,
                               sycl::buffer<float, 1>& a, std::int64_t lda, std::int64_t stride_a,
@@ -2159,6 +2167,16 @@ static inline sycl::event gemm(sycl::queue& queue, transpose transa, transpose t
                                std::int64_t m, std::int64_t n, std::int64_t k, float alpha,
                                const bfloat16* a, std::int64_t lda, const bfloat16* b,
                                std::int64_t ldb, float beta, float* c, std::int64_t ldc,
+                               const std::vector<sycl::event>& dependencies = {}) {
+    auto done = detail::gemm(get_device_id(queue), queue, transa, transb, m, n, k, alpha, a, lda, b,
+                             ldb, beta, c, ldc, dependencies);
+    return done;
+}
+
+static inline sycl::event gemm(sycl::queue& queue, transpose transa, transpose transb,
+                               std::int64_t m, std::int64_t n, std::int64_t k, float alpha,
+                               const bfloat16* a, std::int64_t lda, const bfloat16* b,
+                               std::int64_t ldb, float beta, bfloat16* c, std::int64_t ldc,
                                const std::vector<sycl::event>& dependencies = {}) {
     auto done = detail::gemm(get_device_id(queue), queue, transa, transb, m, n, k, alpha, a, lda, b,
                              ldb, beta, c, ldc, dependencies);

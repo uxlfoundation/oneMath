@@ -604,6 +604,12 @@ static inline void gemm(backend_selector<backend::BACKEND> selector, transpose t
                         sycl::buffer<bfloat16, 1>& b, std::int64_t ldb, float beta,
                         sycl::buffer<float, 1>& c, std::int64_t ldc);
 
+static inline void gemm(backend_selector<backend::BACKEND> selector, transpose transa,
+                        transpose transb, std::int64_t m, std::int64_t n, std::int64_t k,
+                        float alpha, sycl::buffer<bfloat16, 1>& a, std::int64_t lda,
+                        sycl::buffer<bfloat16, 1>& b, std::int64_t ldb, float beta,
+                        sycl::buffer<bfloat16, 1>& c, std::int64_t ldc);
+
 static inline void herk(backend_selector<backend::BACKEND> selector, uplo upper_lower,
                         transpose trans, std::int64_t n, std::int64_t k, float alpha,
                         sycl::buffer<std::complex<float>, 1>& a, std::int64_t lda, float beta,
@@ -2041,6 +2047,12 @@ static inline sycl::event gemm(backend_selector<backend::BACKEND> selector, tran
                                transpose transb, std::int64_t m, std::int64_t n, std::int64_t k,
                                float alpha, const bfloat16* a, std::int64_t lda, const bfloat16* b,
                                std::int64_t ldb, float beta, float* c, std::int64_t ldc,
+                               const std::vector<sycl::event>& dependencies = {});
+
+static inline sycl::event gemm(backend_selector<backend::BACKEND> selector, transpose transa,
+                               transpose transb, std::int64_t m, std::int64_t n, std::int64_t k,
+                               float alpha, const bfloat16* a, std::int64_t lda, const bfloat16* b,
+                               std::int64_t ldb, float beta, bfloat16* c, std::int64_t ldc,
                                const std::vector<sycl::event>& dependencies = {});
 
 static inline sycl::event herk(backend_selector<backend::BACKEND> selector, uplo upper_lower,

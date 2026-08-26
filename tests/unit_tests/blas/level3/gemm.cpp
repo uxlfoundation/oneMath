@@ -22,6 +22,7 @@
 #include <cstring>
 #include <iostream>
 #include <limits>
+#include <type_traits>
 #include <vector>
 
 #if __has_include(<sycl/sycl.hpp>)
@@ -47,10 +48,10 @@ extern std::vector<sycl::device*> devices;
 
 namespace {
 
-template <typename Ta, typename Tc>
+template <typename Ta, typename Tc, typename Ts = Tc>
 int test(device* dev, oneapi::math::layout layout, oneapi::math::transpose transa,
-         oneapi::math::transpose transb, int m, int n, int k, int lda, int ldb, int ldc, Tc alpha,
-         Tc beta) {
+         oneapi::math::transpose transb, int m, int n, int k, int lda, int ldb, int ldc, Ts alpha,
+         Ts beta) {
     // Prepare data.
     vector<Ta, allocator_helper<Ta, 64>> A, B;
     vector<Tc, allocator_helper<Tc, 64>> C, C_ref;
@@ -58,6 +59,15 @@ int test(device* dev, oneapi::math::layout layout, oneapi::math::transpose trans
     rand_matrix(A, layout, transa, m, k, lda);
     rand_matrix(B, layout, transb, k, n, ldb);
     rand_matrix(C, layout, oneapi::math::transpose::nontrans, m, n, ldc);
+    if constexpr (std::is_same_v<Ta, oneapi::math::bfloat16> &&
+                  std::is_same_v<Tc, oneapi::math::bfloat16>) {
+        for (std::size_t i = 0; i < A.size(); ++i)
+            A[i] = static_cast<float>(static_cast<int>(i % 13) - 6) / 8.0f;
+        for (std::size_t i = 0; i < B.size(); ++i)
+            B[i] = static_cast<float>(static_cast<int>(i % 11) - 5) / 8.0f;
+        for (std::size_t i = 0; i < C.size(); ++i)
+            C[i] = static_cast<float>(static_cast<int>(i % 7) - 3) / 4.0f;
+    }
     C_ref = C;
 
     // Call Reference GEMM.
@@ -66,10 +76,11 @@ int test(device* dev, oneapi::math::layout layout, oneapi::math::transpose trans
 
     using Ta_ref = typename ref_type_info<Ta>::type;
     using Tc_ref = typename ref_type_info<Tc>::type;
+    using Ts_ref = typename ref_type_info<Ts>::type;
 
     ::gemm(convert_to_cblas_layout(layout), convert_to_cblas_trans(transa),
-           convert_to_cblas_trans(transb), &m_ref, &n_ref, &k_ref, (Tc_ref*)&alpha,
-           (Ta_ref*)A.data(), &lda_ref, (Ta_ref*)B.data(), &ldb_ref, (Tc_ref*)&beta,
+           convert_to_cblas_trans(transb), &m_ref, &n_ref, &k_ref, (Ts_ref*)&alpha,
+           (Ta_ref*)A.data(), &lda_ref, (Ta_ref*)B.data(), &ldb_ref, (Ts_ref*)&beta,
            (Tc_ref*)C_ref.data(), &ldc_ref);
 
     // Call DPC++ GEMM.
@@ -140,7 +151,8 @@ int test(device* dev, oneapi::math::layout layout, oneapi::math::transpose trans
 
     // Compare the results of reference implementation and DPC++ implementation.
     auto C_accessor = C_buffer.get_host_access(read_only);
-    bool good = check_equal_matrix(C_accessor, C_ref, layout, m, n, ldc, 10 * k, std::cout);
+    const int tolerance = std::is_same_v<Tc, oneapi::math::bfloat16> ? 2 : 10 * k;
+    bool good = check_equal_matrix(C_accessor, C_ref, layout, m, n, ldc, tolerance, std::cout);
 
     return (int)good;
 }
@@ -163,6 +175,23 @@ TEST_P(GemmTests, Bfloat16Bfloat16FloatPrecision) {
     EXPECT_TRUEORSKIP((test<oneapi::math::bfloat16, float>(
         std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::transpose::trans,
         oneapi::math::transpose::trans, 79, 83, 91, 103, 105, 106, alpha, beta)));
+}
+
+TEST_P(GemmTests, Bfloat16Bfloat16Bfloat16Precision) {
+    float alpha(1.25);
+    float beta(-0.5);
+    EXPECT_TRUEORSKIP((test<oneapi::math::bfloat16, oneapi::math::bfloat16, float>(
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::transpose::nontrans,
+        oneapi::math::transpose::nontrans, 17, 19, 23, 29, 31, 37, alpha, beta)));
+    EXPECT_TRUEORSKIP((test<oneapi::math::bfloat16, oneapi::math::bfloat16, float>(
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::transpose::nontrans,
+        oneapi::math::transpose::trans, 17, 19, 23, 29, 31, 37, alpha, beta)));
+    EXPECT_TRUEORSKIP((test<oneapi::math::bfloat16, oneapi::math::bfloat16, float>(
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::transpose::trans,
+        oneapi::math::transpose::nontrans, 17, 19, 23, 29, 31, 37, alpha, beta)));
+    EXPECT_TRUEORSKIP((test<oneapi::math::bfloat16, oneapi::math::bfloat16, float>(
+        std::get<0>(GetParam()), std::get<1>(GetParam()), oneapi::math::transpose::trans,
+        oneapi::math::transpose::trans, 17, 19, 23, 29, 31, 37, alpha, beta)));
 }
 
 TEST_P(GemmTests, HalfHalfFloatPrecision) {

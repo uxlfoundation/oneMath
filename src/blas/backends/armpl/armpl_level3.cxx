@@ -139,7 +139,60 @@ void gemm(sycl::queue& queue, transpose transa, transpose transb, int64_t m, int
 void gemm(sycl::queue& queue, transpose transa, transpose transb, int64_t m, int64_t n, int64_t k,
           float alpha, sycl::buffer<bfloat16, 1>& a, int64_t lda, sycl::buffer<bfloat16, 1>& b,
           int64_t ldb, float beta, sycl::buffer<float, 1>& c, int64_t ldc) {
-    throw unimplemented("blas", __func__, MAJOR_MINOR_TEXT);
+#ifdef _ARMPL_BF16_INTERFACE
+    queue.submit([&](sycl::handler& cgh) {
+        CBLAS_TRANSPOSE transa_ = cblas_convert(transa);
+        CBLAS_TRANSPOSE transb_ = cblas_convert(transb);
+        auto accessor_a = a.get_access<sycl::access::mode::read>(cgh);
+        auto accessor_b = b.get_access<sycl::access::mode::read>(cgh);
+        auto accessor_c = c.get_access<sycl::access::mode::read_write>(cgh);
+        host_task<class armpl_kernel_sbgemm>(cgh, [=]() {
+            ::cblas_sbgemm(MAJOR, transa_, transb_, m, n, k, alpha,
+                           reinterpret_cast<const armpl_bf16_t*>(accessor_a.GET_MULTI_PTR), lda,
+                           reinterpret_cast<const armpl_bf16_t*>(accessor_b.GET_MULTI_PTR), ldb,
+                           beta, accessor_c.GET_MULTI_PTR, ldc);
+        });
+    });
+#else
+    throw unimplemented("blas", __func__, "for bfloat16 with ArmPL older than 26.07");
+#endif
+}
+
+void gemm(sycl::queue& queue, transpose transa, transpose transb, int64_t m, int64_t n, int64_t k,
+          float alpha, sycl::buffer<bfloat16, 1>& a, int64_t lda, sycl::buffer<bfloat16, 1>& b,
+          int64_t ldb, float beta, sycl::buffer<bfloat16, 1>& c, int64_t ldc) {
+#ifdef _ARMPL_BF16_INTERFACE
+    queue.submit([&](sycl::handler& cgh) {
+        CBLAS_TRANSPOSE transa_ = cblas_convert(transa);
+        CBLAS_TRANSPOSE transb_ = cblas_convert(transb);
+        auto accessor_a = a.get_access<sycl::access::mode::read>(cgh);
+        auto accessor_b = b.get_access<sycl::access::mode::read>(cgh);
+        auto accessor_c = c.get_access<sycl::access::mode::read_write>(cgh);
+        // C is staged in float so that sbgemm's fp32 accumulation is rounded once. bgemm
+        // writes bfloat16 C directly, but it takes alpha and beta in bfloat16 too.
+        host_task<class armpl_kernel_sbgemm_bfloat16>(cgh, [=]() {
+#ifdef COLUMN_MAJOR
+            int64_t sizec = ldc * n;
+#endif
+#ifdef ROW_MAJOR
+            int64_t sizec = ldc * m;
+#endif
+            auto f32_c = new float[sizec]();
+            if (beta != 0.0f) {
+                copy_mat(accessor_c, MAJOR, transpose::N, m, n, ldc, 0.0f, f32_c);
+            }
+            ::cblas_sbgemm(MAJOR, transa_, transb_, m, n, k, alpha,
+                           reinterpret_cast<const armpl_bf16_t*>(accessor_a.GET_MULTI_PTR), lda,
+                           reinterpret_cast<const armpl_bf16_t*>(accessor_b.GET_MULTI_PTR), ldb,
+                           beta, f32_c, ldc);
+            float co = 0.0f;
+            copy_mat(f32_c, MAJOR, m, n, ldc, offset::F, &co, (bfloat16*)accessor_c.GET_MULTI_PTR);
+            delete[] f32_c;
+        });
+    });
+#else
+    throw unimplemented("blas", __func__, "for bfloat16 with ArmPL older than 26.07");
+#endif
 }
 
 template <typename T, typename CBLAS_FUNC>
@@ -507,7 +560,63 @@ sycl::event gemm(sycl::queue& queue, transpose transa, transpose transb, int64_t
                  int64_t k, float alpha, const bfloat16* a, int64_t lda, const bfloat16* b,
                  int64_t ldb, float beta, float* c, int64_t ldc,
                  const std::vector<sycl::event>& dependencies) {
-    throw unimplemented("blas", __func__, MAJOR_MINOR_TEXT);
+#ifdef _ARMPL_BF16_INTERFACE
+    auto done = queue.submit([&](sycl::handler& cgh) {
+        int64_t num_events = dependencies.size();
+        for (int64_t i = 0; i < num_events; ++i) {
+            cgh.depends_on(dependencies[i]);
+        }
+        CBLAS_TRANSPOSE transa_ = cblas_convert(transa);
+        CBLAS_TRANSPOSE transb_ = cblas_convert(transb);
+        host_task<class armpl_kernel_sbgemm_usm>(cgh, [=]() {
+            ::cblas_sbgemm(MAJOR, transa_, transb_, m, n, k, alpha,
+                           reinterpret_cast<const armpl_bf16_t*>(a), lda,
+                           reinterpret_cast<const armpl_bf16_t*>(b), ldb, beta, c, ldc);
+        });
+    });
+    return done;
+#else
+    throw unimplemented("blas", __func__, "for bfloat16 with ArmPL older than 26.07");
+#endif
+}
+
+sycl::event gemm(sycl::queue& queue, transpose transa, transpose transb, int64_t m, int64_t n,
+                 int64_t k, float alpha, const bfloat16* a, int64_t lda, const bfloat16* b,
+                 int64_t ldb, float beta, bfloat16* c, int64_t ldc,
+                 const std::vector<sycl::event>& dependencies) {
+#ifdef _ARMPL_BF16_INTERFACE
+    auto done = queue.submit([&](sycl::handler& cgh) {
+        int64_t num_events = dependencies.size();
+        for (int64_t i = 0; i < num_events; ++i) {
+            cgh.depends_on(dependencies[i]);
+        }
+        CBLAS_TRANSPOSE transa_ = cblas_convert(transa);
+        CBLAS_TRANSPOSE transb_ = cblas_convert(transb);
+        // C is staged in float so that sbgemm's fp32 accumulation is rounded once. bgemm
+        // writes bfloat16 C directly, but it takes alpha and beta in bfloat16 too.
+        host_task<class armpl_kernel_sbgemm_bfloat16_usm>(cgh, [=]() {
+#ifdef COLUMN_MAJOR
+            int64_t sizec = ldc * n;
+#endif
+#ifdef ROW_MAJOR
+            int64_t sizec = ldc * m;
+#endif
+            auto f32_c = new float[sizec]();
+            if (beta != 0.0f) {
+                copy_mat(c, MAJOR, transpose::N, m, n, ldc, 0.0f, f32_c);
+            }
+            ::cblas_sbgemm(MAJOR, transa_, transb_, m, n, k, alpha,
+                           reinterpret_cast<const armpl_bf16_t*>(a), lda,
+                           reinterpret_cast<const armpl_bf16_t*>(b), ldb, beta, f32_c, ldc);
+            float co = 0.0f;
+            copy_mat(f32_c, MAJOR, m, n, ldc, offset::F, &co, c);
+            delete[] f32_c;
+        });
+    });
+    return done;
+#else
+    throw unimplemented("blas", __func__, "for bfloat16 with ArmPL older than 26.07");
+#endif
 }
 
 template <typename T, typename CBLAS_FUNC>

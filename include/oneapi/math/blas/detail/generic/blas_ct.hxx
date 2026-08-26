@@ -837,6 +837,14 @@ void gemm(backend_selector<backend::generic> selector, transpose transa, transpo
                                              a, lda, b, ldb, beta, c, ldc);
 }
 
+void gemm(backend_selector<backend::generic> selector, transpose transa, transpose transb,
+          std::int64_t m, std::int64_t n, std::int64_t k, float alpha, sycl::buffer<bfloat16, 1>& a,
+          std::int64_t lda, sycl::buffer<bfloat16, 1>& b, std::int64_t ldb, float beta,
+          sycl::buffer<bfloat16, 1>& c, std::int64_t ldc) {
+    oneapi::math::blas::generic::MAJOR::gemm(selector.get_queue(), transa, transb, m, n, k, alpha,
+                                             a, lda, b, ldb, beta, c, ldc);
+}
+
 void syr2(backend_selector<backend::generic> selector, uplo upper_lower, std::int64_t n,
           float alpha, sycl::buffer<float, 1>& x, std::int64_t incx, sycl::buffer<float, 1>& y,
           std::int64_t incy, sycl::buffer<float, 1>& a, std::int64_t lda) {
@@ -2957,6 +2965,16 @@ sycl::event gemm(backend_selector<backend::generic> selector, transpose transa, 
 sycl::event gemm(backend_selector<backend::generic> selector, transpose transa, transpose transb,
                  std::int64_t m, std::int64_t n, std::int64_t k, float alpha, const bfloat16* a,
                  std::int64_t lda, const bfloat16* b, std::int64_t ldb, float beta, float* c,
+                 std::int64_t ldc, const std::vector<sycl::event>& dependencies) {
+    auto done =
+        oneapi::math::blas::generic::MAJOR::gemm(selector.get_queue(), transa, transb, m, n, k,
+                                                 alpha, a, lda, b, ldb, beta, c, ldc, dependencies);
+    return done;
+}
+
+sycl::event gemm(backend_selector<backend::generic> selector, transpose transa, transpose transb,
+                 std::int64_t m, std::int64_t n, std::int64_t k, float alpha, const bfloat16* a,
+                 std::int64_t lda, const bfloat16* b, std::int64_t ldb, float beta, bfloat16* c,
                  std::int64_t ldc, const std::vector<sycl::event>& dependencies) {
     auto done =
         oneapi::math::blas::generic::MAJOR::gemm(selector.get_queue(), transa, transb, m, n, k,

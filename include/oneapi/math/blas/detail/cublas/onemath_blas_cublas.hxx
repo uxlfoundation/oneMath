@@ -610,6 +610,11 @@ void gemm(sycl::queue& queue, transpose transa, transpose transb, std::int64_t m
           sycl::buffer<bfloat16, 1>& b, std::int64_t ldb, float beta, sycl::buffer<float, 1>& c,
           std::int64_t ldc);
 
+void gemm(sycl::queue& queue, transpose transa, transpose transb, std::int64_t m, std::int64_t n,
+          std::int64_t k, float alpha, sycl::buffer<bfloat16, 1>& a, std::int64_t lda,
+          sycl::buffer<bfloat16, 1>& b, std::int64_t ldb, float beta, sycl::buffer<bfloat16, 1>& c,
+          std::int64_t ldc);
+
 void hemm(sycl::queue& queue, side left_right, uplo upper_lower, std::int64_t m, std::int64_t n,
           std::complex<float> alpha, sycl::buffer<std::complex<float>, 1>& a, std::int64_t lda,
           sycl::buffer<std::complex<float>, 1>& b, std::int64_t ldb, std::complex<float> beta,
@@ -1715,6 +1720,11 @@ sycl::event gemm(sycl::queue& queue, transpose transa, transpose transb, std::in
 sycl::event gemm(sycl::queue& queue, transpose transa, transpose transb, std::int64_t m,
                  std::int64_t n, std::int64_t k, float alpha, const bfloat16* a, std::int64_t lda,
                  const bfloat16* b, std::int64_t ldb, float beta, float* c, std::int64_t ldc,
+                 const std::vector<sycl::event>& dependencies = {});
+
+sycl::event gemm(sycl::queue& queue, transpose transa, transpose transb, std::int64_t m,
+                 std::int64_t n, std::int64_t k, float alpha, const bfloat16* a, std::int64_t lda,
+                 const bfloat16* b, std::int64_t ldb, float beta, bfloat16* c, std::int64_t ldc,
                  const std::vector<sycl::event>& dependencies = {});
 
 sycl::event hemm(sycl::queue& queue, side left_right, uplo upper_lower, std::int64_t m,

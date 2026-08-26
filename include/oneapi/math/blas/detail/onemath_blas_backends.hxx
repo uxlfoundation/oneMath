@@ -65,6 +65,12 @@ ONEMATH_EXPORT void gemm(sycl::queue& queue, oneapi::math::transpose transa,
                          std::int64_t lda, sycl::buffer<bfloat16, 1>& b, std::int64_t ldb,
                          float beta, sycl::buffer<float, 1>& c, std::int64_t ldc);
 
+ONEMATH_EXPORT void gemm(sycl::queue& queue, oneapi::math::transpose transa,
+                         oneapi::math::transpose transb, std::int64_t m, std::int64_t n,
+                         std::int64_t k, float alpha, sycl::buffer<bfloat16, 1>& a,
+                         std::int64_t lda, sycl::buffer<bfloat16, 1>& b, std::int64_t ldb,
+                         float beta, sycl::buffer<bfloat16, 1>& c, std::int64_t ldc);
+
 ONEMATH_EXPORT void symm(sycl::queue& queue, oneapi::math::side left_right,
                          oneapi::math::uplo upper_lower, std::int64_t m, std::int64_t n,
                          float alpha, sycl::buffer<float, 1>& a, std::int64_t lda,
@@ -1295,6 +1301,13 @@ ONEMATH_EXPORT sycl::event gemm(sycl::queue& queue, oneapi::math::transpose tran
                                 oneapi::math::transpose transb, std::int64_t m, std::int64_t n,
                                 std::int64_t k, float alpha, const bfloat16* a, std::int64_t lda,
                                 const bfloat16* b, std::int64_t ldb, float beta, float* c,
+                                std::int64_t ldc,
+                                const std::vector<sycl::event>& dependencies = {});
+
+ONEMATH_EXPORT sycl::event gemm(sycl::queue& queue, oneapi::math::transpose transa,
+                                oneapi::math::transpose transb, std::int64_t m, std::int64_t n,
+                                std::int64_t k, float alpha, const bfloat16* a, std::int64_t lda,
+                                const bfloat16* b, std::int64_t ldb, float beta, bfloat16* c,
                                 std::int64_t ldc,
                                 const std::vector<sycl::event>& dependencies = {});
 

@@ -61,7 +61,7 @@
 #include "oneapi/math/rng/detail/rocrand/onemath_rng_rocrand.hpp"
 #include "rng/function_table.hpp"
 
-#define WRAPPER_VERSION 1
+#define WRAPPER_VERSION 2
 
 extern "C" ONEMATH_EXPORT rng_function_table_t onemath_rng_table = {
     WRAPPER_VERSION, oneapi::math::rng::rocrand::create_philox4x32x10,

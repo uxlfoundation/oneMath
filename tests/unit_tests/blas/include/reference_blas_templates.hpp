@@ -265,6 +265,36 @@ void gemm(CBLAS_LAYOUT layout, CBLAS_TRANSPOSE transa, CBLAS_TRANSPOSE transb, c
     oneapi::math::aligned_free(bf);
 }
 
+static inline void gemm(CBLAS_LAYOUT layout, CBLAS_TRANSPOSE transa, CBLAS_TRANSPOSE transb,
+                        const int* m, const int* n, const int* k, const float* alpha,
+                        const oneapi::math::bfloat16* a, const int* lda,
+                        const oneapi::math::bfloat16* b, const int* ldb, const float* beta,
+                        oneapi::math::bfloat16* c, const int* ldc) {
+    int sizea, sizeb, sizec;
+    if (layout == CblasColMajor) {
+        sizea = (transa == CblasNoTrans) ? *lda * *k : *lda * *m;
+        sizeb = (transb == CblasNoTrans) ? *ldb * *n : *ldb * *k;
+        sizec = *ldc * *n;
+    }
+    else {
+        sizea = (transa == CblasNoTrans) ? *lda * *m : *lda * *k;
+        sizeb = (transb == CblasNoTrans) ? *ldb * *k : *ldb * *n;
+        sizec = *ldc * *m;
+    }
+    float* af = (float*)oneapi::math::aligned_alloc(64, sizeof(float) * sizea);
+    float* bf = (float*)oneapi::math::aligned_alloc(64, sizeof(float) * sizeb);
+    float* cf = (float*)oneapi::math::aligned_alloc(64, sizeof(float) * sizec);
+    copy_mat(a, layout, transa, *m, *k, *lda, af);
+    copy_mat(b, layout, transb, *k, *n, *ldb, bf);
+    copy_mat(c, layout, CblasNoTrans, *m, *n, *ldc, cf);
+    cblas_sgemm_wrapper(layout, transa, transb, *m, *n, *k, *alpha, af, *lda, bf, *ldb, *beta, cf,
+                        *ldc);
+    copy_mat(cf, layout, CblasNoTrans, *m, *n, *ldc, c);
+    oneapi::math::aligned_free(af);
+    oneapi::math::aligned_free(bf);
+    oneapi::math::aligned_free(cf);
+}
+
 template <typename fp>
 static void symm(CBLAS_LAYOUT layout, CBLAS_SIDE left_right, CBLAS_UPLO uplo, const int* m,
                  const int* n, const fp* alpha, const fp* a, const int* lda, const fp* b,

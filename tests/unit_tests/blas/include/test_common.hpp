@@ -438,6 +438,20 @@ void rand_tbsv_matrix(vec& M, oneapi::math::layout layout, oneapi::math::uplo up
 }
 
 // Correctness checking.
+inline bool check_equal(oneapi::math::bfloat16 x, oneapi::math::bfloat16 x_ref, int error_mag) {
+    constexpr float bfloat16_epsilon = 1.0f / 128.0f;
+    const float bound = error_mag * bfloat16_epsilon;
+    const float x_float = static_cast<float>(x);
+    const float x_ref_float = static_cast<float>(x_ref);
+    const float aerr = std::abs(x_float - x_ref_float);
+    const float rerr = aerr / std::abs(x_ref_float);
+    const bool ok = (rerr <= bound) || (aerr <= bound);
+    if (!ok)
+        std::cout << "relative error = " << rerr << " absolute error = " << aerr
+                  << " limit = " << bound << std::endl;
+    return ok;
+}
+
 template <typename fp>
 typename std::enable_if<!std::is_integral<fp>::value, bool>::type check_equal(fp x, fp x_ref,
                                                                               int error_mag) {

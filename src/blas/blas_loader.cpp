@@ -1062,6 +1062,14 @@ void gemm(oneapi::math::device libkey, sycl::queue& queue, transpose transa, tra
         queue, transa, transb, m, n, k, alpha, a, lda, b, ldb, beta, c, ldc);
 }
 
+void gemm(oneapi::math::device libkey, sycl::queue& queue, transpose transa, transpose transb,
+          std::int64_t m, std::int64_t n, std::int64_t k, float alpha, sycl::buffer<bfloat16, 1>& a,
+          std::int64_t lda, sycl::buffer<bfloat16, 1>& b, std::int64_t ldb, float beta,
+          sycl::buffer<bfloat16, 1>& c, std::int64_t ldc) {
+    function_tables[{ libkey, queue }].column_major_gemm_bf16bf16bf16_sycl(
+        queue, transa, transb, m, n, k, alpha, a, lda, b, ldb, beta, c, ldc);
+}
+
 void hemm(oneapi::math::device libkey, sycl::queue& queue, side left_right, uplo upper_lower,
           std::int64_t m, std::int64_t n, std::complex<float> alpha,
           sycl::buffer<std::complex<float>, 1>& a, std::int64_t lda,
@@ -3025,6 +3033,15 @@ sycl::event gemm(oneapi::math::device libkey, sycl::queue& queue, transpose tran
                  float beta, float* c, std::int64_t ldc,
                  const std::vector<sycl::event>& dependencies) {
     return function_tables[{ libkey, queue }].column_major_gemm_bf16bf16f32_usm_sycl(
+        queue, transa, transb, m, n, k, alpha, a, lda, b, ldb, beta, c, ldc, dependencies);
+}
+
+sycl::event gemm(oneapi::math::device libkey, sycl::queue& queue, transpose transa,
+                 transpose transb, std::int64_t m, std::int64_t n, std::int64_t k, float alpha,
+                 const bfloat16* a, std::int64_t lda, const bfloat16* b, std::int64_t ldb,
+                 float beta, bfloat16* c, std::int64_t ldc,
+                 const std::vector<sycl::event>& dependencies) {
+    return function_tables[{ libkey, queue }].column_major_gemm_bf16bf16bf16_usm_sycl(
         queue, transa, transb, m, n, k, alpha, a, lda, b, ldb, beta, c, ldc, dependencies);
 }
 
@@ -5044,6 +5061,14 @@ void gemm(oneapi::math::device libkey, sycl::queue& queue, transpose transa, tra
         queue, transa, transb, m, n, k, alpha, a, lda, b, ldb, beta, c, ldc);
 }
 
+void gemm(oneapi::math::device libkey, sycl::queue& queue, transpose transa, transpose transb,
+          std::int64_t m, std::int64_t n, std::int64_t k, float alpha, sycl::buffer<bfloat16, 1>& a,
+          std::int64_t lda, sycl::buffer<bfloat16, 1>& b, std::int64_t ldb, float beta,
+          sycl::buffer<bfloat16, 1>& c, std::int64_t ldc) {
+    function_tables[{ libkey, queue }].row_major_gemm_bf16bf16bf16_sycl(
+        queue, transa, transb, m, n, k, alpha, a, lda, b, ldb, beta, c, ldc);
+}
+
 void hemm(oneapi::math::device libkey, sycl::queue& queue, side left_right, uplo upper_lower,
           std::int64_t m, std::int64_t n, std::complex<float> alpha,
           sycl::buffer<std::complex<float>, 1>& a, std::int64_t lda,
@@ -7007,6 +7032,15 @@ sycl::event gemm(oneapi::math::device libkey, sycl::queue& queue, transpose tran
                  float beta, float* c, std::int64_t ldc,
                  const std::vector<sycl::event>& dependencies) {
     return function_tables[{ libkey, queue }].row_major_gemm_bf16bf16f32_usm_sycl(
+        queue, transa, transb, m, n, k, alpha, a, lda, b, ldb, beta, c, ldc, dependencies);
+}
+
+sycl::event gemm(oneapi::math::device libkey, sycl::queue& queue, transpose transa,
+                 transpose transb, std::int64_t m, std::int64_t n, std::int64_t k, float alpha,
+                 const bfloat16* a, std::int64_t lda, const bfloat16* b, std::int64_t ldb,
+                 float beta, bfloat16* c, std::int64_t ldc,
+                 const std::vector<sycl::event>& dependencies) {
+    return function_tables[{ libkey, queue }].row_major_gemm_bf16bf16bf16_usm_sycl(
         queue, transa, transb, m, n, k, alpha, a, lda, b, ldb, beta, c, ldc, dependencies);
 }
 

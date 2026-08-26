@@ -814,6 +814,14 @@ void gemm(backend_selector<backend::rocblas> selector, transpose transa, transpo
                                              a, lda, b, ldb, beta, c, ldc);
 }
 
+void gemm(backend_selector<backend::rocblas> selector, transpose transa, transpose transb,
+          int64_t m, int64_t n, int64_t k, float alpha, sycl::buffer<bfloat16, 1>& a, int64_t lda,
+          sycl::buffer<bfloat16, 1>& b, int64_t ldb, float beta, sycl::buffer<bfloat16, 1>& c,
+          int64_t ldc) {
+    oneapi::math::blas::rocblas::MAJOR::gemm(selector.get_queue(), transa, transb, m, n, k, alpha,
+                                             a, lda, b, ldb, beta, c, ldc);
+}
+
 void syr2(backend_selector<backend::rocblas> selector, uplo upper_lower, int64_t n, float alpha,
           sycl::buffer<float, 1>& x, int64_t incx, sycl::buffer<float, 1>& y, int64_t incy,
           sycl::buffer<float, 1>& a, int64_t lda) {
@@ -2862,6 +2870,16 @@ sycl::event gemm(backend_selector<backend::rocblas> selector, transpose transa, 
 sycl::event gemm(backend_selector<backend::rocblas> selector, transpose transa, transpose transb,
                  int64_t m, int64_t n, int64_t k, float alpha, const bfloat16* a, int64_t lda,
                  const bfloat16* b, int64_t ldb, float beta, float* c, int64_t ldc,
+                 const std::vector<sycl::event>& dependencies) {
+    auto done =
+        oneapi::math::blas::rocblas::MAJOR::gemm(selector.get_queue(), transa, transb, m, n, k,
+                                                 alpha, a, lda, b, ldb, beta, c, ldc, dependencies);
+    return done;
+}
+
+sycl::event gemm(backend_selector<backend::rocblas> selector, transpose transa, transpose transb,
+                 int64_t m, int64_t n, int64_t k, float alpha, const bfloat16* a, int64_t lda,
+                 const bfloat16* b, int64_t ldb, float beta, bfloat16* c, int64_t ldc,
                  const std::vector<sycl::event>& dependencies) {
     auto done =
         oneapi::math::blas::rocblas::MAJOR::gemm(selector.get_queue(), transa, transb, m, n, k,

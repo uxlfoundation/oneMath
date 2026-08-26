@@ -666,6 +666,12 @@ typedef struct {
                                                sycl::buffer<oneapi::math::bfloat16, 1>& b,
                                                std::int64_t ldb, float beta,
                                                sycl::buffer<float, 1>& c, std::int64_t ldc);
+    void (*column_major_gemm_bf16bf16bf16_sycl)(
+        sycl::queue& queue, oneapi::math::transpose transa, oneapi::math::transpose transb,
+        std::int64_t m, std::int64_t n, std::int64_t k, float alpha,
+        sycl::buffer<oneapi::math::bfloat16, 1>& a, std::int64_t lda,
+        sycl::buffer<oneapi::math::bfloat16, 1>& b, std::int64_t ldb, float beta,
+        sycl::buffer<oneapi::math::bfloat16, 1>& c, std::int64_t ldc);
     void (*column_major_chemm_sycl)(sycl::queue& queue, oneapi::math::side left_right,
                                     oneapi::math::uplo upper_lower, std::int64_t m, std::int64_t n,
                                     std::complex<float> alpha,
@@ -1923,6 +1929,12 @@ typedef struct {
         const oneapi::math::bfloat16* a, std::int64_t lda, const oneapi::math::bfloat16* b,
         std::int64_t ldb, float beta, float* c, std::int64_t ldc,
         const std::vector<sycl::event>& dependencies);
+    sycl::event (*column_major_gemm_bf16bf16bf16_usm_sycl)(
+        sycl::queue& queue, oneapi::math::transpose transa, oneapi::math::transpose transb,
+        std::int64_t m, std::int64_t n, std::int64_t k, float alpha,
+        const oneapi::math::bfloat16* a, std::int64_t lda, const oneapi::math::bfloat16* b,
+        std::int64_t ldb, float beta, oneapi::math::bfloat16* c, std::int64_t ldc,
+        const std::vector<sycl::event>& dependencies);
     sycl::event (*column_major_chemm_usm_sycl)(
         sycl::queue& queue, oneapi::math::side left_right, oneapi::math::uplo upper_lower,
         std::int64_t m, std::int64_t n, std::complex<float> alpha, const std::complex<float>* a,
@@ -3130,6 +3142,12 @@ typedef struct {
                                             sycl::buffer<oneapi::math::bfloat16, 1>& b,
                                             std::int64_t ldb, float beta, sycl::buffer<float, 1>& c,
                                             std::int64_t ldc);
+    void (*row_major_gemm_bf16bf16bf16_sycl)(
+        sycl::queue& queue, oneapi::math::transpose transa, oneapi::math::transpose transb,
+        std::int64_t m, std::int64_t n, std::int64_t k, float alpha,
+        sycl::buffer<oneapi::math::bfloat16, 1>& a, std::int64_t lda,
+        sycl::buffer<oneapi::math::bfloat16, 1>& b, std::int64_t ldb, float beta,
+        sycl::buffer<oneapi::math::bfloat16, 1>& c, std::int64_t ldc);
     void (*row_major_chemm_sycl)(sycl::queue& queue, oneapi::math::side left_right,
                                  oneapi::math::uplo upper_lower, std::int64_t m, std::int64_t n,
                                  std::complex<float> alpha, sycl::buffer<std::complex<float>, 1>& a,
@@ -4395,6 +4413,12 @@ typedef struct {
         std::int64_t m, std::int64_t n, std::int64_t k, float alpha,
         const oneapi::math::bfloat16* a, std::int64_t lda, const oneapi::math::bfloat16* b,
         std::int64_t ldb, float beta, float* c, std::int64_t ldc,
+        const std::vector<sycl::event>& dependencies);
+    sycl::event (*row_major_gemm_bf16bf16bf16_usm_sycl)(
+        sycl::queue& queue, oneapi::math::transpose transa, oneapi::math::transpose transb,
+        std::int64_t m, std::int64_t n, std::int64_t k, float alpha,
+        const oneapi::math::bfloat16* a, std::int64_t lda, const oneapi::math::bfloat16* b,
+        std::int64_t ldb, float beta, oneapi::math::bfloat16* c, std::int64_t ldc,
         const std::vector<sycl::event>& dependencies);
     sycl::event (*row_major_chemm_usm_sycl)(
         sycl::queue& queue, oneapi::math::side left_right, oneapi::math::uplo upper_lower,
