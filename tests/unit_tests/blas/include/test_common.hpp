@@ -438,26 +438,36 @@ void rand_tbsv_matrix(vec& M, oneapi::math::layout layout, oneapi::math::uplo up
 }
 
 // Correctness checking.
+// A mixed-precision operation can accumulate at magnitudes far above the size of its output
+// entries. The rounding error of an entry whose sum cancels is then set by the accumulation scale
+// rather than by the entry itself, and no relative bound can cover it. Such callers pass that
+// scale as abs_bound, which only ever widens the absolute part of the check.
 template <typename fp>
-typename std::enable_if<!std::is_integral<fp>::value, bool>::type check_equal(fp x, fp x_ref,
-                                                                              int error_mag) {
+typename std::enable_if<!std::is_integral<fp>::value, bool>::type check_equal(
+    fp x, fp x_ref, int error_mag, double abs_bound = 0.0) {
     using fp_real = typename complex_info<fp>::real_type;
     fp_real bound = (error_mag * num_components<fp>() * std::numeric_limits<fp_real>::epsilon());
+    fp_real abs_limit = std::max(bound, fp_real(abs_bound));
 
     bool ok;
 
     fp_real aerr = std::abs(x - x_ref);
     fp_real rerr = aerr / std::abs(x_ref);
-    ok = (rerr <= bound) || (aerr <= bound);
-    if (!ok)
+    ok = (rerr <= bound) || (aerr <= abs_limit);
+    if (!ok) {
         std::cout << "relative error = " << rerr << " absolute error = " << aerr
-                  << " limit = " << bound << std::endl;
+                  << " limit = " << bound;
+        if (abs_limit > bound)
+            std::cout << " absolute limit = " << abs_limit;
+        std::cout << std::endl;
+    }
     return ok;
 }
 
+// An integer result must match exactly, so both tolerances are ignored here.
 template <typename fp>
-typename std::enable_if<std::is_integral<fp>::value, bool>::type check_equal(fp x, fp x_ref,
-                                                                             int error_mag) {
+typename std::enable_if<std::is_integral<fp>::value, bool>::type check_equal(
+    fp x, fp x_ref, int error_mag, double abs_bound = 0.0) {
     return (x == x_ref);
 }
 
@@ -566,13 +576,13 @@ bool check_equal_trsv_vector(vec1& v, vec2& v_ref, int n, int inc, int error_mag
 
 template <typename acc1, typename acc2>
 bool check_equal_matrix(acc1& M, acc2& M_ref, oneapi::math::layout layout, int m, int n, int ld,
-                        int error_mag, std::ostream& out) {
+                        int error_mag, std::ostream& out, double abs_bound = 0.0) {
     bool good = true;
     int idx, count = 0;
     for (int j = 0; j < n; j++) {
         for (int i = 0; i < m; i++) {
             idx = (layout == oneapi::math::layout::col_major) ? i + j * ld : j + i * ld;
-            if (!check_equal(M[idx], M_ref[idx], error_mag)) {
+            if (!check_equal(M[idx], M_ref[idx], error_mag, abs_bound)) {
                 out << "Difference in entry (" << i << ',' << j << "): DPC++ " << M[idx]
                     << " vs. Reference " << M_ref[idx] << std::endl;
                 good = false;
@@ -588,13 +598,13 @@ bool check_equal_matrix(acc1& M, acc2& M_ref, oneapi::math::layout layout, int m
 
 template <typename fp>
 bool check_equal_matrix(const fp* M, const fp* M_ref, oneapi::math::layout layout, int m, int n,
-                        int ld, int error_mag, std::ostream& out) {
+                        int ld, int error_mag, std::ostream& out, double abs_bound = 0.0) {
     bool good = true;
     int idx, count = 0;
     for (int j = 0; j < n; j++) {
         for (int i = 0; i < m; i++) {
             idx = (layout == oneapi::math::layout::col_major) ? i + j * ld : j + i * ld;
-            if (!check_equal(M[idx], M_ref[idx], error_mag)) {
+            if (!check_equal(M[idx], M_ref[idx], error_mag, abs_bound)) {
                 out << "Difference in entry (" << i << ',' << j << "): DPC++ " << M[idx]
                     << " vs. Reference " << M_ref[idx] << std::endl;
                 good = false;
@@ -702,11 +712,11 @@ bool check_almost_equal_matrix_int(Ta& M, Tb& M_ref, oneapi::math::layout layout
 
 template <typename Ta, typename Tb>
 bool check_almost_equal_matrix(Ta& M, Tb& M_ref, oneapi::math::layout layout, int m, int n, int ld,
-                               int error_mag, std::ostream& out) {
+                               int error_mag, std::ostream& out, double abs_bound = 0.0) {
     // Only call if returned dtype is integral
     if constexpr (is_matrix_type_integral<Ta>() && is_matrix_type_integral<Tb>())
         return check_almost_equal_matrix_int(M, M_ref, layout, m, n, ld, error_mag, out);
-    return check_equal_matrix(M, M_ref, layout, m, n, ld, error_mag, out);
+    return check_equal_matrix(M, M_ref, layout, m, n, ld, error_mag, out, abs_bound);
 }
 
 #endif /* header guard */

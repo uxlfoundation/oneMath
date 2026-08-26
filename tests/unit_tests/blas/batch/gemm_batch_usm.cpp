@@ -324,6 +324,14 @@ int test(device* dev, oneapi::math::layout layout, int64_t group_count) {
     // Compare the results of reference implementation and DPC++ implementation.
     int tol_scalar = 10;
 
+    // A float output accumulated from int8 inputs is rounded at the magnitude of the terms summed,
+    // |alpha| * sum|a*b|, which k * 128 * 128 bounds from above. An entry whose sum cancels is far
+    // smaller than that and so cannot meet any relative bound, so allow an absolute error of eps
+    // times the accumulated magnitude instead.
+    constexpr bool int8_to_float = std::is_same_v<Ta, std::int8_t> &&
+                                   std::is_same_v<Tb, std::int8_t> && std::is_same_v<Tc, float> &&
+                                   std::is_same_v<Ts, float>;
+
     idx = 0;
     for (i = 0; i < group_count; i++) {
         for (j = 0; j < group_size[i]; j++) {
@@ -331,10 +339,16 @@ int test(device* dev, oneapi::math::layout layout, int64_t group_count) {
             if (std::is_same_v<Tc, int32_t>)
                 error_mag = 1;
 
+            double abs_error_bound = 0.0;
+            if constexpr (int8_to_float)
+                abs_error_bound = std::numeric_limits<float>::epsilon() *
+                                  std::abs(double(alpha[i])) * double(k[i]) * 128.0 * 128.0;
+
             copy_matrix(c_ref_array[idx], layout, oneapi::math::transpose::nontrans, m[i], n[i],
                         ldc[i], c_cast_ref_array[idx]);
-            good = good && check_almost_equal_matrix(c_array[idx], c_cast_ref_array[idx], layout,
-                                                     m[i], n[i], ldc[i], error_mag, std::cout);
+            good = good &&
+                   check_almost_equal_matrix(c_array[idx], c_cast_ref_array[idx], layout, m[i],
+                                             n[i], ldc[i], error_mag, std::cout, abs_error_bound);
             idx++;
         }
     }
