@@ -124,13 +124,38 @@ int test(device* dev, oneapi::math::layout layout, int N, int incx, int incy) {
     // Compare the results of reference implementation and DPC++ implementation.
 
     auto result_accessor = result_buffer.get_host_access(read_only);
-    bool good = check_equal(result_accessor[0], result_ref, N, std::cout);
+    bool good;
+    if constexpr (std::is_same_v<fp_res, sycl::half> ||
+                  std::is_same_v<fp_res, oneapi::math::bfloat16>) {
+        good = check_equal_low_precision(result_accessor[0], result_ref, 2, std::cout);
+    }
+    else {
+        good = check_equal(result_accessor[0], result_ref, N, std::cout);
+    }
 
     return (int)good;
 }
 
 class DotTests : public ::testing::TestWithParam<std::tuple<sycl::device*, oneapi::math::layout>> {
 };
+
+TEST_P(DotTests, RealHalfPrecision) {
+    EXPECT_TRUEORSKIP((test<sycl::half, sycl::half>(std::get<0>(GetParam()),
+                                                    std::get<1>(GetParam()), 1357, 2, 3)));
+    EXPECT_TRUEORSKIP((test<sycl::half, sycl::half>(std::get<0>(GetParam()),
+                                                    std::get<1>(GetParam()), 1357, 1, 1)));
+    EXPECT_TRUEORSKIP((test<sycl::half, sycl::half>(std::get<0>(GetParam()),
+                                                    std::get<1>(GetParam()), 1357, -3, -2)));
+}
+
+TEST_P(DotTests, RealBfloat16Precision) {
+    EXPECT_TRUEORSKIP((test<oneapi::math::bfloat16, oneapi::math::bfloat16>(
+        std::get<0>(GetParam()), std::get<1>(GetParam()), 1357, 2, 3)));
+    EXPECT_TRUEORSKIP((test<oneapi::math::bfloat16, oneapi::math::bfloat16>(
+        std::get<0>(GetParam()), std::get<1>(GetParam()), 1357, 1, 1)));
+    EXPECT_TRUEORSKIP((test<oneapi::math::bfloat16, oneapi::math::bfloat16>(
+        std::get<0>(GetParam()), std::get<1>(GetParam()), 1357, -3, -2)));
+}
 
 TEST_P(DotTests, RealSinglePrecision) {
     EXPECT_TRUEORSKIP(

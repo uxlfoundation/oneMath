@@ -135,7 +135,16 @@ int test(device* dev, oneapi::math::layout layout, int N, int incx, int incy) {
     }
 
     // Compare the results of reference implementation and DPC++ implementation.
-    bool good = check_equal_ptr(main_queue, result_p, result_ref, N, std::cout);
+    bool good;
+    if constexpr (std::is_same_v<fp_res, sycl::half> ||
+                  std::is_same_v<fp_res, oneapi::math::bfloat16>) {
+        fp_res result_host;
+        main_queue.memcpy(&result_host, result_p, sizeof(fp_res)).wait();
+        good = check_equal_low_precision(result_host, result_ref, 2, std::cout);
+    }
+    else {
+        good = check_equal_ptr(main_queue, result_p, result_ref, N, std::cout);
+    }
 
     oneapi::math::free_usm(result_p, cxt);
 
@@ -144,6 +153,28 @@ int test(device* dev, oneapi::math::layout layout, int N, int incx, int incy) {
 
 class DotUsmTests
         : public ::testing::TestWithParam<std::tuple<sycl::device*, oneapi::math::layout>> {};
+
+TEST_P(DotUsmTests, RealHalfPrecision) {
+    EXPECT_TRUEORSKIP((test<sycl::half, sycl::half>(std::get<0>(GetParam()),
+                                                    std::get<1>(GetParam()), 1357, 2, 3)));
+    EXPECT_TRUEORSKIP((test<sycl::half, sycl::half>(std::get<0>(GetParam()),
+                                                    std::get<1>(GetParam()), 1357, 1, 1)));
+    EXPECT_TRUEORSKIP((test<sycl::half, sycl::half, usm::alloc::device>(
+        std::get<0>(GetParam()), std::get<1>(GetParam()), 101, 1, 1)));
+    EXPECT_TRUEORSKIP((test<sycl::half, sycl::half>(std::get<0>(GetParam()),
+                                                    std::get<1>(GetParam()), 1357, -3, -2)));
+}
+
+TEST_P(DotUsmTests, RealBfloat16Precision) {
+    EXPECT_TRUEORSKIP((test<oneapi::math::bfloat16, oneapi::math::bfloat16>(
+        std::get<0>(GetParam()), std::get<1>(GetParam()), 1357, 2, 3)));
+    EXPECT_TRUEORSKIP((test<oneapi::math::bfloat16, oneapi::math::bfloat16>(
+        std::get<0>(GetParam()), std::get<1>(GetParam()), 1357, 1, 1)));
+    EXPECT_TRUEORSKIP((test<oneapi::math::bfloat16, oneapi::math::bfloat16, usm::alloc::device>(
+        std::get<0>(GetParam()), std::get<1>(GetParam()), 101, 1, 1)));
+    EXPECT_TRUEORSKIP((test<oneapi::math::bfloat16, oneapi::math::bfloat16>(
+        std::get<0>(GetParam()), std::get<1>(GetParam()), 1357, -3, -2)));
+}
 
 TEST_P(DotUsmTests, RealSinglePrecision) {
     EXPECT_TRUEORSKIP(

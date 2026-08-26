@@ -1067,6 +1067,14 @@ static inline void dot(backend_selector<backend::BACKEND> selector, std::int64_t
 static inline void dot(backend_selector<backend::BACKEND> selector, std::int64_t n,
                        sycl::buffer<float, 1>& x, std::int64_t incx, sycl::buffer<float, 1>& y,
                        std::int64_t incy, sycl::buffer<double, 1>& result);
+static inline void dot(backend_selector<backend::BACKEND> selector, std::int64_t n,
+                       sycl::buffer<sycl::half, 1>& x, std::int64_t incx,
+                       sycl::buffer<sycl::half, 1>& y, std::int64_t incy,
+                       sycl::buffer<sycl::half, 1>& result);
+static inline void dot(backend_selector<backend::BACKEND> selector, std::int64_t n,
+                       sycl::buffer<bfloat16, 1>& x, std::int64_t incx,
+                       sycl::buffer<bfloat16, 1>& y, std::int64_t incy,
+                       sycl::buffer<bfloat16, 1>& result);
 
 static inline void symv(backend_selector<backend::BACKEND> selector, uplo upper_lower,
                         std::int64_t n, float alpha, sycl::buffer<float, 1>& a, std::int64_t lda,
@@ -2647,6 +2655,14 @@ static inline sycl::event dot(backend_selector<backend::BACKEND> selector, std::
 static inline sycl::event dot(backend_selector<backend::BACKEND> selector, std::int64_t n,
                               const float* x, std::int64_t incx, const float* y, std::int64_t incy,
                               double* result, const std::vector<sycl::event>& dependencies = {});
+static inline sycl::event dot(backend_selector<backend::BACKEND> selector, std::int64_t n,
+                              const sycl::half* x, std::int64_t incx, const sycl::half* y,
+                              std::int64_t incy, sycl::half* result,
+                              const std::vector<sycl::event>& dependencies = {});
+static inline sycl::event dot(backend_selector<backend::BACKEND> selector, std::int64_t n,
+                              const bfloat16* x, std::int64_t incx, const bfloat16* y,
+                              std::int64_t incy, bfloat16* result,
+                              const std::vector<sycl::event>& dependencies = {});
 
 static inline sycl::event symv(backend_selector<backend::BACKEND> selector, uplo upper_lower,
                                std::int64_t n, float alpha, const float* a, std::int64_t lda,

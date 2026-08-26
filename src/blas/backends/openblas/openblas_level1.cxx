@@ -272,6 +272,16 @@ void dot(sycl::queue& queue, int64_t n, sycl::buffer<float, 1>& x, int64_t incx,
     });
 }
 
+void dot(sycl::queue&, std::int64_t, sycl::buffer<sycl::half, 1>&, std::int64_t,
+         sycl::buffer<sycl::half, 1>&, std::int64_t, sycl::buffer<sycl::half, 1>&) {
+    throw unimplemented("blas", "dot", "for sycl::half");
+}
+
+void dot(sycl::queue&, std::int64_t, sycl::buffer<bfloat16, 1>&, std::int64_t,
+         sycl::buffer<bfloat16, 1>&, std::int64_t, sycl::buffer<bfloat16, 1>&) {
+    throw unimplemented("blas", "dot", "for bfloat16");
+}
+
 void dotc(sycl::queue& queue, int64_t n, sycl::buffer<std::complex<float>, 1>& x, int64_t incx,
           sycl::buffer<std::complex<float>, 1>& y, int64_t incy,
           sycl::buffer<std::complex<float>, 1>& result) {
@@ -1051,6 +1061,16 @@ sycl::event dot(sycl::queue& queue, int64_t n, const float* x, int64_t incx, con
             *result = sum;
         });
     });
+}
+
+sycl::event dot(sycl::queue&, std::int64_t, const sycl::half*, std::int64_t, const sycl::half*,
+                std::int64_t, sycl::half*, const std::vector<sycl::event>&) {
+    throw unimplemented("blas", "dot", "for sycl::half");
+}
+
+sycl::event dot(sycl::queue&, std::int64_t, const bfloat16*, std::int64_t, const bfloat16*,
+                std::int64_t, bfloat16*, const std::vector<sycl::event>&) {
+    throw unimplemented("blas", "dot", "for bfloat16");
 }
 
 sycl::event dotc(sycl::queue& queue, int64_t n, const std::complex<float>* x, int64_t incx,

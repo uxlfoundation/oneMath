@@ -1360,6 +1360,18 @@ void dot(backend_selector<backend::rocblas> selector, int64_t n, sycl::buffer<fl
     oneapi::math::blas::rocblas::MAJOR::dot(selector.get_queue(), n, x, incx, y, incy, result);
 }
 
+void dot(backend_selector<backend::rocblas> selector, int64_t n, sycl::buffer<sycl::half, 1>& x,
+         int64_t incx, sycl::buffer<sycl::half, 1>& y, int64_t incy,
+         sycl::buffer<sycl::half, 1>& result) {
+    oneapi::math::blas::rocblas::MAJOR::dot(selector.get_queue(), n, x, incx, y, incy, result);
+}
+
+void dot(backend_selector<backend::rocblas> selector, int64_t n, sycl::buffer<bfloat16, 1>& x,
+         int64_t incx, sycl::buffer<bfloat16, 1>& y, int64_t incy,
+         sycl::buffer<bfloat16, 1>& result) {
+    oneapi::math::blas::rocblas::MAJOR::dot(selector.get_queue(), n, x, incx, y, incy, result);
+}
+
 void trsm_batch(backend_selector<backend::rocblas> selector, side left_right, uplo upper_lower,
                 transpose trans, diag unit_diag, int64_t m, int64_t n, float alpha,
                 sycl::buffer<float, 1>& a, int64_t lda, int64_t stride_a, sycl::buffer<float, 1>& b,
@@ -3798,6 +3810,20 @@ sycl::event dot(backend_selector<backend::rocblas> selector, int64_t n, const fl
     auto done = oneapi::math::blas::rocblas::MAJOR::dot(selector.get_queue(), n, x, incx, y, incy,
                                                         result, dependencies);
     return done;
+}
+
+sycl::event dot(backend_selector<backend::rocblas> selector, int64_t n, const sycl::half* x,
+                int64_t incx, const sycl::half* y, int64_t incy, sycl::half* result,
+                const std::vector<sycl::event>& dependencies) {
+    return oneapi::math::blas::rocblas::MAJOR::dot(selector.get_queue(), n, x, incx, y, incy,
+                                                   result, dependencies);
+}
+
+sycl::event dot(backend_selector<backend::rocblas> selector, int64_t n, const bfloat16* x,
+                int64_t incx, const bfloat16* y, int64_t incy, bfloat16* result,
+                const std::vector<sycl::event>& dependencies) {
+    return oneapi::math::blas::rocblas::MAJOR::dot(selector.get_queue(), n, x, incx, y, incy,
+                                                   result, dependencies);
 }
 
 sycl::event symv(backend_selector<backend::rocblas> selector, uplo upper_lower, int64_t n,

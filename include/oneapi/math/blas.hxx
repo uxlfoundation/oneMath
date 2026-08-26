@@ -191,6 +191,18 @@ static inline void dot(sycl::queue& queue, std::int64_t n, sycl::buffer<float, 1
     detail::dot(get_device_id(queue), queue, n, x, incx, y, incy, result);
 }
 
+static inline void dot(sycl::queue& queue, std::int64_t n, sycl::buffer<sycl::half, 1>& x,
+                       std::int64_t incx, sycl::buffer<sycl::half, 1>& y, std::int64_t incy,
+                       sycl::buffer<sycl::half, 1>& result) {
+    detail::dot(get_device_id(queue), queue, n, x, incx, y, incy, result);
+}
+
+static inline void dot(sycl::queue& queue, std::int64_t n, sycl::buffer<bfloat16, 1>& x,
+                       std::int64_t incx, sycl::buffer<bfloat16, 1>& y, std::int64_t incy,
+                       sycl::buffer<bfloat16, 1>& result) {
+    detail::dot(get_device_id(queue), queue, n, x, incx, y, incy, result);
+}
+
 static inline void dotc(sycl::queue& queue, std::int64_t n, sycl::buffer<std::complex<float>, 1>& x,
                         std::int64_t incx, sycl::buffer<std::complex<float>, 1>& y,
                         std::int64_t incy, sycl::buffer<std::complex<float>, 1>& result) {
@@ -2012,6 +2024,19 @@ static inline sycl::event dot(sycl::queue& queue, std::int64_t n, const float* x
                               const std::vector<sycl::event>& dependencies = {}) {
     auto done = detail::dot(get_device_id(queue), queue, n, x, incx, y, incy, result, dependencies);
     return done;
+}
+
+static inline sycl::event dot(sycl::queue& queue, std::int64_t n, const sycl::half* x,
+                              std::int64_t incx, const sycl::half* y, std::int64_t incy,
+                              sycl::half* result,
+                              const std::vector<sycl::event>& dependencies = {}) {
+    return detail::dot(get_device_id(queue), queue, n, x, incx, y, incy, result, dependencies);
+}
+
+static inline sycl::event dot(sycl::queue& queue, std::int64_t n, const bfloat16* x,
+                              std::int64_t incx, const bfloat16* y, std::int64_t incy,
+                              bfloat16* result, const std::vector<sycl::event>& dependencies = {}) {
+    return detail::dot(get_device_id(queue), queue, n, x, incx, y, incy, result, dependencies);
 }
 
 static inline sycl::event dotc(sycl::queue& queue, std::int64_t n, const std::complex<float>* x,

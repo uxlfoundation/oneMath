@@ -23,6 +23,8 @@
 #include <algorithm>
 
 #include <complex>
+#include <cstdint>
+#include <cstring>
 #include <stdexcept>
 #include <type_traits>
 
@@ -438,6 +440,35 @@ void rand_tbsv_matrix(vec& M, oneapi::math::layout layout, oneapi::math::uplo up
 }
 
 // Correctness checking.
+template <typename fp>
+bool check_equal_low_precision(fp x, fp x_ref, std::uint32_t max_ulps, std::ostream& out) {
+    static_assert(sizeof(fp) == sizeof(std::uint16_t));
+
+    float x_float = static_cast<float>(x);
+    float x_ref_float = static_cast<float>(x_ref);
+    if (x_float == x_ref_float) {
+        return true;
+    }
+
+    std::uint16_t x_bits, x_ref_bits;
+    std::memcpy(&x_bits, &x, sizeof(x_bits));
+    std::memcpy(&x_ref_bits, &x_ref, sizeof(x_ref_bits));
+    auto ordered = [](std::uint16_t bits) {
+        return (bits & 0x8000) ? 0x8000 - (bits & 0x7fff) : 0x8000 + bits;
+    };
+    std::uint32_t x_ordered = ordered(x_bits);
+    std::uint32_t x_ref_ordered = ordered(x_ref_bits);
+    std::uint32_t ulps =
+        (x_ordered > x_ref_ordered) ? x_ordered - x_ref_ordered : x_ref_ordered - x_ordered;
+    if (ulps <= max_ulps) {
+        return true;
+    }
+
+    out << "Difference in result: DPC++ " << x_float << " vs. Reference " << x_ref_float
+        << ", ULP distance = " << ulps << " limit = " << max_ulps << std::endl;
+    return false;
+}
+
 template <typename fp>
 typename std::enable_if<!std::is_integral<fp>::value, bool>::type check_equal(fp x, fp x_ref,
                                                                               int error_mag) {

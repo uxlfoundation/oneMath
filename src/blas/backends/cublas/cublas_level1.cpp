@@ -26,6 +26,69 @@ namespace oneapi {
 namespace math {
 namespace blas {
 namespace cublas {
+
+class CublasPointerModeGuard {
+public:
+    CublasPointerModeGuard(cublasHandle_t handle, bool use_device_mode)
+            : handle_(handle),
+              restore_(use_device_mode) {
+        if (restore_) {
+            cublasSetPointerMode(handle_, CUBLAS_POINTER_MODE_DEVICE);
+        }
+    }
+
+    ~CublasPointerModeGuard() {
+        if (restore_) {
+            cublasSetPointerMode(handle_, CUBLAS_POINTER_MODE_HOST);
+        }
+    }
+
+private:
+    cublasHandle_t handle_;
+    bool restore_;
+};
+
+template <typename T>
+inline void dot_ex(sycl::queue& queue, int64_t n, sycl::buffer<T, 1>& x, int64_t incx,
+                   sycl::buffer<T, 1>& y, int64_t incy, sycl::buffer<T, 1>& result,
+                   cudaDataType data_type) {
+    overflow_check(n, incx, incy);
+    queue.submit([&](sycl::handler& cgh) {
+        auto x_acc = x.template get_access<sycl::access::mode::read>(cgh);
+        auto y_acc = y.template get_access<sycl::access::mode::read>(cgh);
+        auto res_acc = result.template get_access<sycl::access::mode::write>(cgh);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
+            CublasPointerModeGuard pointer_mode(handle, true);
+            auto x_ = sc.get_mem<T*>(x_acc);
+            auto y_ = sc.get_mem<T*>(y_acc);
+            auto res_ = sc.get_mem<T*>(res_acc);
+            cublasStatus_t err;
+            cublas_native_func(cublasDotEx, err, handle, n, x_, data_type, incx, y_, data_type,
+                               incy, res_, data_type, CUDA_R_32F);
+        });
+    });
+}
+
+template <typename T>
+inline sycl::event dot_ex(sycl::queue& queue, int64_t n, const T* x, int64_t incx, const T* y,
+                          int64_t incy, T* result, const std::vector<sycl::event>& dependencies,
+                          cudaDataType data_type) {
+    overflow_check(n, incx, incy);
+    bool result_on_device =
+        sycl::get_pointer_type(result, queue.get_context()) == sycl::usm::alloc::device;
+    return queue.submit([&](sycl::handler& cgh) {
+        cgh.depends_on(dependencies);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
+            CublasPointerModeGuard pointer_mode(handle, result_on_device);
+            cublasStatus_t err;
+            cublas_native_func(cublasDotEx, err, handle, n, x, data_type, incx, y, data_type, incy,
+                               result, data_type, CUDA_R_32F);
+        });
+    });
+}
+
 namespace column_major {
 
 // Buffer APIs
@@ -315,6 +378,22 @@ DOT_LAUNCHER(c, std::complex<double>, cublasZdotc)
 DOT_LAUNCHER(u, std::complex<float>, cublasCdotu)
 DOT_LAUNCHER(u, std::complex<double>, cublasZdotu)
 #undef DOT_LAUNCHER
+
+#define DOT_EX_LAUNCHER(TYPE, DATA_TYPE)                                              \
+    void dot(sycl::queue& queue, int64_t n, sycl::buffer<TYPE, 1>& x, int64_t incx,   \
+             sycl::buffer<TYPE, 1>& y, int64_t incy, sycl::buffer<TYPE, 1>& result) { \
+        dot_ex(queue, n, x, incx, y, incy, result, DATA_TYPE);                        \
+    }
+DOT_EX_LAUNCHER(sycl::half, CUDA_R_16F)
+#if CUDA_VERSION >= 11000
+DOT_EX_LAUNCHER(bfloat16, CUDA_R_16BF)
+#else
+void dot(sycl::queue&, int64_t, sycl::buffer<bfloat16, 1>&, int64_t, sycl::buffer<bfloat16, 1>&,
+         int64_t, sycl::buffer<bfloat16, 1>&) {
+    throw unimplemented("blas", "dot", "for bfloat16 with CUDA before 11.0");
+}
+#endif
+#undef DOT_EX_LAUNCHER
 
 template <typename Func, typename T1, typename T2, typename T3>
 inline void rot(const char* func_name, Func func, sycl::queue& queue, int64_t n,
@@ -941,6 +1020,22 @@ DOT_LAUNCHER_USM(u, std::complex<float>, cublasCdotu)
 DOT_LAUNCHER_USM(u, std::complex<double>, cublasZdotu)
 #undef DOT_LAUNCHER_USM
 
+#define DOT_EX_LAUNCHER_USM(TYPE, DATA_TYPE)                                                    \
+    sycl::event dot(sycl::queue& queue, int64_t n, const TYPE* x, int64_t incx, const TYPE* y,  \
+                    int64_t incy, TYPE* result, const std::vector<sycl::event>& dependencies) { \
+        return dot_ex(queue, n, x, incx, y, incy, result, dependencies, DATA_TYPE);             \
+    }
+DOT_EX_LAUNCHER_USM(sycl::half, CUDA_R_16F)
+#if CUDA_VERSION >= 11000
+DOT_EX_LAUNCHER_USM(bfloat16, CUDA_R_16BF)
+#else
+sycl::event dot(sycl::queue&, int64_t, const bfloat16*, int64_t, const bfloat16*, int64_t,
+                bfloat16*, const std::vector<sycl::event>&) {
+    throw unimplemented("blas", "dot", "for bfloat16 with CUDA before 11.0");
+}
+#endif
+#undef DOT_EX_LAUNCHER_USM
+
 template <typename Func, typename T1, typename T2, typename T3>
 inline sycl::event rot(const char* func_name, Func func, sycl::queue& queue, int64_t n, T1* x,
                        const int64_t incx, T1* y, int64_t incy, T2 c, T3 s,
@@ -1477,6 +1572,22 @@ DOT_LAUNCHER(u, std::complex<float>, cublasCdotu)
 DOT_LAUNCHER(u, std::complex<double>, cublasZdotu)
 #undef DOT_LAUNCHER
 
+#define DOT_EX_LAUNCHER(TYPE, DATA_TYPE)                                              \
+    void dot(sycl::queue& queue, int64_t n, sycl::buffer<TYPE, 1>& x, int64_t incx,   \
+             sycl::buffer<TYPE, 1>& y, int64_t incy, sycl::buffer<TYPE, 1>& result) { \
+        dot_ex(queue, n, x, incx, y, incy, result, DATA_TYPE);                        \
+    }
+DOT_EX_LAUNCHER(sycl::half, CUDA_R_16F)
+#if CUDA_VERSION >= 11000
+DOT_EX_LAUNCHER(bfloat16, CUDA_R_16BF)
+#else
+void dot(sycl::queue&, int64_t, sycl::buffer<bfloat16, 1>&, int64_t, sycl::buffer<bfloat16, 1>&,
+         int64_t, sycl::buffer<bfloat16, 1>&) {
+    throw unimplemented("blas", "dot", "for bfloat16 with CUDA before 11.0");
+}
+#endif
+#undef DOT_EX_LAUNCHER
+
 template <typename Func, typename T1, typename T2, typename T3>
 inline void rot(const char* func_name, Func func, sycl::queue& queue, int64_t n,
                 sycl::buffer<T1, 1>& x, const int64_t incx, sycl::buffer<T1, 1>& y, int64_t incy,
@@ -1752,6 +1863,22 @@ DOT_LAUNCHER_USM(c, std::complex<double>, cublasZdotc)
 DOT_LAUNCHER_USM(u, std::complex<float>, cublasCdotu)
 DOT_LAUNCHER_USM(u, std::complex<double>, cublasZdotu)
 #undef DOT_LAUNCHER_USM
+
+#define DOT_EX_LAUNCHER_USM(TYPE, DATA_TYPE)                                                    \
+    sycl::event dot(sycl::queue& queue, int64_t n, const TYPE* x, int64_t incx, const TYPE* y,  \
+                    int64_t incy, TYPE* result, const std::vector<sycl::event>& dependencies) { \
+        return dot_ex(queue, n, x, incx, y, incy, result, dependencies, DATA_TYPE);             \
+    }
+DOT_EX_LAUNCHER_USM(sycl::half, CUDA_R_16F)
+#if CUDA_VERSION >= 11000
+DOT_EX_LAUNCHER_USM(bfloat16, CUDA_R_16BF)
+#else
+sycl::event dot(sycl::queue&, int64_t, const bfloat16*, int64_t, const bfloat16*, int64_t,
+                bfloat16*, const std::vector<sycl::event>&) {
+    throw unimplemented("blas", "dot", "for bfloat16 with CUDA before 11.0");
+}
+#endif
+#undef DOT_EX_LAUNCHER_USM
 
 template <typename Func, typename T1, typename T2, typename T3>
 inline sycl::event rot(const char* func_name, Func func, sycl::queue& queue, int64_t n, T1* x,

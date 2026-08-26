@@ -114,6 +114,12 @@ void dot(sycl::queue& queue, std::int64_t n, sycl::buffer<double, 1>& x, std::in
 void dot(sycl::queue& queue, std::int64_t n, sycl::buffer<float, 1>& x, std::int64_t incx,
          sycl::buffer<float, 1>& y, std::int64_t incy, sycl::buffer<double, 1>& result);
 
+void dot(sycl::queue& queue, std::int64_t n, sycl::buffer<sycl::half, 1>& x, std::int64_t incx,
+         sycl::buffer<sycl::half, 1>& y, std::int64_t incy, sycl::buffer<sycl::half, 1>& result);
+
+void dot(sycl::queue& queue, std::int64_t n, sycl::buffer<bfloat16, 1>& x, std::int64_t incx,
+         sycl::buffer<bfloat16, 1>& y, std::int64_t incy, sycl::buffer<bfloat16, 1>& result);
+
 void dotc(sycl::queue& queue, std::int64_t n, sycl::buffer<std::complex<float>, 1>& x,
           std::int64_t incx, sycl::buffer<std::complex<float>, 1>& y, std::int64_t incy,
           sycl::buffer<std::complex<float>, 1>& result);
@@ -1134,6 +1140,14 @@ sycl::event dot(sycl::queue& queue, std::int64_t n, const double* x, std::int64_
 
 sycl::event dot(sycl::queue& queue, std::int64_t n, const float* x, std::int64_t incx,
                 const float* y, std::int64_t incy, double* result,
+                const std::vector<sycl::event>& dependencies = {});
+
+sycl::event dot(sycl::queue& queue, std::int64_t n, const sycl::half* x, std::int64_t incx,
+                const sycl::half* y, std::int64_t incy, sycl::half* result,
+                const std::vector<sycl::event>& dependencies = {});
+
+sycl::event dot(sycl::queue& queue, std::int64_t n, const bfloat16* x, std::int64_t incx,
+                const bfloat16* y, std::int64_t incy, bfloat16* result,
                 const std::vector<sycl::event>& dependencies = {});
 
 sycl::event dotc(sycl::queue& queue, std::int64_t n, const std::complex<float>* x,

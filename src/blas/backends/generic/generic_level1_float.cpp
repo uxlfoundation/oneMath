@@ -41,6 +41,26 @@ constexpr bool is_column_major() {
     return true;
 }
 #include "generic_level1.cxx"
+
+void dot(sycl::queue&, std::int64_t, sycl::buffer<sycl::half, 1>&, std::int64_t,
+         sycl::buffer<sycl::half, 1>&, std::int64_t, sycl::buffer<sycl::half, 1>&) {
+    throw unimplemented("blas", "dot", "for sycl::half");
+}
+
+void dot(sycl::queue&, std::int64_t, sycl::buffer<bfloat16, 1>&, std::int64_t,
+         sycl::buffer<bfloat16, 1>&, std::int64_t, sycl::buffer<bfloat16, 1>&) {
+    throw unimplemented("blas", "dot", "for bfloat16");
+}
+
+sycl::event dot(sycl::queue&, std::int64_t, const sycl::half*, std::int64_t, const sycl::half*,
+                std::int64_t, sycl::half*, const std::vector<sycl::event>&) {
+    throw unimplemented("blas", "dot", "for sycl::half");
+}
+
+sycl::event dot(sycl::queue&, std::int64_t, const bfloat16*, std::int64_t, const bfloat16*,
+                std::int64_t, bfloat16*, const std::vector<sycl::event>&) {
+    throw unimplemented("blas", "dot", "for bfloat16");
+}
 #undef COLUMN_MAJOR
 
 } // namespace column_major
@@ -51,6 +71,26 @@ constexpr bool is_column_major() {
     return false;
 }
 #include "generic_level1.cxx"
+
+void dot(sycl::queue&, std::int64_t, sycl::buffer<sycl::half, 1>&, std::int64_t,
+         sycl::buffer<sycl::half, 1>&, std::int64_t, sycl::buffer<sycl::half, 1>&) {
+    throw unimplemented("blas", "dot", "for sycl::half");
+}
+
+void dot(sycl::queue&, std::int64_t, sycl::buffer<bfloat16, 1>&, std::int64_t,
+         sycl::buffer<bfloat16, 1>&, std::int64_t, sycl::buffer<bfloat16, 1>&) {
+    throw unimplemented("blas", "dot", "for bfloat16");
+}
+
+sycl::event dot(sycl::queue&, std::int64_t, const sycl::half*, std::int64_t, const sycl::half*,
+                std::int64_t, sycl::half*, const std::vector<sycl::event>&) {
+    throw unimplemented("blas", "dot", "for sycl::half");
+}
+
+sycl::event dot(sycl::queue&, std::int64_t, const bfloat16*, std::int64_t, const bfloat16*,
+                std::int64_t, bfloat16*, const std::vector<sycl::event>&) {
+    throw unimplemented("blas", "dot", "for bfloat16");
+}
 #undef ROW_MAJOR
 
 } // namespace row_major

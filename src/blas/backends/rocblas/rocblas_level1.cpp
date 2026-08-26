@@ -29,6 +29,69 @@ namespace oneapi {
 namespace math {
 namespace blas {
 namespace rocblas {
+
+class RocblasPointerModeGuard {
+public:
+    RocblasPointerModeGuard(rocblas_handle handle, bool use_device_mode)
+            : handle_(handle),
+              restore_(use_device_mode) {
+        if (restore_) {
+            rocblas_set_pointer_mode(handle_, rocblas_pointer_mode_device);
+        }
+    }
+
+    ~RocblasPointerModeGuard() {
+        if (restore_) {
+            rocblas_set_pointer_mode(handle_, rocblas_pointer_mode_host);
+        }
+    }
+
+private:
+    rocblas_handle handle_;
+    bool restore_;
+};
+
+template <typename T>
+inline void dot_ex(sycl::queue& queue, int64_t n, sycl::buffer<T, 1>& x, int64_t incx,
+                   sycl::buffer<T, 1>& y, int64_t incy, sycl::buffer<T, 1>& result,
+                   rocblas_datatype data_type) {
+    overflow_check(n, incx, incy);
+    queue.submit([&](sycl::handler& cgh) {
+        auto x_acc = x.template get_access<sycl::access::mode::read>(cgh);
+        auto y_acc = y.template get_access<sycl::access::mode::read>(cgh);
+        auto res_acc = result.template get_access<sycl::access::mode::write>(cgh);
+        onemath_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
+            auto handle = sc.get_handle(queue);
+            RocblasPointerModeGuard pointer_mode(handle, true);
+            auto x_ = sc.get_mem<T*>(x_acc);
+            auto y_ = sc.get_mem<T*>(y_acc);
+            auto res_ = sc.get_mem<T*>(res_acc);
+            rocblas_status err;
+            rocblas_native_func(rocblas_dot_ex, err, handle, n, x_, data_type, incx, y_, data_type,
+                                incy, res_, data_type, rocblas_datatype_f32_r);
+        });
+    });
+}
+
+template <typename T>
+inline sycl::event dot_ex(sycl::queue& queue, int64_t n, const T* x, int64_t incx, const T* y,
+                          int64_t incy, T* result, const std::vector<sycl::event>& dependencies,
+                          rocblas_datatype data_type) {
+    overflow_check(n, incx, incy);
+    bool result_on_device =
+        sycl::get_pointer_type(result, queue.get_context()) == sycl::usm::alloc::device;
+    return queue.submit([&](sycl::handler& cgh) {
+        cgh.depends_on(dependencies);
+        onemath_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
+            auto handle = sc.get_handle(queue);
+            RocblasPointerModeGuard pointer_mode(handle, result_on_device);
+            rocblas_status err;
+            rocblas_native_func(rocblas_dot_ex, err, handle, n, x, data_type, incx, y, data_type,
+                                incy, result, data_type, rocblas_datatype_f32_r);
+        });
+    });
+}
+
 namespace column_major {
 
 // Buffer APIs
@@ -333,6 +396,15 @@ DOT_LAUNCHER(u, std::complex<double>, rocblas_zdotu)
 DOT_LAUNCHER(c, std::complex<double>, rocblas_zdotc)
 
 #undef DOT_LAUNCHER
+
+#define DOT_EX_LAUNCHER(TYPE, DATA_TYPE)                                              \
+    void dot(sycl::queue& queue, int64_t n, sycl::buffer<TYPE, 1>& x, int64_t incx,   \
+             sycl::buffer<TYPE, 1>& y, int64_t incy, sycl::buffer<TYPE, 1>& result) { \
+        dot_ex(queue, n, x, incx, y, incy, result, DATA_TYPE);                        \
+    }
+DOT_EX_LAUNCHER(sycl::half, rocblas_datatype_f16_r)
+DOT_EX_LAUNCHER(bfloat16, rocblas_datatype_bf16_r)
+#undef DOT_EX_LAUNCHER
 
 void dot(sycl::queue& queue, int64_t n, sycl::buffer<float, 1>& x, int64_t incx,
          sycl::buffer<float, 1>& y, int64_t incy, sycl::buffer<double, 1>& result) {
@@ -945,6 +1017,15 @@ DOT_LAUNCHER_USM(c, std::complex<double>, rocblas_zdotc)
 
 #undef DOT_LAUNCHER_USM
 
+#define DOT_EX_LAUNCHER_USM(TYPE, DATA_TYPE)                                                    \
+    sycl::event dot(sycl::queue& queue, int64_t n, const TYPE* x, int64_t incx, const TYPE* y,  \
+                    int64_t incy, TYPE* result, const std::vector<sycl::event>& dependencies) { \
+        return dot_ex(queue, n, x, incx, y, incy, result, dependencies, DATA_TYPE);             \
+    }
+DOT_EX_LAUNCHER_USM(sycl::half, rocblas_datatype_f16_r)
+DOT_EX_LAUNCHER_USM(bfloat16, rocblas_datatype_bf16_r)
+#undef DOT_EX_LAUNCHER_USM
+
 sycl::event dot(sycl::queue& queue, int64_t n, const float* x, int64_t incx, const float* y,
                 int64_t incy, double* result, const std::vector<sycl::event>& dependencies) {
     throw unimplemented("blas", "dot", "for column_major layout");
@@ -1380,6 +1461,15 @@ DOT_LAUNCHER(c, std::complex<double>, rocblas_zdotc)
 
 #undef DOT_LAUNCHER
 
+#define DOT_EX_LAUNCHER(TYPE, DATA_TYPE)                                              \
+    void dot(sycl::queue& queue, int64_t n, sycl::buffer<TYPE, 1>& x, int64_t incx,   \
+             sycl::buffer<TYPE, 1>& y, int64_t incy, sycl::buffer<TYPE, 1>& result) { \
+        dot_ex(queue, n, x, incx, y, incy, result, DATA_TYPE);                        \
+    }
+DOT_EX_LAUNCHER(sycl::half, rocblas_datatype_f16_r)
+DOT_EX_LAUNCHER(bfloat16, rocblas_datatype_bf16_r)
+#undef DOT_EX_LAUNCHER
+
 void dot(sycl::queue& queue, int64_t n, sycl::buffer<float, 1>& x, int64_t incx,
          sycl::buffer<float, 1>& y, int64_t incy, sycl::buffer<double, 1>& result) {
     throw unimplemented("blas", "dot", "for row_major layout");
@@ -1666,6 +1756,15 @@ DOT_LAUNCHER_USM(u, std::complex<double>, rocblas_zdotu)
 DOT_LAUNCHER_USM(c, std::complex<double>, rocblas_zdotc)
 
 #undef DOT_LAUNCHER_USM
+
+#define DOT_EX_LAUNCHER_USM(TYPE, DATA_TYPE)                                                    \
+    sycl::event dot(sycl::queue& queue, int64_t n, const TYPE* x, int64_t incx, const TYPE* y,  \
+                    int64_t incy, TYPE* result, const std::vector<sycl::event>& dependencies) { \
+        return dot_ex(queue, n, x, incx, y, incy, result, dependencies, DATA_TYPE);             \
+    }
+DOT_EX_LAUNCHER_USM(sycl::half, rocblas_datatype_f16_r)
+DOT_EX_LAUNCHER_USM(bfloat16, rocblas_datatype_bf16_r)
+#undef DOT_EX_LAUNCHER_USM
 
 sycl::event dot(sycl::queue& queue, int64_t n, const float* x, int64_t incx, const float* y,
                 int64_t incy, double* result, const std::vector<sycl::event>& dependencies) {

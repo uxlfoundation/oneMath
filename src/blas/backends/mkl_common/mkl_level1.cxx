@@ -317,6 +317,16 @@ void dot(sycl::queue& queue, std::int64_t n, sycl::buffer<float, 1>& x, std::int
     RETHROW_ONEMKL_EXCEPTIONS(blas_major::dot(queue, n, x, incx, y, incy, result));
 }
 
+void dot(sycl::queue&, std::int64_t, sycl::buffer<sycl::half, 1>&, std::int64_t,
+         sycl::buffer<sycl::half, 1>&, std::int64_t, sycl::buffer<sycl::half, 1>&) {
+    throw unimplemented("blas", "dot", "for sycl::half");
+}
+
+void dot(sycl::queue&, std::int64_t, sycl::buffer<bfloat16, 1>&, std::int64_t,
+         sycl::buffer<bfloat16, 1>&, std::int64_t, sycl::buffer<bfloat16, 1>&) {
+    throw unimplemented("blas", "dot", "for bfloat16");
+}
+
 void dotc(sycl::queue& queue, std::int64_t n, sycl::buffer<std::complex<float>, 1>& x,
           std::int64_t incx, sycl::buffer<std::complex<float>, 1>& y, std::int64_t incy,
           sycl::buffer<std::complex<float>, 1>& result) {
@@ -726,6 +736,16 @@ sycl::event dot(sycl::queue& queue, std::int64_t n, const float* x, std::int64_t
                 const std::vector<sycl::event>& dependencies) {
     RETHROW_ONEMKL_EXCEPTIONS_RET(
         blas_major::dot(queue, n, x, incx, y, incy, result, dependencies));
+}
+
+sycl::event dot(sycl::queue&, std::int64_t, const sycl::half*, std::int64_t, const sycl::half*,
+                std::int64_t, sycl::half*, const std::vector<sycl::event>&) {
+    throw unimplemented("blas", "dot", "for sycl::half");
+}
+
+sycl::event dot(sycl::queue&, std::int64_t, const bfloat16*, std::int64_t, const bfloat16*,
+                std::int64_t, bfloat16*, const std::vector<sycl::event>&) {
+    throw unimplemented("blas", "dot", "for bfloat16");
 }
 
 sycl::event dotc(sycl::queue& queue, std::int64_t n, const std::complex<float>* x,
