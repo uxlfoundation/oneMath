@@ -17,35 +17,62 @@
 # SPDX-License-Identifier: Apache-2.0
 #===============================================================================
 
-# The example is written for the MKLCPU and CUFFT backends
-if(NOT (ENABLE_MKLCPU_BACKEND AND ENABLE_CUFFT_BACKEND))
-  return()
+# The MKLCPU + cuFFT example is written for the MKLCPU and CUFFT backends
+if(ENABLE_MKLCPU_BACKEND AND ENABLE_CUFFT_BACKEND)
+  set(EXAMPLE_TARGET example_dft_complex_fwd_usm_mklcpu_cufft)
+
+  # External applications should use find_package or FetchContent to include oneMath first.
+  # See https://github.com/uxlfoundation/oneMath/blob/develop/docs/using_onemath_with_cmake.rst
+
+  # Create a CMake target with one source file
+  add_executable(${EXAMPLE_TARGET} complex_fwd_usm_mklcpu_cufft.cpp)
+
+  # Linking against onemath_dft_mklcpu and onemath_dft_cufft in CMake will add the required include directories and dependencies.
+  # One can also link against `onemath_dft` to link against all the dft backends built.
+  # These targets should only be used for compile-time dispatching.
+  target_link_libraries(${EXAMPLE_TARGET} PUBLIC
+    onemath_dft_mklcpu
+    onemath_dft_cufft
+  )
+
+  # Include directories specific to the examples
+  target_include_directories(${EXAMPLE_TARGET} PUBLIC
+    ${PROJECT_SOURCE_DIR}/examples/include
+  )
+
+  # Enable warnings
+  include(WarningsUtils)
+  target_link_libraries(${EXAMPLE_TARGET} PRIVATE onemath_warnings)
+
+  # Register example as ctest
+  add_test(NAME dft/EXAMPLE/CT/complex_fwd_usm_mklcpu_cufft COMMAND ${EXAMPLE_TARGET})
 endif()
 
-set(EXAMPLE_TARGET example_dft_complex_fwd_usm_mklcpu_cufft)
+# The portFFT example is written for the SYCL-only portFFT backend
+if(ENABLE_PORTFFT_BACKEND)
+  set(EXAMPLE_TARGET example_dft_complex_fwd_usm_portfft)
 
-# External applications should use find_package or FetchContent to include oneMath first.
-# See https://github.com/uxlfoundation/oneMath/blob/develop/docs/using_onemath_with_cmake.rst
+  # External applications should use find_package or FetchContent to include oneMath first.
+  # See https://github.com/uxlfoundation/oneMath/blob/develop/docs/using_onemath_with_cmake.rst
 
-# Create a CMake target with one source file
-add_executable(${EXAMPLE_TARGET} complex_fwd_usm_mklcpu_cufft.cpp)
+  # Create a CMake target with one source file
+  add_executable(${EXAMPLE_TARGET} complex_fwd_usm_portfft.cpp)
 
-# Linking against onemath_dft_mklcpu and onemath_dft_cufft in CMake will add the required include directories and dependencies.
-# One can also link against `onemath_dft` to link against all the dft backends built.
-# These targets should only be used for compile-time dispatching.
-target_link_libraries(${EXAMPLE_TARGET} PUBLIC
-  onemath_dft_mklcpu
-  onemath_dft_cufft
-)
+  # Linking against onemath_dft_portfft in CMake will add the required include directories and dependencies.
+  # This target should only be used for compile-time dispatching.
+  target_link_libraries(${EXAMPLE_TARGET} PUBLIC
+    onemath_dft_portfft
+  )
 
-# Include directories specific to the examples
-target_include_directories(${EXAMPLE_TARGET} PUBLIC
-  ${PROJECT_SOURCE_DIR}/examples/include
-)
+  # Include directories specific to the examples
+  target_include_directories(${EXAMPLE_TARGET} PUBLIC
+    ${PROJECT_SOURCE_DIR}/examples/include
+  )
 
-# Enable warnings
-include(WarningsUtils)
-target_link_libraries(${EXAMPLE_TARGET} PRIVATE onemath_warnings)
+  # Enable warnings
+  include(WarningsUtils)
+  target_link_libraries(${EXAMPLE_TARGET} PRIVATE onemath_warnings)
 
-# Register example as ctest
-add_test(NAME dft/EXAMPLE/CT/complex_fwd_usm_mklcpu_cufft COMMAND ${EXAMPLE_TARGET})
+  # Register example as ctest
+  add_test(NAME dft/EXAMPLE/CT/complex_fwd_usm_portfft COMMAND ${EXAMPLE_TARGET})
+endif()

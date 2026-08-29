@@ -17,31 +17,54 @@
 # SPDX-License-Identifier: Apache-2.0
 #===============================================================================
 
-# The example is written for the MKLCPU and CUBLAS backends
-if(NOT (ENABLE_MKLCPU_BACKEND AND ENABLE_CUBLAS_BACKEND))
-  return()
+# The MKLCPU + CUBLAS example is written for the MKLCPU and CUBLAS backends
+if(ENABLE_MKLCPU_BACKEND AND ENABLE_CUBLAS_BACKEND)
+  set(EXAMPLE_TARGET example_blas_gemm_usm_mklcpu_cublas)
+
+  # External applications should use find_package or FetchContent to include oneMath first.
+  # See https://github.com/uxlfoundation/oneMath/blob/develop/docs/using_onemath_with_cmake.rst
+
+  # Create a CMake target with one source file
+  add_executable(${EXAMPLE_TARGET} gemm_usm_mklcpu_cublas.cpp)
+
+  # Linking against onemath_blas_mklcpu and onemath_blas_cublas in CMake will add the required include directories and dependencies.
+  # One can also link against `onemath_blas` to link against all the blas backends built.
+  # These targets should only be used for compile-time dispatching.
+  target_link_libraries(${EXAMPLE_TARGET} PUBLIC
+    onemath_blas_mklcpu
+    onemath_blas_cublas
+  )
+
+  # Include directories specific to the examples
+  target_include_directories(${EXAMPLE_TARGET} PUBLIC
+    ${PROJECT_SOURCE_DIR}/examples/include
+  )
+
+  # Register example as ctest
+  add_test(NAME blas/EXAMPLE/CT/gemm_usm_mklcpu_cublas COMMAND ${EXAMPLE_TARGET})
 endif()
 
-set(EXAMPLE_TARGET example_blas_gemm_usm_mklcpu_cublas)
+# The generic example is written for the SYCL-only generic BLAS backend
+if(ENABLE_GENERIC_BLAS_BACKEND)
+  set(EXAMPLE_TARGET example_blas_gemm_usm_generic)
 
-# External applications should use find_package or FetchContent to include oneMath first.
-# See https://github.com/uxlfoundation/oneMath/blob/develop/docs/using_onemath_with_cmake.rst
+  # External applications should use find_package or FetchContent to include oneMath first.
+  # See https://github.com/uxlfoundation/oneMath/blob/develop/docs/using_onemath_with_cmake.rst
 
-# Create a CMake target with one source file
-add_executable(${EXAMPLE_TARGET} gemm_usm_mklcpu_cublas.cpp)
+  # Create a CMake target with one source file
+  add_executable(${EXAMPLE_TARGET} gemm_usm_generic.cpp)
 
-# Linking against onemath_blas_mklcpu and onemath_blas_cublas in CMake will add the required include directories and dependencies.
-# One can also link against `onemath_blas` to link against all the blas backends built.
-# These targets should only be used for compile-time dispatching.
-target_link_libraries(${EXAMPLE_TARGET} PUBLIC
-  onemath_blas_mklcpu
-  onemath_blas_cublas
-)
+  # Linking against onemath_blas_generic in CMake will add the required include directories and dependencies.
+  # This target should only be used for compile-time dispatching.
+  target_link_libraries(${EXAMPLE_TARGET} PUBLIC
+    onemath_blas_generic
+  )
 
-# Include directories specific to the examples
-target_include_directories(${EXAMPLE_TARGET} PUBLIC
-  ${PROJECT_SOURCE_DIR}/examples/include
-)
+  # Include directories specific to the examples
+  target_include_directories(${EXAMPLE_TARGET} PUBLIC
+    ${PROJECT_SOURCE_DIR}/examples/include
+  )
 
-# Register example as ctest
-add_test(NAME blas/EXAMPLE/CT/gemm_usm_mklcpu_cublas COMMAND ${EXAMPLE_TARGET})
+  # Register example as ctest
+  add_test(NAME blas/EXAMPLE/CT/gemm_usm_generic COMMAND ${EXAMPLE_TARGET})
+endif()
