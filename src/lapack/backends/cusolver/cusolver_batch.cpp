@@ -428,13 +428,17 @@ inline void potrs_batch(const char* func_name, Func func, sycl::queue& queue,
 
     overflow_check(n, nrhs, lda, ldb, stride_a, stride_b, batch_size, scratchpad_size);
 
-    // cuSolver function only supports nrhs = 1
-    if (nrhs != 1)
-        throw unimplemented("lapack", "potrs_batch", "cusolver potrs_batch only supports nrhs = 1");
+    // cusolverDnXpotrsBatched only writes devInfo when a parameter is invalid
+    sycl::buffer<int> devInfo{ sycl::range<1>{ static_cast<size_t>(batch_size) } };
+    queue.submit([&](sycl::handler& cgh) {
+        auto devInfo_acc = devInfo.template get_access<sycl::access::mode::write>(cgh);
+        cgh.fill(devInfo_acc, 0);
+    });
 
     queue.submit([&](sycl::handler& cgh) {
         auto a_acc = a.template get_access<sycl::access::mode::read_write>(cgh);
         auto b_acc = b.template get_access<sycl::access::mode::read_write>(cgh);
+        auto devInfo_acc = devInfo.template get_access<sycl::access::mode::write>(cgh);
         onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             CUdeviceptr a_dev, b_dev;
@@ -443,21 +447,35 @@ inline void potrs_batch(const char* func_name, Func func, sycl::queue& queue,
 
             auto a_ = sc.get_mem<cuDataType*>(a_acc);
             auto b_ = sc.get_mem<cuDataType*>(b_acc);
+            auto info_ = sc.get_mem<int*>(devInfo_acc);
 
             // Transform ptr and stride to list of ptr's
             cuDataType** a_batched = create_ptr_list_from_stride(a_, stride_a, batch_size);
-            cuDataType** b_batched = create_ptr_list_from_stride(b_, stride_b, batch_size);
+
+            // cusolverDnXpotrsBatched only solves for a single right hand side,
+            // so the columns of b are solved one after the other. The pointers
+            // of every column are uploaded before the first call as the native
+            // calls are not synchronised and would otherwise race with the
+            // device array being rewritten
+            cuDataType** b_batched = (cuDataType**)malloc(sizeof(cuDataType*) * batch_size * nrhs);
+            for (int64_t col = 0; col < nrhs; ++col)
+                for (int64_t i = 0; i < batch_size; ++i)
+                    b_batched[col * batch_size + i] = b_ + stride_b * i + ldb * col;
+
             CUDA_ERROR_FUNC(cuMemAlloc, cuda_result, &a_dev, sizeof(T*) * batch_size);
             CUDA_ERROR_FUNC(cuMemcpyHtoD, cuda_result, a_dev, a_batched, sizeof(T*) * batch_size);
-            CUDA_ERROR_FUNC(cuMemAlloc, cuda_result, &b_dev, sizeof(T*) * batch_size);
-            CUDA_ERROR_FUNC(cuMemcpyHtoD, cuda_result, b_dev, b_batched, sizeof(T*) * batch_size);
+            CUDA_ERROR_FUNC(cuMemAlloc, cuda_result, &b_dev, sizeof(T*) * batch_size * nrhs);
+            CUDA_ERROR_FUNC(cuMemcpyHtoD, cuda_result, b_dev, b_batched,
+                            sizeof(T*) * batch_size * nrhs);
 
             auto** a_dev_ = reinterpret_cast<cuDataType**>(a_dev);
             auto** b_dev_ = reinterpret_cast<cuDataType**>(b_dev);
 
-            cusolver_native_named_func(func_name, func, err, handle, get_cublas_fill_mode(uplo),
-                                       (int)n, (int)nrhs, a_dev_, (int)lda, b_dev_, ldb, nullptr,
-                                       (int)batch_size);
+            for (int64_t col = 0; col < nrhs; ++col) {
+                cusolver_native_named_func(func_name, func, err, handle, get_cublas_fill_mode(uplo),
+                                           (int)n, 1, a_dev_, (int)lda, b_dev_ + col * batch_size,
+                                           (int)ldb, info_, (int)batch_size);
+            }
 
             free(a_batched);
             free(b_batched);
@@ -465,6 +483,8 @@ inline void potrs_batch(const char* func_name, Func func, sycl::queue& queue,
             cuMemFree(b_dev);
         });
     });
+
+    lapack_info_check_batch(queue, devInfo, __func__, func_name, batch_size);
 }
 
 // Scratchpad memory not needed as parts of buffer a is used as workspace memory
@@ -909,32 +929,167 @@ GETRI_BATCH_LAUNCHER_USM(std::complex<double>, cublasZgetriBatched)
 
 #undef GETRI_BATCH_LAUNCHER_USM
 
-sycl::event getri_batch(sycl::queue& queue, std::int64_t* n, float** a, std::int64_t* lda,
-                        std::int64_t** ipiv, std::int64_t group_count, std::int64_t* group_sizes,
-                        float* scratchpad, std::int64_t scratchpad_size,
+// cublas<t>getriBatched requires a uniform n and lda within a call, so one
+// call is issued per group. As for the strided batch, the inverses are
+// computed out of place into the scratchpad and copied back into a.
+template <typename Func, typename T>
+sycl::event getri_batch(const char* func_name, Func func, sycl::queue& queue, std::int64_t* n,
+                        T** a, std::int64_t* lda, std::int64_t** ipiv, std::int64_t group_count,
+                        std::int64_t* group_sizes, T* scratchpad, std::int64_t scratchpad_size,
                         const std::vector<sycl::event>& dependencies) {
-    throw unimplemented("lapack", "getri_batch");
+    using cuDataType = typename CudaEquivalentType<T>::Type;
+
+    int64_t batch_size = 0;
+    int64_t ipiv32_size = 0;
+    overflow_check(group_count, scratchpad_size);
+    for (int64_t group_id = 0; group_id < group_count; ++group_id) {
+        overflow_check(n[group_id], lda[group_id], group_sizes[group_id]);
+        batch_size += group_sizes[group_id];
+        ipiv32_size += n[group_id] * group_sizes[group_id];
+    }
+
+    // The batches of pointers can be device resident, so read them back before
+    // deriving the scratchpad and pivot pointers of every matrix from them
+    std::vector<T*> a_host(batch_size);
+    std::vector<std::int64_t*> ipiv_host(batch_size);
+    std::vector<T*> scratch_host(batch_size);
+    queue.memcpy(a_host.data(), a, sizeof(T*) * batch_size).wait();
+    queue.memcpy(ipiv_host.data(), ipiv, sizeof(std::int64_t*) * batch_size).wait();
+
+    int64_t global_id = 0;
+    int64_t scratch_offset = 0;
+    for (int64_t group_id = 0; group_id < group_count; ++group_id) {
+        for (int64_t local_id = 0; local_id < group_sizes[group_id]; ++local_id, ++global_id) {
+            scratch_host[global_id] = scratchpad + scratch_offset;
+            scratch_offset += lda[group_id] * n[group_id];
+        }
+    }
+
+    T** a_dev = (T**)malloc_device(sizeof(T*) * batch_size, queue);
+    T** scratch_dev = (T**)malloc_device(sizeof(T*) * batch_size, queue);
+    int* ipiv32 = (int*)malloc_device(sizeof(int) * ipiv32_size, queue);
+    int* devInfo = (int*)malloc_device(sizeof(int) * batch_size, queue);
+    auto free_temporaries = [&]() {
+        sycl::free(a_dev, queue);
+        sycl::free(scratch_dev, queue);
+        sycl::free(ipiv32, queue);
+        sycl::free(devInfo, queue);
+    };
+
+    auto done_cpy_a = queue.memcpy(a_dev, a_host.data(), sizeof(T*) * batch_size);
+    auto done_cpy_scratch = queue.memcpy(scratch_dev, scratch_host.data(), sizeof(T*) * batch_size);
+
+    // cublas expects the pivots of a group as a single array holding n
+    // contiguous pivots per matrix
+    std::vector<sycl::event> casting_dependencies;
+    casting_dependencies.reserve(batch_size);
+    global_id = 0;
+    int64_t ipiv_offset = 0;
+    for (int64_t group_id = 0; group_id < group_count; ++group_id) {
+        const int64_t ipiv_len = n[group_id];
+        for (int64_t local_id = 0; local_id < group_sizes[group_id];
+             ++local_id, ++global_id, ipiv_offset += ipiv_len) {
+            const std::int64_t* d_ipiv = ipiv_host[global_id];
+            int* d_ipiv32 = ipiv32 + ipiv_offset;
+            casting_dependencies.push_back(queue.submit([&](sycl::handler& cgh) {
+                cgh.depends_on(dependencies);
+                cgh.parallel_for(
+                    sycl::range<1>{ static_cast<size_t>(ipiv_len) },
+                    [=](sycl::id<1> index) { d_ipiv32[index] = static_cast<int>(d_ipiv[index]); });
+            }));
+        }
+    }
+
+    // getri_batched is contained within cublas, not cusolver. For this reason
+    // we need to use cublas types instead of cusolver types (as is needed for
+    // other lapack routines)
+    auto done = queue.submit([&](sycl::handler& cgh) {
+        using blas::cublas::cublas_error;
+
+        cgh.depends_on(dependencies);
+        cgh.depends_on(done_cpy_a);
+        cgh.depends_on(done_cpy_scratch);
+        cgh.depends_on(casting_dependencies);
+
+        onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+            cublasStatus_t err;
+            cublasHandle_t cublas_handle;
+            CUBLAS_ERROR_FUNC(cublasCreate, err, &cublas_handle);
+            CUstream cu_stream = sycl::get_native<sycl::backend::ext_oneapi_cuda>(queue);
+            CUBLAS_ERROR_FUNC(cublasSetStream, err, cublas_handle, cu_stream);
+
+            auto** a_dev_ = reinterpret_cast<cuDataType**>(a_dev);
+            auto** scratch_dev_ = reinterpret_cast<cuDataType**>(scratch_dev);
+            int64_t offset = 0;
+            int64_t ipiv_offset = 0;
+
+            for (int64_t group_id = 0; group_id < group_count; ++group_id) {
+                blas::cublas::cublas_native_named_func(
+                    func_name, func, err, cublas_handle, (int)n[group_id], a_dev_ + offset,
+                    (int)lda[group_id], ipiv32 + ipiv_offset, scratch_dev_ + offset,
+                    (int)lda[group_id], devInfo + offset, (int)group_sizes[group_id]);
+                offset += group_sizes[group_id];
+                ipiv_offset += n[group_id] * group_sizes[group_id];
+            }
+        });
+    });
+
+    // The inverted matrices stored in the scratchpad need to be stored in a.
+    // Only the n x n part is copied back so that the padding of a is preserved
+    std::vector<sycl::event> copy_dependencies;
+    copy_dependencies.reserve(batch_size);
+    global_id = 0;
+    for (int64_t group_id = 0; group_id < group_count; ++group_id) {
+        const int64_t group_n = n[group_id];
+        const int64_t group_lda = lda[group_id];
+        for (int64_t local_id = 0; local_id < group_sizes[group_id]; ++local_id, ++global_id) {
+            T* a_matrix = a_host[global_id];
+            const T* scratch_matrix = scratch_host[global_id];
+            copy_dependencies.push_back(queue.submit([&](sycl::handler& cgh) {
+                cgh.depends_on(done);
+                cgh.parallel_for(
+                    sycl::range<2>{ static_cast<size_t>(group_n), static_cast<size_t>(group_n) },
+                    [=](sycl::id<2> index) {
+                        const int64_t offset = index[0] * group_lda + index[1];
+                        a_matrix[offset] = scratch_matrix[offset];
+                    });
+            }));
+        }
+    }
+
+    auto done_copy = queue.submit([&](sycl::handler& cgh) {
+        cgh.depends_on(copy_dependencies);
+        cgh.host_task([]() {});
+    });
+
+    // lapack_info_check_batch calls queue.wait()
+    try {
+        lapack_info_check_batch(queue, devInfo, __func__, func_name, batch_size);
+    }
+    catch (...) {
+        free_temporaries();
+        throw;
+    }
+    free_temporaries();
+
+    return done_copy;
 }
-sycl::event getri_batch(sycl::queue& queue, std::int64_t* n, double** a, std::int64_t* lda,
-                        std::int64_t** ipiv, std::int64_t group_count, std::int64_t* group_sizes,
-                        double* scratchpad, std::int64_t scratchpad_size,
-                        const std::vector<sycl::event>& dependencies) {
-    throw unimplemented("lapack", "getri_batch");
-}
-sycl::event getri_batch(sycl::queue& queue, std::int64_t* n, std::complex<float>** a,
-                        std::int64_t* lda, std::int64_t** ipiv, std::int64_t group_count,
-                        std::int64_t* group_sizes, std::complex<float>* scratchpad,
-                        std::int64_t scratchpad_size,
-                        const std::vector<sycl::event>& dependencies) {
-    throw unimplemented("lapack", "getri_batch");
-}
-sycl::event getri_batch(sycl::queue& queue, std::int64_t* n, std::complex<double>** a,
-                        std::int64_t* lda, std::int64_t** ipiv, std::int64_t group_count,
-                        std::int64_t* group_sizes, std::complex<double>* scratchpad,
-                        std::int64_t scratchpad_size,
-                        const std::vector<sycl::event>& dependencies) {
-    throw unimplemented("lapack", "getri_batch");
-}
+
+#define GETRI_GROUP_BATCH_LAUNCHER_USM(TYPE, CUBLAS_ROUTINE)                                     \
+    sycl::event getri_batch(                                                                     \
+        sycl::queue& queue, std::int64_t* n, TYPE** a, std::int64_t* lda, std::int64_t** ipiv,   \
+        std::int64_t group_count, std::int64_t* group_sizes, TYPE* scratchpad,                   \
+        std::int64_t scratchpad_size, const std::vector<sycl::event>& dependencies) {            \
+        return getri_batch(#CUBLAS_ROUTINE, CUBLAS_ROUTINE, queue, n, a, lda, ipiv, group_count, \
+                           group_sizes, scratchpad, scratchpad_size, dependencies);              \
+    }
+
+GETRI_GROUP_BATCH_LAUNCHER_USM(float, cublasSgetriBatched)
+GETRI_GROUP_BATCH_LAUNCHER_USM(double, cublasDgetriBatched)
+GETRI_GROUP_BATCH_LAUNCHER_USM(std::complex<float>, cublasCgetriBatched)
+GETRI_GROUP_BATCH_LAUNCHER_USM(std::complex<double>, cublasZgetriBatched)
+
+#undef GETRI_GROUP_BATCH_LAUNCHER_USM
 
 template <typename Func, typename T>
 inline sycl::event getrs_batch(const char* func_name, Func func, sycl::queue& queue,
@@ -1327,12 +1482,13 @@ inline sycl::event potrs_batch(const char* func_name, Func func, sycl::queue& qu
 
     overflow_check(n, nrhs, lda, ldb, stride_a, stride_b, batch_size, scratchpad_size);
 
-    // cuSolver function only supports nrhs = 1
-    if (nrhs != 1)
-        throw unimplemented("lapack", "potrs_batch", "cusolver potrs_batch only supports nrhs = 1");
+    // cusolverDnXpotrsBatched only writes devInfo when a parameter is invalid
+    int* devInfo = (int*)malloc_device(sizeof(int) * batch_size, queue);
+    auto done_init = queue.memset(devInfo, 0, sizeof(int) * batch_size);
 
     auto done = queue.submit([&](sycl::handler& cgh) {
         cgh.depends_on(dependencies);
+        cgh.depends_on(done_init);
         onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             CUresult cuda_result;
@@ -1343,24 +1499,49 @@ inline sycl::event potrs_batch(const char* func_name, Func func, sycl::queue& qu
 
             // Transform ptr and stride to list of ptr's
             cuDataType** a_batched = create_ptr_list_from_stride(a_, stride_a, batch_size);
-            cuDataType** b_batched = create_ptr_list_from_stride(b_, stride_b, batch_size);
+
+            // cusolverDnXpotrsBatched only solves for a single right hand side,
+            // so the columns of b are solved one after the other. The pointers
+            // of every column are uploaded before the first call as the native
+            // calls are not synchronised and would otherwise race with the
+            // device array being rewritten
+            cuDataType** b_batched = (cuDataType**)malloc(sizeof(cuDataType*) * batch_size * nrhs);
+            for (int64_t col = 0; col < nrhs; ++col)
+                for (int64_t i = 0; i < batch_size; ++i)
+                    b_batched[col * batch_size + i] = b_ + stride_b * i + ldb * col;
+
             CUDA_ERROR_FUNC(cuMemAlloc, cuda_result, &a_dev, sizeof(T*) * batch_size);
-            CUDA_ERROR_FUNC(cuMemAlloc, cuda_result, &b_dev, sizeof(T*) * batch_size);
+            CUDA_ERROR_FUNC(cuMemAlloc, cuda_result, &b_dev, sizeof(T*) * batch_size * nrhs);
             CUDA_ERROR_FUNC(cuMemcpyHtoD, cuda_result, a_dev, a_batched, sizeof(T*) * batch_size);
-            CUDA_ERROR_FUNC(cuMemcpyHtoD, cuda_result, b_dev, b_batched, sizeof(T*) * batch_size);
+            CUDA_ERROR_FUNC(cuMemcpyHtoD, cuda_result, b_dev, b_batched,
+                            sizeof(T*) * batch_size * nrhs);
 
             auto** a_dev_ = reinterpret_cast<cuDataType**>(a_dev);
             auto** b_dev_ = reinterpret_cast<cuDataType**>(b_dev);
 
-            cusolver_native_named_func(func_name, func, err, handle, get_cublas_fill_mode(uplo),
-                                       (int)n, (int)nrhs, a_dev_, (int)lda, b_dev_, ldb, nullptr,
-                                       (int)batch_size);
+            for (int64_t col = 0; col < nrhs; ++col) {
+                cusolver_native_named_func(func_name, func, err, handle, get_cublas_fill_mode(uplo),
+                                           (int)n, 1, a_dev_, (int)lda, b_dev_ + col * batch_size,
+                                           (int)ldb, devInfo, (int)batch_size);
+            }
 
             free(a_batched);
             free(b_batched);
             cuMemFree(a_dev);
+            cuMemFree(b_dev);
         });
     });
+
+    // lapack_info_check_batch calls queue.wait()
+    try {
+        lapack_info_check_batch(queue, devInfo, __func__, func_name, batch_size);
+    }
+    catch (...) {
+        sycl::free(devInfo, queue);
+        throw;
+    }
+    sycl::free(devInfo, queue);
+
     return done;
 }
 
@@ -1393,32 +1574,62 @@ inline sycl::event potrs_batch(const char* func_name, Func func, sycl::queue& qu
     using cuDataType = typename CudaEquivalentType<T>::Type;
 
     int64_t batch_size = 0;
+    int64_t b_column_count = 0;
     for (int64_t i = 0; i < group_count; i++) {
-        overflow_check(n[i], lda[i], group_sizes[i]);
+        overflow_check(n[i], nrhs[i], lda[i], ldb[i], group_sizes[i]);
         batch_size += group_sizes[i];
-
-        // cuSolver function only supports nrhs = 1
-        if (nrhs[i] != 1)
-            throw unimplemented("lapack", "potrs_batch",
-                                "cusolver potrs_batch only supports nrhs = 1");
+        b_column_count += group_sizes[i] * nrhs[i];
     }
 
-    int* info = (int*)malloc_device(sizeof(int*) * batch_size, queue);
+    // b is a batch of pointers that can be device resident, so read it back to
+    // be able to derive the pointer of every right hand side column from it
+    std::vector<T*> b_host(batch_size);
+    queue.memcpy(b_host.data(), b, sizeof(T*) * batch_size).wait();
+
+    // cusolverDnXpotrsBatched only solves for a single right hand side, so the
+    // columns of b are solved one after the other. The pointers of every
+    // column are uploaded before the first call as the native calls are not
+    // synchronised and would otherwise race with the device array being
+    // rewritten
+    std::vector<T*> b_columns(b_column_count);
+    int64_t global_id = 0;
+    int64_t column_offset = 0;
+    for (int64_t i = 0; i < group_count; i++) {
+        for (int64_t col = 0; col < nrhs[i]; ++col)
+            for (int64_t local_id = 0; local_id < group_sizes[i]; ++local_id)
+                b_columns[column_offset + col * group_sizes[i] + local_id] =
+                    b_host[global_id + local_id] + col * ldb[i];
+        global_id += group_sizes[i];
+        column_offset += group_sizes[i] * nrhs[i];
+    }
+
+    int* info = (int*)malloc_device(sizeof(int) * batch_size, queue);
     T** a_dev = (T**)malloc_device(sizeof(T*) * batch_size, queue);
-    T** b_dev = (T**)malloc_device(sizeof(T*) * batch_size, queue);
+    T** b_dev = (T**)malloc_device(sizeof(T*) * b_column_count, queue);
+    auto free_temporaries = [&]() {
+        sycl::free(info, queue);
+        sycl::free(a_dev, queue);
+        sycl::free(b_dev, queue);
+    };
+
+    // cusolverDnXpotrsBatched only writes info when a parameter is invalid
+    auto done_init = queue.memset(info, 0, sizeof(int) * batch_size);
+
     auto done_cpy_a =
         queue.submit([&](sycl::handler& h) { h.memcpy(a_dev, a, batch_size * sizeof(T*)); });
 
-    auto done_cpy_b =
-        queue.submit([&](sycl::handler& h) { h.memcpy(b_dev, b, batch_size * sizeof(T*)); });
+    auto done_cpy_b = queue.submit(
+        [&](sycl::handler& h) { h.memcpy(b_dev, b_columns.data(), b_column_count * sizeof(T*)); });
 
     auto done = queue.submit([&](sycl::handler& cgh) {
         cgh.depends_on(dependencies);
+        cgh.depends_on(done_init);
         cgh.depends_on(done_cpy_a);
         cgh.depends_on(done_cpy_b);
         onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             int64_t offset = 0;
+            int64_t column_offset = 0;
             cusolverStatus_t err;
 
             // Does not use scratch so call cuSolver asynchronously and sync at end
@@ -1426,16 +1637,31 @@ inline sycl::event potrs_batch(const char* func_name, Func func, sycl::queue& qu
                 auto** a_ = reinterpret_cast<cuDataType**>(a_dev);
                 auto** b_ = reinterpret_cast<cuDataType**>(b_dev);
                 auto info_ = reinterpret_cast<int*>(info);
-                CUSOLVER_ERROR_FUNC_T(func_name, func, err, handle, get_cublas_fill_mode(uplo[i]),
-                                      (int)n[i], (int)nrhs[i], a_ + offset, (int)lda[i],
-                                      b_ + offset, (int)ldb[i], info_, (int)group_sizes[i]);
+                for (int64_t col = 0; col < nrhs[i]; ++col) {
+                    CUSOLVER_ERROR_FUNC_T(func_name, func, err, handle,
+                                          get_cublas_fill_mode(uplo[i]), (int)n[i], 1, a_ + offset,
+                                          (int)lda[i], b_ + column_offset + col * group_sizes[i],
+                                          (int)ldb[i], info_ + offset, (int)group_sizes[i]);
+                }
                 offset += group_sizes[i];
+                column_offset += group_sizes[i] * nrhs[i];
             }
 #ifndef SYCL_EXT_ONEAPI_ENQUEUE_NATIVE_COMMAND
             CUSOLVER_SYNC(err, handle)
 #endif
         });
     });
+
+    // lapack_info_check_batch calls queue.wait()
+    try {
+        lapack_info_check_batch(queue, info, __func__, func_name, batch_size);
+    }
+    catch (...) {
+        free_temporaries();
+        throw;
+    }
+    free_temporaries();
+
     return done;
 }
 
@@ -1806,18 +2032,17 @@ GETRF_GROUP_LAUNCHER_SCRATCH(std::complex<double>, cusolverDnZgetrf_bufferSize)
 
 #undef GETRF_GROUP_LAUNCHER_SCRATCH
 
+// cublas<t>getriBatched inverts out of place, so the scratchpad has to hold
+// one output matrix for every matrix of the batch
 #define GETRI_GROUP_LAUNCHER_SCRATCH(TYPE)                                                      \
     template <>                                                                                 \
     std::int64_t getri_batch_scratchpad_size<TYPE>(sycl::queue & queue, std::int64_t* n,        \
                                                    std::int64_t* lda, std::int64_t group_count, \
                                                    std::int64_t* group_sizes) {                 \
-        std::int64_t max_scratch_sz = 0;                                                        \
-        for (auto group_id = 0; group_id < group_count; ++group_id) {                           \
-            auto scratch_sz = lda[group_id] * n[group_id];                                      \
-            if (scratch_sz > max_scratch_sz)                                                    \
-                max_scratch_sz = scratch_sz;                                                    \
-        }                                                                                       \
-        return max_scratch_sz;                                                                  \
+        std::int64_t scratch_sz = 0;                                                            \
+        for (std::int64_t group_id = 0; group_id < group_count; ++group_id)                     \
+            scratch_sz += group_sizes[group_id] * lda[group_id] * n[group_id];                  \
+        return scratch_sz;                                                                      \
     }
 
 GETRI_GROUP_LAUNCHER_SCRATCH(float)
