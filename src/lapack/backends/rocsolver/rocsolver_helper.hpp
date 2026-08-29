@@ -31,6 +31,10 @@
 #include <rocsolver/rocsolver.h>
 #include <hip/hip_runtime.h>
 #include <complex>
+#include <cstddef>
+#include <exception>
+#include <utility>
+#include <vector>
 
 #include "oneapi/math/types.hpp"
 #include "runtime_support_helper.hpp"
@@ -278,6 +282,44 @@ inline void lapack_info_check(sycl::queue& queue, DEVINFO_T devinfo, const char*
         throw oneapi::math::lapack::computation_error(
             func_name, std::string(cufunc_name) + " failed with info = " + std::to_string(devinfo_),
             devinfo_);
+}
+
+inline void get_rocsolver_devinfo(sycl::queue& queue, sycl::buffer<int>& devInfo,
+                                  std::vector<int>& dev_info_) {
+    sycl::host_accessor<int, 1, sycl::access::mode::read> dev_info_acc{ devInfo };
+    for (std::size_t i = 0; i < dev_info_.size(); ++i)
+        dev_info_[i] = dev_info_acc[i];
+}
+
+inline void get_rocsolver_devinfo(sycl::queue& queue, const int* devInfo,
+                                  std::vector<int>& dev_info_) {
+    queue.wait();
+    queue.memcpy(dev_info_.data(), devInfo, sizeof(int) * dev_info_.size()).wait();
+}
+
+/* Reports every failing matrix of a batch. */
+template <typename DEVINFO_T>
+inline void lapack_info_check_batch(sycl::queue& queue, DEVINFO_T devinfo, const char* func_name,
+                                    const char* rocfunc_name, std::int64_t batch_size) {
+    queue.wait();
+    std::vector<int> dev_info_(static_cast<std::size_t>(batch_size));
+    get_rocsolver_devinfo(queue, devinfo, dev_info_);
+    std::vector<std::int64_t> ids;
+    std::vector<std::exception_ptr> exceptions;
+    for (std::size_t i = 0; i < dev_info_.size(); ++i) {
+        const auto val = dev_info_[i];
+        if (val > 0) {
+            ids.push_back(static_cast<std::int64_t>(i));
+            exceptions.push_back(std::make_exception_ptr(oneapi::math::lapack::computation_error(
+                func_name, std::string(rocfunc_name) + " failed with info = " + std::to_string(val),
+                val)));
+        }
+    }
+    if (!ids.empty()) {
+        throw oneapi::math::lapack::batch_error(
+            func_name, std::string(rocfunc_name) + " failed for one or more matrices",
+            static_cast<std::int64_t>(ids.size()), std::move(ids), std::move(exceptions));
+    }
 }
 
 } // namespace rocsolver
