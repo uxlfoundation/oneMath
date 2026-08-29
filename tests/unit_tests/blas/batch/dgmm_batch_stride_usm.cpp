@@ -196,6 +196,10 @@ TEST_P(DgmmBatchStrideUsmTests, RealSinglePrecision) {
                                   oneapi::math::side::left, -2, 5));
     EXPECT_TRUEORSKIP(test<float>(std::get<0>(GetParam()), std::get<1>(GetParam()),
                                   oneapi::math::side::left, 1, 5));
+    EXPECT_TRUEORSKIP(test<float>(std::get<0>(GetParam()), std::get<1>(GetParam()),
+                                  oneapi::math::side::right, 3, 5));
+    EXPECT_TRUEORSKIP(test<float>(std::get<0>(GetParam()), std::get<1>(GetParam()),
+                                  oneapi::math::side::left, -1, 5));
 }
 
 TEST_P(DgmmBatchStrideUsmTests, RealDoublePrecision) {
@@ -213,6 +217,10 @@ TEST_P(DgmmBatchStrideUsmTests, RealDoublePrecision) {
                                    oneapi::math::side::left, -2, 5));
     EXPECT_TRUEORSKIP(test<double>(std::get<0>(GetParam()), std::get<1>(GetParam()),
                                    oneapi::math::side::left, 1, 5));
+    EXPECT_TRUEORSKIP(test<double>(std::get<0>(GetParam()), std::get<1>(GetParam()),
+                                   oneapi::math::side::right, 3, 5));
+    EXPECT_TRUEORSKIP(test<double>(std::get<0>(GetParam()), std::get<1>(GetParam()),
+                                   oneapi::math::side::left, -1, 5));
 }
 
 TEST_P(DgmmBatchStrideUsmTests, ComplexSinglePrecision) {
@@ -228,6 +236,10 @@ TEST_P(DgmmBatchStrideUsmTests, ComplexSinglePrecision) {
                                                 oneapi::math::side::left, -2, 5));
     EXPECT_TRUEORSKIP(test<std::complex<float>>(std::get<0>(GetParam()), std::get<1>(GetParam()),
                                                 oneapi::math::side::left, 1, 5));
+    EXPECT_TRUEORSKIP(test<std::complex<float>>(std::get<0>(GetParam()), std::get<1>(GetParam()),
+                                                oneapi::math::side::right, 3, 5));
+    EXPECT_TRUEORSKIP(test<std::complex<float>>(std::get<0>(GetParam()), std::get<1>(GetParam()),
+                                                oneapi::math::side::left, -1, 5));
 }
 
 TEST_P(DgmmBatchStrideUsmTests, ComplexDoublePrecision) {
@@ -245,6 +257,10 @@ TEST_P(DgmmBatchStrideUsmTests, ComplexDoublePrecision) {
                                                  oneapi::math::side::left, -2, 5));
     EXPECT_TRUEORSKIP(test<std::complex<double>>(std::get<0>(GetParam()), std::get<1>(GetParam()),
                                                  oneapi::math::side::left, 1, 5));
+    EXPECT_TRUEORSKIP(test<std::complex<double>>(std::get<0>(GetParam()), std::get<1>(GetParam()),
+                                                 oneapi::math::side::right, 3, 5));
+    EXPECT_TRUEORSKIP(test<std::complex<double>>(std::get<0>(GetParam()), std::get<1>(GetParam()),
+                                                 oneapi::math::side::left, -1, 5));
 }
 
 INSTANTIATE_TEST_SUITE_P(DgmmBatchStrideUsmTestSuite, DgmmBatchStrideUsmTests,
