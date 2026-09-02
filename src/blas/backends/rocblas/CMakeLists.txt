@@ -46,19 +46,10 @@ target_include_directories(${LIB_OBJ}
           ${ONEMATH_GENERATED_INCLUDE_PATH}
 )
 
-if(NOT ${ONEMATH_SYCL_IMPLEMENTATION} STREQUAL "adaptivecpp")
-    target_compile_options(${LIB_OBJ} PRIVATE ${ONEMATH_BUILD_COPT})
-    target_compile_options(ONEMATH::SYCL::SYCL INTERFACE
-        -fsycl-targets=amdgcn-amd-amdhsa -fsycl-unnamed-lambda
-        -Xsycl-target-backend --offload-arch=${HIP_TARGETS})
-    target_link_options(ONEMATH::SYCL::SYCL INTERFACE
-        -fsycl-targets=amdgcn-amd-amdhsa -Xsycl-target-backend
-        --offload-arch=${HIP_TARGETS})
-else()
-    target_compile_options(${LIB_OBJ} PRIVATE ${ONEMATH_BUILD_COPT})
-    target_compile_options(ONEMATH::SYCL::SYCL INTERFACE)
-    target_link_options(ONEMATH::SYCL::SYCL INTERFACE)
-endif()
+# The SYCL offload targets (-fsycl-targets) for all enabled GPU backends are
+# assembled once in cmake/FindCompiler.cmake so that multi-vendor builds keep
+# every vendor's device image. See issue #708.
+target_compile_options(${LIB_OBJ} PRIVATE ${ONEMATH_BUILD_COPT})
 
 target_link_libraries(${LIB_OBJ} PRIVATE roc::rocblas hip::host Threads::Threads)
 target_link_libraries(${LIB_OBJ} PUBLIC ONEMATH::SYCL::SYCL)
