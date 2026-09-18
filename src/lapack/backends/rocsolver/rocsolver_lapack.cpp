@@ -132,6 +132,49 @@ GEQRF_LAUNCHER(std::complex<double>, rocsolver_zgeqrf)
 
 #undef GEQRF_LAUNCHER
 
+#if ONEMATH_ROCSOLVER_HAS_64BIT_PIVOTS
+
+template <typename Func, typename T>
+void getrf(const char* func_name, Func func, sycl::queue& queue, std::int64_t m, std::int64_t n,
+           sycl::buffer<T>& a, std::int64_t lda, sycl::buffer<std::int64_t>& ipiv,
+           sycl::buffer<T>& scratchpad, std::int64_t scratchpad_size) {
+    using rocmDataType = typename RocmEquivalentType<T>::Type;
+    sycl::buffer<std::int64_t> devInfo{ 1 };
+
+    queue.submit([&](sycl::handler& cgh) {
+        auto a_acc = a.template get_access<sycl::access::mode::read_write>(cgh);
+        auto ipiv_acc = ipiv.template get_access<sycl::access::mode::write>(cgh);
+        auto devInfo_acc = devInfo.template get_access<sycl::access::mode::write>(cgh);
+        onemath_rocsolver_host_task(cgh, queue, [=](RocsolverScopedContextHandler& sc) {
+            auto handle = sc.get_handle(queue);
+            auto a_ = sc.get_mem<rocmDataType*>(a_acc);
+            auto ipiv_ = sc.get_mem<std::int64_t*>(ipiv_acc);
+            auto devInfo_ = sc.get_mem<std::int64_t*>(devInfo_acc);
+            rocblas_status err;
+            rocsolver_native_named_func(func_name, func, err, handle, m, n, a_, lda, ipiv_,
+                                        devInfo_);
+        });
+    });
+    lapack_info_check(queue, devInfo, __func__, func_name);
+}
+
+#define GETRF_LAUNCHER(TYPE, ROCSOLVER_ROUTINE)                                                    \
+    void getrf(sycl::queue& queue, std::int64_t m, std::int64_t n, sycl::buffer<TYPE>& a,          \
+               std::int64_t lda, sycl::buffer<std::int64_t>& ipiv, sycl::buffer<TYPE>& scratchpad, \
+               std::int64_t scratchpad_size) {                                                     \
+        getrf(#ROCSOLVER_ROUTINE, ROCSOLVER_ROUTINE, queue, m, n, a, lda, ipiv, scratchpad,        \
+              scratchpad_size);                                                                    \
+    }
+
+GETRF_LAUNCHER(float, rocsolver_sgetrf_64)
+GETRF_LAUNCHER(double, rocsolver_dgetrf_64)
+GETRF_LAUNCHER(std::complex<float>, rocsolver_cgetrf_64)
+GETRF_LAUNCHER(std::complex<double>, rocsolver_zgetrf_64)
+
+#undef GETRF_LAUNCHER
+
+#else // no 64-bit pivot API: factorise into a temporary 32-bit array and widen it
+
 template <typename Func, typename T>
 void getrf(const char* func_name, Func func, sycl::queue& queue, std::int64_t m, std::int64_t n,
            sycl::buffer<T>& a, std::int64_t lda, sycl::buffer<std::int64_t>& ipiv,
@@ -188,6 +231,8 @@ GETRF_LAUNCHER(std::complex<double>, rocsolver_zgetrf)
 
 #undef GETRF_LAUNCHER
 
+#endif // ONEMATH_ROCSOLVER_HAS_64BIT_PIVOTS
+
 void getri(sycl::queue& queue, std::int64_t n, sycl::buffer<std::complex<float>>& a,
            std::int64_t lda, sycl::buffer<std::int64_t>& ipiv,
            sycl::buffer<std::complex<float>>& scratchpad, std::int64_t scratchpad_size) {
@@ -208,6 +253,50 @@ void getri(sycl::queue& queue, std::int64_t n, sycl::buffer<std::complex<double>
            sycl::buffer<std::complex<double>>& scratchpad, std::int64_t scratchpad_size) {
     throw unimplemented("lapack", "getri");
 }
+
+#if ONEMATH_ROCSOLVER_HAS_64BIT_PIVOTS
+
+template <typename Func, typename T>
+inline void getrs(const char* func_name, Func func, sycl::queue& queue,
+                  oneapi::math::transpose trans, std::int64_t n, std::int64_t nrhs,
+                  sycl::buffer<T>& a, std::int64_t lda, sycl::buffer<std::int64_t>& ipiv,
+                  sycl::buffer<T>& b, std::int64_t ldb, sycl::buffer<T>& scratchpad,
+                  std::int64_t scratchpad_size) {
+    using rocmDataType = typename RocmEquivalentType<T>::Type;
+
+    queue.submit([&](sycl::handler& cgh) {
+        auto a_acc = a.template get_access<sycl::access::mode::read>(cgh);
+        auto ipiv_acc = ipiv.template get_access<sycl::access::mode::read>(cgh);
+        auto b_acc = b.template get_access<sycl::access::mode::write>(cgh);
+        onemath_rocsolver_host_task(cgh, queue, [=](RocsolverScopedContextHandler& sc) {
+            auto handle = sc.get_handle(queue);
+            auto a_ = sc.get_mem<rocmDataType*>(a_acc);
+            auto ipiv_ = sc.get_mem<std::int64_t*>(ipiv_acc);
+            auto b_ = sc.get_mem<rocmDataType*>(b_acc);
+            rocblas_status err;
+            rocsolver_native_named_func(func_name, func, err, handle, get_rocblas_operation(trans),
+                                        n, nrhs, a_, lda, ipiv_, b_, ldb);
+        });
+    });
+}
+
+#define GETRS_LAUNCHER(TYPE, ROCSOLVER_ROUTINE)                                                   \
+    void getrs(sycl::queue& queue, oneapi::math::transpose trans, std::int64_t n,                 \
+               std::int64_t nrhs, sycl::buffer<TYPE>& a, std::int64_t lda,                        \
+               sycl::buffer<std::int64_t>& ipiv, sycl::buffer<TYPE>& b, std::int64_t ldb,         \
+               sycl::buffer<TYPE>& scratchpad, std::int64_t scratchpad_size) {                    \
+        getrs(#ROCSOLVER_ROUTINE, ROCSOLVER_ROUTINE, queue, trans, n, nrhs, a, lda, ipiv, b, ldb, \
+              scratchpad, scratchpad_size);                                                       \
+    }
+
+GETRS_LAUNCHER(float, rocsolver_sgetrs_64)
+GETRS_LAUNCHER(double, rocsolver_dgetrs_64)
+GETRS_LAUNCHER(std::complex<float>, rocsolver_cgetrs_64)
+GETRS_LAUNCHER(std::complex<double>, rocsolver_zgetrs_64)
+
+#undef GETRS_LAUNCHER
+
+#else // no 64-bit pivot API: narrow the pivots into a temporary 32-bit array
 
 template <typename Func, typename T>
 inline void getrs(const char* func_name, Func func, sycl::queue& queue,
@@ -263,6 +352,8 @@ GETRS_LAUNCHER(std::complex<float>, rocsolver_cgetrs)
 GETRS_LAUNCHER(std::complex<double>, rocsolver_zgetrs)
 
 #undef GETRS_LAUNCHER
+
+#endif // ONEMATH_ROCSOLVER_HAS_64BIT_PIVOTS
 
 template <typename Func, typename T_A, typename T_B>
 inline void gesvd(const char* func_name, Func func, sycl::queue& queue, oneapi::math::jobsvd jobu,
@@ -1259,6 +1350,50 @@ GEQRF_LAUNCHER_USM(std::complex<double>, rocsolver_zgeqrf)
 
 #undef GEQRF_LAUNCHER_USM
 
+#if ONEMATH_ROCSOLVER_HAS_64BIT_PIVOTS
+
+template <typename Func, typename T>
+inline sycl::event getrf(const char* func_name, Func func, sycl::queue& queue, std::int64_t m,
+                         std::int64_t n, T* a, std::int64_t lda, std::int64_t* ipiv, T* scratchpad,
+                         std::int64_t scratchpad_size,
+                         const std::vector<sycl::event>& dependencies) {
+    using rocmDataType = typename RocmEquivalentType<T>::Type;
+
+    std::int64_t* devInfo = (std::int64_t*)malloc_device(sizeof(std::int64_t), queue);
+    auto done = queue.submit([&](sycl::handler& cgh) {
+        cgh.depends_on(dependencies);
+        onemath_rocsolver_host_task(cgh, queue, [=](RocsolverScopedContextHandler& sc) {
+            auto handle = sc.get_handle(queue);
+            auto a_ = reinterpret_cast<rocmDataType*>(a);
+            rocblas_status err;
+            rocsolver_native_named_func(func_name, func, err, handle, m, n, a_, lda, ipiv, devInfo);
+        });
+    });
+
+    // lapack_info_check calls queue.wait()
+    lapack_info_check(queue, devInfo, __func__, func_name);
+    free(devInfo, queue);
+    return done;
+}
+
+#define GETRF_LAUNCHER_USM(TYPE, ROCSOLVER_ROUTINE)                                                \
+    sycl::event getrf(sycl::queue& queue, std::int64_t m, std::int64_t n, TYPE* a,                 \
+                      std::int64_t lda, std::int64_t* ipiv, TYPE* scratchpad,                      \
+                      std::int64_t scratchpad_size,                                                \
+                      const std::vector<sycl::event>& dependencies) {                              \
+        return getrf(#ROCSOLVER_ROUTINE, ROCSOLVER_ROUTINE, queue, m, n, a, lda, ipiv, scratchpad, \
+                     scratchpad_size, dependencies);                                               \
+    }
+
+GETRF_LAUNCHER_USM(float, rocsolver_sgetrf_64)
+GETRF_LAUNCHER_USM(double, rocsolver_dgetrf_64)
+GETRF_LAUNCHER_USM(std::complex<float>, rocsolver_cgetrf_64)
+GETRF_LAUNCHER_USM(std::complex<double>, rocsolver_zgetrf_64)
+
+#undef GETRF_LAUNCHER_USM
+
+#else // no 64-bit pivot API: factorise into a temporary 32-bit array and widen it
+
 template <typename Func, typename T>
 inline sycl::event getrf(const char* func_name, Func func, sycl::queue& queue, std::int64_t m,
                          std::int64_t n, T* a, std::int64_t lda, std::int64_t* ipiv, T* scratchpad,
@@ -1320,6 +1455,8 @@ GETRF_LAUNCHER_USM(std::complex<double>, rocsolver_zgetrf)
 
 #undef GETRF_LAUNCHER_USM
 
+#endif // ONEMATH_ROCSOLVER_HAS_64BIT_PIVOTS
+
 sycl::event getri(sycl::queue& queue, std::int64_t n, std::complex<float>* a, std::int64_t lda,
                   std::int64_t* ipiv, std::complex<float>* scratchpad, std::int64_t scratchpad_size,
                   const std::vector<sycl::event>& dependencies) {
@@ -1340,6 +1477,47 @@ sycl::event getri(sycl::queue& queue, std::int64_t n, std::complex<double>* a, s
                   std::int64_t scratchpad_size, const std::vector<sycl::event>& dependencies) {
     throw unimplemented("lapack", "getri");
 }
+
+#if ONEMATH_ROCSOLVER_HAS_64BIT_PIVOTS
+
+template <typename Func, typename T>
+inline sycl::event getrs(const char* func_name, Func func, sycl::queue& queue,
+                         oneapi::math::transpose trans, std::int64_t n, std::int64_t nrhs, T* a,
+                         std::int64_t lda, std::int64_t* ipiv, T* b, std::int64_t ldb,
+                         T* scratchpad, std::int64_t scratchpad_size,
+                         const std::vector<sycl::event>& dependencies) {
+    using rocmDataType = typename RocmEquivalentType<T>::Type;
+
+    return queue.submit([&](sycl::handler& cgh) {
+        cgh.depends_on(dependencies);
+        onemath_rocsolver_host_task(cgh, queue, [=](RocsolverScopedContextHandler& sc) {
+            auto handle = sc.get_handle(queue);
+            auto a_ = reinterpret_cast<rocmDataType*>(a);
+            auto b_ = reinterpret_cast<rocmDataType*>(b);
+            rocblas_status err;
+            rocsolver_native_named_func(func_name, func, err, handle, get_rocblas_operation(trans),
+                                        n, nrhs, a_, lda, ipiv, b_, ldb);
+        });
+    });
+}
+
+#define GETRS_LAUNCHER_USM(TYPE, ROCSOLVER_ROUTINE)                                              \
+    sycl::event getrs(sycl::queue& queue, oneapi::math::transpose trans, std::int64_t n,         \
+                      std::int64_t nrhs, TYPE* a, std::int64_t lda, std::int64_t* ipiv, TYPE* b, \
+                      std::int64_t ldb, TYPE* scratchpad, std::int64_t scratchpad_size,          \
+                      const std::vector<sycl::event>& dependencies) {                            \
+        return getrs(#ROCSOLVER_ROUTINE, ROCSOLVER_ROUTINE, queue, trans, n, nrhs, a, lda, ipiv, \
+                     b, ldb, scratchpad, scratchpad_size, dependencies);                         \
+    }
+
+GETRS_LAUNCHER_USM(float, rocsolver_sgetrs_64)
+GETRS_LAUNCHER_USM(double, rocsolver_dgetrs_64)
+GETRS_LAUNCHER_USM(std::complex<float>, rocsolver_cgetrs_64)
+GETRS_LAUNCHER_USM(std::complex<double>, rocsolver_zgetrs_64)
+
+#undef GETRS_LAUNCHER_USM
+
+#else // no 64-bit pivot API: narrow the pivots into a temporary 32-bit array
 
 template <typename Func, typename T>
 inline sycl::event getrs(const char* func_name, Func func, sycl::queue& queue,
@@ -1401,6 +1579,8 @@ GETRS_LAUNCHER_USM(std::complex<float>, rocsolver_cgetrs)
 GETRS_LAUNCHER_USM(std::complex<double>, rocsolver_zgetrs)
 
 #undef GETRS_LAUNCHER_USM
+
+#endif // ONEMATH_ROCSOLVER_HAS_64BIT_PIVOTS
 
 template <typename Func, typename T_A, typename T_B>
 inline sycl::event gesvd(const char* func_name, Func func, sycl::queue& queue,
