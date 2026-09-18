@@ -33,6 +33,7 @@
 #include "cblas.h"
 #include "oneapi/math/detail/config.hpp"
 #include "oneapi/math.hpp"
+#include "oneapi/math/detail/get_device_id.hpp"
 #include "onemath_blas_helper.hpp"
 #include "reference_blas_templates.hpp"
 #include "test_common.hpp"
@@ -253,8 +254,11 @@ int test(device* dev, oneapi::math::layout layout, int64_t batch_size) {
     // A float output accumulated from int8 inputs is rounded at the magnitude of the terms summed,
     // |alpha| * sum|a*b|, which k * 128 * 128 bounds from above. An entry whose sum cancels is far
     // smaller than that and so cannot meet any relative bound, so allow an absolute error of eps
-    // times the accumulated magnitude instead. Int8Int8SinglePrecisionErrorModel checks that the
-    // error really does stay inside eps * |alpha| * sum|a*b| on fixed data.
+    // times the accumulated magnitude instead. That model is for fp32 accumulation (cuBLAS, and
+    // the CBLAS reference these tests compare against). rocBLAS accumulates exactly in int32, so
+    // its error against an exact integer reference is only the final scaling;
+    // Int8Int8SinglePrecisionErrorModel checks that path with a tighter bound. Against CBLAS the
+    // looser fp32 bound still applies.
     constexpr bool int8_to_float = std::is_same_v<Ta, std::int8_t> &&
                                    std::is_same_v<Tb, std::int8_t> && std::is_same_v<Tc, float> &&
                                    std::is_same_v<Ts, float>;
@@ -425,11 +429,14 @@ int int8_accumulation_error_model(device* dev, oneapi::math::layout layout) {
     }
 
     const double eps = std::numeric_limits<float>::epsilon();
-    // The same pair of bounds the int8-to-float tests above apply, evaluated here against an exact
-    // integer reference: a relative bound of 10 * k * eps, or an absolute one of eps times the
-    // bound k * 128 * 128 on the accumulated magnitude.
+    // cuBLAS (and CBLAS) accumulate in fp32, so the budget is eps times the magnitude of the terms
+    // summed. rocBLAS accumulates exactly in int32 and only rounds when alpha and beta are applied,
+    // so its budget is a few ulps of |alpha * dot| + |beta * C|. AMD_ID is the rocBLAS device in
+    // these tests.
+    const bool integer_accum =
+        static_cast<unsigned int>(dev->get_info<info::device::vendor_id>()) == AMD_ID;
     const double relative_bound = double(10 * k) * eps;
-    const double absolute_bound = eps * std::abs(double(alpha)) * double(k) * 128.0 * 128.0;
+    const double fp32_absolute_bound = eps * std::abs(double(alpha)) * double(k) * 128.0 * 128.0;
     double worst_model_usage = 0.0, worst_absolute_usage = 0.0;
     double worst_cancelling_relative_allowance = 0.0;
     int64_t entries_missing_relative_bound = 0, cancelling_missing_relative_bound = 0;
@@ -457,15 +464,21 @@ int int8_accumulation_error_model(device* dev, oneapi::math::layout layout) {
                     return false;
                 }
 
-                // The error the accumulation is allowed: eps times the magnitude of the terms
-                // summed, plus the scaling of C and the final addition. Exceeding this means the
-                // calibration the absolute tolerance rests on no longer describes the backend.
+                // fp32 path: eps times the magnitude of the terms summed, plus the scaling of C
+                // and the final addition. Integer path: a few ulps of the scaled exact dot and of
+                // beta * C. Exceeding this means the calibration no longer describes the backend.
                 const double model_bound =
-                    eps * (std::abs(double(alpha)) * double(abs_sum) +
-                           std::abs(double(beta) * double(C_in[idx])) + std::abs(expected));
+                    integer_accum
+                        ? 8.0 * eps *
+                              (std::abs(double(alpha) * double(dot)) +
+                               std::abs(double(beta) * double(C_in[idx])) + std::abs(expected))
+                        : eps * (std::abs(double(alpha)) * double(abs_sum) +
+                                 std::abs(double(beta) * double(C_in[idx])) + std::abs(expected));
                 worst_model_usage =
                     std::max(worst_model_usage, model_bound > 0.0 ? error / model_bound : 0.0);
-                worst_absolute_usage = std::max(worst_absolute_usage, error / absolute_bound);
+                if (!integer_accum)
+                    worst_absolute_usage =
+                        std::max(worst_absolute_usage, error / fp32_absolute_bound);
                 if (error > model_bound)
                     good = false;
 
@@ -476,32 +489,129 @@ int int8_accumulation_error_model(device* dev, oneapi::math::layout layout) {
                     entries_missing_relative_bound++;
                     if (cancels)
                         cancelling_missing_relative_bound++;
-                    if (error > absolute_bound)
+                    if (!integer_accum && error > fp32_absolute_bound)
                         good = false;
                 }
             }
     }
 
-    // The cancelling entries are the ones the absolute bound exists for: whatever error the
-    // backend makes on them, the relative bound can only accept a fraction of what the model
-    // permits, so they rest on the absolute bound alone.
-    if (worst_cancelling_relative_allowance >= absolute_bound) {
+    // On the fp32 path the cancelling entries are why the absolute bound exists: the relative
+    // bound can only accept a fraction of what the model permits. The integer path's error is
+    // already a few ulps, so those entries typically pass the relative bound and this check
+    // would not apply.
+    if (!integer_accum && worst_cancelling_relative_allowance >= fp32_absolute_bound) {
         std::cout << "test bug: the relative bound already covers the cancelling entries, so they "
                      "do not exercise the absolute tolerance"
                   << std::endl;
         return false;
     }
 
-    std::cout << "int8 accumulation error reached " << worst_model_usage
-              << " of the accumulated magnitude the model allows and " << worst_absolute_usage
-              << " of the absolute tolerance; " << entries_missing_relative_bound
-              << " entries missed the relative bound, " << cancelling_missing_relative_bound
-              << " of them cancelling" << std::endl;
+    std::cout << "int8 accumulation error reached " << worst_model_usage << " of the "
+              << (integer_accum ? "integer-accumulation" : "fp32-accumulation") << " model";
+    if (!integer_accum)
+        std::cout << " and " << worst_absolute_usage << " of the absolute tolerance";
+    std::cout << "; " << entries_missing_relative_bound << " entries missed the relative bound, "
+              << cancelling_missing_relative_bound << " of them cancelling" << std::endl;
     if (!good)
         std::cout << "int8 accumulation error exceeded the tolerance the int8-to-float gemm_batch "
                      "tests rely on"
                   << std::endl;
     return good;
+}
+
+// The rocBLAS int8-to-float fallback scales its int32 accumulator in a kernel of its own, and
+// launches it over a flat range because HIP cannot map every large multi-dimensional range onto
+// its grid. A large prime n keeps that flat launch covered.
+int int8_flat_range_large_prime(device* dev, oneapi::math::layout layout) {
+    auto exception_handler = [](exception_list exceptions) {
+        for (std::exception_ptr const& e : exceptions) {
+            try {
+                std::rethrow_exception(e);
+            }
+            catch (exception const& e) {
+                std::cout << "Caught asynchronous SYCL exception during GEMM_BATCH_STRIDE:\n"
+                          << e.what() << std::endl;
+                print_error_code(e);
+            }
+        }
+    };
+
+    queue main_queue(*dev, exception_handler);
+    context cxt = main_queue.get_context();
+    std::vector<event> dependencies;
+    const int64_t m = 3, n = 65537, k = 1, batch_size = 1;
+    const bool col = layout == oneapi::math::layout::col_major;
+    const int64_t lda = col ? m : k;
+    const int64_t ldb = col ? k : n;
+    const int64_t ldc = col ? m : n;
+    const int64_t stride_a = col ? lda * k : lda * m;
+    const int64_t stride_b = col ? ldb * n : ldb * k;
+    const int64_t stride_c = col ? ldc * n : ldc * m;
+
+    auto ua = usm_allocator<std::int8_t, usm::alloc::shared, 64>(cxt, *dev);
+    auto uc = usm_allocator<float, usm::alloc::shared, 64>(cxt, *dev);
+    vector<std::int8_t, decltype(ua)> A(stride_a, ua), B(stride_b, ua);
+    vector<float, decltype(uc)> C(stride_c, uc);
+    for (int64_t i = 0; i < m; ++i)
+        A[col ? i : i * lda] = std::int8_t(i + 1);
+    for (int64_t j = 0; j < n; ++j)
+        B[col ? j * ldb : j] = std::int8_t(j % 7 - 3);
+    std::fill(C.begin(), C.end(), -1.0f);
+
+    try {
+        event done;
+#ifdef CALL_RT_API
+        if (col) {
+            done = oneapi::math::blas::column_major::gemm_batch(
+                main_queue, oneapi::math::transpose::nontrans, oneapi::math::transpose::nontrans, m,
+                n, k, 1.0f, &A[0], lda, stride_a, &B[0], ldb, stride_b, 0.0f, &C[0], ldc, stride_c,
+                batch_size, dependencies);
+        }
+        else {
+            done = oneapi::math::blas::row_major::gemm_batch(
+                main_queue, oneapi::math::transpose::nontrans, oneapi::math::transpose::nontrans, m,
+                n, k, 1.0f, &A[0], lda, stride_a, &B[0], ldb, stride_b, 0.0f, &C[0], ldc, stride_c,
+                batch_size, dependencies);
+        }
+        done.wait_and_throw();
+#else
+        if (col) {
+            TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::math::blas::column_major::gemm_batch,
+                                    oneapi::math::transpose::nontrans,
+                                    oneapi::math::transpose::nontrans, m, n, k, 1.0f, &A[0], lda,
+                                    stride_a, &B[0], ldb, stride_b, 0.0f, &C[0], ldc, stride_c,
+                                    batch_size, dependencies);
+        }
+        else {
+            TEST_RUN_BLAS_CT_SELECT(main_queue, oneapi::math::blas::row_major::gemm_batch,
+                                    oneapi::math::transpose::nontrans,
+                                    oneapi::math::transpose::nontrans, m, n, k, 1.0f, &A[0], lda,
+                                    stride_a, &B[0], ldb, stride_b, 0.0f, &C[0], ldc, stride_c,
+                                    batch_size, dependencies);
+        }
+        main_queue.wait_and_throw();
+#endif
+    }
+    catch (const oneapi::math::unimplemented&) {
+        return test_skipped;
+    }
+    catch (const std::exception& error) {
+        std::cout << "Error raised during large-prime GEMM_BATCH_STRIDE:\n"
+                  << error.what() << std::endl;
+        return false;
+    }
+
+    for (int64_t j = 0; j < n; ++j)
+        for (int64_t i = 0; i < m; ++i) {
+            const int64_t index = col ? i + j * ldc : i * ldc + j;
+            const float expected = float((i + 1) * (j % 7 - 3));
+            if (C[index] != expected) {
+                std::cout << "Difference in entry (" << i << ',' << j << "): DPC++ " << C[index]
+                          << " vs. Reference " << expected << std::endl;
+                return false;
+            }
+        }
+    return true;
 }
 
 class GemmBatchStrideUsmTests
@@ -525,6 +635,11 @@ TEST_P(GemmBatchStrideUsmTests, Int8Int8SinglePrecision) {
 TEST_P(GemmBatchStrideUsmTests, Int8Int8SinglePrecisionErrorModel) {
     EXPECT_TRUEORSKIP(
         (int8_accumulation_error_model(std::get<0>(GetParam()), std::get<1>(GetParam()))));
+}
+
+TEST_P(GemmBatchStrideUsmTests, Int8Int8SinglePrecisionLargePrimeRange) {
+    EXPECT_TRUEORSKIP(
+        (int8_flat_range_large_prime(std::get<0>(GetParam()), std::get<1>(GetParam()))));
 }
 
 TEST_P(GemmBatchStrideUsmTests, Int8Int8Int32Precision) {

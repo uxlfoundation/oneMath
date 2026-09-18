@@ -32,6 +32,7 @@ Contents
    :includehidden:
 
    domains/sparse_linear_algebra.rst
+   domains/blas.rst
    create_new_backend.rst
 
 .. toctree::
