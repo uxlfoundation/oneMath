@@ -253,6 +253,14 @@ inline cublasFillMode_t get_cublas_fill_mode(oneapi::math::uplo ul) {
     }
 }
 
+inline cublasDiagType_t get_cublas_diag_type(oneapi::math::diag un) {
+    switch (un) {
+        case oneapi::math::diag::unit: return CUBLAS_DIAG_UNIT;
+        case oneapi::math::diag::nonunit: return CUBLAS_DIAG_NON_UNIT;
+        default: throw "Wrong diag type.";
+    }
+}
+
 inline cublasSideMode_t get_cublas_side_mode(oneapi::math::side lr) {
     switch (lr) {
         case oneapi::math::side::left: return CUBLAS_SIDE_LEFT;
