@@ -24,5 +24,5 @@ sphinxcontrib-jsmath==1.0.1
 sphinxcontrib-qthelp==1.0.7
 sphinxcontrib-serializinghtml==1.1.10
 tomli==2.0.1
-typing_extensions==4.11.0
+typing_extensions==4.15.0
 urllib3==2.7.0
