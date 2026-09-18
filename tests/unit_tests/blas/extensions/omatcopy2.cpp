@@ -48,22 +48,15 @@ extern std::vector<sycl::device*> devices;
 namespace {
 
 template <typename fp>
-int test(device* dev, oneapi::math::layout layout) {
+int test(device* dev, oneapi::math::layout layout, int64_t m, int64_t n, int64_t stride_a,
+         int64_t stride_b, oneapi::math::transpose trans) {
     // Prepare data.
-    int64_t m, n;
     int64_t lda, ldb;
-    int64_t stride_a, stride_b;
-    oneapi::math::transpose trans;
     fp alpha;
 
-    stride_a = 1 + std::rand() % 50;
-    stride_b = 1 + std::rand() % 50;
-    m = 1 + std::rand() % 50;
-    n = 1 + std::rand() % 50;
     lda = stride_a * (std::max(m, n) - 1) + 1;
     ldb = stride_b * (std::max(m, n) - 1) + 1;
     alpha = rand_scalar<fp>();
-    trans = rand_trans<fp>();
 
     int64_t size_a, size_b;
 
@@ -170,6 +163,12 @@ int test(device* dev, oneapi::math::layout layout) {
     return (int)good;
 }
 
+template <typename fp>
+int test(device* dev, oneapi::math::layout layout) {
+    return test<fp>(dev, layout, 1 + std::rand() % 50, 1 + std::rand() % 50, 1 + std::rand() % 50,
+                    1 + std::rand() % 50, rand_trans<fp>());
+}
+
 class Omatcopy2Tests
         : public ::testing::TestWithParam<std::tuple<sycl::device*, oneapi::math::layout>> {};
 
@@ -191,6 +190,11 @@ TEST_P(Omatcopy2Tests, ComplexDoublePrecision) {
     CHECK_DOUBLE_ON_DEVICE(std::get<0>(GetParam()));
 
     EXPECT_TRUEORSKIP(test<std::complex<double>>(std::get<0>(GetParam()), std::get<1>(GetParam())));
+}
+
+TEST_P(Omatcopy2Tests, ComplexConjtransPartialTiles) {
+    EXPECT_TRUEORSKIP(test<std::complex<float>>(std::get<0>(GetParam()), std::get<1>(GetParam()),
+                                                70, 50, 2, 3, oneapi::math::transpose::conjtrans));
 }
 
 INSTANTIATE_TEST_SUITE_P(Omatcopy2TestSuite, Omatcopy2Tests,
