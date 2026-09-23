@@ -242,6 +242,22 @@ A few often-used architectures are listed below:
 For a host with ROCm installed, the device architecture can be retrieved via the
 ``rocminfo`` tool. The architecture will be displayed in the ``Name:`` row.
 
+.. note::
+
+  Recent versions of the DPC++/LLVM compiler default to AMD code object ABI
+  version 6, which is only supported by ROCm 6.3 and higher. When building
+  against ROCm < 6.3 this results in an error such as::
+
+    clang++: error: cannot find ROCm device library for ABI version 6, which
+    requires ROCm 6.3 or higher
+
+  This is a toolchain (compiler/ROCm) compatibility issue and is not specific to
+  oneMath: it affects any HIP or SYCL-on-AMD application built with a recent
+  enough compiler. To build with ROCm < 6.3, downgrade the code object version
+  by adding ``-mcode-object-version=5`` to the compiler flags, for example::
+
+    cmake <build options> -DCMAKE_CXX_FLAGS="-mcode-object-version=5" ..
+
 .. _build_for_other_SYCL_devices:
 
 Building for other SYCL devices
