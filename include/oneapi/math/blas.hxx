@@ -382,6 +382,26 @@ static inline void gemm_batch(sycl::queue& queue, transpose transa, transpose tr
 
 static inline void gemm_batch(sycl::queue& queue, transpose transa, transpose transb,
                               std::int64_t m, std::int64_t n, std::int64_t k, float alpha,
+                              sycl::buffer<bfloat16, 1>& a, std::int64_t lda, std::int64_t stride_a,
+                              sycl::buffer<bfloat16, 1>& b, std::int64_t ldb, std::int64_t stride_b,
+                              float beta, sycl::buffer<float, 1>& c, std::int64_t ldc,
+                              std::int64_t stride_c, std::int64_t batch_size) {
+    detail::gemm_batch(get_device_id(queue), queue, transa, transb, m, n, k, alpha, a, lda,
+                       stride_a, b, ldb, stride_b, beta, c, ldc, stride_c, batch_size);
+}
+
+static inline void gemm_batch(sycl::queue& queue, transpose transa, transpose transb,
+                              std::int64_t m, std::int64_t n, std::int64_t k, float alpha,
+                              sycl::buffer<bfloat16, 1>& a, std::int64_t lda, std::int64_t stride_a,
+                              sycl::buffer<bfloat16, 1>& b, std::int64_t ldb, std::int64_t stride_b,
+                              float beta, sycl::buffer<bfloat16, 1>& c, std::int64_t ldc,
+                              std::int64_t stride_c, std::int64_t batch_size) {
+    detail::gemm_batch(get_device_id(queue), queue, transa, transb, m, n, k, alpha, a, lda,
+                       stride_a, b, ldb, stride_b, beta, c, ldc, stride_c, batch_size);
+}
+
+static inline void gemm_batch(sycl::queue& queue, transpose transa, transpose transb,
+                              std::int64_t m, std::int64_t n, std::int64_t k, float alpha,
                               sycl::buffer<std::int8_t, 1>& a, std::int64_t lda,
                               std::int64_t stride_a, sycl::buffer<std::int8_t, 1>& b,
                               std::int64_t ldb, std::int64_t stride_b, float beta,
@@ -2247,6 +2267,32 @@ static inline sycl::event gemm_batch(sycl::queue& queue, transpose* transa, tran
 
 static inline sycl::event gemm_batch(sycl::queue& queue, transpose* transa, transpose* transb,
                                      std::int64_t* m, std::int64_t* n, std::int64_t* k,
+                                     float* alpha, const bfloat16** a, std::int64_t* lda,
+                                     const bfloat16** b, std::int64_t* ldb, float* beta, float** c,
+                                     std::int64_t* ldc, std::int64_t group_count,
+                                     std::int64_t* group_size,
+                                     const std::vector<sycl::event>& dependencies = {}) {
+    auto done =
+        detail::gemm_batch(get_device_id(queue), queue, transa, transb, m, n, k, alpha, a, lda, b,
+                           ldb, beta, c, ldc, group_count, group_size, dependencies);
+    return done;
+}
+
+static inline sycl::event gemm_batch(sycl::queue& queue, transpose* transa, transpose* transb,
+                                     std::int64_t* m, std::int64_t* n, std::int64_t* k,
+                                     float* alpha, const bfloat16** a, std::int64_t* lda,
+                                     const bfloat16** b, std::int64_t* ldb, float* beta,
+                                     bfloat16** c, std::int64_t* ldc, std::int64_t group_count,
+                                     std::int64_t* group_size,
+                                     const std::vector<sycl::event>& dependencies = {}) {
+    auto done =
+        detail::gemm_batch(get_device_id(queue), queue, transa, transb, m, n, k, alpha, a, lda, b,
+                           ldb, beta, c, ldc, group_count, group_size, dependencies);
+    return done;
+}
+
+static inline sycl::event gemm_batch(sycl::queue& queue, transpose* transa, transpose* transb,
+                                     std::int64_t* m, std::int64_t* n, std::int64_t* k,
                                      float* alpha, const std::int8_t** a, std::int64_t* lda,
                                      const std::int8_t** b, std::int64_t* ldb, float* beta,
                                      float** c, std::int64_t* ldc, std::int64_t group_count,
@@ -2341,6 +2387,32 @@ static inline sycl::event gemm_batch(sycl::queue& queue, transpose transa, trans
                                      const sycl::half* b, std::int64_t ldb, std::int64_t stride_b,
                                      float beta, float* c, std::int64_t ldc, std::int64_t stride_c,
                                      std::int64_t batch_size,
+                                     const std::vector<sycl::event>& dependencies = {}) {
+    auto done = detail::gemm_batch(get_device_id(queue), queue, transa, transb, m, n, k, alpha, a,
+                                   lda, stride_a, b, ldb, stride_b, beta, c, ldc, stride_c,
+                                   batch_size, dependencies);
+    return done;
+}
+
+static inline sycl::event gemm_batch(sycl::queue& queue, transpose transa, transpose transb,
+                                     std::int64_t m, std::int64_t n, std::int64_t k, float alpha,
+                                     const bfloat16* a, std::int64_t lda, std::int64_t stride_a,
+                                     const bfloat16* b, std::int64_t ldb, std::int64_t stride_b,
+                                     float beta, float* c, std::int64_t ldc, std::int64_t stride_c,
+                                     std::int64_t batch_size,
+                                     const std::vector<sycl::event>& dependencies = {}) {
+    auto done = detail::gemm_batch(get_device_id(queue), queue, transa, transb, m, n, k, alpha, a,
+                                   lda, stride_a, b, ldb, stride_b, beta, c, ldc, stride_c,
+                                   batch_size, dependencies);
+    return done;
+}
+
+static inline sycl::event gemm_batch(sycl::queue& queue, transpose transa, transpose transb,
+                                     std::int64_t m, std::int64_t n, std::int64_t k, float alpha,
+                                     const bfloat16* a, std::int64_t lda, std::int64_t stride_a,
+                                     const bfloat16* b, std::int64_t ldb, std::int64_t stride_b,
+                                     float beta, bfloat16* c, std::int64_t ldc,
+                                     std::int64_t stride_c, std::int64_t batch_size,
                                      const std::vector<sycl::event>& dependencies = {}) {
     auto done = detail::gemm_batch(get_device_id(queue), queue, transa, transb, m, n, k, alpha, a,
                                    lda, stride_a, b, ldb, stride_b, beta, c, ldc, stride_c,

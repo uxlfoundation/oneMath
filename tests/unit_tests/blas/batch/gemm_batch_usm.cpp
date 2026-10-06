@@ -391,6 +391,17 @@ TEST_P(GemmBatchUsmTests, HalfHalfFloatPrecision) {
                                                                   std::get<1>(GetParam()), 5)));
 }
 
+TEST_P(GemmBatchUsmTests, Bfloat16Bfloat16SinglePrecision) {
+    EXPECT_TRUEORSKIP((test<oneapi::math::bfloat16, oneapi::math::bfloat16, float, float>(
+        std::get<0>(GetParam()), std::get<1>(GetParam()), 5)));
+}
+
+TEST_P(GemmBatchUsmTests, Bfloat16Bfloat16Bfloat16Precision) {
+    EXPECT_TRUEORSKIP(
+        (test<oneapi::math::bfloat16, oneapi::math::bfloat16, oneapi::math::bfloat16, float>(
+            std::get<0>(GetParam()), std::get<1>(GetParam()), 5)));
+}
+
 TEST_P(GemmBatchUsmTests, Int8Int8SinglePrecision) {
     EXPECT_TRUEORSKIP((test<std::int8_t, std::int8_t, float, float>(std::get<0>(GetParam()),
                                                                     std::get<1>(GetParam()), 5)));

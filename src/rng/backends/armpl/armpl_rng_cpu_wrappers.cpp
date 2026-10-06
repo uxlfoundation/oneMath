@@ -21,7 +21,7 @@
 #include "rng/function_table.hpp"
 #include "oneapi/math/rng/detail/armpl/onemath_rng_armpl.hpp"
 
-#define WRAPPER_VERSION 1
+#define WRAPPER_VERSION 2
 
 extern "C" ONEMATH_EXPORT rng_function_table_t onemath_rng_table = {
     WRAPPER_VERSION, oneapi::math::rng::armpl::create_philox4x32x10,
