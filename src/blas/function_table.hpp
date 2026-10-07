@@ -877,6 +877,20 @@ typedef struct {
         std::int64_t lda, std::int64_t stride_a, sycl::buffer<sycl::half, 1>& b, std::int64_t ldb,
         std::int64_t stride_b, float beta, sycl::buffer<float, 1>& c, std::int64_t ldc,
         std::int64_t stride_c, std::int64_t batch_size);
+    void (*column_major_gemm_bf16bf16f32_batch_strided_sycl)(
+        sycl::queue& queue, oneapi::math::transpose transa, oneapi::math::transpose transb,
+        std::int64_t m, std::int64_t n, std::int64_t k, float alpha,
+        sycl::buffer<oneapi::math::bfloat16, 1>& a, std::int64_t lda, std::int64_t stride_a,
+        sycl::buffer<oneapi::math::bfloat16, 1>& b, std::int64_t ldb, std::int64_t stride_b,
+        float beta, sycl::buffer<float, 1>& c, std::int64_t ldc, std::int64_t stride_c,
+        std::int64_t batch_size);
+    void (*column_major_gemm_bf16bf16bf16_batch_strided_sycl)(
+        sycl::queue& queue, oneapi::math::transpose transa, oneapi::math::transpose transb,
+        std::int64_t m, std::int64_t n, std::int64_t k, float alpha,
+        sycl::buffer<oneapi::math::bfloat16, 1>& a, std::int64_t lda, std::int64_t stride_a,
+        sycl::buffer<oneapi::math::bfloat16, 1>& b, std::int64_t ldb, std::int64_t stride_b,
+        float beta, sycl::buffer<oneapi::math::bfloat16, 1>& c, std::int64_t ldc,
+        std::int64_t stride_c, std::int64_t batch_size);
     void (*column_major_gemm_s8s8f32_batch_strided_sycl)(
         sycl::queue& queue, oneapi::math::transpose transa, oneapi::math::transpose transb,
         std::int64_t m, std::int64_t n, std::int64_t k, float alpha,
@@ -2213,6 +2227,19 @@ typedef struct {
         std::int64_t* lda, const sycl::half** b, std::int64_t* ldb, float* beta, float** c,
         std::int64_t* ldc, std::int64_t group_count, std::int64_t* group_size,
         const std::vector<sycl::event>& dependencies);
+    sycl::event (*column_major_gemm_bf16bf16f32_batch_group_usm_sycl)(
+        sycl::queue& queue, oneapi::math::transpose* transa, oneapi::math::transpose* transb,
+        std::int64_t* m, std::int64_t* n, std::int64_t* k, float* alpha,
+        const oneapi::math::bfloat16** a, std::int64_t* lda, const oneapi::math::bfloat16** b,
+        std::int64_t* ldb, float* beta, float** c, std::int64_t* ldc, std::int64_t group_count,
+        std::int64_t* group_size, const std::vector<sycl::event>& dependencies);
+    sycl::event (*column_major_gemm_bf16bf16bf16_batch_group_usm_sycl)(
+        sycl::queue& queue, oneapi::math::transpose* transa, oneapi::math::transpose* transb,
+        std::int64_t* m, std::int64_t* n, std::int64_t* k, float* alpha,
+        const oneapi::math::bfloat16** a, std::int64_t* lda, const oneapi::math::bfloat16** b,
+        std::int64_t* ldb, float* beta, oneapi::math::bfloat16** c, std::int64_t* ldc,
+        std::int64_t group_count, std::int64_t* group_size,
+        const std::vector<sycl::event>& dependencies);
     sycl::event (*column_major_gemm_s8s8f32_batch_group_usm_sycl)(
         sycl::queue& queue, oneapi::math::transpose* transa, oneapi::math::transpose* transb,
         std::int64_t* m, std::int64_t* n, std::int64_t* k, float* alpha, const std::int8_t** a,
@@ -2264,6 +2291,20 @@ typedef struct {
         std::int64_t lda, std::int64_t stride_a, const sycl::half* b, std::int64_t ldb,
         std::int64_t stride_b, float beta, float* c, std::int64_t ldc, std::int64_t stride_c,
         std::int64_t batch_size, const std::vector<sycl::event>& dependencies);
+    sycl::event (*column_major_gemm_bf16bf16f32_batch_strided_usm_sycl)(
+        sycl::queue& queue, oneapi::math::transpose transa, oneapi::math::transpose transb,
+        std::int64_t m, std::int64_t n, std::int64_t k, float alpha,
+        const oneapi::math::bfloat16* a, std::int64_t lda, std::int64_t stride_a,
+        const oneapi::math::bfloat16* b, std::int64_t ldb, std::int64_t stride_b, float beta,
+        float* c, std::int64_t ldc, std::int64_t stride_c, std::int64_t batch_size,
+        const std::vector<sycl::event>& dependencies);
+    sycl::event (*column_major_gemm_bf16bf16bf16_batch_strided_usm_sycl)(
+        sycl::queue& queue, oneapi::math::transpose transa, oneapi::math::transpose transb,
+        std::int64_t m, std::int64_t n, std::int64_t k, float alpha,
+        const oneapi::math::bfloat16* a, std::int64_t lda, std::int64_t stride_a,
+        const oneapi::math::bfloat16* b, std::int64_t ldb, std::int64_t stride_b, float beta,
+        oneapi::math::bfloat16* c, std::int64_t ldc, std::int64_t stride_c, std::int64_t batch_size,
+        const std::vector<sycl::event>& dependencies);
     sycl::event (*column_major_gemm_s8s8f32_batch_strided_usm_sycl)(
         sycl::queue& queue, oneapi::math::transpose transa, oneapi::math::transpose transb,
         std::int64_t m, std::int64_t n, std::int64_t k, float alpha, const std::int8_t* a,
@@ -3347,6 +3388,20 @@ typedef struct {
         std::int64_t m, std::int64_t n, std::int64_t k, float alpha, sycl::buffer<sycl::half, 1>& a,
         std::int64_t lda, std::int64_t stride_a, sycl::buffer<sycl::half, 1>& b, std::int64_t ldb,
         std::int64_t stride_b, float beta, sycl::buffer<float, 1>& c, std::int64_t ldc,
+        std::int64_t stride_c, std::int64_t batch_size);
+    void (*row_major_gemm_bf16bf16f32_batch_strided_sycl)(
+        sycl::queue& queue, oneapi::math::transpose transa, oneapi::math::transpose transb,
+        std::int64_t m, std::int64_t n, std::int64_t k, float alpha,
+        sycl::buffer<oneapi::math::bfloat16, 1>& a, std::int64_t lda, std::int64_t stride_a,
+        sycl::buffer<oneapi::math::bfloat16, 1>& b, std::int64_t ldb, std::int64_t stride_b,
+        float beta, sycl::buffer<float, 1>& c, std::int64_t ldc, std::int64_t stride_c,
+        std::int64_t batch_size);
+    void (*row_major_gemm_bf16bf16bf16_batch_strided_sycl)(
+        sycl::queue& queue, oneapi::math::transpose transa, oneapi::math::transpose transb,
+        std::int64_t m, std::int64_t n, std::int64_t k, float alpha,
+        sycl::buffer<oneapi::math::bfloat16, 1>& a, std::int64_t lda, std::int64_t stride_a,
+        sycl::buffer<oneapi::math::bfloat16, 1>& b, std::int64_t ldb, std::int64_t stride_b,
+        float beta, sycl::buffer<oneapi::math::bfloat16, 1>& c, std::int64_t ldc,
         std::int64_t stride_c, std::int64_t batch_size);
     void (*row_major_gemm_s8s8f32_batch_strided_sycl)(
         sycl::queue& queue, oneapi::math::transpose transa, oneapi::math::transpose transb,
@@ -4689,6 +4744,19 @@ typedef struct {
         std::int64_t* lda, const sycl::half** b, std::int64_t* ldb, float* beta, float** c,
         std::int64_t* ldc, std::int64_t group_count, std::int64_t* group_size,
         const std::vector<sycl::event>& dependencies);
+    sycl::event (*row_major_gemm_bf16bf16f32_batch_group_usm_sycl)(
+        sycl::queue& queue, oneapi::math::transpose* transa, oneapi::math::transpose* transb,
+        std::int64_t* m, std::int64_t* n, std::int64_t* k, float* alpha,
+        const oneapi::math::bfloat16** a, std::int64_t* lda, const oneapi::math::bfloat16** b,
+        std::int64_t* ldb, float* beta, float** c, std::int64_t* ldc, std::int64_t group_count,
+        std::int64_t* group_size, const std::vector<sycl::event>& dependencies);
+    sycl::event (*row_major_gemm_bf16bf16bf16_batch_group_usm_sycl)(
+        sycl::queue& queue, oneapi::math::transpose* transa, oneapi::math::transpose* transb,
+        std::int64_t* m, std::int64_t* n, std::int64_t* k, float* alpha,
+        const oneapi::math::bfloat16** a, std::int64_t* lda, const oneapi::math::bfloat16** b,
+        std::int64_t* ldb, float* beta, oneapi::math::bfloat16** c, std::int64_t* ldc,
+        std::int64_t group_count, std::int64_t* group_size,
+        const std::vector<sycl::event>& dependencies);
     sycl::event (*row_major_gemm_s8s8f32_batch_group_usm_sycl)(
         sycl::queue& queue, oneapi::math::transpose* transa, oneapi::math::transpose* transb,
         std::int64_t* m, std::int64_t* n, std::int64_t* k, float* alpha, const std::int8_t** a,
@@ -4740,6 +4808,20 @@ typedef struct {
         std::int64_t lda, std::int64_t stride_a, const sycl::half* b, std::int64_t ldb,
         std::int64_t stride_b, float beta, float* c, std::int64_t ldc, std::int64_t stride_c,
         std::int64_t batch_size, const std::vector<sycl::event>& dependencies);
+    sycl::event (*row_major_gemm_bf16bf16f32_batch_strided_usm_sycl)(
+        sycl::queue& queue, oneapi::math::transpose transa, oneapi::math::transpose transb,
+        std::int64_t m, std::int64_t n, std::int64_t k, float alpha,
+        const oneapi::math::bfloat16* a, std::int64_t lda, std::int64_t stride_a,
+        const oneapi::math::bfloat16* b, std::int64_t ldb, std::int64_t stride_b, float beta,
+        float* c, std::int64_t ldc, std::int64_t stride_c, std::int64_t batch_size,
+        const std::vector<sycl::event>& dependencies);
+    sycl::event (*row_major_gemm_bf16bf16bf16_batch_strided_usm_sycl)(
+        sycl::queue& queue, oneapi::math::transpose transa, oneapi::math::transpose transb,
+        std::int64_t m, std::int64_t n, std::int64_t k, float alpha,
+        const oneapi::math::bfloat16* a, std::int64_t lda, std::int64_t stride_a,
+        const oneapi::math::bfloat16* b, std::int64_t ldb, std::int64_t stride_b, float beta,
+        oneapi::math::bfloat16* c, std::int64_t ldc, std::int64_t stride_c, std::int64_t batch_size,
+        const std::vector<sycl::event>& dependencies);
     sycl::event (*row_major_gemm_s8s8f32_batch_strided_usm_sycl)(
         sycl::queue& queue, oneapi::math::transpose transa, oneapi::math::transpose transb,
         std::int64_t m, std::int64_t n, std::int64_t k, float alpha, const std::int8_t* a,
@@ -4994,7 +5076,6 @@ typedef struct {
         std::complex<double>* alpha, std::complex<double>** ab, std::int64_t* lda,
         std::int64_t* ldb, std::int64_t group_count, std::int64_t* groupsize,
         const std::vector<sycl::event>& dependencies);
-
 } blas_function_table_t;
 
 #endif //_BLAS_FUNCTION_TABLE_HPP_

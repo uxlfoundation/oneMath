@@ -461,6 +461,30 @@ void gemm_batch(sycl::queue& queue, transpose transa, transpose transb, int64_t 
 }
 
 void gemm_batch(sycl::queue& queue, transpose transa, transpose transb, int64_t m, int64_t n,
+                int64_t k, float alpha, sycl::buffer<bfloat16, 1>& a, int64_t lda, int64_t stride_a,
+                sycl::buffer<bfloat16, 1>& b, int64_t ldb, int64_t stride_b, float beta,
+                sycl::buffer<float, 1>& c, int64_t ldc, int64_t stride_c, int64_t batch_size) {
+#ifdef COLUMN_MAJOR
+    throw unimplemented("blas", "gemm_batch", "for column_major layout");
+#endif
+#ifdef ROW_MAJOR
+    throw unimplemented("blas", "gemm_batch", "for row_major layout");
+#endif
+}
+
+void gemm_batch(sycl::queue& queue, transpose transa, transpose transb, int64_t m, int64_t n,
+                int64_t k, float alpha, sycl::buffer<bfloat16, 1>& a, int64_t lda, int64_t stride_a,
+                sycl::buffer<bfloat16, 1>& b, int64_t ldb, int64_t stride_b, float beta,
+                sycl::buffer<bfloat16, 1>& c, int64_t ldc, int64_t stride_c, int64_t batch_size) {
+#ifdef COLUMN_MAJOR
+    throw unimplemented("blas", "gemm_batch", "for column_major layout");
+#endif
+#ifdef ROW_MAJOR
+    throw unimplemented("blas", "gemm_batch", "for row_major layout");
+#endif
+}
+
+void gemm_batch(sycl::queue& queue, transpose transa, transpose transb, int64_t m, int64_t n,
                 int64_t k, float alpha, sycl::buffer<int8_t, 1>& a, int64_t lda, int64_t stride_a,
                 sycl::buffer<int8_t, 1>& b, int64_t ldb, int64_t stride_b, float beta,
                 sycl::buffer<float, 1>& c, int64_t ldc, int64_t stride_c, int64_t batch_size) {
@@ -1374,6 +1398,32 @@ sycl::event gemm_batch(sycl::queue& queue, transpose* transa, transpose* transb,
 }
 
 sycl::event gemm_batch(sycl::queue& queue, transpose* transa, transpose* transb, int64_t* m,
+                       int64_t* n, int64_t* k, float* alpha, const bfloat16** a, int64_t* lda,
+                       const bfloat16** b, int64_t* ldb, float* beta, float** c, int64_t* ldc,
+                       int64_t group_count, int64_t* group_size,
+                       const std::vector<sycl::event>& dependencies) {
+#ifdef COLUMN_MAJOR
+    throw unimplemented("blas", "gemm_batch", "for column_major layout");
+#endif
+#ifdef ROW_MAJOR
+    throw unimplemented("blas", "gemm_batch", "for row_major layout");
+#endif
+}
+
+sycl::event gemm_batch(sycl::queue& queue, transpose* transa, transpose* transb, int64_t* m,
+                       int64_t* n, int64_t* k, float* alpha, const bfloat16** a, int64_t* lda,
+                       const bfloat16** b, int64_t* ldb, float* beta, bfloat16** c, int64_t* ldc,
+                       int64_t group_count, int64_t* group_size,
+                       const std::vector<sycl::event>& dependencies) {
+#ifdef COLUMN_MAJOR
+    throw unimplemented("blas", "gemm_batch", "for column_major layout");
+#endif
+#ifdef ROW_MAJOR
+    throw unimplemented("blas", "gemm_batch", "for row_major layout");
+#endif
+}
+
+sycl::event gemm_batch(sycl::queue& queue, transpose* transa, transpose* transb, int64_t* m,
                        int64_t* n, int64_t* k, float* alpha, const int8_t** a, int64_t* lda,
                        const int8_t** b, int64_t* ldb, float* beta, float** c, int64_t* ldc,
                        int64_t group_count, int64_t* group_size,
@@ -1626,6 +1676,32 @@ sycl::event gemm_batch(sycl::queue& queue, transpose transa, transpose transb, i
         });
     });
     return done;
+}
+
+sycl::event gemm_batch(sycl::queue& queue, transpose transa, transpose transb, int64_t m, int64_t n,
+                       int64_t k, float alpha, const bfloat16* a, int64_t lda, int64_t stride_a,
+                       const bfloat16* b, int64_t ldb, int64_t stride_b, float beta, float* c,
+                       int64_t ldc, int64_t stride_c, int64_t batch_size,
+                       const std::vector<sycl::event>& dependencies) {
+#ifdef COLUMN_MAJOR
+    throw unimplemented("blas", "gemm_batch", "for column_major layout");
+#endif
+#ifdef ROW_MAJOR
+    throw unimplemented("blas", "gemm_batch", "for row_major layout");
+#endif
+}
+
+sycl::event gemm_batch(sycl::queue& queue, transpose transa, transpose transb, int64_t m, int64_t n,
+                       int64_t k, float alpha, const bfloat16* a, int64_t lda, int64_t stride_a,
+                       const bfloat16* b, int64_t ldb, int64_t stride_b, float beta, bfloat16* c,
+                       int64_t ldc, int64_t stride_c, int64_t batch_size,
+                       const std::vector<sycl::event>& dependencies) {
+#ifdef COLUMN_MAJOR
+    throw unimplemented("blas", "gemm_batch", "for column_major layout");
+#endif
+#ifdef ROW_MAJOR
+    throw unimplemented("blas", "gemm_batch", "for row_major layout");
+#endif
 }
 
 sycl::event gemm_batch(sycl::queue& queue, transpose transa, transpose transb, int64_t m, int64_t n,

@@ -23,6 +23,8 @@
 #include <algorithm>
 
 #include <complex>
+#include <iostream>
+#include <limits>
 #include <stdexcept>
 #include <type_traits>
 
@@ -41,7 +43,33 @@ static sycl::half abs(sycl::half v) {
     else
         return v;
 }
+static sycl::ext::oneapi::bfloat16 abs(sycl::ext::oneapi::bfloat16 v) {
+    float f = static_cast<float>(v);
+    return sycl::ext::oneapi::bfloat16(f < 0.0f ? -f : f);
+}
 } // namespace std
+
+// Without SYCL_IMPLEMENTATION_INTEL, oneapi::math::bfloat16 is the library type rather
+// than sycl::ext::oneapi::bfloat16, so the tests supply the pieces that type lacks.
+#ifndef SYCL_IMPLEMENTATION_INTEL
+namespace oneapi {
+namespace math {
+inline std::ostream& operator<<(std::ostream& os, const bfloat16& value) {
+    return os << static_cast<float>(value);
+}
+} // namespace math
+} // namespace oneapi
+
+namespace std {
+template <>
+struct numeric_limits<oneapi::math::bfloat16> {
+    static constexpr bool is_specialized = true;
+    static oneapi::math::bfloat16 epsilon() {
+        return oneapi::math::bfloat16(0x1p-7f);
+    }
+};
+} // namespace std
+#endif
 
 // Complex helpers.
 template <typename T>
@@ -151,6 +179,11 @@ uint8_t rand_scalar() {
 template <>
 sycl::half rand_scalar() {
     return sycl::half(std::rand() % 32000) / sycl::half(32000) - sycl::half(0.5);
+}
+
+template <>
+oneapi::math::bfloat16 rand_scalar() {
+    return oneapi::math::bfloat16(float(std::rand() % 32000) / 32000.0f - 0.5f);
 }
 
 template <typename fp>
