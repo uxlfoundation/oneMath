@@ -464,154 +464,24 @@ void gemm_batch(sycl::queue& queue, transpose transa, transpose transb, int64_t 
                 int64_t k, float alpha, sycl::buffer<bfloat16, 1>& a, int64_t lda, int64_t stride_a,
                 sycl::buffer<bfloat16, 1>& b, int64_t ldb, int64_t stride_b, float beta,
                 sycl::buffer<float, 1>& c, int64_t ldc, int64_t stride_c, int64_t batch_size) {
-    queue.submit([&](sycl::handler& cgh) {
-#ifndef __ADAPTIVECPP__ // AdaptiveCpp reports aspect as not supported even if it works
-        if (!verify_support<bfloat16, bfloat16>(queue, sycl::aspect::fp16)) {
-            throw oneapi::math::unimplemented(
-                "blas", "bfloat16", "half is not supported by the device or the sycl compiler");
-        }
-#endif
-        auto a_acc = a.template get_access<sycl::access::mode::read>(cgh);
-        auto b_acc = b.template get_access<sycl::access::mode::read>(cgh);
-        auto c_acc = c.template get_access<sycl::access::mode::read_write>(cgh);
-        CBLAS_TRANSPOSE transa_ = cblas_convert(transa);
-        CBLAS_TRANSPOSE transb_ = cblas_convert(transb);
-        armpl_int_t one = 1;
-        host_task<class armpl_kernel_hgemm_batch_strided>(cgh, [=]() {
-            int64_t totalsize_a, totalsize_b, totalsize_c;
-            int64_t size_a, size_b, size_c;
 #ifdef COLUMN_MAJOR
-            size_a = (transa == transpose::N) ? lda * k : lda * m;
-            size_b = (transb == transpose::N) ? ldb * n : ldb * k;
-            size_c = ldc * n;
+    throw unimplemented("blas", "gemm_batch", "for column_major layout");
 #endif
 #ifdef ROW_MAJOR
-            size_a = (transa == transpose::N) ? lda * m : lda * k;
-            size_b = (transb == transpose::N) ? ldb * k : ldb * n;
-            size_c = ldc * m;
+    throw unimplemented("blas", "gemm_batch", "for row_major layout");
 #endif
-            totalsize_a = (batch_size - 1) * stride_a + size_a;
-            totalsize_b = (batch_size - 1) * stride_b + size_b;
-            totalsize_c = (batch_size - 1) * stride_c + size_c;
-
-            float* f32_a = new float[totalsize_a]();
-            float* f32_b = new float[totalsize_b]();
-            if (!f32_a || !f32_b) {
-                std::cerr << "Error cannot allocate input arrays\n";
-                delete[] f32_a;
-                delete[] f32_b;
-                return;
-            }
-            float** a_array = new float*[batch_size]();
-            float** b_array = new float*[batch_size]();
-            float** c_array = new float*[batch_size]();
-            if (!a_array || !b_array) {
-                std::cerr << "Error cannot allocate input arrays\n";
-                delete[] a_array;
-                delete[] b_array;
-                delete[] c_array;
-                return;
-            }
-            // copy A, B to float
-            copy_mat(a_acc, CblasColMajor, transpose::N, totalsize_a, 1, totalsize_a, 0.0f, f32_a);
-            copy_mat(b_acc, CblasColMajor, transpose::N, totalsize_b, 1, totalsize_b, 0.0f, f32_b);
-            float alphaf = (float)alpha;
-            float betaf = (float)beta;
-            for (size_t i = 0; i < batch_size; ++i) {
-                a_array[i] = f32_a + i * stride_a;
-                b_array[i] = f32_b + i * stride_b;
-                c_array[i] = c_acc.GET_MULTI_PTR + i * stride_c;
-            }
-            ::cblas_sgemm_batch(
-                MAJOR, &transa_, &transb_, (const armpl_int_t*)&m, (const armpl_int_t*)&n,
-                (const armpl_int_t*)&k, &alphaf, (const float**)a_array, (const armpl_int_t*)&lda,
-                (const float**)b_array, (const armpl_int_t*)&ldb, &betaf, (float**)c_array,
-                (const armpl_int_t*)&ldc, one, (const armpl_int_t*)&batch_size);
-            // copy C back to half
-            delete[] a_array;
-            delete[] b_array;
-            delete[] c_array;
-            delete[] f32_a;
-            delete[] f32_b;
-        });
-    });
 }
 
 void gemm_batch(sycl::queue& queue, transpose transa, transpose transb, int64_t m, int64_t n,
                 int64_t k, float alpha, sycl::buffer<bfloat16, 1>& a, int64_t lda, int64_t stride_a,
                 sycl::buffer<bfloat16, 1>& b, int64_t ldb, int64_t stride_b, float beta,
                 sycl::buffer<bfloat16, 1>& c, int64_t ldc, int64_t stride_c, int64_t batch_size) {
-    queue.submit([&](sycl::handler& cgh) {
-#ifndef __ADAPTIVECPP__ // AdaptiveCpp reports aspect as not supported even if it works
-        if (!verify_support<bfloat16, bfloat16>(queue, sycl::aspect::fp16)) {
-            throw oneapi::math::unimplemented(
-                "blas", "bfloat16", "half is not supported by the device or the sycl compiler");
-        }
-#endif
-        auto a_acc = a.template get_access<sycl::access::mode::read>(cgh);
-        auto b_acc = b.template get_access<sycl::access::mode::read>(cgh);
-        auto c_acc = c.template get_access<sycl::access::mode::read_write>(cgh);
-        CBLAS_TRANSPOSE transa_ = cblas_convert(transa);
-        CBLAS_TRANSPOSE transb_ = cblas_convert(transb);
-        armpl_int_t one = 1;
-        host_task<class armpl_kernel_hgemm_batch_strided>(cgh, [=]() {
-            int64_t totalsize_a, totalsize_b, totalsize_c;
-            int64_t size_a, size_b, size_c;
 #ifdef COLUMN_MAJOR
-            size_a = (transa == transpose::N) ? lda * k : lda * m;
-            size_b = (transb == transpose::N) ? ldb * n : ldb * k;
-            size_c = ldc * n;
+    throw unimplemented("blas", "gemm_batch", "for column_major layout");
 #endif
 #ifdef ROW_MAJOR
-            size_a = (transa == transpose::N) ? lda * m : lda * k;
-            size_b = (transb == transpose::N) ? ldb * k : ldb * n;
-            size_c = ldc * m;
+    throw unimplemented("blas", "gemm_batch", "for row_major layout");
 #endif
-            totalsize_a = (batch_size - 1) * stride_a + size_a;
-            totalsize_b = (batch_size - 1) * stride_b + size_b;
-            totalsize_c = (batch_size - 1) * stride_c + size_c;
-
-            float* f32_a = new float[totalsize_a]();
-            float* f32_b = new float[totalsize_b]();
-            if (!f32_a || !f32_b) {
-                std::cerr << "Error cannot allocate input arrays\n";
-                delete[] f32_a;
-                delete[] f32_b;
-                return;
-            }
-            float** a_array = new float*[batch_size]();
-            float** b_array = new float*[batch_size]();
-            bfloat16** c_array = new float*[batch_size]();
-            if (!a_array || !b_array) {
-                std::cerr << "Error cannot allocate input arrays\n";
-                delete[] a_array;
-                delete[] b_array;
-                delete[] c_array;
-                return;
-            }
-            // copy A, B to float
-            copy_mat(a_acc, CblasColMajor, transpose::N, totalsize_a, 1, totalsize_a, 0.0f, f32_a);
-            copy_mat(b_acc, CblasColMajor, transpose::N, totalsize_b, 1, totalsize_b, 0.0f, f32_b);
-            float alphaf = (float)alpha;
-            float betaf = (float)beta;
-            for (size_t i = 0; i < batch_size; ++i) {
-                a_array[i] = f32_a + i * stride_a;
-                b_array[i] = f32_b + i * stride_b;
-                c_array[i] = c_acc.GET_MULTI_PTR + i * stride_c;
-            }
-            ::cblas_sgemm_batch(
-                MAJOR, &transa_, &transb_, (const armpl_int_t*)&m, (const armpl_int_t*)&n,
-                (const armpl_int_t*)&k, &alphaf, (const float**)a_array, (const armpl_int_t*)&lda,
-                (const float**)b_array, (const armpl_int_t*)&ldb, &betaf, (float**)c_array,
-                (const armpl_int_t*)&ldc, one, (const armpl_int_t*)&batch_size);
-            // copy C back to half
-            delete[] a_array;
-            delete[] b_array;
-            delete[] c_array;
-            delete[] f32_a;
-            delete[] f32_b;
-        });
-    });
 }
 
 void gemm_batch(sycl::queue& queue, transpose transa, transpose transb, int64_t m, int64_t n,
@@ -1532,84 +1402,12 @@ sycl::event gemm_batch(sycl::queue& queue, transpose* transa, transpose* transb,
                        const bfloat16** b, int64_t* ldb, float* beta, float** c, int64_t* ldc,
                        int64_t group_count, int64_t* group_size,
                        const std::vector<sycl::event>& dependencies) {
-    auto done = queue.submit([&](sycl::handler& cgh) {
-#ifndef __ADAPTIVECPP__ // AdaptiveCpp reports aspect as not supported even if it works
-        if (!verify_support<bfloat16, bfloat16>(queue, sycl::aspect::fp16)) {
-            throw oneapi::math::unimplemented(
-                "blas", "bfloat16", "half is not supported by the device or the sycl compiler");
-        }
-#endif
-        int64_t num_events = dependencies.size();
-        for (size_t i = 0; i < num_events; ++i) {
-            cgh.depends_on(dependencies[i]);
-        }
-        host_task<class armpl_kernel_hgemm_batch_group_usm>(cgh, [=]() {
-            CBLAS_TRANSPOSE* transa_ = new CBLAS_TRANSPOSE[group_count]();
-            CBLAS_TRANSPOSE* transb_ = new CBLAS_TRANSPOSE[group_count]();
-            float* alphaf = new float[group_count]();
-            float* betaf = new float[group_count]();
-            if (!transa_ || !transb_ || !alphaf || !betaf) {
-                std::cerr << "Error cannot allocate input arrays\n";
-                delete[] transa_;
-                delete[] transb_;
-                delete[] alphaf;
-                delete[] betaf;
-                return;
-            }
-            int64_t totalbatch_size = 0;
-            for (size_t i = 0; i < group_count; ++i) {
-                transa_[i] = cblas_convert(transa[i]);
-                transb_[i] = cblas_convert(transb[i]);
-                alphaf[i] = (float)alpha[i];
-                betaf[i] = (float)beta[i];
-                totalbatch_size += group_size[i];
-            }
-            float** a_array = new float*[totalbatch_size]();
-            float** b_array = new float*[totalbatch_size]();
-            if (!a_array || !b_array) {
-                std::cerr << "Error cannot allocate input arrays\n";
-                delete[] a_array;
-                delete[] b_array;
-                return;
-            }
-            int64_t size_a, size_b, idx;
-            bfloat16 co = 0.0f;
-            for (size_t i = 0, idx = 0; i < group_count; ++i) {
 #ifdef COLUMN_MAJOR
-                size_a = (transa[i] == transpose::N) ? lda[i] * k[i] : lda[i] * m[i];
-                size_b = (transb[i] == transpose::N) ? ldb[i] * n[i] : ldb[i] * k[i];
+    throw unimplemented("blas", "gemm_batch", "for column_major layout");
 #endif
 #ifdef ROW_MAJOR
-                size_a = (transa[i] == transpose::N) ? lda[i] * m[i] : lda[i] * k[i];
-                size_b = (transb[i] == transpose::N) ? ldb[i] * k[i] : ldb[i] * n[i];
+    throw unimplemented("blas", "gemm_batch", "for row_major layout");
 #endif
-                for (size_t j = 0; j < group_size[i]; ++j, ++idx) {
-                    a_array[idx] = new float[size_a]();
-                    b_array[idx] = new float[size_b]();
-                    copy_mat(a[idx], MAJOR, transa[i], m[i], k[i], lda[i], 0.0f, a_array[idx]);
-                    copy_mat(b[idx], MAJOR, transb[i], k[i], n[i], ldb[i], 0.0f, b_array[idx]);
-                }
-            }
-            ::cblas_sgemm_batch(
-                MAJOR, transa_, transb_, (const armpl_int_t*)m, (const armpl_int_t*)n,
-                (const armpl_int_t*)k, alphaf, (const float**)a_array, (const armpl_int_t*)lda,
-                (const float**)b_array, (const armpl_int_t*)ldb, betaf, (float**)c,
-                (const armpl_int_t*)ldc, group_count, (const armpl_int_t*)group_size);
-            for (size_t i = 0, idx = 0; i < group_count; ++i) {
-                for (size_t j = 0; j < group_size[i]; ++j, ++idx) {
-                    delete[] a_array[idx];
-                    delete[] b_array[idx];
-                }
-            }
-            delete[] alphaf;
-            delete[] betaf;
-            delete[] a_array;
-            delete[] b_array;
-            delete[] transa_;
-            delete[] transb_;
-        });
-    });
-    return done;
 }
 
 sycl::event gemm_batch(sycl::queue& queue, transpose* transa, transpose* transb, int64_t* m,
@@ -1617,84 +1415,12 @@ sycl::event gemm_batch(sycl::queue& queue, transpose* transa, transpose* transb,
                        const bfloat16** b, int64_t* ldb, float* beta, bfloat16** c, int64_t* ldc,
                        int64_t group_count, int64_t* group_size,
                        const std::vector<sycl::event>& dependencies) {
-    auto done = queue.submit([&](sycl::handler& cgh) {
-#ifndef __ADAPTIVECPP__ // AdaptiveCpp reports aspect as not supported even if it works
-        if (!verify_support<bfloat16, bfloat16>(queue, sycl::aspect::fp16)) {
-            throw oneapi::math::unimplemented(
-                "blas", "bfloat16", "half is not supported by the device or the sycl compiler");
-        }
-#endif
-        int64_t num_events = dependencies.size();
-        for (size_t i = 0; i < num_events; ++i) {
-            cgh.depends_on(dependencies[i]);
-        }
-        host_task<class armpl_kernel_hgemm_batch_group_usm>(cgh, [=]() {
-            CBLAS_TRANSPOSE* transa_ = new CBLAS_TRANSPOSE[group_count]();
-            CBLAS_TRANSPOSE* transb_ = new CBLAS_TRANSPOSE[group_count]();
-            float* alphaf = new float[group_count]();
-            float* betaf = new float[group_count]();
-            if (!transa_ || !transb_ || !alphaf || !betaf) {
-                std::cerr << "Error cannot allocate input arrays\n";
-                delete[] transa_;
-                delete[] transb_;
-                delete[] alphaf;
-                delete[] betaf;
-                return;
-            }
-            int64_t totalbatch_size = 0;
-            for (size_t i = 0; i < group_count; ++i) {
-                transa_[i] = cblas_convert(transa[i]);
-                transb_[i] = cblas_convert(transb[i]);
-                alphaf[i] = (float)alpha[i];
-                betaf[i] = (float)beta[i];
-                totalbatch_size += group_size[i];
-            }
-            float** a_array = new float*[totalbatch_size]();
-            float** b_array = new float*[totalbatch_size]();
-            if (!a_array || !b_array) {
-                std::cerr << "Error cannot allocate input arrays\n";
-                delete[] a_array;
-                delete[] b_array;
-                return;
-            }
-            int64_t size_a, size_b, idx;
-            bfloat16 co = 0.0f;
-            for (size_t i = 0, idx = 0; i < group_count; ++i) {
 #ifdef COLUMN_MAJOR
-                size_a = (transa[i] == transpose::N) ? lda[i] * k[i] : lda[i] * m[i];
-                size_b = (transb[i] == transpose::N) ? ldb[i] * n[i] : ldb[i] * k[i];
+    throw unimplemented("blas", "gemm_batch", "for column_major layout");
 #endif
 #ifdef ROW_MAJOR
-                size_a = (transa[i] == transpose::N) ? lda[i] * m[i] : lda[i] * k[i];
-                size_b = (transb[i] == transpose::N) ? ldb[i] * k[i] : ldb[i] * n[i];
+    throw unimplemented("blas", "gemm_batch", "for row_major layout");
 #endif
-                for (size_t j = 0; j < group_size[i]; ++j, ++idx) {
-                    a_array[idx] = new float[size_a]();
-                    b_array[idx] = new float[size_b]();
-                    copy_mat(a[idx], MAJOR, transa[i], m[i], k[i], lda[i], 0.0f, a_array[idx]);
-                    copy_mat(b[idx], MAJOR, transb[i], k[i], n[i], ldb[i], 0.0f, b_array[idx]);
-                }
-            }
-            ::cblas_sgemm_batch(
-                MAJOR, transa_, transb_, (const armpl_int_t*)m, (const armpl_int_t*)n,
-                (const armpl_int_t*)k, alphaf, (const float**)a_array, (const armpl_int_t*)lda,
-                (const float**)b_array, (const armpl_int_t*)ldb, betaf, (float**)c,
-                (const armpl_int_t*)ldc, group_count, (const armpl_int_t*)group_size);
-            for (size_t i = 0, idx = 0; i < group_count; ++i) {
-                for (size_t j = 0; j < group_size[i]; ++j, ++idx) {
-                    delete[] a_array[idx];
-                    delete[] b_array[idx];
-                }
-            }
-            delete[] alphaf;
-            delete[] betaf;
-            delete[] a_array;
-            delete[] b_array;
-            delete[] transa_;
-            delete[] transb_;
-        });
-    });
-    return done;
 }
 
 sycl::event gemm_batch(sycl::queue& queue, transpose* transa, transpose* transb, int64_t* m,
@@ -1957,77 +1683,12 @@ sycl::event gemm_batch(sycl::queue& queue, transpose transa, transpose transb, i
                        const bfloat16* b, int64_t ldb, int64_t stride_b, float beta, float* c,
                        int64_t ldc, int64_t stride_c, int64_t batch_size,
                        const std::vector<sycl::event>& dependencies) {
-    auto done = queue.submit([&](sycl::handler& cgh) {
-#ifndef __ADAPTIVECPP__ // AdaptiveCpp reports aspect as not supported even if it works
-        if (!verify_support<bfloat16, bfloat16>(queue, sycl::aspect::fp16)) {
-            throw oneapi::math::unimplemented(
-                "blas", "bfloat16", "half is not supported by the device or the sycl compiler");
-        }
-#endif
-        int64_t num_events = dependencies.size();
-        for (size_t i = 0; i < num_events; ++i) {
-            cgh.depends_on(dependencies[i]);
-        }
-        CBLAS_TRANSPOSE transa_ = cblas_convert(transa);
-        CBLAS_TRANSPOSE transb_ = cblas_convert(transb);
-        armpl_int_t one = 1;
-        host_task<class armpl_kernel_hgemm_batch_strided_usm>(cgh, [=]() {
-            int64_t totalsize_a, totalsize_b;
-            int64_t size_a, size_b;
 #ifdef COLUMN_MAJOR
-            size_a = (transa == transpose::N) ? lda * k : lda * m;
-            size_b = (transb == transpose::N) ? ldb * n : ldb * k;
+    throw unimplemented("blas", "gemm_batch", "for column_major layout");
 #endif
 #ifdef ROW_MAJOR
-            size_a = (transa == transpose::N) ? lda * m : lda * k;
-            size_b = (transb == transpose::N) ? ldb * k : ldb * n;
+    throw unimplemented("blas", "gemm_batch", "for row_major layout");
 #endif
-            totalsize_a = (batch_size - 1) * stride_a + size_a;
-            totalsize_b = (batch_size - 1) * stride_b + size_b;
-
-            // copy A and B to float
-            float* f32_a = new float[totalsize_a]();
-            float* f32_b = new float[totalsize_b]();
-            if (!f32_a || !f32_b) {
-                std::cerr << "Error cannot allocate input arrays\n";
-                delete[] f32_a;
-                delete[] f32_b;
-                return;
-            }
-            copy_mat(a, CblasColMajor, transpose::N, totalsize_a, 1, totalsize_a, 0.0f, f32_a);
-            copy_mat(b, CblasColMajor, transpose::N, totalsize_b, 1, totalsize_b, 0.0f, f32_b);
-
-            float alphaf = (float)alpha;
-            float betaf = (float)beta;
-            float** a_array = new float*[batch_size]();
-            float** b_array = new float*[batch_size]();
-            float** c_array = new float*[batch_size]();
-            if (!a_array || !b_array || !c_array) {
-                std::cerr << "Error cannot allocate input arrays\n";
-                delete[] a_array;
-                delete[] b_array;
-                delete[] c_array;
-                return;
-            }
-            for (size_t i = 0; i < batch_size; ++i) {
-                a_array[i] = (float*)f32_a + i * stride_a;
-                b_array[i] = (float*)f32_b + i * stride_b;
-                c_array[i] = c + i * stride_c;
-            }
-            ::cblas_sgemm_batch(
-                MAJOR, &transa_, &transb_, (const armpl_int_t*)&m, (const armpl_int_t*)&n,
-                (const armpl_int_t*)&k, &alphaf, (const float**)a_array, (const armpl_int_t*)&lda,
-                (const float**)b_array, (const armpl_int_t*)&ldb, &betaf, (float**)c_array,
-                (const armpl_int_t*)&ldc, one, (const armpl_int_t*)&batch_size);
-
-            delete[] a_array;
-            delete[] b_array;
-            delete[] c_array;
-            delete[] f32_a;
-            delete[] f32_b;
-        });
-    });
-    return done;
 }
 
 sycl::event gemm_batch(sycl::queue& queue, transpose transa, transpose transb, int64_t m, int64_t n,
@@ -2035,77 +1696,12 @@ sycl::event gemm_batch(sycl::queue& queue, transpose transa, transpose transb, i
                        const bfloat16* b, int64_t ldb, int64_t stride_b, float beta, bfloat16* c,
                        int64_t ldc, int64_t stride_c, int64_t batch_size,
                        const std::vector<sycl::event>& dependencies) {
-    auto done = queue.submit([&](sycl::handler& cgh) {
-#ifndef __ADAPTIVECPP__ // AdaptiveCpp reports aspect as not supported even if it works
-        if (!verify_support<bfloat16, bfloat16>(queue, sycl::aspect::fp16)) {
-            throw oneapi::math::unimplemented(
-                "blas", "bfloat16", "half is not supported by the device or the sycl compiler");
-        }
-#endif
-        int64_t num_events = dependencies.size();
-        for (size_t i = 0; i < num_events; ++i) {
-            cgh.depends_on(dependencies[i]);
-        }
-        CBLAS_TRANSPOSE transa_ = cblas_convert(transa);
-        CBLAS_TRANSPOSE transb_ = cblas_convert(transb);
-        armpl_int_t one = 1;
-        host_task<class armpl_kernel_hgemm_batch_strided_usm>(cgh, [=]() {
-            int64_t totalsize_a, totalsize_b;
-            int64_t size_a, size_b;
 #ifdef COLUMN_MAJOR
-            size_a = (transa == transpose::N) ? lda * k : lda * m;
-            size_b = (transb == transpose::N) ? ldb * n : ldb * k;
+    throw unimplemented("blas", "gemm_batch", "for column_major layout");
 #endif
 #ifdef ROW_MAJOR
-            size_a = (transa == transpose::N) ? lda * m : lda * k;
-            size_b = (transb == transpose::N) ? ldb * k : ldb * n;
+    throw unimplemented("blas", "gemm_batch", "for row_major layout");
 #endif
-            totalsize_a = (batch_size - 1) * stride_a + size_a;
-            totalsize_b = (batch_size - 1) * stride_b + size_b;
-
-            // copy A and B to float
-            float* f32_a = new float[totalsize_a]();
-            float* f32_b = new float[totalsize_b]();
-            if (!f32_a || !f32_b) {
-                std::cerr << "Error cannot allocate input arrays\n";
-                delete[] f32_a;
-                delete[] f32_b;
-                return;
-            }
-            copy_mat(a, CblasColMajor, transpose::N, totalsize_a, 1, totalsize_a, 0.0f, f32_a);
-            copy_mat(b, CblasColMajor, transpose::N, totalsize_b, 1, totalsize_b, 0.0f, f32_b);
-
-            float alphaf = (float)alpha;
-            float betaf = (float)beta;
-            float** a_array = new float*[batch_size]();
-            float** b_array = new float*[batch_size]();
-            bfloat16** c_array = new float*[batch_size]();
-            if (!a_array || !b_array || !c_array) {
-                std::cerr << "Error cannot allocate input arrays\n";
-                delete[] a_array;
-                delete[] b_array;
-                delete[] c_array;
-                return;
-            }
-            for (size_t i = 0; i < batch_size; ++i) {
-                a_array[i] = (float*)f32_a + i * stride_a;
-                b_array[i] = (float*)f32_b + i * stride_b;
-                c_array[i] = c + i * stride_c;
-            }
-            ::cblas_sgemm_batch(
-                MAJOR, &transa_, &transb_, (const armpl_int_t*)&m, (const armpl_int_t*)&n,
-                (const armpl_int_t*)&k, &alphaf, (const float**)a_array, (const armpl_int_t*)&lda,
-                (const float**)b_array, (const armpl_int_t*)&ldb, &betaf, (float**)c_array,
-                (const armpl_int_t*)&ldc, one, (const armpl_int_t*)&batch_size);
-
-            delete[] a_array;
-            delete[] b_array;
-            delete[] c_array;
-            delete[] f32_a;
-            delete[] f32_b;
-        });
-    });
-    return done;
 }
 
 sycl::event gemm_batch(sycl::queue& queue, transpose transa, transpose transb, int64_t m, int64_t n,
