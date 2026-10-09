@@ -76,27 +76,39 @@ GEBRD_LAUNCHER(std::complex<double>, double, rocsolver_zgebrd)
 
 #undef GEBRD_LAUNCHER
 
-void gerqf(sycl::queue& queue, std::int64_t m, std::int64_t n, sycl::buffer<float>& a,
-           std::int64_t lda, sycl::buffer<float>& tau, sycl::buffer<float>& scratchpad,
-           std::int64_t scratchpad_size) {
-    throw unimplemented("lapack", "gerqf");
+template <typename Func, typename T>
+inline void gerqf(const char* func_name, Func func, sycl::queue& queue, std::int64_t m,
+                  std::int64_t n, sycl::buffer<T>& a, std::int64_t lda, sycl::buffer<T>& tau,
+                  sycl::buffer<T>& scratchpad, std::int64_t scratchpad_size) {
+    using rocmDataType = typename RocmEquivalentType<T>::Type;
+    overflow_check(m, n, lda, scratchpad_size);
+    queue.submit([&](sycl::handler& cgh) {
+        auto a_acc = a.template get_access<sycl::access::mode::read_write>(cgh);
+        auto tau_acc = tau.template get_access<sycl::access::mode::write>(cgh);
+        onemath_rocsolver_host_task(cgh, queue, [=](RocsolverScopedContextHandler& sc) {
+            auto handle = sc.get_handle(queue);
+            auto a_ = sc.get_mem<rocmDataType*>(a_acc);
+            auto tau_ = sc.get_mem<rocmDataType*>(tau_acc);
+            rocblas_status err;
+            rocsolver_native_named_func(func_name, func, err, handle, m, n, a_, lda, tau_);
+        });
+    });
 }
-void gerqf(sycl::queue& queue, std::int64_t m, std::int64_t n, sycl::buffer<double>& a,
-           std::int64_t lda, sycl::buffer<double>& tau, sycl::buffer<double>& scratchpad,
-           std::int64_t scratchpad_size) {
-    throw unimplemented("lapack", "gerqf");
-}
-void gerqf(sycl::queue& queue, std::int64_t m, std::int64_t n, sycl::buffer<std::complex<float>>& a,
-           std::int64_t lda, sycl::buffer<std::complex<float>>& tau,
-           sycl::buffer<std::complex<float>>& scratchpad, std::int64_t scratchpad_size) {
-    throw unimplemented("lapack", "gerqf");
-}
-void gerqf(sycl::queue& queue, std::int64_t m, std::int64_t n,
-           sycl::buffer<std::complex<double>>& a, std::int64_t lda,
-           sycl::buffer<std::complex<double>>& tau, sycl::buffer<std::complex<double>>& scratchpad,
-           std::int64_t scratchpad_size) {
-    throw unimplemented("lapack", "gerqf");
-}
+
+#define GERQF_LAUNCHER(TYPE, ROCSOLVER_ROUTINE)                                            \
+    void gerqf(sycl::queue& queue, std::int64_t m, std::int64_t n, sycl::buffer<TYPE>& a,  \
+               std::int64_t lda, sycl::buffer<TYPE>& tau, sycl::buffer<TYPE>& scratchpad,  \
+               std::int64_t scratchpad_size) {                                             \
+        gerqf(#ROCSOLVER_ROUTINE, ROCSOLVER_ROUTINE, queue, m, n, a, lda, tau, scratchpad, \
+              scratchpad_size);                                                            \
+    }
+
+GERQF_LAUNCHER(float, rocsolver_sgerqf)
+GERQF_LAUNCHER(double, rocsolver_dgerqf)
+GERQF_LAUNCHER(std::complex<float>, rocsolver_cgerqf)
+GERQF_LAUNCHER(std::complex<double>, rocsolver_zgerqf)
+
+#undef GERQF_LAUNCHER
 
 template <typename Func, typename T>
 inline void geqrf(const char* func_name, Func func, sycl::queue& queue, std::int64_t m,
@@ -188,26 +200,56 @@ GETRF_LAUNCHER(std::complex<double>, rocsolver_zgetrf)
 
 #undef GETRF_LAUNCHER
 
-void getri(sycl::queue& queue, std::int64_t n, sycl::buffer<std::complex<float>>& a,
-           std::int64_t lda, sycl::buffer<std::int64_t>& ipiv,
-           sycl::buffer<std::complex<float>>& scratchpad, std::int64_t scratchpad_size) {
-    throw unimplemented("lapack", "getri");
+template <typename Func, typename T>
+inline void getri(const char* func_name, Func func, sycl::queue& queue, std::int64_t n,
+                  sycl::buffer<T>& a, std::int64_t lda, sycl::buffer<std::int64_t>& ipiv,
+                  sycl::buffer<T>& scratchpad, std::int64_t scratchpad_size) {
+    using rocmDataType = typename RocmEquivalentType<T>::Type;
+    overflow_check(n, lda, scratchpad_size);
+
+    // rocSOLVER does not expose a 64-bit getri API, so convert pivots to 32-bit.
+    std::uint64_t ipiv_size = ipiv.size();
+    sycl::buffer<int, 1> ipiv32(sycl::range<1>{ ipiv_size });
+    sycl::buffer<int> devInfo{ 1 };
+
+    queue.submit([&](sycl::handler& cgh) {
+        auto ipiv32_acc = ipiv32.template get_access<sycl::access::mode::write>(cgh);
+        auto ipiv_acc = ipiv.template get_access<sycl::access::mode::read>(cgh);
+        cgh.parallel_for(sycl::range<1>{ ipiv_size }, [=](sycl::id<1> index) {
+            ipiv32_acc[index] = static_cast<std::int32_t>(ipiv_acc[index]);
+        });
+    });
+
+    queue.submit([&](sycl::handler& cgh) {
+        auto a_acc = a.template get_access<sycl::access::mode::read_write>(cgh);
+        auto ipiv_acc = ipiv32.template get_access<sycl::access::mode::read>(cgh);
+        auto devInfo_acc = devInfo.template get_access<sycl::access::mode::write>(cgh);
+        onemath_rocsolver_host_task(cgh, queue, [=](RocsolverScopedContextHandler& sc) {
+            auto handle = sc.get_handle(queue);
+            auto a_ = sc.get_mem<rocmDataType*>(a_acc);
+            auto ipiv_ = sc.get_mem<std::int32_t*>(ipiv_acc);
+            auto devInfo_ = sc.get_mem<int*>(devInfo_acc);
+            rocblas_status err;
+            rocsolver_native_named_func(func_name, func, err, handle, n, a_, lda, ipiv_, devInfo_);
+        });
+    });
+    lapack_info_check(queue, devInfo, __func__, func_name);
 }
-void getri(sycl::queue& queue, std::int64_t n, sycl::buffer<double>& a, std::int64_t lda,
-           sycl::buffer<std::int64_t>& ipiv, sycl::buffer<double>& scratchpad,
-           std::int64_t scratchpad_size) {
-    throw unimplemented("lapack", "getri");
-}
-void getri(sycl::queue& queue, std::int64_t n, sycl::buffer<float>& a, std::int64_t lda,
-           sycl::buffer<std::int64_t>& ipiv, sycl::buffer<float>& scratchpad,
-           std::int64_t scratchpad_size) {
-    throw unimplemented("lapack", "getri");
-}
-void getri(sycl::queue& queue, std::int64_t n, sycl::buffer<std::complex<double>>& a,
-           std::int64_t lda, sycl::buffer<std::int64_t>& ipiv,
-           sycl::buffer<std::complex<double>>& scratchpad, std::int64_t scratchpad_size) {
-    throw unimplemented("lapack", "getri");
-}
+
+#define GETRI_LAUNCHER(TYPE, ROCSOLVER_ROUTINE)                                             \
+    void getri(sycl::queue& queue, std::int64_t n, sycl::buffer<TYPE>& a, std::int64_t lda, \
+               sycl::buffer<std::int64_t>& ipiv, sycl::buffer<TYPE>& scratchpad,            \
+               std::int64_t scratchpad_size) {                                              \
+        getri(#ROCSOLVER_ROUTINE, ROCSOLVER_ROUTINE, queue, n, a, lda, ipiv, scratchpad,    \
+              scratchpad_size);                                                             \
+    }
+
+GETRI_LAUNCHER(float, rocsolver_sgetri)
+GETRI_LAUNCHER(double, rocsolver_dgetri)
+GETRI_LAUNCHER(std::complex<float>, rocsolver_cgetri)
+GETRI_LAUNCHER(std::complex<double>, rocsolver_zgetri)
+
+#undef GETRI_LAUNCHER
 
 template <typename Func, typename T>
 inline void getrs(const char* func_name, Func func, sycl::queue& queue,
@@ -1200,26 +1242,39 @@ GEBRD_LAUNCHER_USM(std::complex<double>, double, rocsolver_zgebrd)
 
 #undef GEBRD_LAUNCHER_USM
 
-sycl::event gerqf(sycl::queue& queue, std::int64_t m, std::int64_t n, float* a, std::int64_t lda,
-                  float* tau, float* scratchpad, std::int64_t scratchpad_size,
-                  const std::vector<sycl::event>& dependencies) {
-    throw unimplemented("lapack", "gerqf");
+template <typename Func, typename T>
+inline sycl::event gerqf(const char* func_name, Func func, sycl::queue& queue, std::int64_t m,
+                         std::int64_t n, T* a, std::int64_t lda, T* tau, T* scratchpad,
+                         std::int64_t scratchpad_size,
+                         const std::vector<sycl::event>& dependencies) {
+    using rocmDataType = typename RocmEquivalentType<T>::Type;
+    overflow_check(m, n, lda, scratchpad_size);
+    return queue.submit([&](sycl::handler& cgh) {
+        cgh.depends_on(dependencies);
+        onemath_rocsolver_host_task(cgh, queue, [=](RocsolverScopedContextHandler& sc) {
+            auto handle = sc.get_handle(queue);
+            auto a_ = reinterpret_cast<rocmDataType*>(a);
+            auto tau_ = reinterpret_cast<rocmDataType*>(tau);
+            rocblas_status err;
+            rocsolver_native_named_func(func_name, func, err, handle, m, n, a_, lda, tau_);
+        });
+    });
 }
-sycl::event gerqf(sycl::queue& queue, std::int64_t m, std::int64_t n, double* a, std::int64_t lda,
-                  double* tau, double* scratchpad, std::int64_t scratchpad_size,
-                  const std::vector<sycl::event>& dependencies) {
-    throw unimplemented("lapack", "gerqf");
-}
-sycl::event gerqf(sycl::queue& queue, std::int64_t m, std::int64_t n, std::complex<float>* a,
-                  std::int64_t lda, std::complex<float>* tau, std::complex<float>* scratchpad,
-                  std::int64_t scratchpad_size, const std::vector<sycl::event>& dependencies) {
-    throw unimplemented("lapack", "gerqf");
-}
-sycl::event gerqf(sycl::queue& queue, std::int64_t m, std::int64_t n, std::complex<double>* a,
-                  std::int64_t lda, std::complex<double>* tau, std::complex<double>* scratchpad,
-                  std::int64_t scratchpad_size, const std::vector<sycl::event>& dependencies) {
-    throw unimplemented("lapack", "gerqf");
-}
+
+#define GERQF_LAUNCHER_USM(TYPE, ROCSOLVER_ROUTINE)                                                \
+    sycl::event gerqf(sycl::queue& queue, std::int64_t m, std::int64_t n, TYPE* a,                 \
+                      std::int64_t lda, TYPE* tau, TYPE* scratchpad, std::int64_t scratchpad_size, \
+                      const std::vector<sycl::event>& dependencies) {                              \
+        return gerqf(#ROCSOLVER_ROUTINE, ROCSOLVER_ROUTINE, queue, m, n, a, lda, tau, scratchpad,  \
+                     scratchpad_size, dependencies);                                               \
+    }
+
+GERQF_LAUNCHER_USM(float, rocsolver_sgerqf)
+GERQF_LAUNCHER_USM(double, rocsolver_dgerqf)
+GERQF_LAUNCHER_USM(std::complex<float>, rocsolver_cgerqf)
+GERQF_LAUNCHER_USM(std::complex<double>, rocsolver_zgerqf)
+
+#undef GERQF_LAUNCHER_USM
 
 template <typename Func, typename T>
 inline sycl::event geqrf(const char* func_name, Func func, sycl::queue& queue, std::int64_t m,
@@ -1320,26 +1375,64 @@ GETRF_LAUNCHER_USM(std::complex<double>, rocsolver_zgetrf)
 
 #undef GETRF_LAUNCHER_USM
 
-sycl::event getri(sycl::queue& queue, std::int64_t n, std::complex<float>* a, std::int64_t lda,
-                  std::int64_t* ipiv, std::complex<float>* scratchpad, std::int64_t scratchpad_size,
-                  const std::vector<sycl::event>& dependencies) {
-    throw unimplemented("lapack", "getri");
+template <typename Func, typename T>
+inline sycl::event getri(const char* func_name, Func func, sycl::queue& queue, std::int64_t n, T* a,
+                         std::int64_t lda, std::int64_t* ipiv, T* scratchpad,
+                         std::int64_t scratchpad_size,
+                         const std::vector<sycl::event>& dependencies) {
+    using rocmDataType = typename RocmEquivalentType<T>::Type;
+    overflow_check(n, lda, scratchpad_size);
+
+    // rocSOLVER does not expose a 64-bit getri API, so convert pivots to 32-bit.
+    std::uint64_t ipiv_size = n;
+    int* ipiv32 = static_cast<int*>(malloc_device(sizeof(int) * ipiv_size, queue));
+    int* devInfo = static_cast<int*>(malloc_device(sizeof(int), queue));
+
+    auto done_casting = queue.submit([&](sycl::handler& cgh) {
+        cgh.depends_on(dependencies);
+        cgh.parallel_for(sycl::range<1>{ ipiv_size }, [=](sycl::id<1> index) {
+            ipiv32[index] = static_cast<std::int32_t>(ipiv[index]);
+        });
+    });
+
+    auto done = queue.submit([&](sycl::handler& cgh) {
+        cgh.depends_on(dependencies);
+        cgh.depends_on(done_casting);
+        onemath_rocsolver_host_task(cgh, queue, [=](RocsolverScopedContextHandler& sc) {
+            auto handle = sc.get_handle(queue);
+            auto a_ = reinterpret_cast<rocmDataType*>(a);
+            rocblas_status err;
+            rocsolver_native_named_func(func_name, func, err, handle, n, a_, lda, ipiv32, devInfo);
+        });
+    });
+
+    try {
+        lapack_info_check(queue, devInfo, __func__, func_name);
+    }
+    catch (...) {
+        free(ipiv32, queue);
+        free(devInfo, queue);
+        throw;
+    }
+    free(ipiv32, queue);
+    free(devInfo, queue);
+    return done;
 }
-sycl::event getri(sycl::queue& queue, std::int64_t n, double* a, std::int64_t lda,
-                  std::int64_t* ipiv, double* scratchpad, std::int64_t scratchpad_size,
-                  const std::vector<sycl::event>& dependencies) {
-    throw unimplemented("lapack", "getri");
-}
-sycl::event getri(sycl::queue& queue, std::int64_t n, float* a, std::int64_t lda,
-                  std::int64_t* ipiv, float* scratchpad, std::int64_t scratchpad_size,
-                  const std::vector<sycl::event>& dependencies) {
-    throw unimplemented("lapack", "getri");
-}
-sycl::event getri(sycl::queue& queue, std::int64_t n, std::complex<double>* a, std::int64_t lda,
-                  std::int64_t* ipiv, std::complex<double>* scratchpad,
-                  std::int64_t scratchpad_size, const std::vector<sycl::event>& dependencies) {
-    throw unimplemented("lapack", "getri");
-}
+
+#define GETRI_LAUNCHER_USM(TYPE, ROCSOLVER_ROUTINE)                                             \
+    sycl::event getri(sycl::queue& queue, std::int64_t n, TYPE* a, std::int64_t lda,            \
+                      std::int64_t* ipiv, TYPE* scratchpad, std::int64_t scratchpad_size,       \
+                      const std::vector<sycl::event>& dependencies) {                           \
+        return getri(#ROCSOLVER_ROUTINE, ROCSOLVER_ROUTINE, queue, n, a, lda, ipiv, scratchpad, \
+                     scratchpad_size, dependencies);                                            \
+    }
+
+GETRI_LAUNCHER_USM(float, rocsolver_sgetri)
+GETRI_LAUNCHER_USM(double, rocsolver_dgetri)
+GETRI_LAUNCHER_USM(std::complex<float>, rocsolver_cgetri)
+GETRI_LAUNCHER_USM(std::complex<double>, rocsolver_zgetri)
+
+#undef GETRI_LAUNCHER_USM
 
 template <typename Func, typename T>
 inline sycl::event getrs(const char* func_name, Func func, sycl::queue& queue,
@@ -2386,22 +2479,22 @@ GEBRD_LAUNCHER_SCRATCH(std::complex<double>)
 template <>
 std::int64_t gerqf_scratchpad_size<float>(sycl::queue& queue, std::int64_t m, std::int64_t n,
                                           std::int64_t lda) {
-    throw unimplemented("lapack", "gerqf_scratchpad_size");
+    return 0;
 }
 template <>
 std::int64_t gerqf_scratchpad_size<double>(sycl::queue& queue, std::int64_t m, std::int64_t n,
                                            std::int64_t lda) {
-    throw unimplemented("lapack", "gerqf_scratchpad_size");
+    return 0;
 }
 template <>
 std::int64_t gerqf_scratchpad_size<std::complex<float>>(sycl::queue& queue, std::int64_t m,
                                                         std::int64_t n, std::int64_t lda) {
-    throw unimplemented("lapack", "gerqf_scratchpad_size");
+    return 0;
 }
 template <>
 std::int64_t gerqf_scratchpad_size<std::complex<double>>(sycl::queue& queue, std::int64_t m,
                                                          std::int64_t n, std::int64_t lda) {
-    throw unimplemented("lapack", "gerqf_scratchpad_size");
+    return 0;
 }
 
 #define GEQRF_LAUNCHER_SCRATCH(TYPE)                                                              \
@@ -2449,21 +2542,21 @@ GETRF_LAUNCHER_SCRATCH(std::complex<double>)
 
 template <>
 std::int64_t getri_scratchpad_size<float>(sycl::queue& queue, std::int64_t n, std::int64_t lda) {
-    throw unimplemented("lapack", "getri_scratchpad_size");
+    return 0;
 }
 template <>
 std::int64_t getri_scratchpad_size<double>(sycl::queue& queue, std::int64_t n, std::int64_t lda) {
-    throw unimplemented("lapack", "getri_scratchpad_size");
+    return 0;
 }
 template <>
 std::int64_t getri_scratchpad_size<std::complex<float>>(sycl::queue& queue, std::int64_t n,
                                                         std::int64_t lda) {
-    throw unimplemented("lapack", "getri_scratchpad_size");
+    return 0;
 }
 template <>
 std::int64_t getri_scratchpad_size<std::complex<double>>(sycl::queue& queue, std::int64_t n,
                                                          std::int64_t lda) {
-    throw unimplemented("lapack", "getri_scratchpad_size");
+    return 0;
 }
 
 #define GETRS_LAUNCHER_SCRATCH(TYPE)                                                              \
