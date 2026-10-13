@@ -44,32 +44,52 @@ if(is_dpcpp)
     # Check if the Nvidia target is supported. PortFFT uses this for choosing default configuration.
     check_cxx_compiler_flag("-fsycl -fsycl-targets=nvptx64-nvidia-cuda" dpcpp_supports_nvptx64)
 
-    if(ENABLE_CURAND_BACKEND OR ENABLE_CUSOLVER_BACKEND OR ENABLE_CUSPARSE_BACKEND)
-      list(APPEND UNIX_INTERFACE_COMPILE_OPTIONS
-        -fsycl-targets=nvptx64-nvidia-cuda -fsycl-unnamed-lambda)
-      list(APPEND UNIX_INTERFACE_LINK_OPTIONS
-        -fsycl-targets=nvptx64-nvidia-cuda)
-    elseif(ENABLE_ROCBLAS_BACKEND OR ENABLE_ROCRAND_BACKEND
-                OR ENABLE_ROCSOLVER_BACKEND OR ENABLE_ROCSPARSE_BACKEND)
-      list(APPEND UNIX_INTERFACE_COMPILE_OPTIONS
-        -fsycl-targets=amdgcn-amd-amdhsa -fsycl-unnamed-lambda 
-	-Xsycl-target-backend --offload-arch=${HIP_TARGETS})
-      list(APPEND UNIX_INTERFACE_LINK_OPTIONS
-        -fsycl-targets=amdgcn-amd-amdhsa -Xsycl-target-backend 
-	--offload-arch=${HIP_TARGETS})
+    # Assemble the SYCL offload target triples for every enabled GPU backend.
+    # DPC++ only honors the *last* -fsycl-targets flag on the command line, so
+    # all target triples must be passed together as a single comma-separated
+    # list. Previously each vendor backend appended its own -fsycl-targets flag
+    # (here and in the individual backend CMake files); in a multi-vendor build
+    # all but the last triple were then silently dropped, so the SYCL device
+    # kernels of the other vendor(s) were missing at runtime (see issue #708).
+    set(ONEMATH_SYCL_TARGET_TRIPLES "")
+    set(ONEMATH_SYCL_TARGET_ARCH_OPTIONS "")
+
+    if(ENABLE_CUBLAS_BACKEND OR ENABLE_CURAND_BACKEND OR ENABLE_CUSOLVER_BACKEND
+        OR ENABLE_CUFFT_BACKEND OR ENABLE_CUSPARSE_BACKEND)
+      list(APPEND ONEMATH_SYCL_TARGET_TRIPLES "nvptx64-nvidia-cuda")
+      if(DEFINED CUDA_TARGETS AND NOT "${CUDA_TARGETS}" STREQUAL "")
+        list(APPEND ONEMATH_SYCL_TARGET_ARCH_OPTIONS
+          -Xsycl-target-backend=nvptx64-nvidia-cuda --cuda-gpu-arch=${CUDA_TARGETS})
+      endif()
     endif()
-    if(ENABLE_CURAND_BACKEND OR ENABLE_CUSOLVER_BACKEND OR ENABLE_CUSPARSE_BACKEND OR ENABLE_ROCBLAS_BACKEND
-	    OR ENABLE_ROCRAND_BACKEND OR ENABLE_ROCSOLVER_BACKEND OR ENABLE_ROCSPARSE_BACKEND)
-      set_target_properties(ONEMATH::SYCL::SYCL PROPERTIES
-        INTERFACE_COMPILE_OPTIONS "${UNIX_INTERFACE_COMPILE_OPTIONS}"
-        INTERFACE_LINK_OPTIONS "${UNIX_INTERFACE_LINK_OPTIONS}"
-        INTERFACE_LINK_LIBRARIES ${SYCL_LIBRARY})
-    else()
-      set_target_properties(ONEMATH::SYCL::SYCL PROPERTIES
-        INTERFACE_COMPILE_OPTIONS "-fsycl"
-        INTERFACE_LINK_OPTIONS "-fsycl"
-        INTERFACE_LINK_LIBRARIES ${SYCL_LIBRARY})
+
+    if(ENABLE_ROCBLAS_BACKEND OR ENABLE_ROCRAND_BACKEND OR ENABLE_ROCSOLVER_BACKEND
+        OR ENABLE_ROCFFT_BACKEND OR ENABLE_ROCSPARSE_BACKEND)
+      list(APPEND ONEMATH_SYCL_TARGET_TRIPLES "amdgcn-amd-amdhsa")
+      list(APPEND ONEMATH_SYCL_TARGET_ARCH_OPTIONS
+        -Xsycl-target-backend=amdgcn-amd-amdhsa --offload-arch=${HIP_TARGETS})
     endif()
+
+    if(ONEMATH_SYCL_TARGET_TRIPLES)
+      # Preserve the Intel GPU (spir64) device image when an Intel oneMKL GPU
+      # backend is enabled alongside a CUDA/HIP backend; otherwise it would be
+      # dropped from the combined -fsycl-targets list.
+      if(ENABLE_MKLGPU_BACKEND)
+        list(APPEND ONEMATH_SYCL_TARGET_TRIPLES "spir64")
+      endif()
+      list(JOIN ONEMATH_SYCL_TARGET_TRIPLES "," ONEMATH_SYCL_TARGETS_ARG)
+      list(APPEND UNIX_INTERFACE_COMPILE_OPTIONS
+        -fsycl-targets=${ONEMATH_SYCL_TARGETS_ARG} -fsycl-unnamed-lambda
+        ${ONEMATH_SYCL_TARGET_ARCH_OPTIONS})
+      list(APPEND UNIX_INTERFACE_LINK_OPTIONS
+        -fsycl-targets=${ONEMATH_SYCL_TARGETS_ARG}
+        ${ONEMATH_SYCL_TARGET_ARCH_OPTIONS})
+    endif()
+
+    set_target_properties(ONEMATH::SYCL::SYCL PROPERTIES
+      INTERFACE_COMPILE_OPTIONS "${UNIX_INTERFACE_COMPILE_OPTIONS}"
+      INTERFACE_LINK_OPTIONS "${UNIX_INTERFACE_LINK_OPTIONS}"
+      INTERFACE_LINK_LIBRARIES ${SYCL_LIBRARY})
   else()
     set_target_properties(ONEMATH::SYCL::SYCL PROPERTIES
       INTERFACE_COMPILE_OPTIONS "-fsycl"
