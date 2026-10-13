@@ -255,16 +255,33 @@ struct RocmEquivalentType<std::complex<double>> {
     using Type = rocblas_double_complex;
 };
 
+/* 64-bit pivot API */
+
+#if !defined(ROCSOLVER_VERSION_MAJOR)
+#define ONEMATH_ROCSOLVER_VERSION 0
+#else
+#define ONEMATH_ROCSOLVER_VERSION (ROCSOLVER_VERSION_MAJOR * 100 + ROCSOLVER_VERSION_MINOR)
+#endif
+
+// rocSOLVER exposes getrf and getrs entry points taking int64_t pivots, which lets oneMath hand
+// the user's ipiv array straight through instead of converting it. They were added in rocSOLVER
+// 3.26 (ROCm 6.2); earlier versions keep the conversion path, so the minimum supported ROCm is
+// unchanged.
+#define ONEMATH_ROCSOLVER_HAS_64BIT_PIVOTS (ONEMATH_ROCSOLVER_VERSION >= 326)
+
 /* devinfo */
 
-inline int get_rocsolver_devinfo(sycl::queue& queue, sycl::buffer<int>& devInfo) {
-    sycl::host_accessor<int, 1, sycl::access::mode::read> dev_info_{ devInfo };
+// The 64-bit entry points report info as int64_t, the legacy ones as int.
+template <typename INFO_T>
+inline INFO_T get_rocsolver_devinfo(sycl::queue& queue, sycl::buffer<INFO_T>& devInfo) {
+    sycl::host_accessor<INFO_T, 1, sycl::access::mode::read> dev_info_{ devInfo };
     return dev_info_[0];
 }
 
-inline int get_rocsolver_devinfo(sycl::queue& queue, const int* devInfo) {
-    int dev_info_;
-    queue.memcpy(&dev_info_, devInfo, sizeof(int));
+template <typename INFO_T>
+inline INFO_T get_rocsolver_devinfo(sycl::queue& queue, const INFO_T* devInfo) {
+    INFO_T dev_info_;
+    queue.memcpy(&dev_info_, devInfo, sizeof(INFO_T));
     queue.wait();
     return dev_info_;
 }
@@ -273,7 +290,7 @@ template <typename DEVINFO_T>
 inline void lapack_info_check(sycl::queue& queue, DEVINFO_T devinfo, const char* func_name,
                               const char* cufunc_name) {
     queue.wait();
-    const int devinfo_ = get_rocsolver_devinfo(queue, devinfo);
+    const auto devinfo_ = get_rocsolver_devinfo(queue, devinfo);
     if (devinfo_ > 0)
         throw oneapi::math::lapack::computation_error(
             func_name, std::string(cufunc_name) + " failed with info = " + std::to_string(devinfo_),
