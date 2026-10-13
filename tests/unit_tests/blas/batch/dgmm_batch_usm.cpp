@@ -185,6 +185,9 @@ int test(device* dev, oneapi::math::layout layout, int64_t group_count) {
 
     // Call DPC++ DGMM_BATCH.
 
+    // left_right is an input parameter, so the backend must leave it untouched.
+    std::vector<oneapi::math::side> left_right_orig(left_right.begin(), left_right.end());
+
     try {
 #ifdef CALL_RT_API
         switch (layout) {
@@ -254,6 +257,11 @@ int test(device* dev, oneapi::math::layout layout, int64_t group_count) {
     }
 
     bool good = true;
+    if (!std::equal(left_right_orig.begin(), left_right_orig.end(), left_right.begin())) {
+        std::cout << "Error: DGMM_BATCH overwrote the input left_right array\n";
+        good = false;
+    }
+
     // Compare the results of reference implementation and DPC++ implementation.
     idx = 0;
     for (i = 0; i < group_count; i++) {
@@ -289,25 +297,37 @@ class DgmmBatchUsmTests
         : public ::testing::TestWithParam<std::tuple<sycl::device*, oneapi::math::layout>> {};
 
 TEST_P(DgmmBatchUsmTests, RealSinglePrecision) {
+    EXPECT_TRUEORSKIP(test<float>(std::get<0>(GetParam()), std::get<1>(GetParam()), 1));
     EXPECT_TRUEORSKIP(test<float>(std::get<0>(GetParam()), std::get<1>(GetParam()), 5));
+    EXPECT_TRUEORSKIP(test<float>(std::get<0>(GetParam()), std::get<1>(GetParam()), 10));
 }
 
 TEST_P(DgmmBatchUsmTests, RealDoublePrecision) {
     CHECK_DOUBLE_ON_DEVICE(std::get<0>(GetParam()));
 
+    EXPECT_TRUEORSKIP(test<double>(std::get<0>(GetParam()), std::get<1>(GetParam()), 1));
     EXPECT_TRUEORSKIP(test<double>(std::get<0>(GetParam()), std::get<1>(GetParam()), 5));
+    EXPECT_TRUEORSKIP(test<double>(std::get<0>(GetParam()), std::get<1>(GetParam()), 10));
 }
 
 TEST_P(DgmmBatchUsmTests, ComplexSinglePrecision) {
     EXPECT_TRUEORSKIP(
+        test<std::complex<float>>(std::get<0>(GetParam()), std::get<1>(GetParam()), 1));
+    EXPECT_TRUEORSKIP(
         test<std::complex<float>>(std::get<0>(GetParam()), std::get<1>(GetParam()), 5));
+    EXPECT_TRUEORSKIP(
+        test<std::complex<float>>(std::get<0>(GetParam()), std::get<1>(GetParam()), 10));
 }
 
 TEST_P(DgmmBatchUsmTests, ComplexDoublePrecision) {
     CHECK_DOUBLE_ON_DEVICE(std::get<0>(GetParam()));
 
     EXPECT_TRUEORSKIP(
+        test<std::complex<double>>(std::get<0>(GetParam()), std::get<1>(GetParam()), 1));
+    EXPECT_TRUEORSKIP(
         test<std::complex<double>>(std::get<0>(GetParam()), std::get<1>(GetParam()), 5));
+    EXPECT_TRUEORSKIP(
+        test<std::complex<double>>(std::get<0>(GetParam()), std::get<1>(GetParam()), 10));
 }
 
 INSTANTIATE_TEST_SUITE_P(DgmmBatchUsmTestSuite, DgmmBatchUsmTests,
