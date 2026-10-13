@@ -428,7 +428,7 @@ Supported compilers include:
     </thead>
     <tbody>
         <tr>
-            <td rowspan=3 align="center">BLAS</td>
+            <td rowspan=4 align="center">BLAS</td>
             <td rowspan=2 align="center">x86 CPU</td>
             <td align="center">Intel(R) oneMKL</td>
             <td align="center">Intel DPC++</td>
@@ -440,10 +440,15 @@ Supported compilers include:
             <td align="center">Dynamic, Static</td>
         </tr>
         <tr>
-            <td align="center">Intel GPU</td>
+            <td rowspan=2 align="center">Intel GPU</td>
             <td align="center">Intel(R) oneMKL</td>
             <td align="center">Intel DPC++</td>
             <td align="center">Dynamic, Static</td>
+        </tr>
+        <tr>
+            <td align="center">generic SYCL BLAS</td>
+            <td align="center">Open DPC++</td>
+            <td align="center">Dynamic</td>
         </tr>
         <tr>
             <td rowspan=2 align="center">LAPACK</td>
