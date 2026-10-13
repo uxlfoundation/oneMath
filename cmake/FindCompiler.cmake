@@ -57,6 +57,32 @@ if(is_dpcpp)
       list(APPEND UNIX_INTERFACE_LINK_OPTIONS
         -fsycl-targets=amdgcn-amd-amdhsa -Xsycl-target-backend 
 	--offload-arch=${HIP_TARGETS})
+      # Recent DPC++/LLVM defaults to AMD code object ABI version 6, which is
+      # only supported by ROCm 6.3+. When building against an older ROCm, fall
+      # back to code object version 5 so the ROCm device library can be found.
+      # See https://github.com/uxlfoundation/oneMath/issues/687
+      if(NOT CMAKE_CXX_FLAGS MATCHES "-mcode-object-version")
+        set(_onemath_rocm_version_file "")
+        foreach(_onemath_rocm_root "$ENV{ROCM_PATH}" "$ENV{HIPROOT}" "/opt/rocm")
+          if(_onemath_rocm_root AND EXISTS "${_onemath_rocm_root}/.info/version")
+            set(_onemath_rocm_version_file "${_onemath_rocm_root}/.info/version")
+            break()
+          endif()
+        endforeach()
+        if(_onemath_rocm_version_file)
+          file(READ "${_onemath_rocm_version_file}" _onemath_rocm_version)
+          string(STRIP "${_onemath_rocm_version}" _onemath_rocm_version)
+          if(_onemath_rocm_version MATCHES "^([0-9]+)\\.([0-9]+)")
+            set(_onemath_rocm_ver "${CMAKE_MATCH_1}.${CMAKE_MATCH_2}")
+            if(_onemath_rocm_ver VERSION_LESS "6.3")
+              message(STATUS "Detected ROCm ${_onemath_rocm_ver} (< 6.3); "
+                "adding -mcode-object-version=5 for AMD targets")
+              list(APPEND UNIX_INTERFACE_COMPILE_OPTIONS -mcode-object-version=5)
+              list(APPEND UNIX_INTERFACE_LINK_OPTIONS -mcode-object-version=5)
+            endif()
+          endif()
+        endif()
+      endif()
     endif()
     if(ENABLE_CURAND_BACKEND OR ENABLE_CUSOLVER_BACKEND OR ENABLE_CUSPARSE_BACKEND OR ENABLE_ROCBLAS_BACKEND
 	    OR ENABLE_ROCRAND_BACKEND OR ENABLE_ROCSOLVER_BACKEND OR ENABLE_ROCSPARSE_BACKEND)
