@@ -249,6 +249,11 @@ int test(device* dev, oneapi::math::layout layout, int64_t batch_size) {
     int error_mag = tol_scalar * k;
     if (std::is_same_v<Tc, int32_t>)
         error_mag = 1;
+    // bfloat16 epsilon is 2^-7, so 10 * k is an absolute tolerance of several units
+    // (7.8125 at k = 100) and a result of 0 passes against a reference of 1. A
+    // bfloat16 result is checked to a few ulps, as the bfloat16 GEMM tests do.
+    if constexpr (std::is_same_v<Tc, oneapi::math::bfloat16>)
+        error_mag = 2;
 
     // A float output accumulated from int8 inputs is rounded at the magnitude of the terms summed,
     // |alpha| * sum|a*b|, which k * 128 * 128 bounds from above. An entry whose sum cancels is far

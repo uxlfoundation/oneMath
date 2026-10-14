@@ -338,6 +338,12 @@ int test(device* dev, oneapi::math::layout layout, int64_t group_count) {
             int error_mag = tol_scalar * k[i];
             if (std::is_same_v<Tc, int32_t>)
                 error_mag = 1;
+            // bfloat16 epsilon is 2^-7, so 10 * k is an absolute tolerance of several
+            // units (7.8125 at k = 100) and a result of 0 passes against a reference
+            // of 1. A bfloat16 result is checked to a few ulps, as the bfloat16 GEMM
+            // tests do.
+            if constexpr (std::is_same_v<Tc, oneapi::math::bfloat16>)
+                error_mag = 2;
 
             double abs_error_bound = 0.0;
             if constexpr (int8_to_float)
