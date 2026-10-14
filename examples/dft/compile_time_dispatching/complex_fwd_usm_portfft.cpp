@@ -66,7 +66,7 @@ void run_example(const sycl::device& dev) {
 
     // Initialize input data
     for (std::size_t i = 0; i < N; ++i) {
-        in_out[i] = { static_cast<float>(i), static_cast<float>(-i) };
+        in_out[i] = { static_cast<float>(i), -static_cast<float>(i) };
     }
 
     // 1. create descriptor
@@ -136,7 +136,7 @@ int main(int /*argc*/, char** /*argv*/) {
     catch (oneapi::math::unimplemented const& e) {
         std::cerr << "Unsupported Configuration:" << std::endl;
         std::cerr << "\t" << e.what() << std::endl;
-        return 0;
+        return 1;
     }
     catch (sycl::exception const& e) {
         std::cerr << "Caught synchronous SYCL exception:" << std::endl;
