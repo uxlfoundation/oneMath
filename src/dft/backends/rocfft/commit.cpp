@@ -39,6 +39,7 @@
 #include "../stride_helper.hpp"
 
 #include "rocfft_handle.hpp"
+#include "stride_validation.hpp"
 
 #include <rocfft.h>
 #include <rocfft-version.h>
@@ -306,18 +307,6 @@ public:
         std::unique_ptr<rocfft_plan_description_t, decltype(description_destroy)>
             description_destroyer_bwd(plan_desc_bwd, description_destroy);
 
-        // Note: index with iterators rather than &array[dimensions], which is an
-        // out-of-range subscript when dimensions == max_supported_dims.
-        std::array<std::size_t, max_supported_dims> stride_a_indices{ 0, 1, 2 };
-        std::sort(stride_a_indices.begin(), stride_a_indices.begin() + dimensions,
-                  [&](std::size_t a, std::size_t b) {
-                      return stride_vecs.vec_a[a] < stride_vecs.vec_a[b];
-                  });
-        std::array<std::size_t, max_supported_dims> stride_b_indices{ 0, 1, 2 };
-        std::sort(stride_b_indices.begin(), stride_b_indices.begin() + dimensions,
-                  [&](std::size_t a, std::size_t b) {
-                      return stride_vecs.vec_b[a] < stride_vecs.vec_b[b];
-                  });
         std::array<std::size_t, max_supported_dims> lengths_cplx = lengths;
         if (dom == dft::domain::REAL) {
             lengths_cplx[0] = lengths_cplx[0] / 2 + 1;
@@ -326,33 +315,9 @@ public:
         // the strides will always be wrong for one of the directions.
         // This is because the least significant dimension is symmetric.
         // If the strides are invalid (too small to fit) then just don't bother creating the plan.
-        auto are_strides_smaller_than_lengths = [=](auto& svec, auto& sindices,
-                                                    auto& domain_lengths) {
-            return dimensions == 1 ||
-                   (svec[sindices[0]] * domain_lengths[sindices[0]] <= svec[sindices[1]] &&
-                    (dimensions == 2 ||
-                     svec[sindices[1]] * domain_lengths[sindices[1]] <= svec[sindices[2]]));
-        };
-
-        const bool vec_a_valid_as_fwd_domain =
-            are_strides_smaller_than_lengths(stride_vecs.vec_a, stride_a_indices, lengths);
-        const bool vec_b_valid_as_fwd_domain =
-            are_strides_smaller_than_lengths(stride_vecs.vec_b, stride_b_indices, lengths);
-        const bool vec_a_valid_as_bwd_domain =
-            are_strides_smaller_than_lengths(stride_vecs.vec_a, stride_a_indices, lengths_cplx);
-        const bool vec_b_valid_as_bwd_domain =
-            are_strides_smaller_than_lengths(stride_vecs.vec_b, stride_b_indices, lengths_cplx);
-
-        // Test if the stride vector being used as the fwd/bwd domain for each direction has
-        // valid strides for that use. The forward direction reads forward-domain data through
-        // vec_a (fwd_in) and writes backward-domain data through vec_b (fwd_out).
-        bool valid_forward = vec_a_valid_as_fwd_domain && vec_b_valid_as_bwd_domain;
-        // With FWD/BWD_STRIDES each vector describes one domain, so the backward direction has
-        // the same requirements. With INPUT/OUTPUT_STRIDES the domains swap: vec_a (bwd_in)
-        // describes backward-domain data and vec_b (bwd_out) forward-domain data.
-        bool valid_backward = stride_api_choice == dft::detail::stride_api::FB_STRIDES
-                                  ? valid_forward
-                                  : (vec_a_valid_as_bwd_domain && vec_b_valid_as_fwd_domain);
+        const auto [valid_forward, valid_backward] = get_stride_validity(
+            dimensions, stride_vecs.vec_a, stride_vecs.vec_b, lengths, lengths_cplx,
+            stride_api_choice == dft::detail::stride_api::FB_STRIDES);
 
         if (!valid_forward && !valid_backward) {
             throw math::exception("dft/backends/rocfft", __FUNCTION__, "Invalid strides.");
