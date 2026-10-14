@@ -27,7 +27,7 @@ jobs:
         - config: portFFT
           domain: dft
           build_options: -DENABLE_PORTFFT_BACKEND=ON -DENABLE_MKLCPU_BACKEND=OFF
-          test_options: -R 'DFT/CT/.*ComputeTests_in_place_COMPLEX.COMPLEX_SINGLE_in_place_buffer.sizes_8_batches_1*'
+          test_options: -R 'DFT/CT/.*ComputeTests_in_place_COMPLEX.COMPLEX_SINGLE_in_place_buffer.sizes_8_batches_1*|dft/EXAMPLE/CT/complex_fwd_usm_portfft'
         - config: oneMKL BLAS
           domain: blas
           build_options: -DREF_BLAS_ROOT=${PWD}/lapack/install
