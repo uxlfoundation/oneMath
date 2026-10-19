@@ -475,6 +475,29 @@ void rand_tbsv_matrix(vec& M, oneapi::math::layout layout, oneapi::math::uplo up
 // entries. The rounding error of an entry whose sum cancels is then set by the accumulation scale
 // rather than by the entry itself, and no relative bound can cover it. Such callers pass that
 // scale as abs_bound, which only ever widens the absolute part of the check.
+//
+// Compare bfloat16 in float. Rounding the absolute or relative error to bfloat16 can change a
+// pass/fail decision next to the tolerance. This matches the bfloat16 GEMM tests.
+inline bool check_equal(oneapi::math::bfloat16 x, oneapi::math::bfloat16 x_ref, int error_mag,
+                        double abs_bound = 0.0) {
+    constexpr float bfloat16_epsilon = 1.0f / 128.0f;
+    const float bound = error_mag * bfloat16_epsilon;
+    const float abs_limit = std::max(bound, static_cast<float>(abs_bound));
+    const float x_float = static_cast<float>(x);
+    const float x_ref_float = static_cast<float>(x_ref);
+    const float aerr = std::abs(x_float - x_ref_float);
+    const float rerr = aerr / std::abs(x_ref_float);
+    const bool ok = (rerr <= bound) || (aerr <= abs_limit);
+    if (!ok) {
+        std::cout << "relative error = " << rerr << " absolute error = " << aerr
+                  << " limit = " << bound;
+        if (abs_limit > bound)
+            std::cout << " absolute limit = " << abs_limit;
+        std::cout << std::endl;
+    }
+    return ok;
+}
+
 template <typename fp>
 typename std::enable_if<!std::is_integral<fp>::value, bool>::type check_equal(
     fp x, fp x_ref, int error_mag, double abs_bound = 0.0) {

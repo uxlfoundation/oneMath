@@ -220,7 +220,7 @@ int test(device* dev, oneapi::math::layout layout, int64_t batch_size) {
         error_mag = 1;
     // bfloat16 epsilon is 2^-7, so 10 * k is an absolute tolerance of several units
     // (7.8125 at k = 100) and a result of 0 passes against a reference of 1. A
-    // bfloat16 result is checked to a few ulps, as the bfloat16 GEMM tests do.
+    // bfloat16 result is checked to 2 ulps in float, as the bfloat16 GEMM tests do.
     if constexpr (std::is_same_v<Tc, oneapi::math::bfloat16>)
         error_mag = 2;
 
