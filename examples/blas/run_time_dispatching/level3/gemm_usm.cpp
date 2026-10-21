@@ -119,9 +119,9 @@ void run_gemm_example(const sycl::device& dev) {
     rand_matrix(C, oneapi::math::transpose::nontrans, m, n, ldC);
 
     // allocate memory on device
-    auto dev_A = sycl::malloc_device<float>(sizea * sizeof(float), main_queue);
-    auto dev_B = sycl::malloc_device<float>(sizeb * sizeof(float), main_queue);
-    auto dev_C = sycl::malloc_device<float>(sizec * sizeof(float), main_queue);
+    auto dev_A = sycl::malloc_device<float>(sizea, main_queue);
+    auto dev_B = sycl::malloc_device<float>(sizeb, main_queue);
+    auto dev_C = sycl::malloc_device<float>(sizec, main_queue);
     if (!dev_A || !dev_B || !dev_C) {
         throw std::runtime_error("Failed to allocate USM memory.");
     }

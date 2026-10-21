@@ -108,19 +108,18 @@ void run_getrs_example(const sycl::device& device) {
     sycl::event getrf_done;
     sycl::event getrs_done;
 
-    float* dev_A = sycl::malloc_device<float>(A_size * sizeof(float), queue);
-    float* dev_B = sycl::malloc_device<float>(B_size * sizeof(float), queue);
-    std::int64_t* dev_ipiv =
-        sycl::malloc_device<std::int64_t>(ipiv_size * sizeof(std::int64_t), queue);
+    float* dev_A = sycl::malloc_device<float>(A_size, queue);
+    float* dev_B = sycl::malloc_device<float>(B_size, queue);
+    std::int64_t* dev_ipiv = sycl::malloc_device<std::int64_t>(ipiv_size, queue);
 
     std::int64_t getrf_scratchpad_size =
         oneapi::math::lapack::getrf_scratchpad_size<float>(queue, m, n, lda);
     std::int64_t getrs_scratchpad_size =
         oneapi::math::lapack::getrs_scratchpad_size<float>(queue, trans, n, nrhs, lda, ldb);
     float* getrf_scratchpad =
-        sycl::malloc_shared<float>(getrf_scratchpad_size * sizeof(float), device, context);
+        sycl::malloc_shared<float>(getrf_scratchpad_size, device, context);
     float* getrs_scratchpad =
-        sycl::malloc_shared<float>(getrs_scratchpad_size * sizeof(float), device, context);
+        sycl::malloc_shared<float>(getrs_scratchpad_size, device, context);
     if (!dev_A || !dev_B || !dev_ipiv) {
         throw std::runtime_error("Failed to allocate USM memory.");
     }
