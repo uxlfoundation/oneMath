@@ -116,10 +116,8 @@ void run_getrs_example(const sycl::device& device) {
         oneapi::math::lapack::getrf_scratchpad_size<float>(queue, m, n, lda);
     std::int64_t getrs_scratchpad_size =
         oneapi::math::lapack::getrs_scratchpad_size<float>(queue, trans, n, nrhs, lda, ldb);
-    float* getrf_scratchpad =
-        sycl::malloc_shared<float>(getrf_scratchpad_size, device, context);
-    float* getrs_scratchpad =
-        sycl::malloc_shared<float>(getrs_scratchpad_size, device, context);
+    float* getrf_scratchpad = sycl::malloc_shared<float>(getrf_scratchpad_size, device, context);
+    float* getrs_scratchpad = sycl::malloc_shared<float>(getrs_scratchpad_size, device, context);
     if (!dev_A || !dev_B || !dev_ipiv) {
         throw std::runtime_error("Failed to allocate USM memory.");
     }
