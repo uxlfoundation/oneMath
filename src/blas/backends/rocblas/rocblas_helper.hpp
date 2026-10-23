@@ -328,6 +328,10 @@ template <>
 struct RocEquivalentType<sycl::half> {
     using Type = rocblas_half;
 };
+template <>
+struct RocEquivalentType<bfloat16> {
+    using Type = rocblas_bfloat16;
+};
 
 } // namespace rocblas
 } // namespace blas

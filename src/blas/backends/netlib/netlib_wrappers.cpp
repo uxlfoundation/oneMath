@@ -20,7 +20,7 @@
 #include "blas/function_table.hpp"
 #include "oneapi/math/blas/detail/netlib/onemath_blas_netlib.hpp"
 
-#define WRAPPER_VERSION 1
+#define WRAPPER_VERSION 2
 
 extern "C" ONEMATH_EXPORT blas_function_table_t onemath_blas_table = {
     WRAPPER_VERSION,
