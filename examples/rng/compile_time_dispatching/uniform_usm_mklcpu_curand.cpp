@@ -116,8 +116,8 @@ void run_uniform_example(const sycl::device& cpu_dev, const sycl::device& gpu_de
     //
     // Data preparation on CPU device and GPU device
     //
-    float* dev_cpu = sycl::malloc_device<float>(n * sizeof(float), cpu_queue);
-    float* dev_gpu = sycl::malloc_device<float>(n * sizeof(float), gpu_queue);
+    float* dev_cpu = sycl::malloc_device<float>(n, cpu_queue);
+    float* dev_gpu = sycl::malloc_device<float>(n, gpu_queue);
     if (!dev_cpu || !dev_gpu) {
         throw std::runtime_error("Failed to allocate USM memory.");
     }

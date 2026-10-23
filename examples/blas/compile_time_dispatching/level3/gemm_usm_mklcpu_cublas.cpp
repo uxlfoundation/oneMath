@@ -141,9 +141,9 @@ void run_gemm_example(const sycl::device& cpu_dev, const sycl::device& gpu_dev) 
     sycl::context cpu_cxt = cpu_queue.get_context();
 
     // allocate on CPU device and copy data from host to SYCL CPU device
-    float* cpu_A = sycl::malloc_device<float>(sizea * sizeof(float), cpu_queue);
-    float* cpu_B = sycl::malloc_device<float>(sizeb * sizeof(float), cpu_queue);
-    float* cpu_C = sycl::malloc_device<float>(sizec * sizeof(float), cpu_queue);
+    float* cpu_A = sycl::malloc_device<float>(sizea, cpu_queue);
+    float* cpu_B = sycl::malloc_device<float>(sizeb, cpu_queue);
+    float* cpu_C = sycl::malloc_device<float>(sizec, cpu_queue);
     if (!cpu_A || !cpu_B || !cpu_C) {
         throw std::runtime_error("Failed to allocate USM memory.");
     }
@@ -159,9 +159,9 @@ void run_gemm_example(const sycl::device& cpu_dev, const sycl::device& gpu_dev) 
     sycl::context gpu_cxt = gpu_queue.get_context();
 
     // allocate on GPU device and copy data from host to SYCL GPU device
-    float* gpu_A = sycl::malloc_device<float>(sizea * sizeof(float), gpu_queue);
-    float* gpu_B = sycl::malloc_device<float>(sizeb * sizeof(float), gpu_queue);
-    float* gpu_C = sycl::malloc_device<float>(sizec * sizeof(float), gpu_queue);
+    float* gpu_A = sycl::malloc_device<float>(sizea, gpu_queue);
+    float* gpu_B = sycl::malloc_device<float>(sizeb, gpu_queue);
+    float* gpu_C = sycl::malloc_device<float>(sizec, gpu_queue);
     if (!gpu_A || !gpu_B || !gpu_C) {
         throw std::runtime_error("Failed to allocate USM memory.");
     }
