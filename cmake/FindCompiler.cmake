@@ -66,8 +66,21 @@ if(is_dpcpp)
     if(ENABLE_ROCBLAS_BACKEND OR ENABLE_ROCRAND_BACKEND OR ENABLE_ROCSOLVER_BACKEND
         OR ENABLE_ROCFFT_BACKEND OR ENABLE_ROCSPARSE_BACKEND)
       list(APPEND ONEMATH_SYCL_TARGET_TRIPLES "amdgcn-amd-amdhsa")
-      list(APPEND ONEMATH_SYCL_TARGET_ARCH_OPTIONS
-        -Xsycl-target-backend=amdgcn-amd-amdhsa --offload-arch=${HIP_TARGETS})
+      # rocFFT stays in the triple list so a mixed CUDA + rocFFT build is not
+      # dropped (issue #708). It did not previously require --offload-arch, so
+      # an empty HIP_TARGETS must not emit a bare flag. The other ROCm backends
+      # cannot compile without an architecture.
+      if(NOT DEFINED HIP_TARGETS OR "${HIP_TARGETS}" STREQUAL "")
+        if(ENABLE_ROCBLAS_BACKEND OR ENABLE_ROCRAND_BACKEND OR ENABLE_ROCSOLVER_BACKEND
+            OR ENABLE_ROCSPARSE_BACKEND)
+          message(FATAL_ERROR
+            "HIP_TARGETS must be set when a ROCm backend other than rocFFT is enabled, "
+            "for example -DHIP_TARGETS=gfx90a")
+        endif()
+      else()
+        list(APPEND ONEMATH_SYCL_TARGET_ARCH_OPTIONS
+          -Xsycl-target-backend=amdgcn-amd-amdhsa --offload-arch=${HIP_TARGETS})
+      endif()
     endif()
 
     if(ONEMATH_SYCL_TARGET_TRIPLES)
