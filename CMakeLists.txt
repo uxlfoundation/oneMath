@@ -222,7 +222,9 @@ if(WIN32 AND ONEMATH_SYCL_IMPLEMENTATION STREQUAL "dpc++")
   endforeach()
   set(CMAKE_CXX_COMPILE_OBJECT "<CMAKE_CXX_COMPILER> -fsycl /nologo <DEFINES> <INCLUDES> /EHsc <FLAGS> /Fo<OBJECT> -c <SOURCE>")
   set(CMAKE_CXX_CREATE_STATIC_LIBRARY "lib /nologo <OBJECTS> /out:<TARGET>")
-  if(CMAKE_VERSION VERSION_LESS "3.25.2")
+  # CMake >= 3.25.2 links through the compiler driver only for IntelLLVM (icx); with open
+  # DPC++ (clang-cl) it calls lld-link directly and the SYCL device code is never linked.
+  if(CMAKE_VERSION VERSION_LESS "3.25.2" OR NOT CMAKE_CXX_COMPILER_ID STREQUAL "IntelLLVM")
     set(CMAKE_CXX_LINK_EXECUTABLE "<CMAKE_CXX_COMPILER> -fsycl -fsycl-device-code-split=per_kernel /nologo <OBJECTS> -o <TARGET> <LINK_LIBRARIES>")
     set(CMAKE_CXX_CREATE_SHARED_LIBRARY "<CMAKE_CXX_COMPILER> -fsycl -fsycl-device-code-split=per_kernel /nologo <OBJECTS> <LINK_LIBRARIES> /link /out:<TARGET> /implib:<TARGET_IMPLIB> /pdb:<TARGET_PDB> /dll /version:<TARGET_VERSION_MAJOR>.<TARGET_VERSION_MINOR>")
   endif()
