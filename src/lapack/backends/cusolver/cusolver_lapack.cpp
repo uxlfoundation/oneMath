@@ -16,6 +16,8 @@
 *  limitations under the License.
 *
 **************************************************************************/
+#include <limits>
+
 #include "cusolver_helper.hpp"
 #include "cusolver_task.hpp"
 
@@ -26,6 +28,49 @@ namespace oneapi {
 namespace math {
 namespace lapack {
 namespace cusolver {
+
+template <typename T>
+inline T conjugate_if_needed(T value) {
+    return value;
+}
+
+template <typename T>
+inline std::complex<T> conjugate_if_needed(std::complex<T> value) {
+    return std::complex<T>(value.real(), -value.imag());
+}
+
+inline bool gesvd_vectors_requested(oneapi::math::jobsvd jobu, oneapi::math::jobsvd jobvt) {
+    return jobu != oneapi::math::jobsvd::novec || jobvt != oneapi::math::jobsvd::novec;
+}
+
+// econ = 0 makes gesvdj return the full n-by-n V, which is only needed when vt must hold
+// all n rows of V**H. Every other job needs no more than the leading min(m,n) rows.
+inline int gesvdj_economy_mode(oneapi::math::jobsvd jobvt) {
+    return jobvt == oneapi::math::jobsvd::vectors ? 0 : 1;
+}
+
+template <typename T>
+inline void configure_gesvdj(gesvdjInfo_t params) {
+    cusolverStatus_t err;
+    CUSOLVER_ERROR_FUNC(cusolverDnXgesvdjSetTolerance, err, params,
+                        static_cast<double>(std::numeric_limits<T>::epsilon()));
+    CUSOLVER_ERROR_FUNC(cusolverDnXgesvdjSetMaxSweeps, err, params, 100);
+}
+
+inline void validate_gesvd_jobs(oneapi::math::jobsvd jobu, oneapi::math::jobsvd jobvt) {
+    if (jobu == oneapi::math::jobsvd::vectorsina && jobvt == oneapi::math::jobsvd::vectorsina)
+        throw invalid_argument("gesvd", "jobu and jobvt cannot both overwrite a", 2);
+}
+
+// gesvdj always computes both vector sets and returns V rather than V**H, so U and V are
+// staged in the scratchpad behind the native workspace and copied out afterwards.
+inline std::int64_t gesvdj_temporary_size(oneapi::math::jobsvd jobu, oneapi::math::jobsvd jobvt,
+                                          std::int64_t m, std::int64_t n) {
+    if (!gesvd_vectors_requested(jobu, jobvt))
+        return 0;
+    const std::int64_t v_columns = jobvt == oneapi::math::jobsvd::vectors ? n : std::min(m, n);
+    return m * std::min(m, n) + n * v_columns;
+}
 
 // BUFFER APIs
 
@@ -265,19 +310,142 @@ GETRS_LAUNCHER(std::complex<double>, cusolverDnZgetrs)
 
 #undef GETRS_LAUNCHER
 
-template <typename Func, typename T_A, typename T_B>
-inline void gesvd(const char* func_name, Func func, sycl::queue& queue, oneapi::math::jobsvd jobu,
-                  oneapi::math::jobsvd jobvt, std::int64_t m, std::int64_t n, sycl::buffer<T_A>& a,
-                  std::int64_t lda, sycl::buffer<T_B>& s, sycl::buffer<T_A>& u, std::int64_t ldu,
+template <typename Func, typename FuncJ, typename T_A, typename T_B>
+inline void gesvd(const char* func_name, Func func, const char* funcj_name, FuncJ funcj,
+                  sycl::queue& queue, oneapi::math::jobsvd jobu, oneapi::math::jobsvd jobvt,
+                  std::int64_t m, std::int64_t n, sycl::buffer<T_A>& a, std::int64_t lda,
+                  sycl::buffer<T_B>& s, sycl::buffer<T_A>& u, std::int64_t ldu,
                   sycl::buffer<T_A>& vt, std::int64_t ldvt, sycl::buffer<T_A>& scratchpad,
                   std::int64_t scratchpad_size) {
     using cuDataType_A = typename CudaEquivalentType<T_A>::Type;
     using cuDataType_B = typename CudaEquivalentType<T_B>::Type;
     overflow_check(n, m, lda, ldu, ldvt, scratchpad_size);
+    validate_gesvd_jobs(jobu, jobvt);
 
-    // cusolver gesvd only supports m >= n (see cuSOLVER documentation).
-    if (m < n)
-        throw unimplemented("lapack", "gesvd", "cusolver gesvd does not support m < n");
+    // LAPACK returns without referencing s, u or vt when either dimension is zero.
+    if (m == 0 || n == 0)
+        return;
+
+    // cuSOLVER's QR-based gesvd is used for m >= n, while its Jacobi gesvdj is used
+    // for m < n. Pin gesvdj's tolerance and sweep limit so wide-matrix convergence
+    // does not depend on the defaults of the installed CUDA release.
+    if (m < n) {
+        const bool vectors_requested = gesvd_vectors_requested(jobu, jobvt);
+        const int econ = gesvdj_economy_mode(jobvt);
+        const std::int64_t u_size = vectors_requested ? m * std::min(m, n) : 0;
+        const std::int64_t temporary_size = gesvdj_temporary_size(jobu, jobvt, m, n);
+        if (scratchpad_size < temporary_size)
+            throw invalid_argument("gesvd", "scratchpad size is too small");
+        const std::int64_t work_size = scratchpad_size - temporary_size;
+        const std::int64_t native_ldu = std::max<std::int64_t>(1, m);
+        const std::int64_t native_ldv = std::max<std::int64_t>(1, n);
+
+        sycl::buffer<int> devInfo{ 1 };
+        cusolverStatus_t params_err;
+        gesvdjInfo_t params = nullptr;
+        CUSOLVER_ERROR_FUNC(cusolverDnCreateGesvdjInfo, params_err, &params);
+        // Keep params alive until devInfo confirms that the asynchronous native work completed.
+        try {
+            configure_gesvdj<T_B>(params);
+            queue.submit([&](sycl::handler& cgh) {
+                auto a_acc = a.template get_access<sycl::access::mode::read_write>(cgh);
+                auto s_acc = s.template get_access<sycl::access::mode::write>(cgh);
+                auto devInfo_acc = devInfo.template get_access<sycl::access::mode::write>(cgh);
+                auto scratch_acc =
+                    scratchpad.template get_access<sycl::access::mode::read_write>(cgh);
+                onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+                    auto handle = sc.get_handle(queue);
+                    auto a_ = sc.get_mem<cuDataType_A*>(a_acc);
+                    auto s_ = sc.get_mem<cuDataType_B*>(s_acc);
+                    auto devInfo_ = sc.get_mem<int*>(devInfo_acc);
+                    auto scratch_ = sc.get_mem<cuDataType_A*>(scratch_acc);
+                    auto u_ = vectors_requested ? scratch_ + work_size : scratch_;
+                    auto v_ = vectors_requested ? u_ + u_size : scratch_;
+                    cusolverStatus_t err;
+                    cusolver_native_named_func(
+                        funcj_name, funcj, err, handle,
+                        vectors_requested ? CUSOLVER_EIG_MODE_VECTOR : CUSOLVER_EIG_MODE_NOVECTOR,
+                        econ, m, n, a_, lda, s_, u_, native_ldu, v_, native_ldv, scratch_,
+                        work_size, devInfo_, params);
+                });
+            });
+
+            if (jobu == oneapi::math::jobsvd::vectorsina) {
+                queue.submit([&](sycl::handler& cgh) {
+                    auto a_acc = a.template get_access<sycl::access::mode::read_write>(cgh);
+                    auto scratch_acc =
+                        scratchpad.template get_access<sycl::access::mode::read>(cgh);
+                    cgh.parallel_for(sycl::range<1>(static_cast<std::size_t>(u_size)),
+                                     [=](sycl::id<1> index) {
+                                         const std::int64_t i = index[0];
+                                         const std::int64_t row = i % m;
+                                         const std::int64_t column = i / m;
+                                         a_acc[row + column * lda] = scratch_acc[work_size + i];
+                                     });
+                });
+            }
+            else if (jobu != oneapi::math::jobsvd::novec) {
+                queue.submit([&](sycl::handler& cgh) {
+                    auto u_acc = u.template get_access<sycl::access::mode::write>(cgh);
+                    auto scratch_acc =
+                        scratchpad.template get_access<sycl::access::mode::read>(cgh);
+                    cgh.parallel_for(sycl::range<1>(static_cast<std::size_t>(u_size)),
+                                     [=](sycl::id<1> index) {
+                                         const std::int64_t i = index[0];
+                                         const std::int64_t row = i % m;
+                                         const std::int64_t column = i / m;
+                                         u_acc[row + column * ldu] = scratch_acc[work_size + i];
+                                     });
+                });
+            }
+
+            const std::int64_t vt_rows = jobvt == oneapi::math::jobsvd::vectors ? n : m;
+            const std::int64_t vt_size = vt_rows * n;
+            if (jobvt == oneapi::math::jobsvd::vectorsina) {
+                queue.submit([&](sycl::handler& cgh) {
+                    auto a_acc = a.template get_access<sycl::access::mode::read_write>(cgh);
+                    auto scratch_acc =
+                        scratchpad.template get_access<sycl::access::mode::read>(cgh);
+                    cgh.parallel_for(
+                        sycl::range<1>(static_cast<std::size_t>(vt_size)), [=](sycl::id<1> index) {
+                            const std::int64_t i = index[0];
+                            const std::int64_t row = i % vt_rows;
+                            const std::int64_t column = i / vt_rows;
+                            const auto value = scratch_acc[work_size + u_size + column + row * n];
+                            a_acc[row + column * lda] = conjugate_if_needed(value);
+                        });
+                });
+            }
+            else if (jobvt != oneapi::math::jobsvd::novec) {
+                queue.submit([&](sycl::handler& cgh) {
+                    auto vt_acc = vt.template get_access<sycl::access::mode::write>(cgh);
+                    auto scratch_acc =
+                        scratchpad.template get_access<sycl::access::mode::read>(cgh);
+                    cgh.parallel_for(
+                        sycl::range<1>(static_cast<std::size_t>(vt_size)), [=](sycl::id<1> index) {
+                            const std::int64_t i = index[0];
+                            const std::int64_t row = i % vt_rows;
+                            const std::int64_t column = i / vt_rows;
+                            const auto value = scratch_acc[work_size + u_size + column + row * n];
+                            vt_acc[row + column * ldvt] = conjugate_if_needed(value);
+                        });
+                });
+            }
+
+            lapack_info_check(queue, devInfo, __func__, funcj_name);
+        }
+        catch (...) {
+            try {
+                queue.wait();
+            }
+            catch (...) {
+            }
+            cusolverDnDestroyGesvdjInfo(params);
+            throw;
+        }
+        CUSOLVER_ERROR_FUNC(cusolverDnDestroyGesvdjInfo, params_err, params);
+        return;
+    }
 
     sycl::buffer<int> devInfo{ 1 };
     queue.submit([&](sycl::handler& cgh) {
@@ -305,20 +473,21 @@ inline void gesvd(const char* func_name, Func func, sycl::queue& queue, oneapi::
     lapack_info_check(queue, devInfo, __func__, func_name);
 }
 
-#define GESVD_LAUNCHER(TYPE_A, TYPE_B, CUSOLVER_ROUTINE)                                        \
-    void gesvd(sycl::queue& queue, oneapi::math::jobsvd jobu, oneapi::math::jobsvd jobvt,       \
-               std::int64_t m, std::int64_t n, sycl::buffer<TYPE_A>& a, std::int64_t lda,       \
-               sycl::buffer<TYPE_B>& s, sycl::buffer<TYPE_A>& u, std::int64_t ldu,              \
-               sycl::buffer<TYPE_A>& vt, std::int64_t ldvt, sycl::buffer<TYPE_A>& scratchpad,   \
-               std::int64_t scratchpad_size) {                                                  \
-        gesvd(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, jobu, jobvt, m, n, a, lda, s, u, ldu, \
-              vt, ldvt, scratchpad, scratchpad_size);                                           \
+#define GESVD_LAUNCHER(TYPE_A, TYPE_B, CUSOLVER_ROUTINE, CUSOLVER_GESVDJ_ROUTINE)             \
+    void gesvd(sycl::queue& queue, oneapi::math::jobsvd jobu, oneapi::math::jobsvd jobvt,     \
+               std::int64_t m, std::int64_t n, sycl::buffer<TYPE_A>& a, std::int64_t lda,     \
+               sycl::buffer<TYPE_B>& s, sycl::buffer<TYPE_A>& u, std::int64_t ldu,            \
+               sycl::buffer<TYPE_A>& vt, std::int64_t ldvt, sycl::buffer<TYPE_A>& scratchpad, \
+               std::int64_t scratchpad_size) {                                                \
+        gesvd(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, #CUSOLVER_GESVDJ_ROUTINE,                  \
+              CUSOLVER_GESVDJ_ROUTINE, queue, jobu, jobvt, m, n, a, lda, s, u, ldu, vt, ldvt, \
+              scratchpad, scratchpad_size);                                                   \
     }
 
-GESVD_LAUNCHER(float, float, cusolverDnSgesvd)
-GESVD_LAUNCHER(double, double, cusolverDnDgesvd)
-GESVD_LAUNCHER(std::complex<float>, float, cusolverDnCgesvd)
-GESVD_LAUNCHER(std::complex<double>, double, cusolverDnZgesvd)
+GESVD_LAUNCHER(float, float, cusolverDnSgesvd, cusolverDnSgesvdj)
+GESVD_LAUNCHER(double, double, cusolverDnDgesvd, cusolverDnDgesvdj)
+GESVD_LAUNCHER(std::complex<float>, float, cusolverDnCgesvd, cusolverDnCgesvdj)
+GESVD_LAUNCHER(std::complex<double>, double, cusolverDnZgesvd, cusolverDnZgesvdj)
 
 #undef GESVD_LAUNCHER
 
@@ -1455,19 +1624,141 @@ GETRS_LAUNCHER_USM(std::complex<double>, cusolverDnZgetrs)
 
 #undef GETRS_LAUNCHER_USM
 
-template <typename Func, typename T_A, typename T_B>
-inline sycl::event gesvd(const char* func_name, Func func, sycl::queue& queue,
-                         oneapi::math::jobsvd jobu, oneapi::math::jobsvd jobvt, std::int64_t m,
-                         std::int64_t n, T_A* a, std::int64_t lda, T_B* s, T_A* u, std::int64_t ldu,
-                         T_A* vt, std::int64_t ldvt, T_A* scratchpad, std::int64_t scratchpad_size,
+template <typename Func, typename FuncJ, typename T_A, typename T_B>
+inline sycl::event gesvd(const char* func_name, Func func, const char* funcj_name, FuncJ funcj,
+                         sycl::queue& queue, oneapi::math::jobsvd jobu, oneapi::math::jobsvd jobvt,
+                         std::int64_t m, std::int64_t n, T_A* a, std::int64_t lda, T_B* s, T_A* u,
+                         std::int64_t ldu, T_A* vt, std::int64_t ldvt, T_A* scratchpad,
+                         std::int64_t scratchpad_size,
                          const std::vector<sycl::event>& dependencies) {
     using cuDataType_A = typename CudaEquivalentType<T_A>::Type;
     using cuDataType_B = typename CudaEquivalentType<T_B>::Type;
     overflow_check(m, n, lda, ldu, ldvt, scratchpad_size);
+    validate_gesvd_jobs(jobu, jobvt);
 
-    // cusolver gesvd only supports m >= n (see cuSOLVER documentation).
-    if (m < n)
-        throw unimplemented("lapack", "gesvd", "cusolver gesvd does not support m < n");
+    // LAPACK returns without referencing s, u or vt when either dimension is zero.
+    if (m == 0 || n == 0) {
+        return queue.submit([&](sycl::handler& cgh) {
+            cgh.depends_on(dependencies);
+            cgh.single_task([=]() {});
+        });
+    }
+
+    // cuSOLVER's QR-based gesvd is used for m >= n, while its Jacobi gesvdj is used
+    // for m < n. Pin gesvdj's tolerance and sweep limit so wide-matrix convergence
+    // does not depend on the defaults of the installed CUDA release.
+    if (m < n) {
+        const bool vectors_requested = gesvd_vectors_requested(jobu, jobvt);
+        const int econ = gesvdj_economy_mode(jobvt);
+        const std::int64_t u_size = vectors_requested ? m * std::min(m, n) : 0;
+        const std::int64_t temporary_size = gesvdj_temporary_size(jobu, jobvt, m, n);
+        if (scratchpad_size < temporary_size)
+            throw invalid_argument("gesvd", "scratchpad size is too small");
+        const std::int64_t work_size = scratchpad_size - temporary_size;
+        const std::int64_t native_ldu = std::max<std::int64_t>(1, m);
+        const std::int64_t native_ldv = std::max<std::int64_t>(1, n);
+
+        cusolverStatus_t params_err;
+        gesvdjInfo_t params = nullptr;
+        CUSOLVER_ERROR_FUNC(cusolverDnCreateGesvdjInfo, params_err, &params);
+        // Keep params alive until devInfo confirms that the asynchronous native work completed.
+        int* devInfo = nullptr;
+        sycl::event done;
+        try {
+            configure_gesvdj<T_B>(params);
+            devInfo = (int*)malloc_device(sizeof(int), queue);
+            done = queue.submit([&](sycl::handler& cgh) {
+                int64_t num_events = dependencies.size();
+                for (int64_t i = 0; i < num_events; i++) {
+                    cgh.depends_on(dependencies[i]);
+                }
+                onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+                    auto handle = sc.get_handle(queue);
+                    auto a_ = reinterpret_cast<cuDataType_A*>(a);
+                    auto s_ = reinterpret_cast<cuDataType_B*>(s);
+                    auto scratch_ = reinterpret_cast<cuDataType_A*>(scratchpad);
+                    auto u_ = vectors_requested ? scratch_ + work_size : scratch_;
+                    auto v_ = vectors_requested ? u_ + u_size : scratch_;
+                    cusolverStatus_t err;
+                    cusolver_native_named_func(
+                        funcj_name, funcj, err, handle,
+                        vectors_requested ? CUSOLVER_EIG_MODE_VECTOR : CUSOLVER_EIG_MODE_NOVECTOR,
+                        econ, m, n, a_, lda, s_, u_, native_ldu, v_, native_ldv, scratch_,
+                        work_size, devInfo, params);
+                });
+            });
+
+            if (jobu == oneapi::math::jobsvd::vectorsina) {
+                done = queue.submit([&](sycl::handler& cgh) {
+                    cgh.depends_on(done);
+                    cgh.parallel_for(sycl::range<1>(static_cast<std::size_t>(u_size)),
+                                     [=](sycl::id<1> index) {
+                                         const std::int64_t i = index[0];
+                                         const std::int64_t row = i % m;
+                                         const std::int64_t column = i / m;
+                                         a[row + column * lda] = scratchpad[work_size + i];
+                                     });
+                });
+            }
+            else if (jobu != oneapi::math::jobsvd::novec) {
+                done = queue.submit([&](sycl::handler& cgh) {
+                    cgh.depends_on(done);
+                    cgh.parallel_for(sycl::range<1>(static_cast<std::size_t>(u_size)),
+                                     [=](sycl::id<1> index) {
+                                         const std::int64_t i = index[0];
+                                         const std::int64_t row = i % m;
+                                         const std::int64_t column = i / m;
+                                         u[row + column * ldu] = scratchpad[work_size + i];
+                                     });
+                });
+            }
+
+            const std::int64_t vt_rows = jobvt == oneapi::math::jobsvd::vectors ? n : m;
+            const std::int64_t vt_size = vt_rows * n;
+            if (jobvt == oneapi::math::jobsvd::vectorsina) {
+                done = queue.submit([&](sycl::handler& cgh) {
+                    cgh.depends_on(done);
+                    cgh.parallel_for(
+                        sycl::range<1>(static_cast<std::size_t>(vt_size)), [=](sycl::id<1> index) {
+                            const std::int64_t i = index[0];
+                            const std::int64_t row = i % vt_rows;
+                            const std::int64_t column = i / vt_rows;
+                            const auto value = scratchpad[work_size + u_size + column + row * n];
+                            a[row + column * lda] = conjugate_if_needed(value);
+                        });
+                });
+            }
+            else if (jobvt != oneapi::math::jobsvd::novec) {
+                done = queue.submit([&](sycl::handler& cgh) {
+                    cgh.depends_on(done);
+                    cgh.parallel_for(
+                        sycl::range<1>(static_cast<std::size_t>(vt_size)), [=](sycl::id<1> index) {
+                            const std::int64_t i = index[0];
+                            const std::int64_t row = i % vt_rows;
+                            const std::int64_t column = i / vt_rows;
+                            const auto value = scratchpad[work_size + u_size + column + row * n];
+                            vt[row + column * ldvt] = conjugate_if_needed(value);
+                        });
+                });
+            }
+
+            lapack_info_check(queue, devInfo, __func__, funcj_name);
+        }
+        catch (...) {
+            try {
+                queue.wait();
+            }
+            catch (...) {
+            }
+            if (devInfo)
+                free(devInfo, queue);
+            cusolverDnDestroyGesvdjInfo(params);
+            throw;
+        }
+        free(devInfo, queue);
+        CUSOLVER_ERROR_FUNC(cusolverDnDestroyGesvdjInfo, params_err, params);
+        return done;
+    }
 
     int* devInfo = (int*)malloc_device(sizeof(int), queue);
     auto done = queue.submit([&](sycl::handler& cgh) {
@@ -1495,20 +1786,21 @@ inline sycl::event gesvd(const char* func_name, Func func, sycl::queue& queue,
     return done;
 }
 
-#define GESVD_LAUNCHER_USM(TYPE_A, TYPE_B, CUSOLVER_ROUTINE)                                      \
-    sycl::event gesvd(sycl::queue& queue, oneapi::math::jobsvd jobu, oneapi::math::jobsvd jobvt,  \
-                      std::int64_t m, std::int64_t n, TYPE_A* a, std::int64_t lda, TYPE_B* s,     \
-                      TYPE_A* u, std::int64_t ldu, TYPE_A* vt, std::int64_t ldvt,                 \
-                      TYPE_A* scratchpad, std::int64_t scratchpad_size,                           \
-                      const std::vector<sycl::event>& dependencies) {                             \
-        return gesvd(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, jobu, jobvt, m, n, a, lda, s, u, \
-                     ldu, vt, ldvt, scratchpad, scratchpad_size, dependencies);                   \
+#define GESVD_LAUNCHER_USM(TYPE_A, TYPE_B, CUSOLVER_ROUTINE, CUSOLVER_GESVDJ_ROUTINE)            \
+    sycl::event gesvd(sycl::queue& queue, oneapi::math::jobsvd jobu, oneapi::math::jobsvd jobvt, \
+                      std::int64_t m, std::int64_t n, TYPE_A* a, std::int64_t lda, TYPE_B* s,    \
+                      TYPE_A* u, std::int64_t ldu, TYPE_A* vt, std::int64_t ldvt,                \
+                      TYPE_A* scratchpad, std::int64_t scratchpad_size,                          \
+                      const std::vector<sycl::event>& dependencies) {                            \
+        return gesvd(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, #CUSOLVER_GESVDJ_ROUTINE,              \
+                     CUSOLVER_GESVDJ_ROUTINE, queue, jobu, jobvt, m, n, a, lda, s, u, ldu, vt,   \
+                     ldvt, scratchpad, scratchpad_size, dependencies);                           \
     }
 
-GESVD_LAUNCHER_USM(float, float, cusolverDnSgesvd)
-GESVD_LAUNCHER_USM(double, double, cusolverDnDgesvd)
-GESVD_LAUNCHER_USM(std::complex<float>, float, cusolverDnCgesvd)
-GESVD_LAUNCHER_USM(std::complex<double>, double, cusolverDnZgesvd)
+GESVD_LAUNCHER_USM(float, float, cusolverDnSgesvd, cusolverDnSgesvdj)
+GESVD_LAUNCHER_USM(double, double, cusolverDnDgesvd, cusolverDnDgesvdj)
+GESVD_LAUNCHER_USM(std::complex<float>, float, cusolverDnCgesvd, cusolverDnCgesvdj)
+GESVD_LAUNCHER_USM(std::complex<double>, double, cusolverDnZgesvd, cusolverDnZgesvdj)
 
 #undef GESVD_LAUNCHER_USM
 
@@ -2543,41 +2835,84 @@ GEQRF_LAUNCHER_SCRATCH(std::complex<double>, cusolverDnZgeqrf_bufferSize)
 
 #undef GEQRF_LAUNCHER_SCRATCH
 
-template <typename Func>
-inline void gesvd_scratchpad_size(const char* func_name, Func func, sycl::queue& queue,
-                                  oneapi::math::jobsvd jobu, oneapi::math::jobsvd jobvt,
-                                  std::int64_t m, std::int64_t n, std::int64_t lda,
-                                  std::int64_t ldu, std::int64_t ldvt, int* scratch_size) {
-    // cusolver gesvd only supports m >= n (see cuSOLVER documentation).
-    if (m < n)
-        throw unimplemented("lapack", "gesvd", "cusolver gesvd does not support m < n");
-
-    queue
-        .submit([&](sycl::handler& cgh) {
-            onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
-                auto handle = sc.get_handle(queue);
-                cusolverStatus_t err;
-                CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, m, n, scratch_size);
-            });
-        })
-        .wait();
-}
-
-#define GESVD_LAUNCHER_SCRATCH(TYPE, CUSOLVER_ROUTINE)                                            \
-    template <>                                                                                   \
-    std::int64_t gesvd_scratchpad_size<TYPE>(                                                     \
-        sycl::queue & queue, oneapi::math::jobsvd jobu, oneapi::math::jobsvd jobvt,               \
-        std::int64_t m, std::int64_t n, std::int64_t lda, std::int64_t ldu, std::int64_t ldvt) {  \
-        int scratch_size;                                                                         \
-        gesvd_scratchpad_size(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, jobu, jobvt, m, n, lda, \
-                              ldu, ldvt, &scratch_size);                                          \
-        return scratch_size;                                                                      \
+template <typename Func, typename FuncJ>
+inline void gesvd_scratchpad_size(const char* func_name, Func func, const char* funcj_name,
+                                  FuncJ funcj, sycl::queue& queue, oneapi::math::jobsvd jobu,
+                                  oneapi::math::jobsvd jobvt, std::int64_t m, std::int64_t n,
+                                  std::int64_t lda, std::int64_t ldu, std::int64_t ldvt,
+                                  std::int64_t* scratch_size) {
+    overflow_check(m, n, lda, ldu, ldvt);
+    validate_gesvd_jobs(jobu, jobvt);
+    if (m == 0 || n == 0) {
+        *scratch_size = 0;
+        return;
+    }
+    if (m < n) {
+        const bool vectors_requested = gesvd_vectors_requested(jobu, jobvt);
+        const int econ = gesvdj_economy_mode(jobvt);
+        int native_scratch_size = 0;
+        queue
+            .submit([&](sycl::handler& cgh) {
+                onemath_cusolver_host_task(
+                    cgh, queue, [=, &native_scratch_size](CusolverScopedContextHandler& sc) {
+                        auto handle = sc.get_handle(queue);
+                        cusolverStatus_t err;
+                        gesvdjInfo_t params = nullptr;
+                        CUSOLVER_ERROR_FUNC(cusolverDnCreateGesvdjInfo, err, &params);
+                        try {
+                            CUSOLVER_ERROR_FUNC_T(funcj_name, funcj, err, handle,
+                                                  vectors_requested ? CUSOLVER_EIG_MODE_VECTOR
+                                                                    : CUSOLVER_EIG_MODE_NOVECTOR,
+                                                  econ, m, n, nullptr, lda, nullptr, nullptr,
+                                                  std::max<std::int64_t>(1, m), nullptr,
+                                                  std::max<std::int64_t>(1, n),
+                                                  &native_scratch_size, params);
+                        }
+                        catch (...) {
+                            cusolverDnDestroyGesvdjInfo(params);
+                            throw;
+                        }
+                        CUSOLVER_ERROR_FUNC(cusolverDnDestroyGesvdjInfo, err, params);
+                    });
+            })
+            .wait();
+        *scratch_size = native_scratch_size + gesvdj_temporary_size(jobu, jobvt, m, n);
+        return;
     }
 
-GESVD_LAUNCHER_SCRATCH(float, cusolverDnSgesvd_bufferSize)
-GESVD_LAUNCHER_SCRATCH(double, cusolverDnDgesvd_bufferSize)
-GESVD_LAUNCHER_SCRATCH(std::complex<float>, cusolverDnCgesvd_bufferSize)
-GESVD_LAUNCHER_SCRATCH(std::complex<double>, cusolverDnZgesvd_bufferSize)
+    int native_scratch_size = 0;
+    queue
+        .submit([&](sycl::handler& cgh) {
+            onemath_cusolver_host_task(cgh, queue,
+                                       [=, &native_scratch_size](CusolverScopedContextHandler& sc) {
+                                           auto handle = sc.get_handle(queue);
+                                           cusolverStatus_t err;
+                                           CUSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle,
+                                                                      m, n, &native_scratch_size);
+                                       });
+        })
+        .wait();
+    *scratch_size = native_scratch_size;
+}
+
+#define GESVD_LAUNCHER_SCRATCH(TYPE, CUSOLVER_ROUTINE, CUSOLVER_GESVDJ_ROUTINE)                  \
+    template <>                                                                                  \
+    std::int64_t gesvd_scratchpad_size<TYPE>(                                                    \
+        sycl::queue & queue, oneapi::math::jobsvd jobu, oneapi::math::jobsvd jobvt,              \
+        std::int64_t m, std::int64_t n, std::int64_t lda, std::int64_t ldu, std::int64_t ldvt) { \
+        std::int64_t scratch_size;                                                               \
+        gesvd_scratchpad_size(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, #CUSOLVER_GESVDJ_ROUTINE,     \
+                              CUSOLVER_GESVDJ_ROUTINE, queue, jobu, jobvt, m, n, lda, ldu, ldvt, \
+                              &scratch_size);                                                    \
+        return scratch_size;                                                                     \
+    }
+
+GESVD_LAUNCHER_SCRATCH(float, cusolverDnSgesvd_bufferSize, cusolverDnSgesvdj_bufferSize)
+GESVD_LAUNCHER_SCRATCH(double, cusolverDnDgesvd_bufferSize, cusolverDnDgesvdj_bufferSize)
+GESVD_LAUNCHER_SCRATCH(std::complex<float>, cusolverDnCgesvd_bufferSize,
+                       cusolverDnCgesvdj_bufferSize)
+GESVD_LAUNCHER_SCRATCH(std::complex<double>, cusolverDnZgesvd_bufferSize,
+                       cusolverDnZgesvdj_bufferSize)
 
 #undef GESVD_LAUNCHER_SCRATCH
 
