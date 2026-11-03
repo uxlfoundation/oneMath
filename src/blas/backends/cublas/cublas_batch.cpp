@@ -21,6 +21,22 @@
 #include "oneapi/math/exceptions.hpp"
 #include "oneapi/math/blas/detail/cublas/onemath_blas_cublas.hpp"
 
+// cublas<t>dgmm_64 takes int64_t sizes and was added in CUDA 12.0. Earlier
+// toolkits only have the 32-bit entry points, which need an overflow check.
+#if defined(CUDA_VERSION) && CUDA_VERSION >= 12000
+#define ONEMATH_CUBLAS_HAS_DGMM_64 1
+#define ONEMATH_CUBLAS_SDGMM       cublasSdgmm_64
+#define ONEMATH_CUBLAS_DDGMM       cublasDdgmm_64
+#define ONEMATH_CUBLAS_CDGMM       cublasCdgmm_64
+#define ONEMATH_CUBLAS_ZDGMM       cublasZdgmm_64
+#else
+#define ONEMATH_CUBLAS_HAS_DGMM_64 0
+#define ONEMATH_CUBLAS_SDGMM       cublasSdgmm
+#define ONEMATH_CUBLAS_DDGMM       cublasDdgmm
+#define ONEMATH_CUBLAS_CDGMM       cublasCdgmm
+#define ONEMATH_CUBLAS_ZDGMM       cublasZdgmm
+#endif
+
 namespace oneapi {
 namespace math {
 namespace blas {
@@ -118,13 +134,17 @@ void gemv_batch(sycl::queue& queue, transpose transa, int64_t m, int64_t n,
 }
 
 // cuBLAS has no batched/strided variant of <t>dgmm (only cublas<t>dgmm), so
-// dgmm_batch is implemented as a loop of cublas<t>dgmm calls. See issue #562.
+// dgmm_batch is a loop of cublas<t>dgmm calls, one launch per matrix. Large
+// batch_size therefore does not scale like a native batched kernel. See issue #562.
 template <typename Func, typename T>
 inline void dgmm_batch(const char* func_name, Func func, sycl::queue& queue, side left_right,
                        int64_t m, int64_t n, sycl::buffer<T, 1>& a, int64_t lda, int64_t stride_a,
                        sycl::buffer<T, 1>& x, int64_t incx, int64_t stride_x, sycl::buffer<T, 1>& c,
                        int64_t ldc, int64_t stride_c, int64_t batch_size) {
     using cuDataType = typename CudaEquivalentType<T>::Type;
+#if !ONEMATH_CUBLAS_HAS_DGMM_64
+    overflow_check(m, n, lda, ldc, incx, stride_a, stride_x, stride_c, batch_size);
+#endif
     queue.submit([&](sycl::handler& cgh) {
         auto a_acc = a.template get_access<sycl::access::mode::read>(cgh);
         auto x_acc = x.template get_access<sycl::access::mode::read>(cgh);
@@ -154,10 +174,10 @@ inline void dgmm_batch(const char* func_name, Func func, sycl::queue& queue, sid
                    incx, stride_x, c, ldc, stride_c, batch_size);                                  \
     }
 
-DGMM_STRIDED_BATCH_LAUNCHER(float, cublasSdgmm_64)
-DGMM_STRIDED_BATCH_LAUNCHER(double, cublasDdgmm_64)
-DGMM_STRIDED_BATCH_LAUNCHER(std::complex<float>, cublasCdgmm_64)
-DGMM_STRIDED_BATCH_LAUNCHER(std::complex<double>, cublasZdgmm_64)
+DGMM_STRIDED_BATCH_LAUNCHER(float, ONEMATH_CUBLAS_SDGMM)
+DGMM_STRIDED_BATCH_LAUNCHER(double, ONEMATH_CUBLAS_DDGMM)
+DGMM_STRIDED_BATCH_LAUNCHER(std::complex<float>, ONEMATH_CUBLAS_CDGMM)
+DGMM_STRIDED_BATCH_LAUNCHER(std::complex<double>, ONEMATH_CUBLAS_ZDGMM)
 
 #undef DGMM_STRIDED_BATCH_LAUNCHER
 
@@ -579,6 +599,9 @@ inline sycl::event dgmm_batch(const char* func_name, Func func, sycl::queue& que
                               int64_t stride_c, int64_t batch_size,
                               const std::vector<sycl::event>& dependencies) {
     using cuDataType = typename CudaEquivalentType<T>::Type;
+#if !ONEMATH_CUBLAS_HAS_DGMM_64
+    overflow_check(m, n, lda, ldc, incx, stride_a, stride_x, stride_c, batch_size);
+#endif
     auto done = queue.submit([&](sycl::handler& cgh) {
         int64_t num_events = dependencies.size();
         for (int64_t i = 0; i < num_events; i++) {
@@ -611,10 +634,10 @@ inline sycl::event dgmm_batch(const char* func_name, Func func, sycl::queue& que
                           dependencies);                                                           \
     }
 
-DGMM_STRIDED_BATCH_LAUNCHER_USM(float, cublasSdgmm_64)
-DGMM_STRIDED_BATCH_LAUNCHER_USM(double, cublasDdgmm_64)
-DGMM_STRIDED_BATCH_LAUNCHER_USM(std::complex<float>, cublasCdgmm_64)
-DGMM_STRIDED_BATCH_LAUNCHER_USM(std::complex<double>, cublasZdgmm_64)
+DGMM_STRIDED_BATCH_LAUNCHER_USM(float, ONEMATH_CUBLAS_SDGMM)
+DGMM_STRIDED_BATCH_LAUNCHER_USM(double, ONEMATH_CUBLAS_DDGMM)
+DGMM_STRIDED_BATCH_LAUNCHER_USM(std::complex<float>, ONEMATH_CUBLAS_CDGMM)
+DGMM_STRIDED_BATCH_LAUNCHER_USM(std::complex<double>, ONEMATH_CUBLAS_ZDGMM)
 
 #undef DGMM_STRIDED_BATCH_LAUNCHER_USM
 
@@ -628,6 +651,10 @@ inline sycl::event dgmm_batch(const char* func_name, Func func, sycl::queue& que
                               int64_t* groupsize, const std::vector<sycl::event>& dependencies,
                               bool flip_side = false) {
     using cuDataType = typename CudaEquivalentType<T>::Type;
+#if !ONEMATH_CUBLAS_HAS_DGMM_64
+    for (int64_t i = 0; i < group_count; i++)
+        overflow_check(m[i], n[i], lda[i], ldc[i], incx[i], groupsize[i]);
+#endif
     auto done = queue.submit([&](sycl::handler& cgh) {
         int64_t num_events = dependencies.size();
         for (int64_t i = 0; i < num_events; i++) {
@@ -663,10 +690,10 @@ inline sycl::event dgmm_batch(const char* func_name, Func func, sycl::queue& que
                           incx, c, ldc, group_count, groupsize, dependencies);                    \
     }
 
-DGMM_GROUP_BATCH_LAUNCHER_USM(float, cublasSdgmm_64)
-DGMM_GROUP_BATCH_LAUNCHER_USM(double, cublasDdgmm_64)
-DGMM_GROUP_BATCH_LAUNCHER_USM(std::complex<float>, cublasCdgmm_64)
-DGMM_GROUP_BATCH_LAUNCHER_USM(std::complex<double>, cublasZdgmm_64)
+DGMM_GROUP_BATCH_LAUNCHER_USM(float, ONEMATH_CUBLAS_SDGMM)
+DGMM_GROUP_BATCH_LAUNCHER_USM(double, ONEMATH_CUBLAS_DDGMM)
+DGMM_GROUP_BATCH_LAUNCHER_USM(std::complex<float>, ONEMATH_CUBLAS_CDGMM)
+DGMM_GROUP_BATCH_LAUNCHER_USM(std::complex<double>, ONEMATH_CUBLAS_ZDGMM)
 
 #undef DGMM_GROUP_BATCH_LAUNCHER_USM
 
@@ -1596,10 +1623,10 @@ DGMM_STRIDED_BATCH_LAUNCHER_USM(std::complex<double>)
                                         dependencies, /*flip_side=*/true);                        \
     }
 
-DGMM_GROUP_BATCH_LAUNCHER_USM(float, cublasSdgmm_64)
-DGMM_GROUP_BATCH_LAUNCHER_USM(double, cublasDdgmm_64)
-DGMM_GROUP_BATCH_LAUNCHER_USM(std::complex<float>, cublasCdgmm_64)
-DGMM_GROUP_BATCH_LAUNCHER_USM(std::complex<double>, cublasZdgmm_64)
+DGMM_GROUP_BATCH_LAUNCHER_USM(float, ONEMATH_CUBLAS_SDGMM)
+DGMM_GROUP_BATCH_LAUNCHER_USM(double, ONEMATH_CUBLAS_DDGMM)
+DGMM_GROUP_BATCH_LAUNCHER_USM(std::complex<float>, ONEMATH_CUBLAS_CDGMM)
+DGMM_GROUP_BATCH_LAUNCHER_USM(std::complex<double>, ONEMATH_CUBLAS_ZDGMM)
 
 #undef DGMM_GROUP_BATCH_LAUNCHER_USM
 
