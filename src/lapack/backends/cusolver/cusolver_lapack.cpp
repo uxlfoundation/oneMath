@@ -16,6 +16,9 @@
 *  limitations under the License.
 *
 **************************************************************************/
+#include <limits>
+
+#include "cublas_helper.hpp"
 #include "cusolver_helper.hpp"
 #include "cusolver_task.hpp"
 
@@ -970,32 +973,101 @@ SYTRF_LAUNCHER(std::complex<double>, cusolverDnZsytrf)
 
 #undef SYTRF_LAUNCHER
 
-void trtrs(sycl::queue& queue, oneapi::math::uplo uplo, oneapi::math::transpose trans,
-           oneapi::math::diag diag, std::int64_t n, std::int64_t nrhs,
-           sycl::buffer<std::complex<float>>& a, std::int64_t lda,
-           sycl::buffer<std::complex<float>>& b, std::int64_t ldb,
-           sycl::buffer<std::complex<float>>& scratchpad, std::int64_t scratchpad_size) {
-    throw unimplemented("lapack", "trtrs");
+// cuSOLVER has no trtrs, but cublas<t>trsm solves the same system with
+// alpha = 1. trsm divides by the diagonal of a without reporting a singular
+// matrix, which LAPACK does through info while leaving b untouched, so the
+// diagonal is searched for a zero before the solve is enqueued.
+
+constexpr int trtrs_not_singular = std::numeric_limits<int>::max();
+
+inline void trtrs_throw_if_singular(int singular_index) {
+    if (singular_index == trtrs_not_singular)
+        return;
+
+    throw oneapi::math::lapack::computation_error(
+        "trtrs",
+        "the diagonal element " + std::to_string(singular_index) +
+            " of a is zero, a is singular and the solution has not been computed",
+        singular_index);
 }
-void trtrs(sycl::queue& queue, oneapi::math::uplo uplo, oneapi::math::transpose trans,
-           oneapi::math::diag diag, std::int64_t n, std::int64_t nrhs, sycl::buffer<double>& a,
-           std::int64_t lda, sycl::buffer<double>& b, std::int64_t ldb,
-           sycl::buffer<double>& scratchpad, std::int64_t scratchpad_size) {
-    throw unimplemented("lapack", "trtrs");
+
+// Returns the one based index of the first zero diagonal element of a, or
+// trtrs_not_singular. A unit diagonal is not referenced by trsm.
+template <typename T>
+inline int trtrs_find_zero_diagonal(sycl::queue& queue, oneapi::math::diag diag, std::int64_t n,
+                                    sycl::buffer<T>& a, std::int64_t lda) {
+    int singular_index = trtrs_not_singular;
+    if (diag == oneapi::math::diag::unit || n <= 0)
+        return singular_index;
+
+    {
+        sycl::buffer<int> singular_index_buf{ &singular_index, sycl::range<1>{ 1 } };
+        queue.submit([&](sycl::handler& cgh) {
+            sycl::accessor a_acc{ a, cgh, sycl::read_only };
+            sycl::accessor singular_index_acc{ singular_index_buf, cgh, sycl::read_write };
+            cgh.parallel_for(sycl::range<1>{ static_cast<std::size_t>(n) }, [=](sycl::id<1> index) {
+                const std::int64_t i = index[0];
+                if (a_acc[i + i * lda] == T(0)) {
+                    sycl::atomic_ref<int, sycl::memory_order::relaxed, sycl::memory_scope::device>
+                        first{ singular_index_acc[0] };
+                    first.fetch_min(static_cast<int>(i) + 1);
+                }
+            });
+        });
+    }
+    return singular_index;
 }
-void trtrs(sycl::queue& queue, oneapi::math::uplo uplo, oneapi::math::transpose trans,
-           oneapi::math::diag diag, std::int64_t n, std::int64_t nrhs, sycl::buffer<float>& a,
-           std::int64_t lda, sycl::buffer<float>& b, std::int64_t ldb,
-           sycl::buffer<float>& scratchpad, std::int64_t scratchpad_size) {
-    throw unimplemented("lapack", "trtrs");
+
+template <typename Func, typename T>
+inline void trtrs(const char* func_name, Func func, sycl::queue& queue, oneapi::math::uplo uplo,
+                  oneapi::math::transpose trans, oneapi::math::diag diag, std::int64_t n,
+                  std::int64_t nrhs, sycl::buffer<T>& a, std::int64_t lda, sycl::buffer<T>& b,
+                  std::int64_t ldb, sycl::buffer<T>& scratchpad, std::int64_t scratchpad_size) {
+    using cuDataType = typename CudaEquivalentType<T>::Type;
+    overflow_check(n, nrhs, lda, ldb, scratchpad_size);
+
+    trtrs_throw_if_singular(trtrs_find_zero_diagonal(queue, diag, n, a, lda));
+
+    queue.submit([&](sycl::handler& cgh) {
+        using blas::cublas::cublas_error;
+
+        auto a_acc = a.template get_access<sycl::access::mode::read>(cgh);
+        auto b_acc = b.template get_access<sycl::access::mode::read_write>(cgh);
+        onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+            const T alpha = T(1);
+            auto a_ = sc.get_mem<cuDataType*>(a_acc);
+            auto b_ = sc.get_mem<cuDataType*>(b_acc);
+            cublasStatus_t err;
+            cublasHandle_t cublas_handle;
+            CUBLAS_ERROR_FUNC(cublasCreate, err, &cublas_handle);
+            CUstream cu_stream = sycl::get_native<sycl::backend::ext_oneapi_cuda>(queue);
+            CUBLAS_ERROR_FUNC(cublasSetStream, err, cublas_handle, cu_stream);
+
+            blas::cublas::cublas_native_named_func(
+                func_name, func, err, cublas_handle, CUBLAS_SIDE_LEFT, get_cublas_fill_mode(uplo),
+                get_cublas_operation(trans), get_cublas_diag_type(diag), n, nrhs,
+                (cuDataType*)&alpha, a_, lda, b_, ldb);
+
+            CUBLAS_ERROR_FUNC(cublasDestroy, err, cublas_handle);
+        });
+    });
 }
-void trtrs(sycl::queue& queue, oneapi::math::uplo uplo, oneapi::math::transpose trans,
-           oneapi::math::diag diag, std::int64_t n, std::int64_t nrhs,
-           sycl::buffer<std::complex<double>>& a, std::int64_t lda,
-           sycl::buffer<std::complex<double>>& b, std::int64_t ldb,
-           sycl::buffer<std::complex<double>>& scratchpad, std::int64_t scratchpad_size) {
-    throw unimplemented("lapack", "trtrs");
-}
+
+#define TRTRS_LAUNCHER(TYPE, CUBLAS_ROUTINE)                                                      \
+    void trtrs(sycl::queue& queue, oneapi::math::uplo uplo, oneapi::math::transpose trans,        \
+               oneapi::math::diag diag, std::int64_t n, std::int64_t nrhs, sycl::buffer<TYPE>& a, \
+               std::int64_t lda, sycl::buffer<TYPE>& b, std::int64_t ldb,                         \
+               sycl::buffer<TYPE>& scratchpad, std::int64_t scratchpad_size) {                    \
+        trtrs(#CUBLAS_ROUTINE, CUBLAS_ROUTINE, queue, uplo, trans, diag, n, nrhs, a, lda, b, ldb, \
+              scratchpad, scratchpad_size);                                                       \
+    }
+
+TRTRS_LAUNCHER(float, cublasStrsm)
+TRTRS_LAUNCHER(double, cublasDtrsm)
+TRTRS_LAUNCHER(std::complex<float>, cublasCtrsm)
+TRTRS_LAUNCHER(std::complex<double>, cublasZtrsm)
+
+#undef TRTRS_LAUNCHER
 
 template <typename Func, typename T>
 inline void ungbr(const char* func_name, Func func, sycl::queue& queue, oneapi::math::generate vec,
@@ -2209,32 +2281,97 @@ SYTRF_LAUNCHER_USM(std::complex<double>, cusolverDnZsytrf)
 
 #undef SYTRF_LAUNCHER_USM
 
-sycl::event trtrs(sycl::queue& queue, oneapi::math::uplo uplo, oneapi::math::transpose trans,
-                  oneapi::math::diag diag, std::int64_t n, std::int64_t nrhs,
-                  std::complex<float>* a, std::int64_t lda, std::complex<float>* b,
-                  std::int64_t ldb, std::complex<float>* scratchpad, std::int64_t scratchpad_size,
-                  const std::vector<sycl::event>& dependencies) {
-    throw unimplemented("lapack", "trtrs");
+// Returns the one based index of the first zero diagonal element of a, or
+// trtrs_not_singular. A unit diagonal is not referenced by trsm.
+template <typename T>
+inline int trtrs_find_zero_diagonal(sycl::queue& queue, oneapi::math::diag diag, std::int64_t n,
+                                    const T* a, std::int64_t lda,
+                                    const std::vector<sycl::event>& dependencies) {
+    int singular_index = trtrs_not_singular;
+    if (diag == oneapi::math::diag::unit || n <= 0)
+        return singular_index;
+
+    int* singular_index_dev = (int*)malloc_device(sizeof(int), queue);
+    try {
+        auto done_init = queue.fill(singular_index_dev, trtrs_not_singular, 1, dependencies);
+        auto done = queue.submit([&](sycl::handler& cgh) {
+            cgh.depends_on(done_init);
+            cgh.parallel_for(sycl::range<1>{ static_cast<std::size_t>(n) }, [=](sycl::id<1> index) {
+                const std::int64_t i = index[0];
+                if (a[i + i * lda] == T(0)) {
+                    sycl::atomic_ref<int, sycl::memory_order::relaxed, sycl::memory_scope::device>
+                        first{ *singular_index_dev };
+                    first.fetch_min(static_cast<int>(i) + 1);
+                }
+            });
+        });
+        queue.memcpy(&singular_index, singular_index_dev, sizeof(int), { done }).wait();
+    }
+    catch (...) {
+        free(singular_index_dev, queue);
+        throw;
+    }
+    free(singular_index_dev, queue);
+
+    return singular_index;
 }
-sycl::event trtrs(sycl::queue& queue, oneapi::math::uplo uplo, oneapi::math::transpose trans,
-                  oneapi::math::diag diag, std::int64_t n, std::int64_t nrhs, double* a,
-                  std::int64_t lda, double* b, std::int64_t ldb, double* scratchpad,
-                  std::int64_t scratchpad_size, const std::vector<sycl::event>& dependencies) {
-    throw unimplemented("lapack", "trtrs");
+
+template <typename Func, typename T>
+inline sycl::event trtrs(const char* func_name, Func func, sycl::queue& queue,
+                         oneapi::math::uplo uplo, oneapi::math::transpose trans,
+                         oneapi::math::diag diag, std::int64_t n, std::int64_t nrhs, T* a,
+                         std::int64_t lda, T* b, std::int64_t ldb, T* scratchpad,
+                         std::int64_t scratchpad_size,
+                         const std::vector<sycl::event>& dependencies) {
+    using cuDataType = typename CudaEquivalentType<T>::Type;
+    overflow_check(n, nrhs, lda, ldb, scratchpad_size);
+
+    trtrs_throw_if_singular(trtrs_find_zero_diagonal(queue, diag, n, a, lda, dependencies));
+
+    auto done = queue.submit([&](sycl::handler& cgh) {
+        using blas::cublas::cublas_error;
+
+        int64_t num_events = dependencies.size();
+        for (int64_t i = 0; i < num_events; i++) {
+            cgh.depends_on(dependencies[i]);
+        }
+        onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+            const T alpha = T(1);
+            auto a_ = reinterpret_cast<cuDataType*>(a);
+            auto b_ = reinterpret_cast<cuDataType*>(b);
+            cublasStatus_t err;
+            cublasHandle_t cublas_handle;
+            CUBLAS_ERROR_FUNC(cublasCreate, err, &cublas_handle);
+            CUstream cu_stream = sycl::get_native<sycl::backend::ext_oneapi_cuda>(queue);
+            CUBLAS_ERROR_FUNC(cublasSetStream, err, cublas_handle, cu_stream);
+
+            blas::cublas::cublas_native_named_func(
+                func_name, func, err, cublas_handle, CUBLAS_SIDE_LEFT, get_cublas_fill_mode(uplo),
+                get_cublas_operation(trans), get_cublas_diag_type(diag), n, nrhs,
+                (cuDataType*)&alpha, a_, lda, b_, ldb);
+
+            CUBLAS_ERROR_FUNC(cublasDestroy, err, cublas_handle);
+        });
+    });
+    return done;
 }
-sycl::event trtrs(sycl::queue& queue, oneapi::math::uplo uplo, oneapi::math::transpose trans,
-                  oneapi::math::diag diag, std::int64_t n, std::int64_t nrhs, float* a,
-                  std::int64_t lda, float* b, std::int64_t ldb, float* scratchpad,
-                  std::int64_t scratchpad_size, const std::vector<sycl::event>& dependencies) {
-    throw unimplemented("lapack", "trtrs");
-}
-sycl::event trtrs(sycl::queue& queue, oneapi::math::uplo uplo, oneapi::math::transpose trans,
-                  oneapi::math::diag diag, std::int64_t n, std::int64_t nrhs,
-                  std::complex<double>* a, std::int64_t lda, std::complex<double>* b,
-                  std::int64_t ldb, std::complex<double>* scratchpad, std::int64_t scratchpad_size,
-                  const std::vector<sycl::event>& dependencies) {
-    throw unimplemented("lapack", "trtrs");
-}
+
+#define TRTRS_LAUNCHER_USM(TYPE, CUBLAS_ROUTINE)                                                  \
+    sycl::event trtrs(sycl::queue& queue, oneapi::math::uplo uplo, oneapi::math::transpose trans, \
+                      oneapi::math::diag diag, std::int64_t n, std::int64_t nrhs, TYPE* a,        \
+                      std::int64_t lda, TYPE* b, std::int64_t ldb, TYPE* scratchpad,              \
+                      std::int64_t scratchpad_size,                                               \
+                      const std::vector<sycl::event>& dependencies) {                             \
+        return trtrs(#CUBLAS_ROUTINE, CUBLAS_ROUTINE, queue, uplo, trans, diag, n, nrhs, a, lda,  \
+                     b, ldb, scratchpad, scratchpad_size, dependencies);                          \
+    }
+
+TRTRS_LAUNCHER_USM(float, cublasStrsm)
+TRTRS_LAUNCHER_USM(double, cublasDtrsm)
+TRTRS_LAUNCHER_USM(std::complex<float>, cublasCtrsm)
+TRTRS_LAUNCHER_USM(std::complex<double>, cublasZtrsm)
+
+#undef TRTRS_LAUNCHER_USM
 
 template <typename Func, typename T>
 inline sycl::event ungbr(const char* func_name, Func func, sycl::queue& queue,
@@ -3147,37 +3284,22 @@ SYTRD_LAUNCHER_SCRATCH(double, cusolverDnDsytrd_bufferSize)
 
 #undef SYTRD_LAUNCHER_SCRATCH
 
-template <>
-std::int64_t trtrs_scratchpad_size<float>(sycl::queue& queue, oneapi::math::uplo uplo,
-                                          oneapi::math::transpose trans, oneapi::math::diag diag,
-                                          std::int64_t n, std::int64_t nrhs, std::int64_t lda,
-                                          std::int64_t ldb) {
-    throw unimplemented("lapack", "trtrs_scratchpad_size");
-}
-template <>
-std::int64_t trtrs_scratchpad_size<double>(sycl::queue& queue, oneapi::math::uplo uplo,
-                                           oneapi::math::transpose trans, oneapi::math::diag diag,
-                                           std::int64_t n, std::int64_t nrhs, std::int64_t lda,
-                                           std::int64_t ldb) {
-    throw unimplemented("lapack", "trtrs_scratchpad_size");
-}
-template <>
-std::int64_t trtrs_scratchpad_size<std::complex<float>>(sycl::queue& queue, oneapi::math::uplo uplo,
-                                                        oneapi::math::transpose trans,
-                                                        oneapi::math::diag diag, std::int64_t n,
-                                                        std::int64_t nrhs, std::int64_t lda,
-                                                        std::int64_t ldb) {
-    throw unimplemented("lapack", "trtrs_scratchpad_size");
-}
-template <>
-std::int64_t trtrs_scratchpad_size<std::complex<double>>(sycl::queue& queue,
-                                                         oneapi::math::uplo uplo,
-                                                         oneapi::math::transpose trans,
-                                                         oneapi::math::diag diag, std::int64_t n,
-                                                         std::int64_t nrhs, std::int64_t lda,
-                                                         std::int64_t ldb) {
-    throw unimplemented("lapack", "trtrs_scratchpad_size");
-}
+// cublas<t>trsm does not use scratchpad memory
+#define TRTRS_LAUNCHER_SCRATCH(TYPE)                                                  \
+    template <>                                                                       \
+    std::int64_t trtrs_scratchpad_size<TYPE>(                                         \
+        sycl::queue & queue, oneapi::math::uplo uplo, oneapi::math::transpose trans,  \
+        oneapi::math::diag diag, std::int64_t n, std::int64_t nrhs, std::int64_t lda, \
+        std::int64_t ldb) {                                                           \
+        return 0;                                                                     \
+    }
+
+TRTRS_LAUNCHER_SCRATCH(float)
+TRTRS_LAUNCHER_SCRATCH(double)
+TRTRS_LAUNCHER_SCRATCH(std::complex<float>)
+TRTRS_LAUNCHER_SCRATCH(std::complex<double>)
+
+#undef TRTRS_LAUNCHER_SCRATCH
 
 template <typename Func>
 inline void ungbr_scratchpad_size(const char* func_name, Func func, sycl::queue& queue,
