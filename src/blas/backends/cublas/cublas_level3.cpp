@@ -120,14 +120,9 @@ inline void gemm_ex(DATATYPE_A DT_A, DATATYPE_B DT_B, DATATYPE_C DT_C, sycl::que
 
 GEMM_EX_LAUNCHER(sycl::half, sycl::half, float, CUDA_R_16F, CUDA_R_16F, CUDA_R_32F)
 GEMM_EX_LAUNCHER(sycl::half, sycl::half, sycl::half, CUDA_R_16F, CUDA_R_16F, CUDA_R_16F)
+GEMM_EX_LAUNCHER(bfloat16, bfloat16, float, CUDA_R_16BF, CUDA_R_16BF, CUDA_R_32F)
 
 #undef GEMM_EX_LAUNCHER
-
-void gemm(sycl::queue& queue, transpose transa, transpose transb, int64_t m, int64_t n, int64_t k,
-          float alpha, sycl::buffer<bfloat16, 1>& a, int64_t lda, sycl::buffer<bfloat16, 1>& b,
-          int64_t ldb, float beta, sycl::buffer<float, 1>& c, int64_t ldc) {
-    throw unimplemented("blas", "gemm", "for column_major layout");
-}
 
 template <typename Func, typename T>
 inline void symm(const char* func_name, Func func, sycl::queue& queue, side left_right,
@@ -527,15 +522,9 @@ inline sycl::event gemm_ex_usm(DATATYPE_A DT_A, DATATYPE_B DT_B, DATATYPE_C DT_C
 
 GEMM_EX_LAUNCHER_USM(sycl::half, sycl::half, float, CUDA_R_16F, CUDA_R_16F, CUDA_R_32F)
 GEMM_EX_LAUNCHER_USM(sycl::half, sycl::half, sycl::half, CUDA_R_16F, CUDA_R_16F, CUDA_R_16F)
+GEMM_EX_LAUNCHER_USM(bfloat16, bfloat16, float, CUDA_R_16BF, CUDA_R_16BF, CUDA_R_32F)
 
 #undef GEMM_EX_LAUNCHER_USM
-
-sycl::event gemm(sycl::queue& queue, transpose transa, transpose transb, int64_t m, int64_t n,
-                 int64_t k, float alpha, const bfloat16* a, int64_t lda, const bfloat16* b,
-                 int64_t ldb, float beta, float* c, int64_t ldc,
-                 const std::vector<sycl::event>& dependencies) {
-    throw unimplemented("blas", "gemm", "for column_major layout");
-}
 
 template <typename Func, typename T>
 inline sycl::event symm(const char* func_name, Func func, sycl::queue& queue, side left_right,
