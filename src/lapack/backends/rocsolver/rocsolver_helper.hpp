@@ -31,6 +31,10 @@
 #include <rocsolver/rocsolver.h>
 #include <hip/hip_runtime.h>
 #include <complex>
+#include <cstddef>
+#include <exception>
+#include <utility>
+#include <vector>
 
 #include "oneapi/math/types.hpp"
 #include "runtime_support_helper.hpp"
@@ -255,16 +259,29 @@ struct RocmEquivalentType<std::complex<double>> {
     using Type = rocblas_double_complex;
 };
 
+/* 64-bit API */
+
+#if !defined(ROCSOLVER_VERSION_MAJOR)
+#define ONEMATH_ROCSOLVER_VERSION 0
+#else
+#define ONEMATH_ROCSOLVER_VERSION (ROCSOLVER_VERSION_MAJOR * 100 + ROCSOLVER_VERSION_MINOR)
+#endif
+
+// rocSOLVER added 64-bit entry points in version 3.26 (ROCm 6.2).
+#define ONEMATH_ROCSOLVER_HAS_64BIT_API (ONEMATH_ROCSOLVER_VERSION >= 326)
+
 /* devinfo */
 
-inline int get_rocsolver_devinfo(sycl::queue& queue, sycl::buffer<int>& devInfo) {
-    sycl::host_accessor<int, 1, sycl::access::mode::read> dev_info_{ devInfo };
+template <typename INFO_T>
+inline INFO_T get_rocsolver_devinfo(sycl::queue& queue, sycl::buffer<INFO_T>& devInfo) {
+    sycl::host_accessor<INFO_T, 1, sycl::access::mode::read> dev_info_{ devInfo };
     return dev_info_[0];
 }
 
-inline int get_rocsolver_devinfo(sycl::queue& queue, const int* devInfo) {
-    int dev_info_;
-    queue.memcpy(&dev_info_, devInfo, sizeof(int));
+template <typename INFO_T>
+inline INFO_T get_rocsolver_devinfo(sycl::queue& queue, const INFO_T* devInfo) {
+    INFO_T dev_info_;
+    queue.memcpy(&dev_info_, devInfo, sizeof(INFO_T));
     queue.wait();
     return dev_info_;
 }
@@ -273,11 +290,68 @@ template <typename DEVINFO_T>
 inline void lapack_info_check(sycl::queue& queue, DEVINFO_T devinfo, const char* func_name,
                               const char* cufunc_name) {
     queue.wait();
-    const int devinfo_ = get_rocsolver_devinfo(queue, devinfo);
+    const auto devinfo_ = get_rocsolver_devinfo(queue, devinfo);
     if (devinfo_ > 0)
         throw oneapi::math::lapack::computation_error(
             func_name, std::string(cufunc_name) + " failed with info = " + std::to_string(devinfo_),
             devinfo_);
+}
+
+template <typename INFO_T>
+inline void get_rocsolver_devinfo(sycl::queue& queue, sycl::buffer<INFO_T>& devInfo,
+                                  std::vector<INFO_T>& dev_info_) {
+    sycl::host_accessor<INFO_T, 1, sycl::access::mode::read> dev_info_acc{ devInfo };
+    for (std::size_t i = 0; i < dev_info_.size(); ++i)
+        dev_info_[i] = dev_info_acc[i];
+}
+
+template <typename INFO_T>
+inline void get_rocsolver_devinfo(sycl::queue& queue, const INFO_T* devInfo,
+                                  std::vector<INFO_T>& dev_info_) {
+    queue.wait();
+    queue.memcpy(dev_info_.data(), devInfo, sizeof(INFO_T) * dev_info_.size()).wait();
+}
+
+template <typename INFO_T>
+inline void throw_rocsolver_batch_errors(const std::vector<INFO_T>& dev_info_,
+                                         const char* func_name, const char* rocfunc_name) {
+    std::vector<std::int64_t> ids;
+    std::vector<std::exception_ptr> exceptions;
+    for (std::size_t i = 0; i < dev_info_.size(); ++i) {
+        const auto val = dev_info_[i];
+        if (val > 0) {
+            ids.push_back(static_cast<std::int64_t>(i));
+            exceptions.push_back(std::make_exception_ptr(oneapi::math::lapack::computation_error(
+                func_name, std::string(rocfunc_name) + " failed with info = " + std::to_string(val),
+                val)));
+        }
+    }
+    if (!ids.empty()) {
+        throw oneapi::math::lapack::batch_error(
+            func_name, std::string(rocfunc_name) + " failed for one or more matrices",
+            static_cast<std::int64_t>(ids.size()), std::move(ids), std::move(exceptions));
+    }
+}
+
+/* Reports every failing matrix of a batch. */
+template <typename INFO_T>
+inline void lapack_info_check_batch(sycl::queue& queue, sycl::buffer<INFO_T>& devinfo,
+                                    const char* func_name, const char* rocfunc_name,
+                                    std::int64_t batch_size) {
+    queue.wait();
+    std::vector<INFO_T> dev_info_(static_cast<std::size_t>(batch_size));
+    get_rocsolver_devinfo(queue, devinfo, dev_info_);
+    throw_rocsolver_batch_errors(dev_info_, func_name, rocfunc_name);
+}
+
+template <typename INFO_T>
+inline void lapack_info_check_batch(sycl::queue& queue, const INFO_T* devinfo,
+                                    const char* func_name, const char* rocfunc_name,
+                                    std::int64_t batch_size) {
+    queue.wait();
+    std::vector<INFO_T> dev_info_(static_cast<std::size_t>(batch_size));
+    get_rocsolver_devinfo(queue, devinfo, dev_info_);
+    throw_rocsolver_batch_errors(dev_info_, func_name, rocfunc_name);
 }
 
 } // namespace rocsolver
