@@ -1359,7 +1359,8 @@ inline sycl::event getrf(const char* func_name, Func func, sycl::queue& queue, s
                          const std::vector<sycl::event>& dependencies) {
     using rocmDataType = typename RocmEquivalentType<T>::Type;
 
-    std::int64_t* devInfo = (std::int64_t*)malloc_device(sizeof(std::int64_t), queue);
+    device_usm_ptr<std::int64_t> devInfo_owner(queue, 1, func_name);
+    std::int64_t* devInfo = devInfo_owner.get();
     auto done = queue.submit([&](sycl::handler& cgh) {
         cgh.depends_on(dependencies);
         onemath_rocsolver_host_task(cgh, queue, [=](RocsolverScopedContextHandler& sc) {
@@ -1370,9 +1371,9 @@ inline sycl::event getrf(const char* func_name, Func func, sycl::queue& queue, s
         });
     });
 
-    // lapack_info_check calls queue.wait()
+    // lapack_info_check calls queue.wait() and throws on a positive info.
+    // devInfo_owner releases the allocation on that path as well.
     lapack_info_check(queue, devInfo, __func__, func_name);
-    free(devInfo, queue);
     return done;
 }
 
@@ -1406,9 +1407,10 @@ inline sycl::event getrf(const char* func_name, Func func, sycl::queue& queue, s
     // To get around the limitation.
     // Allocate memory with 32-bit ints then copy over results
     std::uint64_t ipiv_size = std::min(n, m);
-    int* ipiv32 = (int*)malloc_device(sizeof(int) * ipiv_size, queue);
-
-    int* devInfo = (int*)malloc_device(sizeof(int), queue);
+    device_usm_ptr<int> ipiv32_owner(queue, static_cast<std::size_t>(ipiv_size), func_name);
+    device_usm_ptr<int> devInfo_owner(queue, 1, func_name);
+    int* ipiv32 = ipiv32_owner.get();
+    int* devInfo = devInfo_owner.get();
     auto done = queue.submit([&](sycl::handler& cgh) {
         int64_t num_events = dependencies.size();
         for (int64_t i = 0; i < num_events; i++) {
@@ -1434,8 +1436,6 @@ inline sycl::event getrf(const char* func_name, Func func, sycl::queue& queue, s
     });
 
     lapack_info_check(queue, devInfo, __func__, func_name);
-    free(ipiv32, queue);
-    free(devInfo, queue);
     return done_casting;
 }
 

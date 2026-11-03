@@ -257,17 +257,43 @@ struct RocmEquivalentType<std::complex<double>> {
 
 /* 64-bit pivot API */
 
-#if !defined(ROCSOLVER_VERSION_MAJOR)
-#define ONEMATH_ROCSOLVER_VERSION 0
-#else
-#define ONEMATH_ROCSOLVER_VERSION (ROCSOLVER_VERSION_MAJOR * 100 + ROCSOLVER_VERSION_MINOR)
+#if !defined(ROCSOLVER_VERSION_MAJOR) || !defined(ROCSOLVER_VERSION_MINOR)
+#error "ROCSOLVER_VERSION_MAJOR is not defined; rocsolver-version.h was not pulled in"
 #endif
+#define ONEMATH_ROCSOLVER_VERSION (ROCSOLVER_VERSION_MAJOR * 100 + ROCSOLVER_VERSION_MINOR)
 
 // rocSOLVER exposes getrf and getrs entry points taking int64_t pivots, which lets oneMath hand
 // the user's ipiv array straight through instead of converting it. They were added in rocSOLVER
 // 3.26 (ROCm 6.2); earlier versions keep the conversion path, so the minimum supported ROCm is
 // unchanged.
 #define ONEMATH_ROCSOLVER_HAS_64BIT_PIVOTS (ONEMATH_ROCSOLVER_VERSION >= 326)
+
+// Frees on destruction, including when lapack_info_check throws. Capture get()
+// into device code; the object itself is not copyable.
+template <typename T>
+class device_usm_ptr {
+public:
+    device_usm_ptr(sycl::queue& queue, std::size_t count, const char* func_name) : queue_(queue) {
+        if (count == 0)
+            return;
+        ptr_ = static_cast<T*>(sycl::malloc_device(sizeof(T) * count, queue));
+        if (!ptr_)
+            throw oneapi::math::device_bad_alloc("lapack", func_name, queue.get_device());
+    }
+    ~device_usm_ptr() {
+        if (ptr_)
+            sycl::free(ptr_, queue_);
+    }
+    device_usm_ptr(const device_usm_ptr&) = delete;
+    device_usm_ptr& operator=(const device_usm_ptr&) = delete;
+    T* get() const {
+        return ptr_;
+    }
+
+private:
+    sycl::queue& queue_;
+    T* ptr_ = nullptr;
+};
 
 /* devinfo */
 
