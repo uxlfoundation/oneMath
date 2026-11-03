@@ -41,23 +41,9 @@ target_include_directories(${LIB_OBJ}
 )
 target_compile_options(${LIB_OBJ} PRIVATE ${ONEMATH_BUILD_COPT})
 
-if (NOT "${ONEMATH_SYCL_IMPLEMENTATION}" STREQUAL "adaptivecpp")
-  target_compile_options(ONEMATH::SYCL::SYCL INTERFACE
-    -fsycl-targets=nvptx64-nvidia-cuda -fsycl-unnamed-lambda
-  )
-  target_link_options(ONEMATH::SYCL::SYCL INTERFACE
-    -fsycl-targets=nvptx64-nvidia-cuda
-  )
-
-  if (DEFINED CUDA_TARGETS AND NOT "${CUDA_TARGETS}" STREQUAL "")
-    target_compile_options(ONEMATH::SYCL::SYCL INTERFACE
-      -Xsycl-target-backend --cuda-gpu-arch=${CUDA_TARGETS}
-    )
-    target_link_options(ONEMATH::SYCL::SYCL INTERFACE
-      -Xsycl-target-backend --cuda-gpu-arch=${CUDA_TARGETS}
-    )
-  endif()
-endif()
+# The SYCL offload targets (-fsycl-targets) for all enabled GPU backends are
+# assembled once in cmake/FindCompiler.cmake so that multi-vendor builds keep
+# every vendor's device image. See issue #708.
 
 target_link_libraries(${LIB_OBJ} PUBLIC ONEMATH::SYCL::SYCL ONEMATH::cuBLAS::cuBLAS)
 target_compile_features(${LIB_OBJ} PUBLIC cxx_std_11)
