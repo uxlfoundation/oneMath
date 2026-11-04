@@ -113,6 +113,14 @@ static inline void bump32(engine_state<oneapi::math::rng::device::pcg64_dxsm<Vec
 template <std::int32_t VecSize>
 static inline void skip_ahead(engine_state<oneapi::math::rng::device::pcg64_dxsm<VecSize>>& state,
                               pcg128_t num_to_skip) {
+    // consume a pending upper half first, so that an even remainder does not
+    // leave a stale state.result behind
+    if (state.has_32 && (num_to_skip.low || num_to_skip.high)) {
+        state.has_32 = false;
+        num_to_skip.high -= (num_to_skip.low == 0);
+        num_to_skip.low -= 1;
+    }
+
     pcg128_t acc_mul = { 0ULL, 1ULL };
     pcg128_t acc_inc = { 0ULL, 0ULL };
     pcg128_t tmp_mul = { 0ULL, pcg64_dxsm_param::cheap_multiplier };
@@ -146,6 +154,13 @@ static inline void skip_ahead(engine_state<oneapi::math::rng::device::pcg64_dxsm
 template <std::int32_t VecSize>
 static inline void skip_ahead(engine_state<oneapi::math::rng::device::pcg64_dxsm<VecSize>>& state,
                               std::uint64_t num_to_skip) {
+    // consume a pending upper half first, so that an even remainder does not
+    // leave a stale state.result behind
+    if (state.has_32 && num_to_skip) {
+        state.has_32 = false;
+        num_to_skip -= 1;
+    }
+
     pcg128_t acc_mul = { 0ULL, 1ULL };
     pcg128_t acc_inc = { 0ULL, 0ULL };
     pcg128_t tmp_mul = { 0ULL, pcg64_dxsm_param::cheap_multiplier };
@@ -182,12 +197,31 @@ static inline void init(engine_state<oneapi::math::rng::device::pcg64_dxsm<VecSi
     state.s = add_128x128(pcg64_dxsm_param::increment,
                           mul_lo_128x64(state.s, pcg64_dxsm_param::cheap_multiplier));
 
+    // has_32 must be initialized before skip_ahead: an odd offset calls bump32(),
+    // which reads it and leaves the pending upper 32-bit half in state.result.
+    state.has_32 = false;
+
     if (n_offset > 1)
         pcg64_dxsm_impl::skip_ahead(state, { offset_ptr[1], offset_ptr[0] });
     else
         pcg64_dxsm_impl::skip_ahead(state, offset_ptr[0]);
+}
 
-    state.has_32 = false;
+// A 64-bit number takes two consecutive 32-bit positions of the stream:
+// (next << 32) | pending, if an upper half is pending (e.g. after an odd offset)
+template <std::int32_t VecSize>
+static inline std::uint64_t generate_single64(
+    engine_state<oneapi::math::rng::device::pcg64_dxsm<VecSize>>& state) {
+    std::uint64_t tmp = prepare_output(state.s);
+    update_state(state.s);
+
+    if (!state.has_32) {
+        return tmp;
+    }
+
+    std::uint64_t res = static_cast<std::uint64_t>(state.result) | (tmp << 32);
+    state.result = static_cast<std::uint32_t>(tmp >> 32);
+    return res;
 }
 
 template <std::int32_t VecSize>
@@ -196,8 +230,7 @@ static inline sycl::vec<std::uint64_t, VecSize> generate64(
     sycl::vec<std::uint64_t, VecSize> res;
 
     for (int i = 0; i < VecSize; i++) {
-        res[i] = prepare_output(state.s);
-        update_state(state.s);
+        res[i] = generate_single64(state);
     }
 
     return res;
@@ -209,12 +242,33 @@ static inline sycl::vec<std::uint32_t, VecSize> generate32_even(
     sycl::vec<std::uint32_t, VecSize> res;
     std::uint64_t tmp;
 
-    for (int i = 0; i < (VecSize / 2); i++) {
+    if (state.has_32) {
+        // a pending upper half (e.g. after an odd offset) goes first;
+        // the last upper half becomes the new pending one, has_32 stays true
+        res[0] = state.result;
+
+        for (int i = 0; i < (VecSize / 2) - 1; i++) {
+            tmp = prepare_output(state.s);
+            res[(2 * i) + 1] = static_cast<std::uint32_t>(tmp);
+            res[(2 * i) + 2] = static_cast<std::uint32_t>(tmp >> 32);
+
+            update_state(state.s);
+        }
+
         tmp = prepare_output(state.s);
-        res[2 * i] = static_cast<std::uint32_t>(tmp);
-        res[(2 * i) + 1] = static_cast<std::uint32_t>(tmp >> 32);
+        res[VecSize - 1] = static_cast<std::uint32_t>(tmp);
+        state.result = static_cast<std::uint32_t>(tmp >> 32);
 
         update_state(state.s);
+    }
+    else {
+        for (int i = 0; i < (VecSize / 2); i++) {
+            tmp = prepare_output(state.s);
+            res[2 * i] = static_cast<std::uint32_t>(tmp);
+            res[(2 * i) + 1] = static_cast<std::uint32_t>(tmp >> 32);
+
+            update_state(state.s);
+        }
     }
 
     return res;
@@ -274,14 +328,6 @@ static inline sycl::vec<std::uint32_t, VecSize> generate32(
         return generate32_odd<VecSize>(state);
     else
         return generate32_even<VecSize>(state);
-}
-
-template <std::int32_t VecSize>
-static inline std::uint64_t generate_single64(
-    engine_state<oneapi::math::rng::device::pcg64_dxsm<VecSize>>& state) {
-    std::uint64_t res = prepare_output(state.s);
-    update_state(state.s);
-    return res;
 }
 
 template <std::int32_t VecSize>
