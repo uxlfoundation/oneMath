@@ -56,27 +56,16 @@ If you find a bug or problem, please open a request under [Issues](https://githu
 
 ## Security Issues
 
-Report security issues to onemkl.maintainers@intel.com.
+Report security issues as described in the [security policy](SECURITY.md).
 
 ## oneMath Maintainers
 
-For GitHub questions, issues, RFCs, or PRs you can contact maintainers via one of the following GitHub teams based on the topic:
+For GitHub questions, issues, RFCs, or PRs you can contact maintainers via the following GitHub teams:
 
 | GitHub team name | Description |
 :-----------|:------------|
-| @uxlfoundation/onemath-maintain  | All oneMath maintainers |
-| @uxlfoundation/onemath-arch-write | oneMath Architecture maintainers |
-| @uxlfoundation/onemath-blas-write | oneMath BLAS maintainers |
-| @uxlfoundation/onemath-dft-write | oneMath DFT maintainers |
-| @uxlfoundation/onemath-lapack-write | oneMath LAPACK maintainers |
-| @uxlfoundation/onemath-rng-write | oneMath RNG maintainers |
-| @uxlfoundation/onemath-sparse-write | oneMath Sparse Algebra maintainers |
-| @uxlfoundation/onemath-vm-write | oneMath Vector Math maintainers |
-| @uxlfoundation/onemath-cpu-aarch64 | AArch64 CPU maintainers |
-| @uxlfoundation/onemath-cpu-x64 | x86 CPU maintainers |
-| @uxlfoundation/onemath-gpu-amd | AMD GPU maintainers |
-| @uxlfoundation/onemath-gpu-intel | Intel GPU maintainers |
-| @uxlfoundation/onemath-gpu-nvidia | NVIDIA GPU maintainers |
+| @uxlfoundation/onemath-maintain | All oneMath maintainers |
+| @uxlfoundation/onemath-admin | oneMath repository administrators |
 
 Please read [MAINTAINERS page](MAINTAINERS.md) for more information about maintainer roles, responsibilities, and how to become one of them.
 
