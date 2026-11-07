@@ -26,7 +26,7 @@
 #include "oneapi/math/detail/backends_table.hpp"
 #include "oneapi/math/detail/exceptions.hpp"
 
-#define SPEC_VERSION 1
+#define SPEC_VERSION 2
 
 #ifdef __linux__
 #include <dlfcn.h>

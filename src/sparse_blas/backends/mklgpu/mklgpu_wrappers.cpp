@@ -23,7 +23,7 @@
 
 #include "sparse_blas/function_table.hpp"
 
-#define WRAPPER_VERSION 1
+#define WRAPPER_VERSION 2
 #define BACKEND         mklgpu
 
 extern "C" sparse_blas_function_table_t onemath_sparse_blas_table = {
