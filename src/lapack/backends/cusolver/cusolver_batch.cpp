@@ -428,13 +428,17 @@ inline void potrs_batch(const char* func_name, Func func, sycl::queue& queue,
 
     overflow_check(n, nrhs, lda, ldb, stride_a, stride_b, batch_size, scratchpad_size);
 
-    // cuSolver function only supports nrhs = 1
-    if (nrhs != 1)
-        throw unimplemented("lapack", "potrs_batch", "cusolver potrs_batch only supports nrhs = 1");
+    // cusolverDnXpotrsBatched only writes devInfo when a parameter is invalid
+    sycl::buffer<int> devInfo{ sycl::range<1>{ static_cast<size_t>(batch_size) } };
+    queue.submit([&](sycl::handler& cgh) {
+        auto devInfo_acc = devInfo.template get_access<sycl::access::mode::write>(cgh);
+        cgh.fill(devInfo_acc, 0);
+    });
 
     queue.submit([&](sycl::handler& cgh) {
         auto a_acc = a.template get_access<sycl::access::mode::read_write>(cgh);
         auto b_acc = b.template get_access<sycl::access::mode::read_write>(cgh);
+        auto devInfo_acc = devInfo.template get_access<sycl::access::mode::write>(cgh);
         onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             CUdeviceptr a_dev, b_dev;
@@ -443,21 +447,35 @@ inline void potrs_batch(const char* func_name, Func func, sycl::queue& queue,
 
             auto a_ = sc.get_mem<cuDataType*>(a_acc);
             auto b_ = sc.get_mem<cuDataType*>(b_acc);
+            auto info_ = sc.get_mem<int*>(devInfo_acc);
 
             // Transform ptr and stride to list of ptr's
             cuDataType** a_batched = create_ptr_list_from_stride(a_, stride_a, batch_size);
-            cuDataType** b_batched = create_ptr_list_from_stride(b_, stride_b, batch_size);
+
+            // cusolverDnXpotrsBatched only solves one right hand side, so this
+            // requires one native batched call per column and its cost scales
+            // with nrhs. Upload every column's pointers before the first call:
+            // native calls are not synchronised and would otherwise race with
+            // a rewritten device pointer array.
+            cuDataType** b_batched = (cuDataType**)malloc(sizeof(cuDataType*) * batch_size * nrhs);
+            for (int64_t col = 0; col < nrhs; ++col)
+                for (int64_t i = 0; i < batch_size; ++i)
+                    b_batched[col * batch_size + i] = b_ + stride_b * i + ldb * col;
+
             CUDA_ERROR_FUNC(cuMemAlloc, cuda_result, &a_dev, sizeof(T*) * batch_size);
             CUDA_ERROR_FUNC(cuMemcpyHtoD, cuda_result, a_dev, a_batched, sizeof(T*) * batch_size);
-            CUDA_ERROR_FUNC(cuMemAlloc, cuda_result, &b_dev, sizeof(T*) * batch_size);
-            CUDA_ERROR_FUNC(cuMemcpyHtoD, cuda_result, b_dev, b_batched, sizeof(T*) * batch_size);
+            CUDA_ERROR_FUNC(cuMemAlloc, cuda_result, &b_dev, sizeof(T*) * batch_size * nrhs);
+            CUDA_ERROR_FUNC(cuMemcpyHtoD, cuda_result, b_dev, b_batched,
+                            sizeof(T*) * batch_size * nrhs);
 
             auto** a_dev_ = reinterpret_cast<cuDataType**>(a_dev);
             auto** b_dev_ = reinterpret_cast<cuDataType**>(b_dev);
 
-            cusolver_native_named_func(func_name, func, err, handle, get_cublas_fill_mode(uplo),
-                                       (int)n, (int)nrhs, a_dev_, (int)lda, b_dev_, ldb, nullptr,
-                                       (int)batch_size);
+            for (int64_t col = 0; col < nrhs; ++col) {
+                cusolver_native_named_func(func_name, func, err, handle, get_cublas_fill_mode(uplo),
+                                           (int)n, 1, a_dev_, (int)lda, b_dev_ + col * batch_size,
+                                           (int)ldb, info_, (int)batch_size);
+            }
 
             free(a_batched);
             free(b_batched);
@@ -465,6 +483,8 @@ inline void potrs_batch(const char* func_name, Func func, sycl::queue& queue,
             cuMemFree(b_dev);
         });
     });
+
+    lapack_info_check_batch(queue, devInfo, __func__, func_name, batch_size);
 }
 
 // Scratchpad memory not needed as parts of buffer a is used as workspace memory
@@ -1327,12 +1347,13 @@ inline sycl::event potrs_batch(const char* func_name, Func func, sycl::queue& qu
 
     overflow_check(n, nrhs, lda, ldb, stride_a, stride_b, batch_size, scratchpad_size);
 
-    // cuSolver function only supports nrhs = 1
-    if (nrhs != 1)
-        throw unimplemented("lapack", "potrs_batch", "cusolver potrs_batch only supports nrhs = 1");
+    // cusolverDnXpotrsBatched only writes devInfo when a parameter is invalid
+    int* devInfo = (int*)malloc_device(sizeof(int) * batch_size, queue);
+    auto done_init = queue.memset(devInfo, 0, sizeof(int) * batch_size);
 
     auto done = queue.submit([&](sycl::handler& cgh) {
         cgh.depends_on(dependencies);
+        cgh.depends_on(done_init);
         onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             CUresult cuda_result;
@@ -1343,24 +1364,49 @@ inline sycl::event potrs_batch(const char* func_name, Func func, sycl::queue& qu
 
             // Transform ptr and stride to list of ptr's
             cuDataType** a_batched = create_ptr_list_from_stride(a_, stride_a, batch_size);
-            cuDataType** b_batched = create_ptr_list_from_stride(b_, stride_b, batch_size);
+
+            // cusolverDnXpotrsBatched only solves one right hand side, so this
+            // requires one native batched call per column and its cost scales
+            // with nrhs. Upload every column's pointers before the first call:
+            // native calls are not synchronised and would otherwise race with
+            // a rewritten device pointer array.
+            cuDataType** b_batched = (cuDataType**)malloc(sizeof(cuDataType*) * batch_size * nrhs);
+            for (int64_t col = 0; col < nrhs; ++col)
+                for (int64_t i = 0; i < batch_size; ++i)
+                    b_batched[col * batch_size + i] = b_ + stride_b * i + ldb * col;
+
             CUDA_ERROR_FUNC(cuMemAlloc, cuda_result, &a_dev, sizeof(T*) * batch_size);
-            CUDA_ERROR_FUNC(cuMemAlloc, cuda_result, &b_dev, sizeof(T*) * batch_size);
+            CUDA_ERROR_FUNC(cuMemAlloc, cuda_result, &b_dev, sizeof(T*) * batch_size * nrhs);
             CUDA_ERROR_FUNC(cuMemcpyHtoD, cuda_result, a_dev, a_batched, sizeof(T*) * batch_size);
-            CUDA_ERROR_FUNC(cuMemcpyHtoD, cuda_result, b_dev, b_batched, sizeof(T*) * batch_size);
+            CUDA_ERROR_FUNC(cuMemcpyHtoD, cuda_result, b_dev, b_batched,
+                            sizeof(T*) * batch_size * nrhs);
 
             auto** a_dev_ = reinterpret_cast<cuDataType**>(a_dev);
             auto** b_dev_ = reinterpret_cast<cuDataType**>(b_dev);
 
-            cusolver_native_named_func(func_name, func, err, handle, get_cublas_fill_mode(uplo),
-                                       (int)n, (int)nrhs, a_dev_, (int)lda, b_dev_, ldb, nullptr,
-                                       (int)batch_size);
+            for (int64_t col = 0; col < nrhs; ++col) {
+                cusolver_native_named_func(func_name, func, err, handle, get_cublas_fill_mode(uplo),
+                                           (int)n, 1, a_dev_, (int)lda, b_dev_ + col * batch_size,
+                                           (int)ldb, devInfo, (int)batch_size);
+            }
 
             free(a_batched);
             free(b_batched);
             cuMemFree(a_dev);
+            cuMemFree(b_dev);
         });
     });
+
+    // lapack_info_check_batch calls queue.wait()
+    try {
+        lapack_info_check_batch(queue, devInfo, __func__, func_name, batch_size);
+    }
+    catch (...) {
+        sycl::free(devInfo, queue);
+        throw;
+    }
+    sycl::free(devInfo, queue);
+
     return done;
 }
 
@@ -1393,32 +1439,62 @@ inline sycl::event potrs_batch(const char* func_name, Func func, sycl::queue& qu
     using cuDataType = typename CudaEquivalentType<T>::Type;
 
     int64_t batch_size = 0;
+    int64_t b_column_count = 0;
     for (int64_t i = 0; i < group_count; i++) {
-        overflow_check(n[i], lda[i], group_sizes[i]);
+        overflow_check(n[i], nrhs[i], lda[i], ldb[i], group_sizes[i]);
         batch_size += group_sizes[i];
-
-        // cuSolver function only supports nrhs = 1
-        if (nrhs[i] != 1)
-            throw unimplemented("lapack", "potrs_batch",
-                                "cusolver potrs_batch only supports nrhs = 1");
+        b_column_count += group_sizes[i] * nrhs[i];
     }
 
-    int* info = (int*)malloc_device(sizeof(int*) * batch_size, queue);
+    // b is a batch of pointers that can be device resident, so read it back to
+    // be able to derive the pointer of every right hand side column from it
+    std::vector<T*> b_host(batch_size);
+    queue.memcpy(b_host.data(), b, sizeof(T*) * batch_size).wait();
+
+    // cusolverDnXpotrsBatched only solves one right hand side, so this requires
+    // one native batched call per column and its cost scales with nrhs. Upload
+    // every column's pointers before the first call: native calls are not
+    // synchronised and would otherwise race with a rewritten device pointer
+    // array.
+    std::vector<T*> b_columns(b_column_count);
+    int64_t global_id = 0;
+    int64_t column_offset = 0;
+    for (int64_t i = 0; i < group_count; i++) {
+        for (int64_t col = 0; col < nrhs[i]; ++col)
+            for (int64_t local_id = 0; local_id < group_sizes[i]; ++local_id)
+                b_columns[column_offset + col * group_sizes[i] + local_id] =
+                    b_host[global_id + local_id] + col * ldb[i];
+        global_id += group_sizes[i];
+        column_offset += group_sizes[i] * nrhs[i];
+    }
+
+    int* info = (int*)malloc_device(sizeof(int) * batch_size, queue);
     T** a_dev = (T**)malloc_device(sizeof(T*) * batch_size, queue);
-    T** b_dev = (T**)malloc_device(sizeof(T*) * batch_size, queue);
+    T** b_dev = (T**)malloc_device(sizeof(T*) * b_column_count, queue);
+    auto free_temporaries = [&]() {
+        sycl::free(info, queue);
+        sycl::free(a_dev, queue);
+        sycl::free(b_dev, queue);
+    };
+
+    // cusolverDnXpotrsBatched only writes info when a parameter is invalid
+    auto done_init = queue.memset(info, 0, sizeof(int) * batch_size);
+
     auto done_cpy_a =
         queue.submit([&](sycl::handler& h) { h.memcpy(a_dev, a, batch_size * sizeof(T*)); });
 
-    auto done_cpy_b =
-        queue.submit([&](sycl::handler& h) { h.memcpy(b_dev, b, batch_size * sizeof(T*)); });
+    auto done_cpy_b = queue.submit(
+        [&](sycl::handler& h) { h.memcpy(b_dev, b_columns.data(), b_column_count * sizeof(T*)); });
 
     auto done = queue.submit([&](sycl::handler& cgh) {
         cgh.depends_on(dependencies);
+        cgh.depends_on(done_init);
         cgh.depends_on(done_cpy_a);
         cgh.depends_on(done_cpy_b);
         onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
             int64_t offset = 0;
+            int64_t column_offset = 0;
             cusolverStatus_t err;
 
             // Does not use scratch so call cuSolver asynchronously and sync at end
@@ -1426,16 +1502,31 @@ inline sycl::event potrs_batch(const char* func_name, Func func, sycl::queue& qu
                 auto** a_ = reinterpret_cast<cuDataType**>(a_dev);
                 auto** b_ = reinterpret_cast<cuDataType**>(b_dev);
                 auto info_ = reinterpret_cast<int*>(info);
-                CUSOLVER_ERROR_FUNC_T(func_name, func, err, handle, get_cublas_fill_mode(uplo[i]),
-                                      (int)n[i], (int)nrhs[i], a_ + offset, (int)lda[i],
-                                      b_ + offset, (int)ldb[i], info_, (int)group_sizes[i]);
+                for (int64_t col = 0; col < nrhs[i]; ++col) {
+                    CUSOLVER_ERROR_FUNC_T(func_name, func, err, handle,
+                                          get_cublas_fill_mode(uplo[i]), (int)n[i], 1, a_ + offset,
+                                          (int)lda[i], b_ + column_offset + col * group_sizes[i],
+                                          (int)ldb[i], info_ + offset, (int)group_sizes[i]);
+                }
                 offset += group_sizes[i];
+                column_offset += group_sizes[i] * nrhs[i];
             }
 #ifndef SYCL_EXT_ONEAPI_ENQUEUE_NATIVE_COMMAND
             CUSOLVER_SYNC(err, handle)
 #endif
         });
     });
+
+    // lapack_info_check_batch calls queue.wait()
+    try {
+        lapack_info_check_batch(queue, info, __func__, func_name, batch_size);
+    }
+    catch (...) {
+        free_temporaries();
+        throw;
+    }
+    free_temporaries();
+
     return done;
 }
 
