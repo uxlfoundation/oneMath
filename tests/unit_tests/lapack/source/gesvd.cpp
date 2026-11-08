@@ -39,6 +39,20 @@ const char* accuracy_input = R"(
 1 1 8 8 10 10 10 27182
 1 1 30 24 42 33 33 27182
 1 1 24 30 33 33 42 27182
+0 0 24 30 33 33 42 27182
+3 3 24 30 33 33 42 27182
+2 0 24 30 33 33 42 27182
+0 2 24 30 33 33 42 27182
+2 1 24 30 33 33 42 27182
+1 2 24 30 33 33 42 27182
+1 0 24 30 33 33 42 27182
+0 1 24 30 33 33 42 27182
+3 0 24 30 33 33 42 27182
+0 3 24 30 33 33 42 27182
+1 3 24 30 33 33 42 27182
+3 1 24 30 33 33 42 27182
+2 3 24 30 33 33 42 27182
+3 2 24 30 33 33 42 27182
 )";
 
 template <typename data_T>
@@ -108,9 +122,16 @@ bool accuracy(const sycl::device& dev, oneapi::math::jobsvd jobu, oneapi::math::
     }
     bool result = true;
 
-    if (jobu == oneapi::math::jobsvd::vectors && jobvt == oneapi::math::jobsvd::vectors) {
+    if (jobu == oneapi::math::jobsvd::vectorsina)
+        reference::lacpy('A', m, ucols, A.data(), lda, U.data(), ldu);
+    if (jobvt == oneapi::math::jobsvd::vectorsina)
+        reference::lacpy('A', vtrows, n, A.data(), lda, Vt.data(), ldvt);
+
+    const bool has_u = jobu != oneapi::math::jobsvd::novec;
+    const bool has_vt = jobvt != oneapi::math::jobsvd::novec;
+    if (has_u && has_vt) {
         /* |A - U S V'| < |A| O(eps) */
-        std::vector<fp> US(m * n);
+        std::vector<fp> US(m * min_mn);
         int64_t ldus = m;
         for (int64_t col = 0; col < min_mn; col++)
             for (int64_t row = 0; row < m; row++)
@@ -118,17 +139,12 @@ bool accuracy(const sycl::device& dev, oneapi::math::jobsvd jobu, oneapi::math::
         std::vector<fp> USV(m * n);
         int64_t ldusv = m;
         reference::gemm(oneapi::math::transpose::nontrans, oneapi::math::transpose::nontrans, m, n,
-                        n, 1.0, US.data(), ldus, Vt.data(), ldvt, 0.0, USV.data(), ldusv);
+                        min_mn, 1.0, US.data(), ldus, Vt.data(), ldvt, 0.0, USV.data(), ldusv);
         if (!rel_mat_err_check(m, n, A_initial, lda, USV, ldusv)) {
             test_log::lout << "Factorization check failed" << std::endl;
             result = false;
         }
     }
-
-    if (jobu == oneapi::math::jobsvd::vectorsina)
-        reference::lacpy('A', m, ucols, A.data(), lda, U.data(), ldu);
-    if (jobvt == oneapi::math::jobsvd::vectorsina)
-        reference::lacpy('A', vtrows, n, A.data(), lda, Vt.data(), ldvt);
 
     if (jobu == oneapi::math::jobsvd::vectors || jobu == oneapi::math::jobsvd::somevec ||
         jobu == oneapi::math::jobsvd::vectorsina) {
@@ -161,6 +177,7 @@ bool accuracy(const sycl::device& dev, oneapi::math::jobsvd jobu, oneapi::math::
 
 const char* dependency_input = R"(
 1 1 1 1 1 1 1 1
+1 1 7 11 9 10 13 1
 )";
 
 template <typename data_T>
