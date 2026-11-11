@@ -20,7 +20,7 @@
 #include "rng/function_table.hpp"
 #include "oneapi/math/rng/detail/mklgpu/onemath_rng_mklgpu.hpp"
 
-#define WRAPPER_VERSION 1
+#define WRAPPER_VERSION 2
 
 extern "C" ONEMATH_EXPORT rng_function_table_t onemath_rng_table = {
     WRAPPER_VERSION, oneapi::math::rng::mklgpu::create_philox4x32x10,

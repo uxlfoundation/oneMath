@@ -6,7 +6,7 @@
 
 #include "oneapi/math/blas/detail/generic/onemath_blas_generic.hpp"
 
-#define WRAPPER_VERSION 1
+#define WRAPPER_VERSION 2
 
 extern "C" ONEMATH_EXPORT blas_function_table_t onemath_blas_table = {
     WRAPPER_VERSION,

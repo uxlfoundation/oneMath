@@ -21,7 +21,7 @@
 #include "blas/function_table.hpp"
 #include "oneapi/math/blas/detail/armpl/onemath_blas_armpl.hpp"
 
-#define WRAPPER_VERSION 1
+#define WRAPPER_VERSION 2
 
 extern "C" ONEMATH_EXPORT blas_function_table_t onemath_blas_table = {
     WRAPPER_VERSION,
