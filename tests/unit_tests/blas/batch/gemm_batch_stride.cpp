@@ -218,6 +218,23 @@ int test(device* dev, oneapi::math::layout layout, int64_t batch_size) {
     int error_mag = tol_scalar * k;
     if (std::is_same_v<Tc, int32_t>)
         error_mag = 1;
+    // bfloat16 epsilon is 2^-7, so 10 * k is an absolute tolerance of several units
+    // (7.8125 at k = 100) and a result of 0 passes against a reference of 1. A
+    // bfloat16 result is checked to 2 ulps in float, as the bfloat16 GEMM tests do.
+    if constexpr (std::is_same_v<Tc, oneapi::math::bfloat16>)
+        error_mag = 2;
+
+    // A float output accumulated from int8 inputs is rounded at the magnitude of the terms summed,
+    // |alpha| * sum|a*b|, which k * 128 * 128 bounds from above. An entry whose sum cancels is far
+    // smaller than that and so cannot meet any relative bound, so allow an absolute error of eps
+    // times the accumulated magnitude instead.
+    constexpr bool int8_to_float = std::is_same_v<Ta, std::int8_t> &&
+                                   std::is_same_v<Tb, std::int8_t> && std::is_same_v<Tc, float> &&
+                                   std::is_same_v<Ts, float>;
+    double abs_error_bound = 0.0;
+    if constexpr (int8_to_float)
+        abs_error_bound = std::numeric_limits<float>::epsilon() * std::abs(double(alpha)) *
+                          double(k) * 128.0 * 128.0;
 
     for (size_t i = 0; i < C_ref.size(); ++i) {
         C_cast_ref[i] = C_ref[i];
@@ -225,7 +242,7 @@ int test(device* dev, oneapi::math::layout layout, int64_t batch_size) {
     auto C_accessor = C_buffer.get_host_access(read_only);
     bool good = check_almost_equal_matrix(C_accessor, C_cast_ref, oneapi::math::layout::col_major,
                                           stride_c * batch_size, 1, stride_c * batch_size,
-                                          error_mag, std::cout);
+                                          error_mag, std::cout, abs_error_bound);
 
     return (int)good;
 }
@@ -241,6 +258,17 @@ TEST_P(GemmBatchStrideTests, RealHalfPrecision) {
 TEST_P(GemmBatchStrideTests, HalfHalfFloatPrecision) {
     EXPECT_TRUEORSKIP((test<sycl::half, sycl::half, float, float>(std::get<0>(GetParam()),
                                                                   std::get<1>(GetParam()), 5)));
+}
+
+TEST_P(GemmBatchStrideTests, Bfloat16Bfloat16SinglePrecision) {
+    EXPECT_TRUEORSKIP((test<oneapi::math::bfloat16, oneapi::math::bfloat16, float, float>(
+        std::get<0>(GetParam()), std::get<1>(GetParam()), 5)));
+}
+
+TEST_P(GemmBatchStrideTests, Bfloat16Bfloat16Bfloat16Precision) {
+    EXPECT_TRUEORSKIP(
+        (test<oneapi::math::bfloat16, oneapi::math::bfloat16, oneapi::math::bfloat16, float>(
+            std::get<0>(GetParam()), std::get<1>(GetParam()), 5)));
 }
 
 TEST_P(GemmBatchStrideTests, Int8Int8SinglePrecision) {

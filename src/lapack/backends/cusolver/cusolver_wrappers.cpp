@@ -19,7 +19,7 @@
 #include "lapack/function_table.hpp"
 #include "oneapi/math/lapack/detail/cusolver/onemath_lapack_cusolver.hpp"
 
-#define WRAPPER_VERSION 2
+#define WRAPPER_VERSION 4
 
 extern "C" ONEMATH_EXPORT lapack_function_table_t onemath_lapack_table = {
     WRAPPER_VERSION,

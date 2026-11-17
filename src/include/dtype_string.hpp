@@ -21,6 +21,7 @@
 #define _ONEMATH_ERROR_HELPER_HPP_
 
 #include <string>
+#include "oneapi/math/types.hpp"
 
 template <typename T>
 inline const std::string dtype_string();
@@ -35,6 +36,10 @@ inline const std::string dtype_string<double>() {
 template <>
 inline const std::string dtype_string<sycl::half>() {
     return "half";
+}
+template <>
+inline const std::string dtype_string<oneapi::math::bfloat16>() {
+    return "bfloat16";
 }
 template <>
 inline const std::string dtype_string<std::complex<float>>() {
