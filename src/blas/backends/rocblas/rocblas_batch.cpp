@@ -731,7 +731,8 @@ template <typename Func, typename T>
 inline sycl::event gemv_batch(Func func, sycl::queue& queue, transpose* trans, int64_t* m,
                               int64_t* n, T* alpha, const T** a, int64_t* lda, const T** x,
                               int64_t* incx, T* beta, T** y, int64_t* incy, int64_t group_count,
-                              int64_t* group_size, const std::vector<sycl::event>& dependencies) {
+                              int64_t* group_size, const std::vector<sycl::event>& dependencies,
+                              bool row_major = false) {
     using rocDataType = typename RocEquivalentType<T>::Type;
     for (int64_t i = 0; i < group_count; i++) {
         overflow_check(m[i], n[i], lda[i], incx[i], incy[i], group_size[i]);
@@ -748,7 +749,8 @@ inline sycl::event gemv_batch(Func func, sycl::queue& queue, transpose* trans, i
                 auto** a_ = reinterpret_cast<const rocDataType**>(a);
                 auto** x_ = reinterpret_cast<const rocDataType**>(x);
                 auto** y_ = reinterpret_cast<rocDataType**>(y);
-                rocblas_native_func(func, err, handle, get_rocblas_operation(trans[i]), (int)m[i],
+                const auto trans_i = row_major ? flip_for_row_major(trans[i]) : trans[i];
+                rocblas_native_func(func, err, handle, get_rocblas_operation(trans_i), (int)m[i],
                                     (int)n[i], (rocDataType*)&alpha[i], a_ + offset, (int)lda[i],
                                     x_ + offset, (int)incx[i], (rocDataType*)&beta[i], y_ + offset,
                                     (int)incy[i], (int)group_size[i]);
@@ -1474,33 +1476,35 @@ inline void gemv_batch(Func func, sycl::queue& queue, transpose trans, int64_t m
                        int64_t stridea, sycl::buffer<std::complex<T>, 1>& x, int64_t incx,
                        int64_t stridex, std::complex<T> beta, sycl::buffer<std::complex<T>, 1>& y,
                        int64_t incy, int64_t stridey, int64_t batch_size) {
-    auto new_trans = trans == oneapi::math::transpose::nontrans ? oneapi::math::transpose::trans
-                                                                : oneapi::math::transpose::nontrans;
-
-    if (trans == oneapi::math::transpose::conjtrans) {
-        alpha = std::conj(alpha);
-        beta = std::conj(beta);
-
-        if (m > 0) {
+    // conjtrans is computed as conj(y) = conj(alpha) * A^T * conj(x) + conj(beta) * conj(y),
+    // so x and y are conjugated in place around the call and conjugated back afterwards.
+    const bool conj = trans == oneapi::math::transpose::conjtrans;
+    auto conj_xy = [&]() {
+        if (m > 0)
             queue.submit(
                 [&](sycl::handler& cgh) { conj_vector(cgh, x, m, incx, stridex, batch_size); });
-
-            if (n > 0) {
-                queue.submit(
-                    [&](sycl::handler& cgh) { conj_vector(cgh, y, n, incy, stridey, batch_size); });
-            }
-        }
-    }
-
-    column_major::gemv_batch(func, queue, new_trans, n, m, alpha, a, lda, stridea, x, incx, stridex,
-                             beta, y, incy, stridey, batch_size);
-
-    if (trans == oneapi::math::transpose::conjtrans) {
-        if (n > 0) {
+        if (n > 0)
             queue.submit(
                 [&](sycl::handler& cgh) { conj_vector(cgh, y, n, incy, stridey, batch_size); });
-        }
+    };
+    if (conj) {
+        alpha = std::conj(alpha);
+        beta = std::conj(beta);
+        conj_xy();
     }
+
+    try {
+        column_major::gemv_batch(func, queue, flip_for_row_major(trans), n, m, alpha, a, lda,
+                                 stridea, x, incx, stridex, beta, y, incy, stridey, batch_size);
+    }
+    catch (...) {
+        if (conj)
+            conj_xy();
+        throw;
+    }
+
+    if (conj)
+        conj_xy();
 }
 
 template <typename Func, typename T>
@@ -1849,41 +1853,46 @@ inline sycl::event gemv_batch(Func func, sycl::queue& queue, transpose trans, in
                               int64_t stridex, std::complex<T> beta, std::complex<T>* y,
                               int64_t incy, int64_t stridey, int64_t batch_size,
                               const std::vector<sycl::event>& dependencies) {
-    sycl::event done;
+    // conjtrans is computed as conj(y) = conj(alpha) * A^T * conj(x) + conj(beta) * conj(y),
+    // so x and y are conjugated in place around the call and conjugated back afterwards.
+    const bool conj = trans == oneapi::math::transpose::conjtrans;
+    auto conj_xy = [&](std::vector<sycl::event> deps) {
+        if (m > 0) {
+            deps = { queue.submit([&](sycl::handler& cgh) {
+                cgh.depends_on(deps);
+                conj_vector(cgh, (std::complex<T>*)x, m, incx, stridex, batch_size);
+            }) };
+        }
+        if (n > 0) {
+            deps = { queue.submit([&](sycl::handler& cgh) {
+                cgh.depends_on(deps);
+                conj_vector(cgh, y, n, incy, stridey, batch_size);
+            }) };
+        }
+        return deps;
+    };
 
-    auto new_trans = trans == oneapi::math::transpose::nontrans ? oneapi::math::transpose::trans
-                                                                : oneapi::math::transpose::nontrans;
-
-    if (trans == oneapi::math::transpose::conjtrans) {
+    std::vector<sycl::event> deps = dependencies;
+    if (conj) {
         alpha = std::conj(alpha);
         beta = std::conj(beta);
-
-        if (m > 0) {
-            done = queue.submit([&](sycl::handler& cgh) {
-                conj_vector(cgh, (std::complex<T>*)x, m, incx, stridex, batch_size);
-            });
-
-            if (n > 0) {
-                done = queue.submit(
-                    [&](sycl::handler& cgh) { conj_vector(cgh, y, n, incy, stridey, batch_size); });
-            }
-        }
+        deps = conj_xy(deps);
     }
 
-    done.wait_and_throw();
-
-    done = column_major::gemv_batch(func, queue, new_trans, n, m, alpha, a, lda, stridea, x, incx,
-                                    stridex, beta, y, incy, stridey, batch_size, dependencies);
-
-    if (trans == oneapi::math::transpose::conjtrans) {
-        if (n > 0) {
-            done = queue.submit([&](sycl::handler& cgh) {
-                cgh.depends_on(done);
-                conj_vector(cgh, y, n, incy, stridey, batch_size);
-            });
-        }
+    sycl::event done;
+    try {
+        done = column_major::gemv_batch(func, queue, flip_for_row_major(trans), n, m, alpha, a, lda,
+                                        stridea, x, incx, stridex, beta, y, incy, stridey,
+                                        batch_size, deps);
+    }
+    catch (...) {
+        if (conj)
+            conj_xy(deps);
+        throw;
     }
 
+    if (conj)
+        done = conj_xy({ done }).front();
     return done;
 }
 
@@ -1924,58 +1933,59 @@ inline sycl::event gemv_batch(Func func, sycl::queue& queue, transpose* trans, i
                               std::complex<T>* beta, std::complex<T>** y, int64_t* incy,
                               int64_t group_count, int64_t* group_size,
                               const std::vector<sycl::event>& dependencies) {
-    sycl::event done;
-
-    int64_t stride = 0;
-    for (int64_t i = 0; i < group_count; i++) {
-        if (trans[i] == oneapi::math::transpose::conjtrans) {
-            alpha[i] = std::conj(alpha[i]);
-            beta[i] = std::conj(beta[i]);
-
-            if (m[i] > 0) {
-                done = queue.submit([&](sycl::handler& cgh) {
-                    conj_vector(cgh, (std::complex<T>**)x, m[i], incx[i], stride, group_size[i]);
-                });
-
+    // conjtrans groups are computed as
+    // conj(y) = conj(alpha) * A^T * conj(x) + conj(beta) * conj(y), so their x and y are
+    // conjugated in place around the call and conjugated back afterwards. alpha and beta are
+    // conjugated in local copies, which must outlive the host task, hence the wait below.
+    auto conj_xy = [&](const std::vector<sycl::event>& deps) {
+        std::vector<sycl::event> events;
+        int64_t stride = 0;
+        for (int64_t i = 0; i < group_count; i++) {
+            if (trans[i] == oneapi::math::transpose::conjtrans) {
+                if (m[i] > 0) {
+                    events.push_back(queue.submit([&](sycl::handler& cgh) {
+                        cgh.depends_on(deps);
+                        conj_vector(cgh, (std::complex<T>**)x, m[i], incx[i], stride,
+                                    group_size[i]);
+                    }));
+                }
                 if (n[i] > 0) {
-                    done = queue.submit([&](sycl::handler& cgh) {
+                    events.push_back(queue.submit([&](sycl::handler& cgh) {
+                        cgh.depends_on(deps);
                         conj_vector(cgh, y, n[i], incy[i], stride, group_size[i]);
-                    });
+                    }));
                 }
             }
+            stride += group_size[i];
         }
-        stride += group_size[i];
-    }
+        return events.empty() ? deps : events;
+    };
 
-    done.wait_and_throw();
-
-    auto tmp_trans = std::vector<transpose>{ (std::size_t)group_count };
-    for (int64_t i = 0; i < group_count; i++) {
-        const auto new_trans = trans[i] == oneapi::math::transpose::nontrans
-                                   ? oneapi::math::transpose::trans
-                                   : oneapi::math::transpose::nontrans;
-        tmp_trans[i] = trans[i];
-        trans[i] = new_trans;
-    }
-    done = column_major::gemv_batch(func, queue, trans, n, m, alpha, a, lda, x, incx, beta, y, incy,
-                                    group_count, group_size, dependencies);
-    done.wait_and_throw();
-    for (int64_t i = 0; i < group_count; i++) {
-        trans[i] = tmp_trans[i];
-    }
-
-    stride = 0;
+    std::vector<std::complex<T>> alpha_c(alpha, alpha + group_count);
+    std::vector<std::complex<T>> beta_c(beta, beta + group_count);
     for (int64_t i = 0; i < group_count; i++) {
         if (trans[i] == oneapi::math::transpose::conjtrans) {
-            if (n[i] > 0) {
-                done = queue.submit([&](sycl::handler& cgh) {
-                    conj_vector(cgh, y, n[i], incy[i], stride, group_size[i]);
-                });
-            }
+            alpha_c[i] = std::conj(alpha_c[i]);
+            beta_c[i] = std::conj(beta_c[i]);
         }
-        stride += group_size[i];
     }
 
+    const auto deps = conj_xy(dependencies);
+    sycl::event done;
+    try {
+        done = column_major::gemv_batch(func, queue, trans, n, m, alpha_c.data(), a, lda, x, incx,
+                                        beta_c.data(), y, incy, group_count, group_size, deps,
+                                        /*row_major=*/true);
+        done.wait_and_throw();
+    }
+    catch (...) {
+        for (auto& e : conj_xy(deps))
+            e.wait();
+        throw;
+    }
+
+    for (auto& e : conj_xy({ done }))
+        e.wait_and_throw();
     return done;
 }
 
@@ -1984,23 +1994,8 @@ inline sycl::event gemv_batch(Func func, sycl::queue& queue, transpose* trans, i
                               int64_t* n, T* alpha, const T** a, int64_t* lda, const T** x,
                               int64_t* incx, T* beta, T** y, int64_t* incy, int64_t group_count,
                               int64_t* group_size, const std::vector<sycl::event>& dependencies) {
-    auto tmp_trans = std::vector<transpose>{ static_cast<std::size_t>(group_count) };
-
-    for (int64_t i = 0; i < group_count; i++) {
-        const auto new_trans = trans[i] == oneapi::math::transpose::nontrans
-                                   ? oneapi::math::transpose::trans
-                                   : oneapi::math::transpose::nontrans;
-        tmp_trans[i] = trans[i];
-        trans[i] = new_trans;
-    }
-    auto done = column_major::gemv_batch(func, queue, trans, n, m, alpha, a, lda, x, incx, beta, y,
-                                         incy, group_count, group_size, dependencies);
-    done.wait_and_throw();
-    for (int64_t i = 0; i < group_count; i++) {
-        trans[i] = tmp_trans[i];
-    }
-
-    return done;
+    return column_major::gemv_batch(func, queue, trans, n, m, alpha, a, lda, x, incx, beta, y, incy,
+                                    group_count, group_size, dependencies, /*row_major=*/true);
 }
 
 #define GEMV_BATCH_LAUNCHER_USM(TYPE, ROCBLAS_ROUTINE)                                             \

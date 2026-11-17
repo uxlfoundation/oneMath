@@ -92,6 +92,7 @@ int test(device* dev, oneapi::math::layout layout, int64_t incx, int64_t incy, i
     }
 
     y_ref = y;
+    const std::vector<fp> x_orig(x.begin(), x.end());
 
     // Call reference GEMV_BATCH_STRIDE.
     using fp_ref = typename ref_type_info<fp>::type;
@@ -181,7 +182,12 @@ int test(device* dev, oneapi::math::layout layout, int64_t incx, int64_t incy, i
     // Compare the results of reference implementation and DPC++ implementation.
 
     auto y_accessor = y_buffer.get_host_access(read_only);
+    auto x_accessor = x_buffer.get_host_access(read_only);
     bool good = true;
+    if (!std::equal(x_orig.begin(), x_orig.end(), x_accessor.get_pointer())) {
+        std::cout << "Error: GEMV_BATCH_STRIDE overwrote the input x\n";
+        good = false;
+    }
     for (i = 0; i < batch_size; i++) {
         good = good && check_equal_vector(y_accessor.get_pointer() + i * stride_y,
                                           y_ref.data() + i * stride_y, y_len, incy,
