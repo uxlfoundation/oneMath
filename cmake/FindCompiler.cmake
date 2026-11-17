@@ -76,9 +76,14 @@ if(is_dpcpp)
             set(_onemath_rocm_ver "${CMAKE_MATCH_1}.${CMAKE_MATCH_2}")
             if(_onemath_rocm_ver VERSION_LESS "6.3")
               message(STATUS "Detected ROCm ${_onemath_rocm_ver} (< 6.3); "
-                "adding -mcode-object-version=5 for AMD targets")
-              list(APPEND UNIX_INTERFACE_COMPILE_OPTIONS -mcode-object-version=5)
-              list(APPEND UNIX_INTERFACE_LINK_OPTIONS -mcode-object-version=5)
+                "adding -mcode-object-version=5 for the AMD offload target")
+              # Attach the flag to amdgcn only. A mixed CUDA + ROCm compile
+              # passes one -fsycl-targets list, and a bare -mcode-object-version
+              # would also be applied to nvptx.
+              list(APPEND UNIX_INTERFACE_COMPILE_OPTIONS
+                -Xsycl-target-frontend=amdgcn-amd-amdhsa -mcode-object-version=5)
+              list(APPEND UNIX_INTERFACE_LINK_OPTIONS
+                -Xsycl-target-frontend=amdgcn-amd-amdhsa -mcode-object-version=5)
             endif()
           endif()
         endif()

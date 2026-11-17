@@ -253,10 +253,11 @@ For a host with ROCm installed, the device architecture can be retrieved via the
 
   This is a toolchain (compiler/ROCm) compatibility issue and is not specific to
   oneMath: it affects any HIP or SYCL-on-AMD application built with a recent
-  enough compiler. To build with ROCm < 6.3, downgrade the code object version
-  by adding ``-mcode-object-version=5`` to the compiler flags, for example::
+  enough compiler. To build with ROCm < 6.3, pass the code object downgrade to
+  the AMD offload target. oneMath adds this automatically when it detects
+  ROCm < 6.3::
 
-    cmake <build options> -DCMAKE_CXX_FLAGS="-mcode-object-version=5" ..
+    -Xsycl-target-frontend=amdgcn-amd-amdhsa -mcode-object-version=5
 
 .. _build_for_other_SYCL_devices:
 
