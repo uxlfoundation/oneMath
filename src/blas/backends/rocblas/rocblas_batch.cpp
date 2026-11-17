@@ -67,6 +67,23 @@ namespace oneapi {
 namespace math {
 namespace blas {
 namespace rocblas {
+
+// Row-major group calls map to column-major by swapping these parameters per group.
+static inline side flip_for_row_major(side left_right) {
+    return left_right == oneapi::math::side::left ? oneapi::math::side::right
+                                                  : oneapi::math::side::left;
+}
+
+static inline uplo flip_for_row_major(uplo upper_lower) {
+    return upper_lower == oneapi::math::uplo::lower ? oneapi::math::uplo::upper
+                                                    : oneapi::math::uplo::lower;
+}
+
+static inline transpose flip_for_row_major(transpose trans) {
+    return trans == oneapi::math::transpose::nontrans ? oneapi::math::transpose::trans
+                                                      : oneapi::math::transpose::nontrans;
+}
+
 namespace column_major {
 
 // Buffer APIs
@@ -1059,7 +1076,8 @@ template <typename Func, typename T>
 inline sycl::event trsm_batch(Func func, sycl::queue& queue, side* left_right, uplo* upper_lower,
                               transpose* trans, diag* unit_diag, int64_t* m, int64_t* n, T* alpha,
                               const T** a, int64_t* lda, T** b, int64_t* ldb, int64_t group_count,
-                              int64_t* group_size, const std::vector<sycl::event>& dependencies) {
+                              int64_t* group_size, const std::vector<sycl::event>& dependencies,
+                              bool row_major = false) {
     using rocDataType = typename RocEquivalentType<T>::Type;
     for (int64_t i = 0; i < group_count; i++) {
         overflow_check(m[i], n[i], lda[i], ldb[i], group_size[i]);
@@ -1075,9 +1093,10 @@ inline sycl::event trsm_batch(Func func, sycl::queue& queue, side* left_right, u
             for (int64_t i = 0; i < group_count; i++) {
                 auto** a_ = reinterpret_cast<const rocDataType**>(a);
                 auto** b_ = reinterpret_cast<rocDataType**>(b);
-                rocblas_native_func(func, err, handle, get_rocblas_side_mode(left_right[i]),
-                                    get_rocblas_fill_mode(upper_lower[i]),
-                                    get_rocblas_operation(trans[i]),
+                const auto side_i = row_major ? flip_for_row_major(left_right[i]) : left_right[i];
+                const auto uplo_i = row_major ? flip_for_row_major(upper_lower[i]) : upper_lower[i];
+                rocblas_native_func(func, err, handle, get_rocblas_side_mode(side_i),
+                                    get_rocblas_fill_mode(uplo_i), get_rocblas_operation(trans[i]),
                                     get_rocblas_diag_type(unit_diag[i]), (int)m[i], (int)n[i],
                                     (rocDataType*)&alpha[i], a_ + offset, (int)lda[i], b_ + offset,
                                     (int)ldb[i], (int)group_size[i]);
@@ -1110,7 +1129,8 @@ template <typename Func, typename T>
 inline sycl::event syrk_batch(Func func, sycl::queue& queue, uplo* upper_lower, transpose* trans,
                               int64_t* n, int64_t* k, T* alpha, const T** a, int64_t* lda, T* beta,
                               T** c, int64_t* ldc, int64_t group_count, int64_t* group_size,
-                              const std::vector<sycl::event>& dependencies) {
+                              const std::vector<sycl::event>& dependencies,
+                              bool row_major = false) {
     using rocDataType = typename RocEquivalentType<T>::Type;
     for (int64_t i = 0; i < group_count; i++) {
         overflow_check(n[i], k[i], lda[i], ldc[i], group_size[i]);
@@ -1126,8 +1146,10 @@ inline sycl::event syrk_batch(Func func, sycl::queue& queue, uplo* upper_lower, 
             for (int64_t i = 0; i < group_count; i++) {
                 auto** a_ = reinterpret_cast<const rocDataType**>(a);
                 auto** c_ = reinterpret_cast<rocDataType**>(c);
-                rocblas_native_func(func, err, handle, get_rocblas_fill_mode(upper_lower[i]),
-                                    get_rocblas_operation(trans[i]), (int)n[i], (int)k[i],
+                const auto uplo_i = row_major ? flip_for_row_major(upper_lower[i]) : upper_lower[i];
+                const auto trans_i = row_major ? flip_for_row_major(trans[i]) : trans[i];
+                rocblas_native_func(func, err, handle, get_rocblas_fill_mode(uplo_i),
+                                    get_rocblas_operation(trans_i), (int)n[i], (int)k[i],
                                     (rocDataType*)&alpha[i], a_ + offset, (int)lda[i],
                                     (rocDataType*)&beta[i], c_ + offset, (int)ldc[i],
                                     (int)group_size[i]);
@@ -2203,19 +2225,9 @@ inline sycl::event trsm_batch(Func func, sycl::queue& queue, side* left_right, u
                               transpose* trans, diag* unit_diag, int64_t* m, int64_t* n, T* alpha,
                               const T** a, int64_t* lda, T** b, int64_t* ldb, int64_t group_count,
                               int64_t* group_size, const std::vector<sycl::event>& dependencies) {
-    for (int64_t i = 0; i < group_count; i++) {
-        const auto new_side = left_right[i] == oneapi::math::side::left ? oneapi::math::side::right
-                                                                        : oneapi::math::side::left;
-        left_right[i] = new_side;
-
-        const auto new_uplo = upper_lower[i] == oneapi::math::uplo::lower
-                                  ? oneapi::math::uplo::upper
-                                  : oneapi::math::uplo::lower;
-        upper_lower[i] = new_uplo;
-    }
-
     return column_major::trsm_batch(func, queue, left_right, upper_lower, trans, unit_diag, n, m,
-                                    alpha, a, lda, b, ldb, group_count, group_size, dependencies);
+                                    alpha, a, lda, b, ldb, group_count, group_size, dependencies,
+                                    /*row_major=*/true);
 }
 
 #define TRSM_BATCH_LAUNCHER_USM(TYPE, ROCBLAS_ROUTINE)                                             \
@@ -2240,20 +2252,9 @@ inline sycl::event syrk_batch(Func func, sycl::queue& queue, uplo* upper_lower, 
                               int64_t* n, int64_t* k, T* alpha, const T** a, int64_t* lda, T* beta,
                               T** c, int64_t* ldc, int64_t group_count, int64_t* group_size,
                               const std::vector<sycl::event>& dependencies) {
-    for (int64_t i = 0; i < group_count; i++) {
-        const auto new_uplo = upper_lower[i] == oneapi::math::uplo::lower
-                                  ? oneapi::math::uplo::upper
-                                  : oneapi::math::uplo::lower;
-        upper_lower[i] = new_uplo;
-
-        const auto new_trans = trans[i] == oneapi::math::transpose::nontrans
-                                   ? oneapi::math::transpose::trans
-                                   : oneapi::math::transpose::nontrans;
-        trans[i] = new_trans;
-    }
-
     return column_major::syrk_batch(func, queue, upper_lower, trans, n, k, alpha, a, lda, beta, c,
-                                    ldc, group_count, group_size, dependencies);
+                                    ldc, group_count, group_size, dependencies,
+                                    /*row_major=*/true);
 }
 
 #define SYRK_BATCH_LAUNCHER_USM(TYPE, ROCBLAS_ROUTINE)                                           \

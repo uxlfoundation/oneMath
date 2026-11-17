@@ -271,6 +271,14 @@ int test(device* dev, oneapi::math::layout layout, int64_t group_count) {
     }
 
     bool good = true;
+    for (i = 0; i < group_count; i++) {
+        if (convert_to_cblas_uplo(upper_lower[i]) != upper_lower_ref[i] ||
+            convert_to_cblas_trans(trans[i]) != trans_ref[i]) {
+            std::cout << "Error: SYRK_BATCH overwrote an input parameter array\n";
+            good = false;
+            break;
+        }
+    }
     // Compare the results of reference implementation and DPC++ implementation.
     idx = 0;
     for (i = 0; i < group_count; i++) {
