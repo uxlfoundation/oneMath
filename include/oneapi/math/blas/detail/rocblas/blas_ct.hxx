@@ -194,6 +194,26 @@ void gemm_batch(backend_selector<backend::rocblas> selector, transpose transa, t
 }
 
 void gemm_batch(backend_selector<backend::rocblas> selector, transpose transa, transpose transb,
+                int64_t m, int64_t n, int64_t k, float alpha, sycl::buffer<bfloat16, 1>& a,
+                int64_t lda, int64_t stride_a, sycl::buffer<bfloat16, 1>& b, int64_t ldb,
+                int64_t stride_b, float beta, sycl::buffer<float, 1>& c, int64_t ldc,
+                int64_t stride_c, int64_t batch_size) {
+    oneapi::math::blas::rocblas::MAJOR::gemm_batch(selector.get_queue(), transa, transb, m, n, k,
+                                                   alpha, a, lda, stride_a, b, ldb, stride_b, beta,
+                                                   c, ldc, stride_c, batch_size);
+}
+
+void gemm_batch(backend_selector<backend::rocblas> selector, transpose transa, transpose transb,
+                int64_t m, int64_t n, int64_t k, float alpha, sycl::buffer<bfloat16, 1>& a,
+                int64_t lda, int64_t stride_a, sycl::buffer<bfloat16, 1>& b, int64_t ldb,
+                int64_t stride_b, float beta, sycl::buffer<bfloat16, 1>& c, int64_t ldc,
+                int64_t stride_c, int64_t batch_size) {
+    oneapi::math::blas::rocblas::MAJOR::gemm_batch(selector.get_queue(), transa, transb, m, n, k,
+                                                   alpha, a, lda, stride_a, b, ldb, stride_b, beta,
+                                                   c, ldc, stride_c, batch_size);
+}
+
+void gemm_batch(backend_selector<backend::rocblas> selector, transpose transa, transpose transb,
                 int64_t m, int64_t n, int64_t k, float alpha, sycl::buffer<std::int8_t, 1>& a,
                 int64_t lda, int64_t stride_a, sycl::buffer<std::int8_t, 1>& b, int64_t ldb,
                 int64_t stride_b, float beta, sycl::buffer<float, 1>& c, int64_t ldc,
@@ -2587,6 +2607,28 @@ sycl::event gemm_batch(backend_selector<backend::rocblas> selector, transpose* t
 
 sycl::event gemm_batch(backend_selector<backend::rocblas> selector, transpose* transa,
                        transpose* transb, int64_t* m, int64_t* n, int64_t* k, float* alpha,
+                       const bfloat16** a, int64_t* lda, const bfloat16** b, int64_t* ldb,
+                       float* beta, float** c, int64_t* ldc, int64_t group_count,
+                       int64_t* group_size, const std::vector<sycl::event>& dependencies) {
+    auto done = oneapi::math::blas::rocblas::MAJOR::gemm_batch(
+        selector.get_queue(), transa, transb, m, n, k, alpha, a, lda, b, ldb, beta, c, ldc,
+        group_count, group_size, dependencies);
+    return done;
+}
+
+sycl::event gemm_batch(backend_selector<backend::rocblas> selector, transpose* transa,
+                       transpose* transb, int64_t* m, int64_t* n, int64_t* k, float* alpha,
+                       const bfloat16** a, int64_t* lda, const bfloat16** b, int64_t* ldb,
+                       float* beta, bfloat16** c, int64_t* ldc, int64_t group_count,
+                       int64_t* group_size, const std::vector<sycl::event>& dependencies) {
+    auto done = oneapi::math::blas::rocblas::MAJOR::gemm_batch(
+        selector.get_queue(), transa, transb, m, n, k, alpha, a, lda, b, ldb, beta, c, ldc,
+        group_count, group_size, dependencies);
+    return done;
+}
+
+sycl::event gemm_batch(backend_selector<backend::rocblas> selector, transpose* transa,
+                       transpose* transb, int64_t* m, int64_t* n, int64_t* k, float* alpha,
                        const std::int8_t** a, int64_t* lda, const std::int8_t** b, int64_t* ldb,
                        float* beta, float** c, int64_t* ldc, int64_t group_count,
                        int64_t* group_size, const std::vector<sycl::event>& dependencies) {
@@ -2671,6 +2713,30 @@ sycl::event gemm_batch(backend_selector<backend::rocblas> selector, transpose tr
                        transpose transb, int64_t m, int64_t n, int64_t k, float alpha,
                        const sycl::half* a, int64_t lda, int64_t stride_a, const sycl::half* b,
                        int64_t ldb, int64_t stride_b, float beta, float* c, int64_t ldc,
+                       int64_t stride_c, int64_t batch_size,
+                       const std::vector<sycl::event>& dependencies) {
+    auto done = oneapi::math::blas::rocblas::MAJOR::gemm_batch(
+        selector.get_queue(), transa, transb, m, n, k, alpha, a, lda, stride_a, b, ldb, stride_b,
+        beta, c, ldc, stride_c, batch_size, dependencies);
+    return done;
+}
+
+sycl::event gemm_batch(backend_selector<backend::rocblas> selector, transpose transa,
+                       transpose transb, int64_t m, int64_t n, int64_t k, float alpha,
+                       const bfloat16* a, int64_t lda, int64_t stride_a, const bfloat16* b,
+                       int64_t ldb, int64_t stride_b, float beta, float* c, int64_t ldc,
+                       int64_t stride_c, int64_t batch_size,
+                       const std::vector<sycl::event>& dependencies) {
+    auto done = oneapi::math::blas::rocblas::MAJOR::gemm_batch(
+        selector.get_queue(), transa, transb, m, n, k, alpha, a, lda, stride_a, b, ldb, stride_b,
+        beta, c, ldc, stride_c, batch_size, dependencies);
+    return done;
+}
+
+sycl::event gemm_batch(backend_selector<backend::rocblas> selector, transpose transa,
+                       transpose transb, int64_t m, int64_t n, int64_t k, float alpha,
+                       const bfloat16* a, int64_t lda, int64_t stride_a, const bfloat16* b,
+                       int64_t ldb, int64_t stride_b, float beta, bfloat16* c, int64_t ldc,
                        int64_t stride_c, int64_t batch_size,
                        const std::vector<sycl::event>& dependencies) {
     auto done = oneapi::math::blas::rocblas::MAJOR::gemm_batch(
