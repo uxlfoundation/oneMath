@@ -262,14 +262,13 @@ void run_one(sycl::queue& queue, const problem& p, T* da, T* db, bool& verified,
     }
 }
 
-#define FOR_EACH_GEOMETRY(F)                                                                    \
-    F(16, 16, 4)                                                                                \
-    F(16, 16, 8)                                                                                \
-    F(16, 16, 16) F(32, 8, 8) F(32, 16, 4) F(32, 16, 8) F(32, 16, 16) F(32, 32, 4) F(32, 32, 8) \
-        F(32, 32, 16) F(32, 32, 32) F(64, 16, 4) F(64, 16, 8) F(64, 16, 16) F(64, 32, 4)        \
-            F(64, 32, 8) F(64, 32, 16) F(64, 64, 4) F(64, 64, 8) F(64, 64, 16) F(128, 16, 4)    \
-                F(128, 16, 8) F(128, 32, 4) F(128, 32, 8) F(128, 64, 4) F(128, 64, 8)           \
-                    F(128, 128, 4) F(128, 128, 8)
+template <typename T, int Rows, int Cols, int Block>
+void run_geometry(sycl::queue& queue, const problem& p, T* da, T* db) {
+    // One instantiation per tile, so the one-time correctness check stays per geometry.
+    static bool verified = false;
+    static bool ok = true;
+    run_one<T, geometry<Rows, Cols, Block>>(queue, p, da, db, verified, ok);
+}
 
 template <typename T>
 void sweep_type(sycl::queue& queue, const std::vector<problem>& problems) {
@@ -287,14 +286,34 @@ void sweep_type(sycl::queue& queue, const std::vector<problem>& problems) {
         queue.fill(da, static_cast<T>(1), p.size_a).wait();
         queue.fill(db, static_cast<T>(0), p.size_b).wait();
 
-#define RUN(R, C, B)                                                   \
-    {                                                                  \
-        static bool verified = false;                                  \
-        static bool ok = true;                                         \
-        run_one<T, geometry<R, C, B>>(queue, p, da, db, verified, ok); \
-    }
-        FOR_EACH_GEOMETRY(RUN)
-#undef RUN
+        run_geometry<T, 16, 16, 4>(queue, p, da, db);
+        run_geometry<T, 16, 16, 8>(queue, p, da, db);
+        run_geometry<T, 16, 16, 16>(queue, p, da, db);
+        run_geometry<T, 32, 8, 8>(queue, p, da, db);
+        run_geometry<T, 32, 16, 4>(queue, p, da, db);
+        run_geometry<T, 32, 16, 8>(queue, p, da, db);
+        run_geometry<T, 32, 16, 16>(queue, p, da, db);
+        run_geometry<T, 32, 32, 4>(queue, p, da, db);
+        run_geometry<T, 32, 32, 8>(queue, p, da, db);
+        run_geometry<T, 32, 32, 16>(queue, p, da, db);
+        run_geometry<T, 32, 32, 32>(queue, p, da, db);
+        run_geometry<T, 64, 16, 4>(queue, p, da, db);
+        run_geometry<T, 64, 16, 8>(queue, p, da, db);
+        run_geometry<T, 64, 16, 16>(queue, p, da, db);
+        run_geometry<T, 64, 32, 4>(queue, p, da, db);
+        run_geometry<T, 64, 32, 8>(queue, p, da, db);
+        run_geometry<T, 64, 32, 16>(queue, p, da, db);
+        run_geometry<T, 64, 64, 4>(queue, p, da, db);
+        run_geometry<T, 64, 64, 8>(queue, p, da, db);
+        run_geometry<T, 64, 64, 16>(queue, p, da, db);
+        run_geometry<T, 128, 16, 4>(queue, p, da, db);
+        run_geometry<T, 128, 16, 8>(queue, p, da, db);
+        run_geometry<T, 128, 32, 4>(queue, p, da, db);
+        run_geometry<T, 128, 32, 8>(queue, p, da, db);
+        run_geometry<T, 128, 64, 4>(queue, p, da, db);
+        run_geometry<T, 128, 64, 8>(queue, p, da, db);
+        run_geometry<T, 128, 128, 4>(queue, p, da, db);
+        run_geometry<T, 128, 128, 8>(queue, p, da, db);
 
         sycl::free(da, queue);
         sycl::free(db, queue);
