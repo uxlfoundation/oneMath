@@ -48,7 +48,8 @@ extern std::vector<sycl::device*> devices;
 namespace {
 
 template <typename fp>
-int test(device* dev, oneapi::math::layout layout, int64_t incx, int64_t incy, int64_t batch_size) {
+int test(device* dev, oneapi::math::layout layout, int64_t incx, int64_t incy, int64_t batch_size,
+         bool shared_x = false) {
     // Prepare data.
     int64_t m, n;
     int64_t lda;
@@ -78,11 +79,13 @@ int test(device* dev, oneapi::math::layout layout, int64_t incx, int64_t incy, i
     int y_len = inner_dimension(transa, m, n);
 
     int64_t stride_x, stride_y, stride_a;
-    stride_x = x_len * std::abs(incx);
+    stride_x = shared_x ? 0 : x_len * std::abs(incx);
     stride_y = y_len * std::abs(incy);
     stride_a = lda * std::max(m, n);
 
-    vector<fp, allocator_helper<fp, 64>> x(stride_x * batch_size), A(stride_a * batch_size);
+    vector<fp, allocator_helper<fp, 64>> x(
+        std::max<int64_t>(stride_x * batch_size, x_len * std::abs(incx))),
+        A(stride_a * batch_size);
     vector<fp, allocator_helper<fp, 64>> y(stride_y * batch_size), y_ref(stride_y * batch_size);
 
     for (i = 0; i < batch_size; i++) {
@@ -203,6 +206,8 @@ TEST_P(GemvBatchStrideTests, RealSinglePrecision) {
     EXPECT_TRUEORSKIP(test<float>(std::get<0>(GetParam()), std::get<1>(GetParam()), 2, 3, 5));
     EXPECT_TRUEORSKIP(test<float>(std::get<0>(GetParam()), std::get<1>(GetParam()), -2, -3, 5));
     EXPECT_TRUEORSKIP(test<float>(std::get<0>(GetParam()), std::get<1>(GetParam()), 1, 1, 5));
+    EXPECT_TRUEORSKIP(test<float>(std::get<0>(GetParam()), std::get<1>(GetParam()), 2, 3, 5,
+                                  /*shared_x=*/true));
 }
 
 TEST_P(GemvBatchStrideTests, RealDoublePrecision) {
@@ -211,22 +216,34 @@ TEST_P(GemvBatchStrideTests, RealDoublePrecision) {
     EXPECT_TRUEORSKIP(test<double>(std::get<0>(GetParam()), std::get<1>(GetParam()), 2, 3, 5));
     EXPECT_TRUEORSKIP(test<double>(std::get<0>(GetParam()), std::get<1>(GetParam()), -2, -3, 5));
     EXPECT_TRUEORSKIP(test<double>(std::get<0>(GetParam()), std::get<1>(GetParam()), 1, 1, 5));
+    EXPECT_TRUEORSKIP(test<double>(std::get<0>(GetParam()), std::get<1>(GetParam()), 2, 3, 5,
+                                   /*shared_x=*/true));
 }
 
 TEST_P(GemvBatchStrideTests, ComplexSinglePrecision) {
     EXPECT_TRUEORSKIP(
-        test<std::complex<float>>(std::get<0>(GetParam()), std::get<1>(GetParam()), 2, 3, 5);
-        test<std::complex<float>>(std::get<0>(GetParam()), std::get<1>(GetParam()), -2, -3, 5);
+        test<std::complex<float>>(std::get<0>(GetParam()), std::get<1>(GetParam()), 2, 3, 5));
+    EXPECT_TRUEORSKIP(
+        test<std::complex<float>>(std::get<0>(GetParam()), std::get<1>(GetParam()), -2, -3, 5));
+    EXPECT_TRUEORSKIP(
         test<std::complex<float>>(std::get<0>(GetParam()), std::get<1>(GetParam()), 1, 1, 5));
+    EXPECT_TRUEORSKIP(test<std::complex<float>>(std::get<0>(GetParam()), std::get<1>(GetParam()), 2,
+                                                3, 5,
+                                                /*shared_x=*/true));
 }
 
 TEST_P(GemvBatchStrideTests, ComplexDoublePrecision) {
     CHECK_DOUBLE_ON_DEVICE(std::get<0>(GetParam()));
 
     EXPECT_TRUEORSKIP(
-        test<std::complex<double>>(std::get<0>(GetParam()), std::get<1>(GetParam()), 2, 3, 5);
-        test<std::complex<double>>(std::get<0>(GetParam()), std::get<1>(GetParam()), -2, -3, 5);
+        test<std::complex<double>>(std::get<0>(GetParam()), std::get<1>(GetParam()), 2, 3, 5));
+    EXPECT_TRUEORSKIP(
+        test<std::complex<double>>(std::get<0>(GetParam()), std::get<1>(GetParam()), -2, -3, 5));
+    EXPECT_TRUEORSKIP(
         test<std::complex<double>>(std::get<0>(GetParam()), std::get<1>(GetParam()), 1, 1, 5));
+    EXPECT_TRUEORSKIP(test<std::complex<double>>(std::get<0>(GetParam()), std::get<1>(GetParam()),
+                                                 2, 3, 5,
+                                                 /*shared_x=*/true));
 }
 
 INSTANTIATE_TEST_SUITE_P(GemvBatchStrideTestSuite, GemvBatchStrideTests,

@@ -63,6 +63,46 @@ static inline void conj_vector(sycl::handler& cgh, T** ptr, const int64_t len, c
                      });
 }
 
+// Writes the conjugate of each vector to out with unit increment and stride len. Batch entries
+// may share x, so x itself is left unmodified.
+template <typename T>
+static inline void conj_copy_vector(sycl::handler& cgh, sycl::buffer<T>& x, sycl::buffer<T>& out,
+                                    const int64_t len, const int64_t inc, const int64_t stride,
+                                    const int64_t batch_size) {
+    const auto abs_inc = std::abs(inc);
+    const auto abs_stride = std::abs(stride);
+    auto x_acc = x.template get_access<sycl::access::mode::read>(cgh);
+    auto out_acc = out.template get_access<sycl::access::mode::discard_write>(cgh);
+    cgh.parallel_for(sycl::range{ (std::size_t)batch_size, (std::size_t)len },
+                     [=](sycl::item<2> it) {
+                         out_acc[it.get_id(0) * len + it.get_id(1)] =
+                             std::conj(x_acc[it.get_id(0) * abs_stride + it.get_id(1) * abs_inc]);
+                     });
+}
+template <typename T>
+static inline void conj_copy_vector(sycl::handler& cgh, const T* x, T* out, const int64_t len,
+                                    const int64_t inc, const int64_t stride,
+                                    const int64_t batch_size) {
+    const auto abs_inc = std::abs(inc);
+    const auto abs_stride = std::abs(stride);
+    cgh.parallel_for(sycl::range{ (std::size_t)batch_size, (std::size_t)len },
+                     [=](sycl::item<2> it) {
+                         out[it.get_id(0) * len + it.get_id(1)] =
+                             std::conj(x[it.get_id(0) * abs_stride + it.get_id(1) * abs_inc]);
+                     });
+}
+template <typename T>
+static inline void conj_copy_vector(sycl::handler& cgh, const T* const* x, T* out,
+                                    const int64_t len, const int64_t inc, const int64_t offset,
+                                    const int64_t group_size) {
+    const auto abs_inc = std::abs(inc);
+    cgh.parallel_for(sycl::range{ (std::size_t)group_size, (std::size_t)len },
+                     [=](sycl::item<2> it) {
+                         out[it.get_id(0) * len + it.get_id(1)] =
+                             std::conj(x[it.get_id(0) + offset][it.get_id(1) * abs_inc]);
+                     });
+}
+
 namespace oneapi {
 namespace math {
 namespace blas {
@@ -1476,35 +1516,44 @@ inline void gemv_batch(Func func, sycl::queue& queue, transpose trans, int64_t m
                        int64_t stridea, sycl::buffer<std::complex<T>, 1>& x, int64_t incx,
                        int64_t stridex, std::complex<T> beta, sycl::buffer<std::complex<T>, 1>& y,
                        int64_t incy, int64_t stridey, int64_t batch_size) {
-    // conjtrans is computed as conj(y) = conj(alpha) * A^T * conj(x) + conj(beta) * conj(y),
-    // so x and y are conjugated in place around the call and conjugated back afterwards.
-    const bool conj = trans == oneapi::math::transpose::conjtrans;
-    auto conj_xy = [&]() {
-        if (m > 0)
-            queue.submit(
-                [&](sycl::handler& cgh) { conj_vector(cgh, x, m, incx, stridex, batch_size); });
-        if (n > 0)
-            queue.submit(
-                [&](sycl::handler& cgh) { conj_vector(cgh, y, n, incy, stridey, batch_size); });
-    };
-    if (conj) {
-        alpha = std::conj(alpha);
-        beta = std::conj(beta);
-        conj_xy();
-    }
-
-    try {
+    if (trans != oneapi::math::transpose::conjtrans) {
         column_major::gemv_batch(func, queue, flip_for_row_major(trans), n, m, alpha, a, lda,
                                  stridea, x, incx, stridex, beta, y, incy, stridey, batch_size);
-    }
-    catch (...) {
-        if (conj)
-            conj_xy();
-        throw;
+        return;
     }
 
-    if (conj)
-        conj_xy();
+    // conjtrans is computed as conj(y) = conj(alpha) * A^T * conj(x) + conj(beta) * conj(y).
+    // x is conjugated into a temporary because batch entries may share it; y is conjugated in
+    // place around the call and conjugated back afterwards. The rocBLAS call is a native command,
+    // which the DPC++ HIP adapter does not reliably order after its dependencies, so the inputs
+    // are prepared before it is submitted.
+    auto conj_y = [&]() {
+        return queue.submit(
+            [&](sycl::handler& cgh) { conj_vector(cgh, y, n, incy, stridey, batch_size); });
+    };
+    sycl::buffer<std::complex<T>, 1> x_c(sycl::range<1>(std::max<int64_t>(batch_size * m, 1)));
+    if (m > 0) {
+        queue
+            .submit([&](sycl::handler& cgh) {
+                conj_copy_vector(cgh, x, x_c, m, incx, stridex, batch_size);
+            })
+            .wait();
+    }
+    if (n > 0)
+        conj_y().wait();
+
+    try {
+        column_major::gemv_batch(func, queue, flip_for_row_major(trans), n, m, std::conj(alpha), a,
+                                 lda, stridea, x_c, incx < 0 ? -1 : 1, m, std::conj(beta), y, incy,
+                                 stridey, batch_size);
+    }
+    catch (...) {
+        if (n > 0)
+            conj_y();
+        throw;
+    }
+    if (n > 0)
+        conj_y();
 }
 
 template <typename Func, typename T>
@@ -1853,47 +1902,59 @@ inline sycl::event gemv_batch(Func func, sycl::queue& queue, transpose trans, in
                               int64_t stridex, std::complex<T> beta, std::complex<T>* y,
                               int64_t incy, int64_t stridey, int64_t batch_size,
                               const std::vector<sycl::event>& dependencies) {
-    // conjtrans is computed as conj(y) = conj(alpha) * A^T * conj(x) + conj(beta) * conj(y),
-    // so x and y are conjugated in place around the call and conjugated back afterwards.
-    const bool conj = trans == oneapi::math::transpose::conjtrans;
-    auto conj_xy = [&](std::vector<sycl::event> deps) {
-        if (m > 0) {
-            deps = { queue.submit([&](sycl::handler& cgh) {
-                cgh.depends_on(deps);
-                conj_vector(cgh, (std::complex<T>*)x, m, incx, stridex, batch_size);
-            }) };
-        }
-        if (n > 0) {
-            deps = { queue.submit([&](sycl::handler& cgh) {
-                cgh.depends_on(deps);
-                conj_vector(cgh, y, n, incy, stridey, batch_size);
-            }) };
-        }
-        return deps;
+    if (trans != oneapi::math::transpose::conjtrans) {
+        return column_major::gemv_batch(func, queue, flip_for_row_major(trans), n, m, alpha, a, lda,
+                                        stridea, x, incx, stridex, beta, y, incy, stridey,
+                                        batch_size, dependencies);
+    }
+
+    // conjtrans is computed as conj(y) = conj(alpha) * A^T * conj(x) + conj(beta) * conj(y).
+    // x is conjugated into a temporary because batch entries may share it; y is conjugated in
+    // place around the call and conjugated back afterwards. The rocBLAS call is a native command,
+    // which the DPC++ HIP adapter does not reliably order after its dependencies, so the inputs
+    // are prepared before it is submitted.
+    auto conj_y = [&](const std::vector<sycl::event>& deps) {
+        return queue.submit([&](sycl::handler& cgh) {
+            cgh.depends_on(deps);
+            conj_vector(cgh, y, n, incy, stridey, batch_size);
+        });
     };
 
-    std::vector<sycl::event> deps = dependencies;
-    if (conj) {
-        alpha = std::conj(alpha);
-        beta = std::conj(beta);
-        deps = conj_xy(deps);
+    std::complex<T>* x_c = nullptr;
+    if (m > 0) {
+        x_c = sycl::malloc_device<std::complex<T>>(batch_size * m, queue);
+        queue
+            .submit([&](sycl::handler& cgh) {
+                cgh.depends_on(dependencies);
+                conj_copy_vector(cgh, x, x_c, m, incx, stridex, batch_size);
+            })
+            .wait();
     }
+    if (n > 0)
+        conj_y(dependencies).wait();
 
     sycl::event done;
     try {
-        done = column_major::gemv_batch(func, queue, flip_for_row_major(trans), n, m, alpha, a, lda,
-                                        stridea, x, incx, stridex, beta, y, incy, stridey,
-                                        batch_size, deps);
+        done = column_major::gemv_batch(
+            func, queue, flip_for_row_major(trans), n, m, std::conj(alpha), a, lda, stridea,
+            x_c ? x_c : x, x_c ? (incx < 0 ? -1 : 1) : incx, x_c ? m : stridex, std::conj(beta), y,
+            incy, stridey, batch_size, dependencies);
     }
     catch (...) {
-        if (conj)
-            conj_xy(deps);
+        if (n > 0)
+            conj_y({}).wait();
+        sycl::free(x_c, queue);
         throw;
     }
 
-    if (conj)
-        done = conj_xy({ done }).front();
-    return done;
+    const auto restored = n > 0 ? conj_y({ done }) : done;
+    if (!x_c)
+        return restored;
+    const auto context = queue.get_context();
+    return queue.submit([&](sycl::handler& cgh) {
+        cgh.depends_on(restored);
+        cgh.host_task([=]() { sycl::free(x_c, context); });
+    });
 }
 
 template <typename Func, typename T>
@@ -1934,58 +1995,96 @@ inline sycl::event gemv_batch(Func func, sycl::queue& queue, transpose* trans, i
                               int64_t group_count, int64_t* group_size,
                               const std::vector<sycl::event>& dependencies) {
     // conjtrans groups are computed as
-    // conj(y) = conj(alpha) * A^T * conj(x) + conj(beta) * conj(y), so their x and y are
-    // conjugated in place around the call and conjugated back afterwards. alpha and beta are
-    // conjugated in local copies, which must outlive the host task, hence the wait below.
-    auto conj_xy = [&](const std::vector<sycl::event>& deps) {
+    // conj(y) = conj(alpha) * A^T * conj(x) + conj(beta) * conj(y). Their x vectors are
+    // conjugated into a temporary because batch entries may share them; their y vectors are
+    // conjugated in place around the call and conjugated back afterwards. The rocBLAS call is a
+    // native command, which the DPC++ HIP adapter does not reliably order after its dependencies,
+    // so the inputs are prepared before it is submitted. The local copies and temporaries must
+    // outlive the host task, hence the wait after it.
+    auto conj_y = [&](const std::vector<sycl::event>& deps) {
         std::vector<sycl::event> events;
-        int64_t stride = 0;
+        int64_t offset = 0;
         for (int64_t i = 0; i < group_count; i++) {
-            if (trans[i] == oneapi::math::transpose::conjtrans) {
-                if (m[i] > 0) {
-                    events.push_back(queue.submit([&](sycl::handler& cgh) {
-                        cgh.depends_on(deps);
-                        conj_vector(cgh, (std::complex<T>**)x, m[i], incx[i], stride,
-                                    group_size[i]);
-                    }));
-                }
-                if (n[i] > 0) {
-                    events.push_back(queue.submit([&](sycl::handler& cgh) {
-                        cgh.depends_on(deps);
-                        conj_vector(cgh, y, n[i], incy[i], stride, group_size[i]);
-                    }));
-                }
+            if (trans[i] == oneapi::math::transpose::conjtrans && n[i] > 0) {
+                events.push_back(queue.submit([&](sycl::handler& cgh) {
+                    cgh.depends_on(deps);
+                    conj_vector(cgh, y, n[i], incy[i], offset, group_size[i]);
+                }));
             }
-            stride += group_size[i];
+            offset += group_size[i];
         }
         return events.empty() ? deps : events;
     };
 
     std::vector<std::complex<T>> alpha_c(alpha, alpha + group_count);
     std::vector<std::complex<T>> beta_c(beta, beta + group_count);
+    std::vector<int64_t> incx_c(incx, incx + group_count);
+    int64_t total_size = 0, x_c_size = 0;
     for (int64_t i = 0; i < group_count; i++) {
         if (trans[i] == oneapi::math::transpose::conjtrans) {
             alpha_c[i] = std::conj(alpha_c[i]);
             beta_c[i] = std::conj(beta_c[i]);
+            if (m[i] > 0) {
+                incx_c[i] = incx[i] < 0 ? -1 : 1;
+                x_c_size += group_size[i] * m[i];
+            }
         }
+        total_size += group_size[i];
     }
 
-    const auto deps = conj_xy(dependencies);
+    std::vector<sycl::event> prepared = conj_y(dependencies);
+    std::complex<T>* x_c = nullptr;
+    const std::complex<T>** x_ptrs = nullptr;
+    if (x_c_size > 0) {
+        x_c = sycl::malloc_device<std::complex<T>>(x_c_size, queue);
+        x_ptrs = sycl::malloc_device<const std::complex<T>*>(total_size, queue);
+        auto ptrs_copied =
+            queue.memcpy(x_ptrs, x, total_size * sizeof(const std::complex<T>*), dependencies);
+        int64_t offset = 0, x_c_offset = 0;
+        for (int64_t i = 0; i < group_count; i++) {
+            if (trans[i] == oneapi::math::transpose::conjtrans && m[i] > 0) {
+                auto* out = x_c + x_c_offset;
+                prepared.push_back(queue.submit([&](sycl::handler& cgh) {
+                    cgh.depends_on(dependencies);
+                    conj_copy_vector(cgh, x, out, m[i], incx[i], offset, group_size[i]);
+                }));
+                prepared.push_back(queue.submit([&](sycl::handler& cgh) {
+                    cgh.depends_on(ptrs_copied);
+                    const auto len = m[i];
+                    auto* ptrs = x_ptrs + offset;
+                    cgh.parallel_for(sycl::range{ (std::size_t)group_size[i] },
+                                     [=](sycl::id<1> j) { ptrs[j] = out + j * len; });
+                }));
+                x_c_offset += group_size[i] * m[i];
+            }
+            offset += group_size[i];
+        }
+    }
+    for (auto& e : prepared)
+        e.wait();
+    auto free_temporaries = [&]() {
+        sycl::free(x_c, queue);
+        sycl::free(x_ptrs, queue);
+    };
+
     sycl::event done;
     try {
-        done = column_major::gemv_batch(func, queue, trans, n, m, alpha_c.data(), a, lda, x, incx,
-                                        beta_c.data(), y, incy, group_count, group_size, deps,
+        done = column_major::gemv_batch(func, queue, trans, n, m, alpha_c.data(), a, lda,
+                                        x_ptrs ? x_ptrs : x, incx_c.data(), beta_c.data(), y, incy,
+                                        group_count, group_size, dependencies,
                                         /*row_major=*/true);
         done.wait_and_throw();
     }
     catch (...) {
-        for (auto& e : conj_xy(deps))
+        for (auto& e : conj_y({}))
             e.wait();
+        free_temporaries();
         throw;
     }
 
-    for (auto& e : conj_xy({ done }))
+    for (auto& e : conj_y({ done }))
         e.wait_and_throw();
+    free_temporaries();
     return done;
 }
 
