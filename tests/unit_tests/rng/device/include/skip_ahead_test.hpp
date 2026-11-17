@@ -49,59 +49,78 @@ public:
     void operator()(Queue queue) {
         using UIntType = std::conditional_t<is_mcg59<Engine>::value, std::uint64_t, std::uint32_t>;
 
-        std::vector<UIntType> r(N_GEN);
-        std::vector<UIntType> r_ref(N_GEN);
-
-        try {
-            sycl::range<1> range(N_GEN / Engine::vec_size);
-
-            sycl::buffer<UIntType> buf(r);
-            auto event = queue.submit([&](sycl::handler& cgh) {
-                sycl::accessor acc(buf, cgh, sycl::write_only);
-                cgh.parallel_for(range, [=](sycl::item<1> item) {
-                    size_t id = item.get_id(0);
-                    Engine engine(SEED);
-                    oneapi::math::rng::device::skip_ahead(engine, id * Engine::vec_size);
-                    oneapi::math::rng::device::bits<UIntType> distr;
-                    auto res = oneapi::math::rng::device::generate(distr, engine);
-                    if constexpr (Engine::vec_size == 1) {
-                        acc[id] = res;
+        // reference: stream from offset 0, one extra number for the engines started at offset 1
+        std::vector<UIntType> r_ref(N_GEN + Engine::vec_size);
+        {
+            Engine engine(SEED);
+            oneapi::math::rng::device::bits<UIntType> distr;
+            for (int i = 0; i < N_GEN + Engine::vec_size; i += Engine::vec_size) {
+                auto res = oneapi::math::rng::device::generate(distr, engine);
+                if constexpr (Engine::vec_size == 1) {
+                    r_ref[i] = res;
+                }
+                else {
+                    for (int j = 0; j < Engine::vec_size; ++j) {
+                        r_ref[i + j] = res[j];
                     }
-                    else {
-                        res.store(id, get_multi_ptr(acc));
-                    }
-                });
-            });
-            event.wait_and_throw();
-        }
-        catch (const oneapi::math::unimplemented& e) {
-            status = test_skipped;
-            return;
-        }
-        catch (sycl::exception const& e) {
-            std::cout << "SYCL exception during generation" << std::endl
-                      << e.what() << std::endl
-                      << "Error code: " << get_error_code(e) << std::endl;
-            status = test_failed;
-            return;
-        }
-
-        // validation
-        Engine engine(SEED);
-        oneapi::math::rng::device::bits<UIntType> distr;
-        for (int i = 0; i < N_GEN; i += Engine::vec_size) {
-            auto res = oneapi::math::rng::device::generate(distr, engine);
-            if constexpr (Engine::vec_size == 1) {
-                r_ref[i] = res;
-            }
-            else {
-                for (int j = 0; j < Engine::vec_size; ++j) {
-                    r_ref[i + j] = res[j];
                 }
             }
         }
 
-        status = check_equal_vector_device(r, r_ref);
+        // work-item id must produce r_ref[start + id * vec_size ...]:
+        //   Engine(SEED)    + skip_ahead(id * vec_size), start = 0
+        //   Engine(SEED, id * vec_size),                 start = 0
+        //   Engine(SEED, 1) + skip_ahead(id * vec_size), start = 1 (odd offset, then
+        //       a skip with a pending 32-bit half for 64-bit engines like pcg64_dxsm)
+        const char* names[] = { "Engine(SEED) + skip_ahead", "Engine(SEED, offset)",
+                                "Engine(SEED, 1) + skip_ahead" };
+        for (int mode = 0; mode < 3; mode++) {
+            std::vector<UIntType> r(N_GEN);
+            try {
+                sycl::range<1> range(N_GEN / Engine::vec_size);
+
+                sycl::buffer<UIntType> buf(r);
+                auto event = queue.submit([&](sycl::handler& cgh) {
+                    sycl::accessor acc(buf, cgh, sycl::write_only);
+                    cgh.parallel_for(range, [=](sycl::item<1> item) {
+                        size_t id = item.get_id(0);
+                        std::uint64_t offset = id * Engine::vec_size;
+                        std::uint64_t ctor_offset = (mode == 1) ? offset : (mode == 2) ? 1 : 0;
+                        Engine engine(SEED, ctor_offset);
+                        if (mode != 1) {
+                            oneapi::math::rng::device::skip_ahead(engine, offset);
+                        }
+                        oneapi::math::rng::device::bits<UIntType> distr;
+                        auto res = oneapi::math::rng::device::generate(distr, engine);
+                        if constexpr (Engine::vec_size == 1) {
+                            acc[id] = res;
+                        }
+                        else {
+                            res.store(id, get_multi_ptr(acc));
+                        }
+                    });
+                });
+                event.wait_and_throw();
+            }
+            catch (const oneapi::math::unimplemented& e) {
+                status = test_skipped;
+                return;
+            }
+            catch (sycl::exception const& e) {
+                std::cout << "SYCL exception during generation" << std::endl
+                          << e.what() << std::endl
+                          << "Error code: " << get_error_code(e) << std::endl;
+                status = test_failed;
+                return;
+            }
+
+            // validation
+            if (!check_equal_vector_device(r.data(), r_ref.data() + (mode == 2 ? 1 : 0), N_GEN)) {
+                std::cout << names[mode] << " failed" << std::endl;
+                status = test_failed;
+                return;
+            }
+        }
     }
 
     int status = test_passed;

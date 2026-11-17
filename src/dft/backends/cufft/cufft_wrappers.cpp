@@ -20,7 +20,7 @@
 #include "oneapi/math/dft/detail/cufft/onemath_dft_cufft.hpp"
 #include "dft/function_table.hpp"
 
-#define WRAPPER_VERSION 2
+#define WRAPPER_VERSION 3
 #define BACKEND         cufft
 
 extern "C" dft_function_table_t onemath_dft_table = {

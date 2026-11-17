@@ -21,7 +21,7 @@
 #include "blas/function_table.hpp"
 #include "oneapi/math/blas/detail/rocblas/onemath_blas_rocblas.hpp"
 
-#define WRAPPER_VERSION 2
+#define WRAPPER_VERSION 3
 
 extern "C" blas_function_table_t onemath_blas_table = {
     WRAPPER_VERSION,
@@ -212,6 +212,8 @@ extern "C" blas_function_table_t onemath_blas_table = {
     oneapi::math::blas::rocblas::column_major::gemm_batch,
     oneapi::math::blas::rocblas::column_major::gemm_batch,
     oneapi::math::blas::rocblas::column_major::gemm_batch,
+    oneapi::math::blas::rocblas::column_major::gemm_batch,
+    oneapi::math::blas::rocblas::column_major::gemm_batch,
     oneapi::math::blas::rocblas::column_major::trsm_batch,
     oneapi::math::blas::rocblas::column_major::trsm_batch,
     oneapi::math::blas::rocblas::column_major::trsm_batch,
@@ -475,6 +477,10 @@ extern "C" blas_function_table_t onemath_blas_table = {
     oneapi::math::blas::rocblas::column_major::gemm_batch,
     oneapi::math::blas::rocblas::column_major::gemm_batch,
     oneapi::math::blas::rocblas::column_major::gemm_batch,
+    oneapi::math::blas::rocblas::column_major::gemm_batch,
+    oneapi::math::blas::rocblas::column_major::gemm_batch,
+    oneapi::math::blas::rocblas::column_major::gemm_batch,
+    oneapi::math::blas::rocblas::column_major::gemm_batch,
     oneapi::math::blas::rocblas::column_major::gemmt,
     oneapi::math::blas::rocblas::column_major::gemmt,
     oneapi::math::blas::rocblas::column_major::gemmt,
@@ -706,6 +712,8 @@ extern "C" blas_function_table_t onemath_blas_table = {
     oneapi::math::blas::rocblas::row_major::gemm_batch,
     oneapi::math::blas::rocblas::row_major::gemm_batch,
     oneapi::math::blas::rocblas::row_major::gemm_batch,
+    oneapi::math::blas::rocblas::row_major::gemm_batch,
+    oneapi::math::blas::rocblas::row_major::gemm_batch,
     oneapi::math::blas::rocblas::row_major::trsm_batch,
     oneapi::math::blas::rocblas::row_major::trsm_batch,
     oneapi::math::blas::rocblas::row_major::trsm_batch,
@@ -953,6 +961,10 @@ extern "C" blas_function_table_t onemath_blas_table = {
     oneapi::math::blas::rocblas::row_major::trsm_batch,
     oneapi::math::blas::rocblas::row_major::trsm_batch,
     oneapi::math::blas::rocblas::row_major::trsm_batch,
+    oneapi::math::blas::rocblas::row_major::gemm_batch,
+    oneapi::math::blas::rocblas::row_major::gemm_batch,
+    oneapi::math::blas::rocblas::row_major::gemm_batch,
+    oneapi::math::blas::rocblas::row_major::gemm_batch,
     oneapi::math::blas::rocblas::row_major::gemm_batch,
     oneapi::math::blas::rocblas::row_major::gemm_batch,
     oneapi::math::blas::rocblas::row_major::gemm_batch,

@@ -19,7 +19,7 @@
 #include "blas/function_table.hpp"
 #include "oneapi/math/blas/detail/cublas/onemath_blas_cublas.hpp"
 
-#define WRAPPER_VERSION 2
+#define WRAPPER_VERSION 3
 
 extern "C" blas_function_table_t onemath_blas_table = {
     WRAPPER_VERSION,
@@ -210,6 +210,8 @@ extern "C" blas_function_table_t onemath_blas_table = {
     oneapi::math::blas::cublas::column_major::gemm_batch,
     oneapi::math::blas::cublas::column_major::gemm_batch,
     oneapi::math::blas::cublas::column_major::gemm_batch,
+    oneapi::math::blas::cublas::column_major::gemm_batch,
+    oneapi::math::blas::cublas::column_major::gemm_batch,
     oneapi::math::blas::cublas::column_major::trsm_batch,
     oneapi::math::blas::cublas::column_major::trsm_batch,
     oneapi::math::blas::cublas::column_major::trsm_batch,
@@ -473,6 +475,10 @@ extern "C" blas_function_table_t onemath_blas_table = {
     oneapi::math::blas::cublas::column_major::gemm_batch,
     oneapi::math::blas::cublas::column_major::gemm_batch,
     oneapi::math::blas::cublas::column_major::gemm_batch,
+    oneapi::math::blas::cublas::column_major::gemm_batch,
+    oneapi::math::blas::cublas::column_major::gemm_batch,
+    oneapi::math::blas::cublas::column_major::gemm_batch,
+    oneapi::math::blas::cublas::column_major::gemm_batch,
     oneapi::math::blas::cublas::column_major::gemmt,
     oneapi::math::blas::cublas::column_major::gemmt,
     oneapi::math::blas::cublas::column_major::gemmt,
@@ -704,6 +710,8 @@ extern "C" blas_function_table_t onemath_blas_table = {
     oneapi::math::blas::cublas::row_major::gemm_batch,
     oneapi::math::blas::cublas::row_major::gemm_batch,
     oneapi::math::blas::cublas::row_major::gemm_batch,
+    oneapi::math::blas::cublas::row_major::gemm_batch,
+    oneapi::math::blas::cublas::row_major::gemm_batch,
     oneapi::math::blas::cublas::row_major::trsm_batch,
     oneapi::math::blas::cublas::row_major::trsm_batch,
     oneapi::math::blas::cublas::row_major::trsm_batch,
@@ -951,6 +959,10 @@ extern "C" blas_function_table_t onemath_blas_table = {
     oneapi::math::blas::cublas::row_major::trsm_batch,
     oneapi::math::blas::cublas::row_major::trsm_batch,
     oneapi::math::blas::cublas::row_major::trsm_batch,
+    oneapi::math::blas::cublas::row_major::gemm_batch,
+    oneapi::math::blas::cublas::row_major::gemm_batch,
+    oneapi::math::blas::cublas::row_major::gemm_batch,
+    oneapi::math::blas::cublas::row_major::gemm_batch,
     oneapi::math::blas::cublas::row_major::gemm_batch,
     oneapi::math::blas::cublas::row_major::gemm_batch,
     oneapi::math::blas::cublas::row_major::gemm_batch,

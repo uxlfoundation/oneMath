@@ -113,16 +113,12 @@ inline void asum(Func func, sycl::queue& queue, int64_t n, sycl::buffer<T1, 1>& 
             // rocblas_set_pointer_mode mode otherwise it causes the segmentation
             // fault. When it is set to device it is users responsibility to
             // synchronise as the function is completely asynchronous.
-            rocblas_set_pointer_mode(handle, rocblas_pointer_mode_device);
+            rocblas_pointer_mode_guard pointer_mode_guard(handle, rocblas_pointer_mode_device);
             auto x_ = sc.get_mem<rocDataType1*>(x_acc);
             auto res_ = sc.get_mem<rocDataType2*>(res_acc);
             rocblas_status err;
             // ASUM does not support negative index
             rocblas_native_func(func, err, handle, n, x_, std::abs(incx), res_);
-            // Higher level BLAS functions expect rocblas_pointer_mode_host
-            // to be set, therfore we need to reset this to the default value
-            // in order to avoid invalid memory accesses
-            rocblas_set_pointer_mode(handle, rocblas_pointer_mode_host);
         });
     });
 }
@@ -246,17 +242,13 @@ inline void rotg(Func func, sycl::queue& queue, sycl::buffer<T1, 1>& a, sycl::bu
             // rocblas_set_pointer_mode mode otherwise it causes the segmentation
             // fault. When it is set to device it is users responsibility to
             // synchronise as the function is completely asynchronous.
-            rocblas_set_pointer_mode(handle, rocblas_pointer_mode_device);
+            rocblas_pointer_mode_guard pointer_mode_guard(handle, rocblas_pointer_mode_device);
             auto a_ = sc.get_mem<rocDataType1*>(a_acc);
             auto b_ = sc.get_mem<rocDataType1*>(b_acc);
             auto c_ = sc.get_mem<rocDataType2*>(c_acc);
             auto s_ = sc.get_mem<rocDataType1*>(s_acc);
             rocblas_status err;
             rocblas_native_func(func, err, handle, a_, b_, c_, s_);
-            // Higher level BLAS functions expect rocblas_pointer_mode_host
-            // to be set, therfore we need to reset this to the default value
-            // in order to avoid invalid memory accesses
-            rocblas_set_pointer_mode(handle, rocblas_pointer_mode_host);
         });
     });
 }
@@ -292,16 +284,12 @@ inline void rotm(Func func, sycl::queue& queue, int64_t n, sycl::buffer<T, 1>& x
             // rocblas_set_pointer_mode mode otherwise it causes the segmentation
             // fault. When it is set to device it is users responsibility to
             // synchronise as the function is completely asynchronous.
-            rocblas_set_pointer_mode(handle, rocblas_pointer_mode_device);
+            rocblas_pointer_mode_guard pointer_mode_guard(handle, rocblas_pointer_mode_device);
             auto x_ = sc.get_mem<rocDataType*>(x_acc);
             auto y_ = sc.get_mem<rocDataType*>(y_acc);
             auto param_ = sc.get_mem<rocDataType*>(param_acc);
             rocblas_status err;
             rocblas_native_func(func, err, handle, n, x_, incx, y_, incy, param_);
-            // Higher level BLAS functions expect rocblas_pointer_mode_host
-            // to be set, therfore we need to reset this to the default value
-            // in order to avoid invalid memory accesses
-            rocblas_set_pointer_mode(handle, rocblas_pointer_mode_host);
         });
     });
 }
@@ -368,16 +356,12 @@ inline void dot(Func func, sycl::queue& queue, int64_t n, sycl::buffer<T, 1>& x,
             // rocblas_set_pointer_mode mode otherwise it causes the segmentation
             // fault. When it is set to device it is users responsibility to
             // synchronise as the function is completely asynchronous.
-            rocblas_set_pointer_mode(handle, rocblas_pointer_mode_device);
+            rocblas_pointer_mode_guard pointer_mode_guard(handle, rocblas_pointer_mode_device);
             auto x_ = sc.get_mem<rocDataType*>(x_acc);
             auto y_ = sc.get_mem<rocDataType*>(y_acc);
             auto res_ = sc.get_mem<rocDataType*>(res_acc);
             rocblas_status err;
             rocblas_native_func(func, err, handle, n, x_, incx, y_, incy, res_);
-            // Higher level BLAS functions expect rocblas_pointer_mode_host
-            // to be set, therfore we need to reset this to the default value
-            // in order to avoid invalid memory accesses
-            rocblas_set_pointer_mode(handle, rocblas_pointer_mode_host);
         });
     });
 }
@@ -469,16 +453,12 @@ void sdsdot(sycl::queue& queue, int64_t n, float sb, sycl::buffer<float, 1>& x, 
             // rocblas_set_pointer_mode mode otherwise it causes the segmentation
             // fault. When it is set to device it is users responsibility to
             // synchronise as the function is completely asynchronous.
-            rocblas_set_pointer_mode(handle, rocblas_pointer_mode_device);
+            rocblas_pointer_mode_guard pointer_mode_guard(handle, rocblas_pointer_mode_device);
             auto x_ = sc.get_mem<float*>(x_acc);
             auto y_ = sc.get_mem<float*>(y_acc);
             auto res_ = sc.get_mem<float*>(res_acc);
             rocblas_status err;
             rocblas_native_func(rocblas_sdot, err, handle, n, x_, incx, y_, incy, res_);
-            // Higher level BLAS functions expect rocblas_pointer_mode_host
-            // to be set, therfore we need to reset this to the default value
-            // in order to avoid invalid memory accesses
-            rocblas_set_pointer_mode(handle, rocblas_pointer_mode_host);
         });
     });
 
@@ -507,7 +487,7 @@ inline void rotmg(Func func, sycl::queue& queue, sycl::buffer<T, 1>& d1, sycl::b
             // rocblas_set_pointer_mode mode otherwise it causes the segmentation
             // fault. When it is set to device it is users responsibility to
             // synchronise as the function is completely asynchronous.
-            rocblas_set_pointer_mode(handle, rocblas_pointer_mode_device);
+            rocblas_pointer_mode_guard pointer_mode_guard(handle, rocblas_pointer_mode_device);
             auto d1_ = sc.get_mem<rocDataType*>(d1_acc);
             auto d2_ = sc.get_mem<rocDataType*>(d2_acc);
             auto x1_ = sc.get_mem<rocDataType*>(x1_acc);
@@ -515,10 +495,6 @@ inline void rotmg(Func func, sycl::queue& queue, sycl::buffer<T, 1>& d1, sycl::b
             auto param_ = sc.get_mem<rocDataType*>(param_acc);
             rocblas_status err;
             rocblas_native_func(func, err, handle, d1_, d2_, x1_, y1_, param_);
-            // Higher level BLAS functions expect rocblas_pointer_mode_host
-            // to be set, therfore we need to reset this to the default value
-            // in order to avoid invalid memory accesses
-            rocblas_set_pointer_mode(handle, rocblas_pointer_mode_host);
         });
     });
 }
@@ -560,17 +536,13 @@ inline void iamax(Func func, sycl::queue& queue, int64_t n, sycl::buffer<T, 1>& 
             // rocblas_set_pointer_mode mode otherwise it causes the segmentation
             // fault. When it is set to device it is users responsibility to
             // synchronise as the function is completely asynchronous.
-            rocblas_set_pointer_mode(handle, rocblas_pointer_mode_device);
+            rocblas_pointer_mode_guard pointer_mode_guard(handle, rocblas_pointer_mode_device);
             auto x_ = sc.get_mem<rocDataType*>(x_acc);
             auto int_res_ = sc.get_mem<int*>(int_res_acc);
             rocblas_status err;
             // For negative incx, iamax returns 0. This behaviour is similar to that of
             // reference netlib BLAS.
             rocblas_native_func(func, err, handle, n, x_, incx, int_res_);
-            // Higher level BLAS functions expect rocblas_pointer_mode_host
-            // to be set, therfore we need to reset this to the default value
-            // in order to avoid invalid memory accesses
-            rocblas_set_pointer_mode(handle, rocblas_pointer_mode_host);
         });
     });
 
@@ -657,17 +629,13 @@ inline void iamin(Func func, sycl::queue& queue, int64_t n, sycl::buffer<T, 1>& 
             // rocblas_set_pointer_mode mode otherwise it causes the segmentation
             // fault. When it is set to device it is users responsibility to
             // synchronise as the function is completely asynchronous.
-            rocblas_set_pointer_mode(handle, rocblas_pointer_mode_device);
+            rocblas_pointer_mode_guard pointer_mode_guard(handle, rocblas_pointer_mode_device);
             auto x_ = sc.get_mem<rocDataType*>(x_acc);
             auto int_res_ = sc.get_mem<int*>(int_res_acc);
             rocblas_status err;
             // For negative incx, iamin returns 0. This behaviour is similar to that of
             // implemented as a reference IAMIN.
             rocblas_native_func(func, err, handle, n, x_, incx, int_res_);
-            // Higher level BLAS functions expect rocblas_pointer_mode_host
-            // to be set, therfore we need to reset this to the default value
-            // in order to avoid invalid memory accesses
-            rocblas_set_pointer_mode(handle, rocblas_pointer_mode_host);
         });
     });
 
@@ -713,16 +681,12 @@ inline void nrm2(Func func, sycl::queue& queue, int64_t n, sycl::buffer<T1, 1>& 
             // rocblas_set_pointer_mode mode otherwise it causes the segmentation
             // fault. When it is set to device it is users responsibility to
             // synchronise as the function is completely asynchronous.
-            rocblas_set_pointer_mode(handle, rocblas_pointer_mode_device);
+            rocblas_pointer_mode_guard pointer_mode_guard(handle, rocblas_pointer_mode_device);
             auto x_ = sc.get_mem<rocDataType1*>(x_acc);
             auto res_ = sc.get_mem<rocDataType2*>(res_acc);
             rocblas_status err;
             // NRM2 does not support negative index
             rocblas_native_func(func, err, handle, n, x_, std::abs(incx), res_);
-            // Higher level BLAS functions expect rocblas_pointer_mode_host
-            // to be set, therfore we need to reset this to the default value
-            // in order to avoid invalid memory accesses
-            rocblas_set_pointer_mode(handle, rocblas_pointer_mode_host);
         });
     });
 }
@@ -753,14 +717,13 @@ inline sycl::event asum(Func func, sycl::queue& queue, int64_t n, const T1* x, c
         cgh.depends_on(dependencies);
         onemath_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
-            rocblas_set_pointer_mode(handle, rocblas_pointer_mode_device);
+            rocblas_pointer_mode_guard pointer_mode_guard(handle, rocblas_pointer_mode_device);
 
             auto x_ = reinterpret_cast<const rocDataType1*>(x);
             auto res_ = reinterpret_cast<rocDataType2*>(result);
             rocblas_status err;
             // ASUM does not support negative index
             rocblas_native_func(func, err, handle, n, x_, std::abs(incx), res_);
-            rocblas_set_pointer_mode(handle, rocblas_pointer_mode_host);
         });
     });
 
@@ -1146,14 +1109,13 @@ inline sycl::event iamax(Func func, sycl::queue& queue, int64_t n, const T* x, c
         cgh.depends_on(dependencies);
         onemath_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
-            rocblas_set_pointer_mode(handle, rocblas_pointer_mode_device);
+            rocblas_pointer_mode_guard pointer_mode_guard(handle, rocblas_pointer_mode_device);
             auto x_ = reinterpret_cast<const rocDataType*>(x);
             auto int_res_p_ = reinterpret_cast<int*>(int_res_p);
             rocblas_status err;
             // For negative incx, iamax returns 0. This behaviour is similar to that of
             // reference iamax.
             rocblas_native_func(func, err, handle, n, x_, incx, int_res_p_);
-            rocblas_set_pointer_mode(handle, rocblas_pointer_mode_host);
         });
     });
 
@@ -1230,7 +1192,7 @@ inline sycl::event iamin(Func func, sycl::queue& queue, int64_t n, const T* x, c
         cgh.depends_on(dependencies);
         onemath_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
-            rocblas_set_pointer_mode(handle, rocblas_pointer_mode_device);
+            rocblas_pointer_mode_guard pointer_mode_guard(handle, rocblas_pointer_mode_device);
 
             auto x_ = reinterpret_cast<const rocDataType*>(x);
             auto int_res_p_ = reinterpret_cast<int*>(int_res_p);
@@ -1238,7 +1200,6 @@ inline sycl::event iamin(Func func, sycl::queue& queue, int64_t n, const T* x, c
             // For negative incx, iamin returns 0. This behaviour is similar to that of
             // implemented iamin.
             rocblas_native_func(func, err, handle, n, x_, incx, int_res_p_);
-            rocblas_set_pointer_mode(handle, rocblas_pointer_mode_host);
         });
     });
 
@@ -1273,14 +1234,13 @@ inline sycl::event nrm2(Func func, sycl::queue& queue, int64_t n, const T1* x, c
         cgh.depends_on(dependencies);
         onemath_rocblas_host_task(cgh, queue, [=](RocblasScopedContextHandler& sc) {
             auto handle = sc.get_handle(queue);
-            rocblas_set_pointer_mode(handle, rocblas_pointer_mode_device);
+            rocblas_pointer_mode_guard pointer_mode_guard(handle, rocblas_pointer_mode_device);
 
             auto x_ = reinterpret_cast<const rocDataType1*>(x);
             auto res_ = reinterpret_cast<rocDataType2*>(result);
             rocblas_status err;
             // NRM2 does not support negative index
             rocblas_native_func(func, err, handle, n, x_, std::abs(incx), res_);
-            rocblas_set_pointer_mode(handle, rocblas_pointer_mode_host);
         });
     });
 

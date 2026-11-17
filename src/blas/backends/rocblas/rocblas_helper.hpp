@@ -173,6 +173,39 @@ public:
     hipError_t hip_err;                                                    \
     HIP_ERROR_FUNC(hipStreamSynchronize, hip_err, currentStreamId);
 
+// Sets the pointer mode of a rocBLAS handle and restores the previous mode on scope
+// exit. rocBLAS handles are cached and reused across calls, so an unwound scope must
+// not leave the handle in device mode: later routines pass host addresses for their
+// scalar arguments and rocBLAS would dereference them on the device.
+//
+// Note this restores whatever mode was in effect on entry, rather than unconditionally
+// forcing host mode as the manual set/reset pairs it replaces used to. That is correct
+// as long as every call site goes through this guard, but it does drop the old code's
+// incidental self-healing: if some other, unguarded path ever left a handle in device
+// mode, the previous code would have normalized it back to host on the next guarded
+// call, whereas this guard simply propagates the leaked mode.
+class rocblas_pointer_mode_guard {
+    rocblas_handle handle_;
+    rocblas_pointer_mode previous_;
+
+public:
+    rocblas_pointer_mode_guard(rocblas_handle handle, rocblas_pointer_mode mode)
+            : handle_(handle),
+              previous_(rocblas_pointer_mode_host) {
+        rocblas_status err;
+        ROCBLAS_ERROR_FUNC(rocblas_get_pointer_mode, err, handle_, &previous_);
+        ROCBLAS_ERROR_FUNC(rocblas_set_pointer_mode, err, handle_, mode);
+    }
+
+    // Not ROCBLAS_ERROR_FUNC: destructors must not throw, so the restore is best-effort.
+    ~rocblas_pointer_mode_guard() {
+        rocblas_set_pointer_mode(handle_, previous_);
+    }
+
+    rocblas_pointer_mode_guard(const rocblas_pointer_mode_guard&) = delete;
+    rocblas_pointer_mode_guard& operator=(const rocblas_pointer_mode_guard&) = delete;
+};
+
 template <class Func, class... Types>
 inline void rocblas_native_func(Func func, rocblas_status err, rocblas_handle handle,
                                 Types... args) {

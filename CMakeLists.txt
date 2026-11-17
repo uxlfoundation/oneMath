@@ -296,6 +296,12 @@ else()
   # Find necessary packages
   if(ONEMATH_SYCL_IMPLEMENTATION)
     string( TOLOWER "${ONEMATH_SYCL_IMPLEMENTATION}" ONEMATH_SYCL_IMPLEMENTATION)
+    # hipSYCL was renamed to AdaptiveCpp. Accept the legacy value as a
+    # deprecated alias so existing build scripts keep working.
+    if (ONEMATH_SYCL_IMPLEMENTATION STREQUAL "hipsycl")
+      message(WARNING "ONEMATH_SYCL_IMPLEMENTATION=hipsycl is deprecated: hipSYCL has been renamed to AdaptiveCpp. Treating it as 'adaptivecpp'. Please use -DONEMATH_SYCL_IMPLEMENTATION=adaptivecpp instead.")
+      set(ONEMATH_SYCL_IMPLEMENTATION "adaptivecpp")
+    endif()
     if (ONEMATH_SYCL_IMPLEMENTATION STREQUAL "adaptivecpp")
       message(STATUS "Looking for AdaptiveCpp")
       find_package(AdaptiveCpp CONFIG REQUIRED)

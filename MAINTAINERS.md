@@ -13,6 +13,9 @@ oneMath project defines four main roles:
 These roles are merit based. Refer to the corresponding section for specific
 requirements and the nomination process.
 
+All maintainers belong to one GitHub team, @uxlfoundation/onemath-maintain, which
+reviews every change. Repository administrators belong to @uxlfoundation/onemath-admin.
+
 ## Contributor
 
 A Contributor invests time and resources to improve oneMath project.
@@ -66,19 +69,8 @@ Privileges:
   * Eligible to become an Architecture maintainer.
 
 The process of becoming a Domain maintainer is:
-1. A Contributor requests to join corresponding Domain maintainer GitHub team.
-2. At least one specific Domain maintainer approves the request.
-
-### List of GitHub teams for Domain maintainers
-
-| GitHub team name | Domain maintainers |
-:-----------|:------------|
-| @uxlfoundation/onemath-blas-write | oneMath BLAS maintainers |
-| @uxlfoundation/onemath-dft-write | oneMath DFT maintainers |
-| @uxlfoundation/onemath-lapack-write | oneMath LAPACK maintainers |
-| @uxlfoundation/onemath-rng-write | oneMath RNG maintainers |
-| @uxlfoundation/onemath-sparse-write | oneMath Sparse Algebra maintainers |
-| @uxlfoundation/onemath-vm-write | oneMath Vector Math maintainers |
+1. A Contributor asks to join the oneMath maintainers GitHub team as a maintainer of a specific domain.
+2. At least one maintainer of that domain approves the request.
 
 ## Backend Maintainer
 
@@ -113,18 +105,8 @@ Privileges:
   * Eligible to become an Architecture maintainer.
 
 The process of becoming a Backend maintainer is:
-1. A Contributor requests to join corresponding Backend maintainer GitHub team.
-2. At least one specific Backend maintainer approves the request.
-
-### List of GitHub teams for Backend maintainers
-
-| GitHub team name | Backend maintainers |
-:-----------|:------------|
-| @uxlfoundation/onemath-cpu-aarch64 | AArch64 CPU maintainers |
-| @uxlfoundation/onemath-cpu-x64 | x86 CPU maintainers |
-| @uxlfoundation/onemath-gpu-amd | AMD GPU maintainers |
-| @uxlfoundation/onemath-gpu-intel | Intel GPU maintainers |
-| @uxlfoundation/onemath-gpu-nvidia | NVIDIA GPU maintainers |
+1. A Contributor asks to join the oneMath maintainers GitHub team as a maintainer of a specific backend.
+2. At least one maintainer of that backend approves the request.
 
 ## Architecture Maintainer
 Architecture maintainers are the most established contributors who are responsible for the
@@ -155,7 +137,7 @@ Privileges:
   * Can recommend Contributor, Domain maintainer, or Backend maintainer to become Architecture maintainer.
 
 Process of becoming a maintainer:
-1. A Contributor, Domain maintainer, or Backend maintainer requests to join oneMath Architecture
-   maintainers GitHub team (@uxlfoundation/onemath-arch-write).
+1. A Contributor, Domain maintainer, or Backend maintainer asks to become an Architecture
+   maintainer in the oneMath maintainers GitHub team.
 2. At least one of the existing Architecture maintainers approves the request.
 
