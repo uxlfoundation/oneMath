@@ -155,7 +155,10 @@ rocblas_handle RocblasScopedContextHandler::get_handle(const sycl::queue& queue)
 }
 
 hipStream_t RocblasScopedContextHandler::get_stream(const sycl::queue& queue) {
-    return sycl::get_native<sycl::backend::ext_oneapi_hip>(queue);
+    // The stream must come from the interop handle rather than from the queue:
+    // a queue owns a pool of streams and only the one the command was scheduled
+    // on is tracked by the SYCL event that gates this command's completion.
+    return interop_h.get_native_queue<sycl::backend::ext_oneapi_hip>();
 }
 sycl::context RocblasScopedContextHandler::get_context(const sycl::queue& queue) {
     return queue.get_context();

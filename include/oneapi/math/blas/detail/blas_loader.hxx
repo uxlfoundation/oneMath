@@ -123,6 +123,22 @@ ONEMATH_EXPORT void gemm_batch(oneapi::math::device libkey, sycl::queue& queue, 
                                std::int64_t ldb, std::int64_t stride_b, float beta,
                                sycl::buffer<float, 1>& c, std::int64_t ldc, std::int64_t stride_c,
                                std::int64_t batch_size);
+
+ONEMATH_EXPORT void gemm_batch(oneapi::math::device libkey, sycl::queue& queue, transpose transa,
+                               transpose transb, std::int64_t m, std::int64_t n, std::int64_t k,
+                               float alpha, sycl::buffer<bfloat16, 1>& a, std::int64_t lda,
+                               std::int64_t stride_a, sycl::buffer<bfloat16, 1>& b,
+                               std::int64_t ldb, std::int64_t stride_b, float beta,
+                               sycl::buffer<float, 1>& c, std::int64_t ldc, std::int64_t stride_c,
+                               std::int64_t batch_size);
+
+ONEMATH_EXPORT void gemm_batch(oneapi::math::device libkey, sycl::queue& queue, transpose transa,
+                               transpose transb, std::int64_t m, std::int64_t n, std::int64_t k,
+                               float alpha, sycl::buffer<bfloat16, 1>& a, std::int64_t lda,
+                               std::int64_t stride_a, sycl::buffer<bfloat16, 1>& b,
+                               std::int64_t ldb, std::int64_t stride_b, float beta,
+                               sycl::buffer<bfloat16, 1>& c, std::int64_t ldc,
+                               std::int64_t stride_c, std::int64_t batch_size);
 ONEMATH_EXPORT void gemm_batch(oneapi::math::device libkey, sycl::queue& queue, transpose transa,
                                transpose transb, std::int64_t m, std::int64_t n, std::int64_t k,
                                float alpha, sycl::buffer<std::int8_t, 1>& a, std::int64_t lda,
@@ -1229,6 +1245,23 @@ ONEMATH_EXPORT sycl::event gemm_batch(oneapi::math::device libkey, sycl::queue& 
                                       std::int64_t* ldb, float* beta, float** c, std::int64_t* ldc,
                                       std::int64_t group_count, std::int64_t* group_size,
                                       const std::vector<sycl::event>& dependencies = {});
+
+ONEMATH_EXPORT sycl::event gemm_batch(oneapi::math::device libkey, sycl::queue& queue,
+                                      transpose* transa, transpose* transb, std::int64_t* m,
+                                      std::int64_t* n, std::int64_t* k, float* alpha,
+                                      const bfloat16** a, std::int64_t* lda, const bfloat16** b,
+                                      std::int64_t* ldb, float* beta, float** c, std::int64_t* ldc,
+                                      std::int64_t group_count, std::int64_t* group_size,
+                                      const std::vector<sycl::event>& dependencies = {});
+
+ONEMATH_EXPORT sycl::event gemm_batch(oneapi::math::device libkey, sycl::queue& queue,
+                                      transpose* transa, transpose* transb, std::int64_t* m,
+                                      std::int64_t* n, std::int64_t* k, float* alpha,
+                                      const bfloat16** a, std::int64_t* lda, const bfloat16** b,
+                                      std::int64_t* ldb, float* beta, bfloat16** c,
+                                      std::int64_t* ldc, std::int64_t group_count,
+                                      std::int64_t* group_size,
+                                      const std::vector<sycl::event>& dependencies = {});
 ONEMATH_EXPORT sycl::event gemm_batch(oneapi::math::device libkey, sycl::queue& queue,
                                       transpose* transa, transpose* transb, std::int64_t* m,
                                       std::int64_t* n, std::int64_t* k, float* alpha,
@@ -1290,6 +1323,24 @@ ONEMATH_EXPORT sycl::event gemm_batch(oneapi::math::device libkey, sycl::queue& 
                                       const sycl::half* b, std::int64_t ldb, std::int64_t stride_b,
                                       float beta, float* c, std::int64_t ldc, std::int64_t stride_c,
                                       std::int64_t batch_size,
+                                      const std::vector<sycl::event>& dependencies = {});
+
+ONEMATH_EXPORT sycl::event gemm_batch(oneapi::math::device libkey, sycl::queue& queue,
+                                      transpose transa, transpose transb, std::int64_t m,
+                                      std::int64_t n, std::int64_t k, float alpha,
+                                      const bfloat16* a, std::int64_t lda, std::int64_t stride_a,
+                                      const bfloat16* b, std::int64_t ldb, std::int64_t stride_b,
+                                      float beta, float* c, std::int64_t ldc, std::int64_t stride_c,
+                                      std::int64_t batch_size,
+                                      const std::vector<sycl::event>& dependencies = {});
+
+ONEMATH_EXPORT sycl::event gemm_batch(oneapi::math::device libkey, sycl::queue& queue,
+                                      transpose transa, transpose transb, std::int64_t m,
+                                      std::int64_t n, std::int64_t k, float alpha,
+                                      const bfloat16* a, std::int64_t lda, std::int64_t stride_a,
+                                      const bfloat16* b, std::int64_t ldb, std::int64_t stride_b,
+                                      float beta, bfloat16* c, std::int64_t ldc,
+                                      std::int64_t stride_c, std::int64_t batch_size,
                                       const std::vector<sycl::event>& dependencies = {});
 ONEMATH_EXPORT sycl::event gemm_batch(oneapi::math::device libkey, sycl::queue& queue,
                                       transpose transa, transpose transb, std::int64_t m,
@@ -2331,10 +2382,12 @@ ONEMATH_EXPORT sycl::event spr2(oneapi::math::device libkey, sycl::queue& queue,
 
 ONEMATH_EXPORT sycl::event rotm(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
                                 float* x, std::int64_t incx, float* y, std::int64_t incy,
-                                float* param, const std::vector<sycl::event>& dependencies = {});
+                                const float* param,
+                                const std::vector<sycl::event>& dependencies = {});
 ONEMATH_EXPORT sycl::event rotm(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
                                 double* x, std::int64_t incx, double* y, std::int64_t incy,
-                                double* param, const std::vector<sycl::event>& dependencies = {});
+                                const double* param,
+                                const std::vector<sycl::event>& dependencies = {});
 
 ONEMATH_EXPORT sycl::event dot(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
                                const float* x, std::int64_t incx, const float* y, std::int64_t incy,

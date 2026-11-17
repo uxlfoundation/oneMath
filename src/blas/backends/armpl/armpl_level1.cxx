@@ -698,8 +698,9 @@ ROTG_USM_LAUNCHER(std::complex<float>, float, ::cblas_crotg)
 ROTG_USM_LAUNCHER(std::complex<double>, double, ::cblas_zrotg)
 
 template <typename T, typename CBLAS_FUNC>
-sycl::event rotm(sycl::queue& queue, int64_t n, T* x, int64_t incx, T* y, int64_t incy, T* param,
-                 const std::vector<sycl::event>& dependencies, CBLAS_FUNC cblas_func) {
+sycl::event rotm(sycl::queue& queue, int64_t n, T* x, int64_t incx, T* y, int64_t incy,
+                 const T* param, const std::vector<sycl::event>& dependencies,
+                 CBLAS_FUNC cblas_func) {
     auto done = queue.submit([&](sycl::handler& cgh) {
         int64_t num_events = dependencies.size();
         for (int64_t i = 0; i < num_events; ++i) {
@@ -712,7 +713,7 @@ sycl::event rotm(sycl::queue& queue, int64_t n, T* x, int64_t incx, T* y, int64_
 
 #define ROTM_USM_LAUNCHER(TYPE, ROUTINE)                                                          \
     sycl::event rotm(sycl::queue& queue, int64_t n, TYPE* x, int64_t incx, TYPE* y, int64_t incy, \
-                     TYPE* param, const std::vector<sycl::event>& dependencies) {                 \
+                     const TYPE* param, const std::vector<sycl::event>& dependencies) {           \
         return rotm(queue, n, x, incx, y, incy, param, dependencies, ROUTINE);                    \
     }
 

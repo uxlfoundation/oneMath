@@ -21,7 +21,7 @@
 #include "oneapi/math/lapack/detail/armpl/onemath_lapack_armpl.hxx"
 #include "lapack/function_table.hpp"
 
-#define WRAPPER_VERSION 1
+#define WRAPPER_VERSION 2
 
 extern "C" lapack_function_table_t onemath_lapack_table = {
     WRAPPER_VERSION,

@@ -167,7 +167,12 @@ public:
  * getrf/potrf/..., the Householder routines have no `info` output either, so they
  * do not get an implicit host-side wait from `lapack_info_check`. Waiting for the
  * stream keeps the enqueued work complete once the call returns.
- * See uxlfoundation/oneMath#626. */
+ *
+ * The interop-handle stream is not sufficient on its own. On an Instinct MI100
+ * (gfx908), ROCm 7.1.1 (rocSOLVER 3.31.0) and DPC++ 7.1.0
+ * (clang 23.0.0git, llvm fbf7d1fd2cbf), repeated geqrf+orgqr still failed until
+ * this hipStreamSynchronize. See uxlfoundation/oneMath#626.
+ */
 template <class Func, class... Types>
 inline void rocsolver_native_named_func(const char* func_name, Func func, rocsolver_status err,
                                         rocsolver_handle handle, Types... args) {
