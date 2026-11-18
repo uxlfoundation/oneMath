@@ -240,6 +240,7 @@ inline void gemm_batch_impl(sycl::queue& queue, transpose transa, transpose tran
 
 GEMM_STRIDED_BATCH_LAUNCHER(sycl::half, sycl::half, sycl::half, sycl::half)
 GEMM_STRIDED_BATCH_LAUNCHER(sycl::half, sycl::half, float, float)
+GEMM_STRIDED_BATCH_LAUNCHER(std::int8_t, std::int8_t, float, float)
 GEMM_STRIDED_BATCH_LAUNCHER(float, float, float, float)
 GEMM_STRIDED_BATCH_LAUNCHER(double, double, double, double)
 GEMM_STRIDED_BATCH_LAUNCHER(std::complex<float>, std::complex<float>, std::complex<float>,
@@ -249,6 +250,8 @@ GEMM_STRIDED_BATCH_LAUNCHER(std::complex<double>, std::complex<double>, std::com
 
 #undef GEMM_STRIDED_BATCH_LAUNCHER
 
+// cuBLAS computes an int32 output only with CUBLAS_COMPUTE_32I, which requires int32 alpha and
+// beta, whereas oneMath specifies float scalars for this combination.
 #define GEMM_STRIDED_BATCH_LAUNCHER(TYPE_A, TYPE_B, TYPE_C, TYPE_S)                               \
     void gemm_batch(sycl::queue& queue, transpose transa, transpose transb, int64_t m, int64_t n, \
                     int64_t k, TYPE_S alpha, sycl::buffer<TYPE_A, 1>& a, int64_t lda,             \
@@ -261,8 +264,9 @@ GEMM_STRIDED_BATCH_LAUNCHER(std::complex<double>, std::complex<double>, std::com
                                 dtype_string<TYPE_C>() + "," + dtype_string<TYPE_S>() + ">");     \
     }
 
-GEMM_STRIDED_BATCH_LAUNCHER(std::int8_t, std::int8_t, float, float)
 GEMM_STRIDED_BATCH_LAUNCHER(std::int8_t, std::int8_t, std::int32_t, float)
+GEMM_STRIDED_BATCH_LAUNCHER(bfloat16, bfloat16, float, float)
+GEMM_STRIDED_BATCH_LAUNCHER(bfloat16, bfloat16, bfloat16, float)
 
 #undef GEMM_STRIDED_BATCH_LAUNCHER
 
@@ -757,6 +761,7 @@ inline sycl::event gemm_batch_strided_usm_impl(sycl::queue& queue, transpose tra
 
 GEMM_STRIDED_BATCH_LAUNCHER_USM(sycl::half, sycl::half, sycl::half, sycl::half)
 GEMM_STRIDED_BATCH_LAUNCHER_USM(sycl::half, sycl::half, float, float)
+GEMM_STRIDED_BATCH_LAUNCHER_USM(std::int8_t, std::int8_t, float, float)
 GEMM_STRIDED_BATCH_LAUNCHER_USM(float, float, float, float)
 GEMM_STRIDED_BATCH_LAUNCHER_USM(double, double, double, double)
 GEMM_STRIDED_BATCH_LAUNCHER_USM(std::complex<float>, std::complex<float>, std::complex<float>,
@@ -778,8 +783,9 @@ GEMM_STRIDED_BATCH_LAUNCHER_USM(std::complex<double>, std::complex<double>, std:
                                 dtype_string<TYPE_C>() + "," + dtype_string<TYPE_S>() + ">");  \
     }
 
-GEMM_STRIDED_BATCH_LAUNCHER_USM(std::int8_t, std::int8_t, float, float)
 GEMM_STRIDED_BATCH_LAUNCHER_USM(std::int8_t, std::int8_t, std::int32_t, float)
+GEMM_STRIDED_BATCH_LAUNCHER_USM(bfloat16, bfloat16, float, float)
+GEMM_STRIDED_BATCH_LAUNCHER_USM(bfloat16, bfloat16, bfloat16, float)
 
 #undef GEMM_STRIDED_BATCH_LAUNCHER_USM
 
@@ -850,6 +856,7 @@ inline sycl::event gemm_batch_usm_impl(sycl::queue& queue, transpose* transa, tr
 
 GEMM_BATCH_LAUNCHER_USM(sycl::half, sycl::half, sycl::half, sycl::half)
 GEMM_BATCH_LAUNCHER_USM(sycl::half, sycl::half, float, float)
+GEMM_BATCH_LAUNCHER_USM(std::int8_t, std::int8_t, float, float)
 GEMM_BATCH_LAUNCHER_USM(float, float, float, float)
 GEMM_BATCH_LAUNCHER_USM(double, double, double, double)
 GEMM_BATCH_LAUNCHER_USM(std::complex<float>, std::complex<float>, std::complex<float>,
@@ -871,8 +878,9 @@ GEMM_BATCH_LAUNCHER_USM(std::complex<double>, std::complex<double>, std::complex
                                 dtype_string<TYPE_C>() + "," + dtype_string<TYPE_S>() + ">");      \
     }
 
-GEMM_BATCH_LAUNCHER_USM(std::int8_t, std::int8_t, float, float)
 GEMM_BATCH_LAUNCHER_USM(std::int8_t, std::int8_t, std::int32_t, float)
+GEMM_BATCH_LAUNCHER_USM(bfloat16, bfloat16, float, float)
+GEMM_BATCH_LAUNCHER_USM(bfloat16, bfloat16, bfloat16, float)
 
 #undef GEMM_BATCH_LAUNCHER_USM
 
@@ -1280,6 +1288,8 @@ GEMM_STRIDED_BATCH_LAUNCHER(sycl::half, sycl::half, sycl::half, sycl::half)
 GEMM_STRIDED_BATCH_LAUNCHER(sycl::half, sycl::half, float, float)
 GEMM_STRIDED_BATCH_LAUNCHER(std::int8_t, std::int8_t, float, float)
 GEMM_STRIDED_BATCH_LAUNCHER(std::int8_t, std::int8_t, std::int32_t, float)
+GEMM_STRIDED_BATCH_LAUNCHER(bfloat16, bfloat16, float, float)
+GEMM_STRIDED_BATCH_LAUNCHER(bfloat16, bfloat16, bfloat16, float)
 GEMM_STRIDED_BATCH_LAUNCHER(float, float, float, float)
 GEMM_STRIDED_BATCH_LAUNCHER(double, double, double, double)
 GEMM_STRIDED_BATCH_LAUNCHER(std::complex<float>, std::complex<float>, std::complex<float>,
@@ -1643,6 +1653,8 @@ GEMM_STRIDED_BATCH_LAUNCHER_USM(sycl::half, sycl::half, sycl::half, sycl::half)
 GEMM_STRIDED_BATCH_LAUNCHER_USM(sycl::half, sycl::half, float, float)
 GEMM_STRIDED_BATCH_LAUNCHER_USM(std::int8_t, std::int8_t, float, float)
 GEMM_STRIDED_BATCH_LAUNCHER_USM(std::int8_t, std::int8_t, std::int32_t, float)
+GEMM_STRIDED_BATCH_LAUNCHER_USM(bfloat16, bfloat16, float, float)
+GEMM_STRIDED_BATCH_LAUNCHER_USM(bfloat16, bfloat16, bfloat16, float)
 GEMM_STRIDED_BATCH_LAUNCHER_USM(float, float, float, float)
 GEMM_STRIDED_BATCH_LAUNCHER_USM(double, double, double, double)
 GEMM_STRIDED_BATCH_LAUNCHER_USM(std::complex<float>, std::complex<float>, std::complex<float>,
@@ -1665,6 +1677,8 @@ GEMM_BATCH_LAUNCHER_USM(sycl::half, sycl::half, sycl::half, sycl::half)
 GEMM_BATCH_LAUNCHER_USM(sycl::half, sycl::half, float, float)
 GEMM_BATCH_LAUNCHER_USM(std::int8_t, std::int8_t, float, float)
 GEMM_BATCH_LAUNCHER_USM(std::int8_t, std::int8_t, std::int32_t, float)
+GEMM_BATCH_LAUNCHER_USM(bfloat16, bfloat16, float, float)
+GEMM_BATCH_LAUNCHER_USM(bfloat16, bfloat16, bfloat16, float)
 GEMM_BATCH_LAUNCHER_USM(float, float, float, float)
 GEMM_BATCH_LAUNCHER_USM(double, double, double, double)
 GEMM_BATCH_LAUNCHER_USM(std::complex<float>, std::complex<float>, std::complex<float>,

@@ -274,6 +274,11 @@ inline void gesvd(const char* func_name, Func func, sycl::queue& queue, oneapi::
     using cuDataType_A = typename CudaEquivalentType<T_A>::Type;
     using cuDataType_B = typename CudaEquivalentType<T_B>::Type;
     overflow_check(n, m, lda, ldu, ldvt, scratchpad_size);
+
+    // cusolver gesvd only supports m >= n (see cuSOLVER documentation).
+    if (m < n)
+        throw unimplemented("lapack", "gesvd", "cusolver gesvd does not support m < n");
+
     sycl::buffer<int> devInfo{ 1 };
     queue.submit([&](sycl::handler& cgh) {
         auto a_acc = a.template get_access<sycl::access::mode::read_write>(cgh);
@@ -1459,6 +1464,11 @@ inline sycl::event gesvd(const char* func_name, Func func, sycl::queue& queue,
     using cuDataType_A = typename CudaEquivalentType<T_A>::Type;
     using cuDataType_B = typename CudaEquivalentType<T_B>::Type;
     overflow_check(m, n, lda, ldu, ldvt, scratchpad_size);
+
+    // cusolver gesvd only supports m >= n (see cuSOLVER documentation).
+    if (m < n)
+        throw unimplemented("lapack", "gesvd", "cusolver gesvd does not support m < n");
+
     int* devInfo = (int*)malloc_device(sizeof(int), queue);
     auto done = queue.submit([&](sycl::handler& cgh) {
         int64_t num_events = dependencies.size();
@@ -2538,6 +2548,10 @@ inline void gesvd_scratchpad_size(const char* func_name, Func func, sycl::queue&
                                   oneapi::math::jobsvd jobu, oneapi::math::jobsvd jobvt,
                                   std::int64_t m, std::int64_t n, std::int64_t lda,
                                   std::int64_t ldu, std::int64_t ldvt, int* scratch_size) {
+    // cusolver gesvd only supports m >= n (see cuSOLVER documentation).
+    if (m < n)
+        throw unimplemented("lapack", "gesvd", "cusolver gesvd does not support m < n");
+
     queue
         .submit([&](sycl::handler& cgh) {
             onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {

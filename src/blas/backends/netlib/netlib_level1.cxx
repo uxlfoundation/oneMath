@@ -1361,7 +1361,7 @@ sycl::event rotg(sycl::queue& queue, std::complex<double>* a, std::complex<doubl
 }
 
 sycl::event rotm(sycl::queue& queue, int64_t n, float* x, int64_t incx, float* y, int64_t incy,
-                 float* param, const std::vector<sycl::event>& dependencies) {
+                 const float* param, const std::vector<sycl::event>& dependencies) {
     auto done = queue.submit([&](sycl::handler& cgh) {
         int64_t num_events = dependencies.size();
         for (int64_t i = 0; i < num_events; i++) {
@@ -1375,7 +1375,7 @@ sycl::event rotm(sycl::queue& queue, int64_t n, float* x, int64_t incx, float* y
 }
 
 sycl::event rotm(sycl::queue& queue, int64_t n, double* x, int64_t incx, double* y, int64_t incy,
-                 double* param, const std::vector<sycl::event>& dependencies) {
+                 const double* param, const std::vector<sycl::event>& dependencies) {
     auto done = queue.submit([&](sycl::handler& cgh) {
         int64_t num_events = dependencies.size();
         for (int64_t i = 0; i < num_events; i++) {

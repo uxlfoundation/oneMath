@@ -140,20 +140,19 @@ void run_getrs_example(const sycl::device& cpu_device, const sycl::device& gpu_d
     sycl::event cpu_getrf_done;
     sycl::event cpu_getrs_done;
 
-    float* cpu_A = sycl::malloc_device<float>(A_size * sizeof(float), cpu_queue);
-    float* cpu_B = sycl::malloc_device<float>(B_size * sizeof(float), cpu_queue);
-    std::int64_t* cpu_ipiv =
-        sycl::malloc_device<std::int64_t>(ipiv_size * sizeof(std::int64_t), cpu_queue);
+    float* cpu_A = sycl::malloc_device<float>(A_size, cpu_queue);
+    float* cpu_B = sycl::malloc_device<float>(B_size, cpu_queue);
+    std::int64_t* cpu_ipiv = sycl::malloc_device<std::int64_t>(ipiv_size, cpu_queue);
 
     std::int64_t cpu_getrf_scratchpad_size = oneapi::math::lapack::getrf_scratchpad_size<float>(
         oneapi::math::backend_selector<oneapi::math::backend::mklcpu>{ cpu_queue }, m, n, lda);
     std::int64_t cpu_getrs_scratchpad_size = oneapi::math::lapack::getrs_scratchpad_size<float>(
         oneapi::math::backend_selector<oneapi::math::backend::mklcpu>{ cpu_queue }, trans, n, nrhs,
         lda, ldb);
-    float* cpu_getrf_scratchpad = sycl::malloc_device<float>(
-        cpu_getrf_scratchpad_size * sizeof(float), cpu_device, cpu_context);
-    float* cpu_getrs_scratchpad = sycl::malloc_device<float>(
-        cpu_getrs_scratchpad_size * sizeof(float), cpu_device, cpu_context);
+    float* cpu_getrf_scratchpad =
+        sycl::malloc_device<float>(cpu_getrf_scratchpad_size, cpu_device, cpu_context);
+    float* cpu_getrs_scratchpad =
+        sycl::malloc_device<float>(cpu_getrs_scratchpad_size, cpu_device, cpu_context);
     if (!cpu_A || !cpu_B || !cpu_ipiv || !cpu_getrf_scratchpad || !cpu_getrs_scratchpad) {
         throw std::runtime_error("Failed to allocate USM memory.");
     }
@@ -170,20 +169,19 @@ void run_getrs_example(const sycl::device& cpu_device, const sycl::device& gpu_d
     sycl::event gpu_getrf_done;
     sycl::event gpu_getrs_done;
 
-    float* gpu_A = sycl::malloc_device<float>(A_size * sizeof(float), gpu_queue);
-    float* gpu_B = sycl::malloc_device<float>(B_size * sizeof(float), gpu_queue);
-    std::int64_t* gpu_ipiv =
-        sycl::malloc_device<std::int64_t>(ipiv_size * sizeof(std::int64_t), gpu_queue);
+    float* gpu_A = sycl::malloc_device<float>(A_size, gpu_queue);
+    float* gpu_B = sycl::malloc_device<float>(B_size, gpu_queue);
+    std::int64_t* gpu_ipiv = sycl::malloc_device<std::int64_t>(ipiv_size, gpu_queue);
 
     std::int64_t gpu_getrf_scratchpad_size = oneapi::math::lapack::getrf_scratchpad_size<float>(
         oneapi::math::backend_selector<oneapi::math::backend::cusolver>{ gpu_queue }, m, n, lda);
     std::int64_t gpu_getrs_scratchpad_size = oneapi::math::lapack::getrs_scratchpad_size<float>(
         oneapi::math::backend_selector<oneapi::math::backend::cusolver>{ gpu_queue }, trans, n,
         nrhs, lda, ldb);
-    float* gpu_getrf_scratchpad = sycl::malloc_device<float>(
-        gpu_getrf_scratchpad_size * sizeof(float), gpu_device, gpu_context);
-    float* gpu_getrs_scratchpad = sycl::malloc_device<float>(
-        gpu_getrs_scratchpad_size * sizeof(float), gpu_device, gpu_context);
+    float* gpu_getrf_scratchpad =
+        sycl::malloc_device<float>(gpu_getrf_scratchpad_size, gpu_device, gpu_context);
+    float* gpu_getrs_scratchpad =
+        sycl::malloc_device<float>(gpu_getrs_scratchpad_size, gpu_device, gpu_context);
     if (!gpu_A || !gpu_B || !gpu_ipiv || !gpu_getrf_scratchpad) {
         throw std::runtime_error("Failed to allocate USM memory.");
     }
