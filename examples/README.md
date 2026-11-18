@@ -8,6 +8,12 @@ oneMath offers examples with the following routines:
 
 Each routine has one run-time dispatching example and one compile-time dispatching example (which uses both mklcpu and cuda backends), located in `example/<$domain>/run_time_dispatching` and `example/<$domain>/compile_time_dispatching` subfolders, respectively.
 
+In addition, the SYCL-only backends provide standalone compile-time dispatching examples that run on a single SYCL device:
+- blas: `level3/gemm_usm_generic` (built when `ENABLE_GENERIC_BLAS_BACKEND` is enabled)
+- dft: `complex_fwd_usm_portfft` (built when `ENABLE_PORTFFT_BACKEND` is enabled)
+
+These are useful for validating the generic BLAS and portFFT backends, which cannot be combined with any other backend.
+
 To build examples, use cmake build option `-DBUILD_EXAMPLES=true`.
 Compile_time_dispatching will be built if `-DBUILD_EXAMPLES=true` and cuda backend is enabled, because the compile-time dispatching example runs on both mklcpu and cuda backends.
 Run_time_dispatching will be built if `-DBUILD_EXAMPLES=true` and `-DBUILD_SHARED_LIBS=true`.
@@ -179,6 +185,57 @@ Running with single precision real data type on:
                             [ ...
 
 BLAS GEMM USM example ran OK on MKLCPU and CUBLAS
+
+```
+
+Compile-time dispatching example with the SYCL-only generic BLAS backend
+```
+$ ./bin/example_blas_gemm_usm_generic
+
+########################################################################
+# General Matrix-Matrix Multiplication using Unified Shared Memory Example:
+#
+# C = alpha * A * B + beta * C
+#
+# where A, B and C are general dense matrices and alpha, beta are
+# floating point type precision scalars.
+#
+# Using apis:
+#   gemm
+#
+# Using single precision (float) data type
+#
+# Running on a SYCL device with the generic BLAS backend
+#
+########################################################################
+
+Running BLAS GEMM USM example on GPU device.
+Device name is: Intel(R) Arc(TM) B580 Graphics
+Running with single precision real data type:
+
+                GEMM parameters:
+                        transA = trans, transB = nontrans
+                        m = 45, n = 98, k = 67
+                        lda = 103, ldB = 105, ldC = 106
+                        alpha = 2, beta = 3
+
+                Outputting 2x2 block of A,B,C matrices:
+
+                        A = [ 0.340188, 0.260249, ...
+                            [ -0.105617, 0.0125354, ...
+                            [ ...
+
+
+                        B = [ -0.326421, -0.192968, ...
+                            [ 0.363891, 0.251295, ...
+                            [ ...
+
+
+                        C = [ 0.00698781, 0.525862, ...
+                            [ 0.585167, 1.59017, ...
+                            [ ...
+
+BLAS GEMM USM example ran OK on the generic backend
 
 ```
  
@@ -478,6 +535,33 @@ Running with single precision real data type:
 DFT example run_time dispatch
 Unsupported Configuration:
 	oneMath: dft/backends/portfft/commit: function is not implemented REAL domain is unsupported
+```
+
+Compile-time dispatching example with the SYCL-only portFFT backend
+
+(Note that the portFFT backend only supports the COMPLEX domain.)
+
+```none
+$ ./bin/example_dft_complex_fwd_usm_portfft
+
+########################################################################
+# Complex in-place forward transform for USM API's example:
+#
+# Using APIs:
+#   Compile-time dispatch API
+#   USM forward complex in-place
+#
+# Using single precision (float) data type
+#
+# Running on a SYCL device with the portFFT backend.
+#
+########################################################################
+
+Running DFT complex forward example on GPU device
+Device name is: Intel(R) Arc(TM) B580 Graphics
+Using compile-time dispatch API with portFFT.
+Running with single precision real data type:
+DFT Complex USM example ran OK on portFFT
 ```
 
 ## sparse_blas
