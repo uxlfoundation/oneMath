@@ -36,94 +36,8 @@ inline T abs_value(std::complex<T> val) {
     return sycl::fabs(val.real()) + sycl::fabs(val.imag());
 }
 
-// SYCL reference implementation of iamin for buffer API
-// Used as workaround for oneMKL 2026.0 SSE2 bug when |incx| > 1
-template <typename T>
-void sycl_iamin_impl(sycl::queue& queue, std::int64_t n, sycl::buffer<T, 1>& x, std::int64_t incx,
-                     sycl::buffer<std::int64_t, 1>& result, oneapi::math::index_base base) {
-    queue.submit([&](sycl::handler& cgh) {
-        auto x_acc = x.template get_access<sycl::access::mode::read>(cgh);
-        auto res_acc = result.template get_access<sycl::access::mode::write>(cgh);
-
-        cgh.single_task([=]() {
-            if (n < 1 || incx < 1) {
-                res_acc[0] = 0;
-                return;
-            }
-
-            std::int64_t min_idx = 0;
-            auto min_val = abs_value(x_acc[0]);
-
-            if (sycl::isnan(min_val)) {
-                res_acc[0] = (base == oneapi::math::index_base::zero ? 0 : 1);
-                return;
-            }
-
-            std::int64_t abs_incx = (incx > 0) ? incx : -incx;
-            for (std::int64_t logical_i = 1; logical_i < n; ++logical_i) {
-                std::int64_t i = logical_i * abs_incx;
-                auto curr_val = abs_value(x_acc[i]);
-
-                if (sycl::isnan(curr_val)) {
-                    res_acc[0] = logical_i + (base == oneapi::math::index_base::zero ? 0 : 1);
-                    return;
-                }
-
-                if (curr_val < min_val) {
-                    min_idx = logical_i;
-                    min_val = curr_val;
-                }
-            }
-
-            res_acc[0] = min_idx + (base == oneapi::math::index_base::zero ? 0 : 1);
-        });
-    });
-}
-
-// SYCL reference implementation of iamax for buffer API
-template <typename T>
-void sycl_iamax_impl(sycl::queue& queue, std::int64_t n, sycl::buffer<T, 1>& x, std::int64_t incx,
-                     sycl::buffer<std::int64_t, 1>& result, oneapi::math::index_base base) {
-    queue.submit([&](sycl::handler& cgh) {
-        auto x_acc = x.template get_access<sycl::access::mode::read>(cgh);
-        auto res_acc = result.template get_access<sycl::access::mode::write>(cgh);
-
-        cgh.single_task([=]() {
-            if (n < 1 || incx < 1) {
-                res_acc[0] = 0;
-                return;
-            }
-
-            std::int64_t max_idx = 0;
-            auto max_val = abs_value(x_acc[0]);
-
-            if (sycl::isnan(max_val)) {
-                res_acc[0] = (base == oneapi::math::index_base::zero ? 0 : 1);
-                return;
-            }
-
-            std::int64_t abs_incx = (incx > 0) ? incx : -incx;
-            for (std::int64_t logical_i = 1; logical_i < n; ++logical_i) {
-                std::int64_t i = logical_i * abs_incx;
-                auto curr_val = abs_value(x_acc[i]);
-
-                if (sycl::isnan(curr_val)) {
-                    res_acc[0] = logical_i + (base == oneapi::math::index_base::zero ? 0 : 1);
-                    return;
-                }
-
-                if (curr_val > max_val) {
-                    max_idx = logical_i;
-                    max_val = curr_val;
-                }
-            }
-
-            res_acc[0] = max_idx + (base == oneapi::math::index_base::zero ? 0 : 1);
-        });
-    });
-}
-
 // SYCL reference implementation of iamin for USM API
+// Used as workaround for oneMKL 2026.0 SSE2 bug when |incx| > 1
 template <typename T>
 sycl::event sycl_iamin_usm_impl(sycl::queue& queue, std::int64_t n, const T* x, std::int64_t incx,
                                 std::int64_t* result, oneapi::math::index_base base,
@@ -214,389 +128,309 @@ sycl::event sycl_iamax_usm_impl(sycl::queue& queue, std::int64_t n, const T* x, 
 
 void asum(sycl::queue& queue, std::int64_t n, sycl::buffer<std::complex<float>, 1>& x,
           std::int64_t incx, sycl::buffer<float, 1>& result) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::asum(queue, n, x, incx, result));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void asum(sycl::queue& queue, std::int64_t n, sycl::buffer<std::complex<double>, 1>& x,
           std::int64_t incx, sycl::buffer<double, 1>& result) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::asum(queue, n, x, incx, result));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void asum(sycl::queue& queue, std::int64_t n, sycl::buffer<float, 1>& x, std::int64_t incx,
           sycl::buffer<float, 1>& result) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::asum(queue, n, x, incx, result));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void asum(sycl::queue& queue, std::int64_t n, sycl::buffer<double, 1>& x, std::int64_t incx,
           sycl::buffer<double, 1>& result) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::asum(queue, n, x, incx, result));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void axpy(sycl::queue& queue, std::int64_t n, float alpha, sycl::buffer<float, 1>& x,
           std::int64_t incx, sycl::buffer<float, 1>& y, std::int64_t incy) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::axpy(queue, n, alpha, x, incx, y, incy));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void axpy(sycl::queue& queue, std::int64_t n, double alpha, sycl::buffer<double, 1>& x,
           std::int64_t incx, sycl::buffer<double, 1>& y, std::int64_t incy) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::axpy(queue, n, alpha, x, incx, y, incy));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void axpy(sycl::queue& queue, std::int64_t n, std::complex<float> alpha,
           sycl::buffer<std::complex<float>, 1>& x, std::int64_t incx,
           sycl::buffer<std::complex<float>, 1>& y, std::int64_t incy) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::axpy(queue, n, alpha, x, incx, y, incy));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void axpy(sycl::queue& queue, std::int64_t n, std::complex<double> alpha,
           sycl::buffer<std::complex<double>, 1>& x, std::int64_t incx,
           sycl::buffer<std::complex<double>, 1>& y, std::int64_t incy) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::axpy(queue, n, alpha, x, incx, y, incy));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void axpby(sycl::queue& queue, std::int64_t n, float alpha, sycl::buffer<float, 1>& x,
            std::int64_t incx, float beta, sycl::buffer<float, 1>& y, std::int64_t incy) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::axpby(queue, n, alpha, x, incx, beta, y, incy));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void axpby(sycl::queue& queue, std::int64_t n, double alpha, sycl::buffer<double, 1>& x,
            std::int64_t incx, double beta, sycl::buffer<double, 1>& y, std::int64_t incy) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::axpby(queue, n, alpha, x, incx, beta, y, incy));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void axpby(sycl::queue& queue, std::int64_t n, std::complex<float> alpha,
            sycl::buffer<std::complex<float>, 1>& x, std::int64_t incx, std::complex<float> beta,
            sycl::buffer<std::complex<float>, 1>& y, std::int64_t incy) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::axpby(queue, n, alpha, x, incx, beta, y, incy));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void axpby(sycl::queue& queue, std::int64_t n, std::complex<double> alpha,
            sycl::buffer<std::complex<double>, 1>& x, std::int64_t incx, std::complex<double> beta,
            sycl::buffer<std::complex<double>, 1>& y, std::int64_t incy) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::axpby(queue, n, alpha, x, incx, beta, y, incy));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void copy(sycl::queue& queue, std::int64_t n, sycl::buffer<float, 1>& x, std::int64_t incx,
           sycl::buffer<float, 1>& y, std::int64_t incy) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::copy(queue, n, x, incx, y, incy));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void copy(sycl::queue& queue, std::int64_t n, sycl::buffer<double, 1>& x, std::int64_t incx,
           sycl::buffer<double, 1>& y, std::int64_t incy) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::copy(queue, n, x, incx, y, incy));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void copy(sycl::queue& queue, std::int64_t n, sycl::buffer<std::complex<float>, 1>& x,
           std::int64_t incx, sycl::buffer<std::complex<float>, 1>& y, std::int64_t incy) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::copy(queue, n, x, incx, y, incy));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void copy(sycl::queue& queue, std::int64_t n, sycl::buffer<std::complex<double>, 1>& x,
           std::int64_t incx, sycl::buffer<std::complex<double>, 1>& y, std::int64_t incy) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::copy(queue, n, x, incx, y, incy));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void dot(sycl::queue& queue, std::int64_t n, sycl::buffer<float, 1>& x, std::int64_t incx,
          sycl::buffer<float, 1>& y, std::int64_t incy, sycl::buffer<float, 1>& result) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::dot(queue, n, x, incx, y, incy, result));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void dot(sycl::queue& queue, std::int64_t n, sycl::buffer<double, 1>& x, std::int64_t incx,
          sycl::buffer<double, 1>& y, std::int64_t incy, sycl::buffer<double, 1>& result) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::dot(queue, n, x, incx, y, incy, result));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void sdsdot(sycl::queue& queue, std::int64_t n, float sb, sycl::buffer<float, 1>& x,
             std::int64_t incx, sycl::buffer<float, 1>& y, std::int64_t incy,
             sycl::buffer<float, 1>& result) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::sdsdot(queue, n, sb, x, incx, y, incy, result));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void dot(sycl::queue& queue, std::int64_t n, sycl::buffer<float, 1>& x, std::int64_t incx,
          sycl::buffer<float, 1>& y, std::int64_t incy, sycl::buffer<double, 1>& result) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::dot(queue, n, x, incx, y, incy, result));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void dotc(sycl::queue& queue, std::int64_t n, sycl::buffer<std::complex<float>, 1>& x,
           std::int64_t incx, sycl::buffer<std::complex<float>, 1>& y, std::int64_t incy,
           sycl::buffer<std::complex<float>, 1>& result) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::dotc(queue, n, x, incx, y, incy, result));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void dotc(sycl::queue& queue, std::int64_t n, sycl::buffer<std::complex<double>, 1>& x,
           std::int64_t incx, sycl::buffer<std::complex<double>, 1>& y, std::int64_t incy,
           sycl::buffer<std::complex<double>, 1>& result) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::dotc(queue, n, x, incx, y, incy, result));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void dotu(sycl::queue& queue, std::int64_t n, sycl::buffer<std::complex<float>, 1>& x,
           std::int64_t incx, sycl::buffer<std::complex<float>, 1>& y, std::int64_t incy,
           sycl::buffer<std::complex<float>, 1>& result) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::dotu(queue, n, x, incx, y, incy, result));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void dotu(sycl::queue& queue, std::int64_t n, sycl::buffer<std::complex<double>, 1>& x,
           std::int64_t incx, sycl::buffer<std::complex<double>, 1>& y, std::int64_t incy,
           sycl::buffer<std::complex<double>, 1>& result) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::dotu(queue, n, x, incx, y, incy, result));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void nrm2(sycl::queue& queue, std::int64_t n, sycl::buffer<std::complex<float>, 1>& x,
           std::int64_t incx, sycl::buffer<float, 1>& result) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::nrm2(queue, n, x, incx, result));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void nrm2(sycl::queue& queue, std::int64_t n, sycl::buffer<std::complex<double>, 1>& x,
           std::int64_t incx, sycl::buffer<double, 1>& result) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::nrm2(queue, n, x, incx, result));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void nrm2(sycl::queue& queue, std::int64_t n, sycl::buffer<float, 1>& x, std::int64_t incx,
           sycl::buffer<float, 1>& result) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::nrm2(queue, n, x, incx, result));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void nrm2(sycl::queue& queue, std::int64_t n, sycl::buffer<double, 1>& x, std::int64_t incx,
           sycl::buffer<double, 1>& result) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::nrm2(queue, n, x, incx, result));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void rot(sycl::queue& queue, std::int64_t n, sycl::buffer<std::complex<float>, 1>& x,
          std::int64_t incx, sycl::buffer<std::complex<float>, 1>& y, std::int64_t incy, float c,
          float s) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::rot(queue, n, x, incx, y, incy, c, s));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void rot(sycl::queue& queue, std::int64_t n, sycl::buffer<std::complex<double>, 1>& x,
          std::int64_t incx, sycl::buffer<std::complex<double>, 1>& y, std::int64_t incy, double c,
          double s) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::rot(queue, n, x, incx, y, incy, c, s));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void rot(sycl::queue& queue, std::int64_t n, sycl::buffer<float, 1>& x, std::int64_t incx,
          sycl::buffer<float, 1>& y, std::int64_t incy, float c, float s) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::rot(queue, n, x, incx, y, incy, c, s));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void rot(sycl::queue& queue, std::int64_t n, sycl::buffer<double, 1>& x, std::int64_t incx,
          sycl::buffer<double, 1>& y, std::int64_t incy, double c, double s) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::rot(queue, n, x, incx, y, incy, c, s));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void rotg(sycl::queue& queue, sycl::buffer<float, 1>& a, sycl::buffer<float, 1>& b,
           sycl::buffer<float, 1>& c, sycl::buffer<float, 1>& s) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::rotg(queue, a, b, c, s));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void rotg(sycl::queue& queue, sycl::buffer<double, 1>& a, sycl::buffer<double, 1>& b,
           sycl::buffer<double, 1>& c, sycl::buffer<double, 1>& s) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::rotg(queue, a, b, c, s));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void rotg(sycl::queue& queue, sycl::buffer<std::complex<float>, 1>& a,
           sycl::buffer<std::complex<float>, 1>& b, sycl::buffer<float, 1>& c,
           sycl::buffer<std::complex<float>, 1>& s) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::rotg(queue, a, b, c, s));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void rotg(sycl::queue& queue, sycl::buffer<std::complex<double>, 1>& a,
           sycl::buffer<std::complex<double>, 1>& b, sycl::buffer<double, 1>& c,
           sycl::buffer<std::complex<double>, 1>& s) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::rotg(queue, a, b, c, s));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void rotm(sycl::queue& queue, std::int64_t n, sycl::buffer<float, 1>& x, std::int64_t incx,
           sycl::buffer<float, 1>& y, std::int64_t incy, sycl::buffer<float, 1>& param) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::rotm(queue, n, x, incx, y, incy, param));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void rotm(sycl::queue& queue, std::int64_t n, sycl::buffer<double, 1>& x, std::int64_t incx,
           sycl::buffer<double, 1>& y, std::int64_t incy, sycl::buffer<double, 1>& param) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::rotm(queue, n, x, incx, y, incy, param));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void rotmg(sycl::queue& queue, sycl::buffer<float, 1>& d1, sycl::buffer<float, 1>& d2,
            sycl::buffer<float, 1>& x1, float y1, sycl::buffer<float, 1>& param) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::rotmg(queue, d1, d2, x1, y1, param));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void rotmg(sycl::queue& queue, sycl::buffer<double, 1>& d1, sycl::buffer<double, 1>& d2,
            sycl::buffer<double, 1>& x1, double y1, sycl::buffer<double, 1>& param) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::rotmg(queue, d1, d2, x1, y1, param));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void scal(sycl::queue& queue, std::int64_t n, float alpha, sycl::buffer<float, 1>& x,
           std::int64_t incx) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::scal(queue, n, alpha, x, incx));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void scal(sycl::queue& queue, std::int64_t n, double alpha, sycl::buffer<double, 1>& x,
           std::int64_t incx) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::scal(queue, n, alpha, x, incx));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void scal(sycl::queue& queue, std::int64_t n, std::complex<float> alpha,
           sycl::buffer<std::complex<float>, 1>& x, std::int64_t incx) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::scal(queue, n, alpha, x, incx));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void scal(sycl::queue& queue, std::int64_t n, std::complex<double> alpha,
           sycl::buffer<std::complex<double>, 1>& x, std::int64_t incx) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::scal(queue, n, alpha, x, incx));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void scal(sycl::queue& queue, std::int64_t n, float alpha, sycl::buffer<std::complex<float>, 1>& x,
           std::int64_t incx) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::scal(queue, n, alpha, x, incx));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void scal(sycl::queue& queue, std::int64_t n, double alpha,
           sycl::buffer<std::complex<double>, 1>& x, std::int64_t incx) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::scal(queue, n, alpha, x, incx));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void swap(sycl::queue& queue, std::int64_t n, sycl::buffer<float, 1>& x, std::int64_t incx,
           sycl::buffer<float, 1>& y, std::int64_t incy) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::swap(queue, n, x, incx, y, incy));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void swap(sycl::queue& queue, std::int64_t n, sycl::buffer<double, 1>& x, std::int64_t incx,
           sycl::buffer<double, 1>& y, std::int64_t incy) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::swap(queue, n, x, incx, y, incy));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void swap(sycl::queue& queue, std::int64_t n, sycl::buffer<std::complex<float>, 1>& x,
           std::int64_t incx, sycl::buffer<std::complex<float>, 1>& y, std::int64_t incy) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::swap(queue, n, x, incx, y, incy));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void swap(sycl::queue& queue, std::int64_t n, sycl::buffer<std::complex<double>, 1>& x,
           std::int64_t incx, sycl::buffer<std::complex<double>, 1>& y, std::int64_t incy) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::swap(queue, n, x, incx, y, incy));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void iamax(sycl::queue& queue, std::int64_t n, sycl::buffer<float, 1>& x, std::int64_t incx,
            sycl::buffer<std::int64_t, 1>& result, oneapi::math::index_base base) {
-#ifdef APPLY_ONEMKL_2026_IAMIN_IAMAX_WORKAROUND
-    if (std::abs(incx) > 1) {
-        sycl_iamax_impl(queue, n, x, incx, result, base);
-    }
-    else {
-#endif
-        RETHROW_ONEMKL_EXCEPTIONS(
-            blas_major::iamax(queue, n, x, incx, result, detail::get_onemkl_index_base(base)));
-#ifdef APPLY_ONEMKL_2026_IAMIN_IAMAX_WORKAROUND
-    }
-#endif
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void iamax(sycl::queue& queue, std::int64_t n, sycl::buffer<double, 1>& x, std::int64_t incx,
            sycl::buffer<std::int64_t, 1>& result, oneapi::math::index_base base) {
-#ifdef APPLY_ONEMKL_2026_IAMIN_IAMAX_WORKAROUND
-    if (std::abs(incx) > 1) {
-        sycl_iamax_impl(queue, n, x, incx, result, base);
-    }
-    else {
-#endif
-        RETHROW_ONEMKL_EXCEPTIONS(
-            blas_major::iamax(queue, n, x, incx, result, detail::get_onemkl_index_base(base)));
-#ifdef APPLY_ONEMKL_2026_IAMIN_IAMAX_WORKAROUND
-    }
-#endif
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void iamax(sycl::queue& queue, std::int64_t n, sycl::buffer<std::complex<float>, 1>& x,
            std::int64_t incx, sycl::buffer<std::int64_t, 1>& result,
            oneapi::math::index_base base) {
-#ifdef APPLY_ONEMKL_2026_IAMIN_IAMAX_WORKAROUND
-    if (std::abs(incx) > 1) {
-        sycl_iamax_impl(queue, n, x, incx, result, base);
-    }
-    else {
-#endif
-        RETHROW_ONEMKL_EXCEPTIONS(
-            blas_major::iamax(queue, n, x, incx, result, detail::get_onemkl_index_base(base)));
-#ifdef APPLY_ONEMKL_2026_IAMIN_IAMAX_WORKAROUND
-    }
-#endif
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void iamax(sycl::queue& queue, std::int64_t n, sycl::buffer<std::complex<double>, 1>& x,
            std::int64_t incx, sycl::buffer<std::int64_t, 1>& result,
            oneapi::math::index_base base) {
-#ifdef APPLY_ONEMKL_2026_IAMIN_IAMAX_WORKAROUND
-    if (std::abs(incx) > 1) {
-        sycl_iamax_impl(queue, n, x, incx, result, base);
-    }
-    else {
-#endif
-        RETHROW_ONEMKL_EXCEPTIONS(
-            blas_major::iamax(queue, n, x, incx, result, detail::get_onemkl_index_base(base)));
-#ifdef APPLY_ONEMKL_2026_IAMIN_IAMAX_WORKAROUND
-    }
-#endif
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void iamin(sycl::queue& queue, std::int64_t n, sycl::buffer<float, 1>& x, std::int64_t incx,
            sycl::buffer<std::int64_t, 1>& result, oneapi::math::index_base base) {
-#ifdef APPLY_ONEMKL_2026_IAMIN_IAMAX_WORKAROUND
-    if (std::abs(incx) > 1) {
-        sycl_iamin_impl(queue, n, x, incx, result, base);
-    }
-    else {
-#endif
-        RETHROW_ONEMKL_EXCEPTIONS(
-            blas_major::iamin(queue, n, x, incx, result, detail::get_onemkl_index_base(base)));
-#ifdef APPLY_ONEMKL_2026_IAMIN_IAMAX_WORKAROUND
-    }
-#endif
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void iamin(sycl::queue& queue, std::int64_t n, sycl::buffer<double, 1>& x, std::int64_t incx,
            sycl::buffer<std::int64_t, 1>& result, oneapi::math::index_base base) {
-#ifdef APPLY_ONEMKL_2026_IAMIN_IAMAX_WORKAROUND
-    if (std::abs(incx) > 1) {
-        sycl_iamin_impl(queue, n, x, incx, result, base);
-    }
-    else {
-#endif
-        RETHROW_ONEMKL_EXCEPTIONS(
-            blas_major::iamin(queue, n, x, incx, result, detail::get_onemkl_index_base(base)));
-#ifdef APPLY_ONEMKL_2026_IAMIN_IAMAX_WORKAROUND
-    }
-#endif
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void iamin(sycl::queue& queue, std::int64_t n, sycl::buffer<std::complex<float>, 1>& x,
            std::int64_t incx, sycl::buffer<std::int64_t, 1>& result,
            oneapi::math::index_base base) {
-#ifdef APPLY_ONEMKL_2026_IAMIN_IAMAX_WORKAROUND
-    if (std::abs(incx) > 1) {
-        sycl_iamin_impl(queue, n, x, incx, result, base);
-    }
-    else {
-#endif
-        RETHROW_ONEMKL_EXCEPTIONS(
-            blas_major::iamin(queue, n, x, incx, result, detail::get_onemkl_index_base(base)));
-#ifdef APPLY_ONEMKL_2026_IAMIN_IAMAX_WORKAROUND
-    }
-#endif
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void iamin(sycl::queue& queue, std::int64_t n, sycl::buffer<std::complex<double>, 1>& x,
            std::int64_t incx, sycl::buffer<std::int64_t, 1>& result,
            oneapi::math::index_base base) {
-#ifdef APPLY_ONEMKL_2026_IAMIN_IAMAX_WORKAROUND
-    if (std::abs(incx) > 1) {
-        sycl_iamin_impl(queue, n, x, incx, result, base);
-    }
-    else {
-#endif
-        RETHROW_ONEMKL_EXCEPTIONS(
-            blas_major::iamin(queue, n, x, incx, result, detail::get_onemkl_index_base(base)));
-#ifdef APPLY_ONEMKL_2026_IAMIN_IAMAX_WORKAROUND
-    }
-#endif
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 // USM APIs

@@ -23,185 +23,149 @@ void gemm_bias(sycl::queue& queue, transpose transa, transpose transb, offset of
                int64_t n, int64_t k, float alpha, sycl::buffer<int8_t, 1>& a, int64_t lda,
                int8_t ao, sycl::buffer<int8_t, 1>& b, int64_t ldb, int8_t bo, float beta,
                sycl::buffer<int32_t, 1>& c, int64_t ldc, sycl::buffer<int32_t, 1>& co) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::gemm_bias(
-        queue, detail::get_onemkl_transpose(transa), detail::get_onemkl_transpose(transb),
-        detail::get_onemkl_offset(offsetc), m, n, k, alpha, a, lda, ao, b, ldb, bo, beta, c, ldc,
-        co));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void gemm_bias(sycl::queue& queue, transpose transa, transpose transb, offset offsetc, int64_t m,
                int64_t n, int64_t k, float alpha, sycl::buffer<int8_t, 1>& a, int64_t lda,
                int8_t ao, sycl::buffer<uint8_t, 1>& b, int64_t ldb, uint8_t bo, float beta,
                sycl::buffer<int32_t, 1>& c, int64_t ldc, sycl::buffer<int32_t, 1>& co) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::gemm_bias(
-        queue, detail::get_onemkl_transpose(transa), detail::get_onemkl_transpose(transb),
-        detail::get_onemkl_offset(offsetc), m, n, k, alpha, a, lda, ao, b, ldb, bo, beta, c, ldc,
-        co));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void gemm_bias(sycl::queue& queue, transpose transa, transpose transb, offset offsetc, int64_t m,
                int64_t n, int64_t k, float alpha, sycl::buffer<uint8_t, 1>& a, int64_t lda,
                uint8_t ao, sycl::buffer<int8_t, 1>& b, int64_t ldb, int8_t bo, float beta,
                sycl::buffer<int32_t, 1>& c, int64_t ldc, sycl::buffer<int32_t, 1>& co) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::gemm_bias(
-        queue, detail::get_onemkl_transpose(transa), detail::get_onemkl_transpose(transb),
-        detail::get_onemkl_offset(offsetc), m, n, k, alpha, a, lda, ao, b, ldb, bo, beta, c, ldc,
-        co));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void gemm_bias(sycl::queue& queue, transpose transa, transpose transb, offset offsetc, int64_t m,
                int64_t n, int64_t k, float alpha, sycl::buffer<uint8_t, 1>& a, int64_t lda,
                uint8_t ao, sycl::buffer<uint8_t, 1>& b, int64_t ldb, uint8_t bo, float beta,
                sycl::buffer<int32_t, 1>& c, int64_t ldc, sycl::buffer<int32_t, 1>& co) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::gemm_bias(
-        queue, detail::get_onemkl_transpose(transa), detail::get_onemkl_transpose(transb),
-        detail::get_onemkl_offset(offsetc), m, n, k, alpha, a, lda, ao, b, ldb, bo, beta, c, ldc,
-        co));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void gemmt(sycl::queue& queue, uplo upper_lower, transpose transa, transpose transb, int64_t n,
            int64_t k, float alpha, sycl::buffer<float, 1>& a, int64_t lda,
            sycl::buffer<float, 1>& b, int64_t ldb, float beta, sycl::buffer<float, 1>& c,
            int64_t ldc) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::gemmt(
-        queue, detail::get_onemkl_uplo(upper_lower), detail::get_onemkl_transpose(transa),
-        detail::get_onemkl_transpose(transb), n, k, alpha, a, lda, b, ldb, beta, c, ldc));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void gemmt(sycl::queue& queue, uplo upper_lower, transpose transa, transpose transb, int64_t n,
            int64_t k, double alpha, sycl::buffer<double, 1>& a, int64_t lda,
            sycl::buffer<double, 1>& b, int64_t ldb, double beta, sycl::buffer<double, 1>& c,
            int64_t ldc) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::gemmt(
-        queue, detail::get_onemkl_uplo(upper_lower), detail::get_onemkl_transpose(transa),
-        detail::get_onemkl_transpose(transb), n, k, alpha, a, lda, b, ldb, beta, c, ldc));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void gemmt(sycl::queue& queue, uplo upper_lower, transpose transa, transpose transb, int64_t n,
            int64_t k, std::complex<double> alpha, sycl::buffer<std::complex<double>, 1>& a,
            int64_t lda, sycl::buffer<std::complex<double>, 1>& b, int64_t ldb,
            std::complex<double> beta, sycl::buffer<std::complex<double>, 1>& c, int64_t ldc) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::gemmt(
-        queue, detail::get_onemkl_uplo(upper_lower), detail::get_onemkl_transpose(transa),
-        detail::get_onemkl_transpose(transb), n, k, alpha, a, lda, b, ldb, beta, c, ldc));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void gemmt(sycl::queue& queue, uplo upper_lower, transpose transa, transpose transb, int64_t n,
            int64_t k, std::complex<float> alpha, sycl::buffer<std::complex<float>, 1>& a,
            int64_t lda, sycl::buffer<std::complex<float>, 1>& b, int64_t ldb,
            std::complex<float> beta, sycl::buffer<std::complex<float>, 1>& c, int64_t ldc) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::gemmt(
-        queue, detail::get_onemkl_uplo(upper_lower), detail::get_onemkl_transpose(transa),
-        detail::get_onemkl_transpose(transb), n, k, alpha, a, lda, b, ldb, beta, c, ldc));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void omatcopy(sycl::queue& queue, transpose trans, int64_t m, int64_t n, float alpha,
               sycl::buffer<float, 1>& a, int64_t lda, sycl::buffer<float, 1>& b, int64_t ldb) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::omatcopy(queue, detail::get_onemkl_transpose(trans), m, n,
-                                                   alpha, a, lda, b, ldb));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void omatcopy(sycl::queue& queue, transpose trans, int64_t m, int64_t n, double alpha,
               sycl::buffer<double, 1>& a, int64_t lda, sycl::buffer<double, 1>& b, int64_t ldb) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::omatcopy(queue, detail::get_onemkl_transpose(trans), m, n,
-                                                   alpha, a, lda, b, ldb));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void omatcopy(sycl::queue& queue, transpose trans, int64_t m, int64_t n, std::complex<float> alpha,
               sycl::buffer<std::complex<float>, 1>& a, int64_t lda,
               sycl::buffer<std::complex<float>, 1>& b, int64_t ldb) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::omatcopy(queue, detail::get_onemkl_transpose(trans), m, n,
-                                                   alpha, a, lda, b, ldb));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void omatcopy(sycl::queue& queue, transpose trans, int64_t m, int64_t n, std::complex<double> alpha,
               sycl::buffer<std::complex<double>, 1>& a, int64_t lda,
               sycl::buffer<std::complex<double>, 1>& b, int64_t ldb) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::omatcopy(queue, detail::get_onemkl_transpose(trans), m, n,
-                                                   alpha, a, lda, b, ldb));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void omatcopy2(sycl::queue& queue, transpose trans, int64_t m, int64_t n, float alpha,
                sycl::buffer<float, 1>& a, int64_t lda, std::int64_t stridea,
                sycl::buffer<float, 1>& b, int64_t ldb, std::int64_t strideb) {
-    throw unimplemented("blas", "omatcopy2", "");
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void omatcopy2(sycl::queue& queue, transpose trans, int64_t m, int64_t n, double alpha,
                sycl::buffer<double, 1>& a, int64_t lda, std::int64_t stridea,
                sycl::buffer<double, 1>& b, int64_t ldb, std::int64_t strideb) {
-    throw unimplemented("blas", "omatcopy2", "");
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void omatcopy2(sycl::queue& queue, transpose trans, int64_t m, int64_t n, std::complex<float> alpha,
                sycl::buffer<std::complex<float>, 1>& a, int64_t lda, std::int64_t stridea,
                sycl::buffer<std::complex<float>, 1>& b, int64_t ldb, std::int64_t strideb) {
-    throw unimplemented("blas", "omatcopy2", "");
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void omatcopy2(sycl::queue& queue, transpose trans, int64_t m, int64_t n,
                std::complex<double> alpha, sycl::buffer<std::complex<double>, 1>& a, int64_t lda,
                std::int64_t stridea, sycl::buffer<std::complex<double>, 1>& b, int64_t ldb,
                std::int64_t strideb) {
-    throw unimplemented("blas", "omatcopy2", "");
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void imatcopy(sycl::queue& queue, transpose trans, int64_t m, int64_t n, float alpha,
               sycl::buffer<float, 1>& ab, int64_t lda, int64_t ldb) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::imatcopy(queue, detail::get_onemkl_transpose(trans), m, n,
-                                                   alpha, ab, lda, ldb));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void imatcopy(sycl::queue& queue, transpose trans, int64_t m, int64_t n, double alpha,
               sycl::buffer<double, 1>& ab, int64_t lda, int64_t ldb) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::imatcopy(queue, detail::get_onemkl_transpose(trans), m, n,
-                                                   alpha, ab, lda, ldb));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void imatcopy(sycl::queue& queue, transpose trans, int64_t m, int64_t n, std::complex<float> alpha,
               sycl::buffer<std::complex<float>, 1>& ab, int64_t lda, int64_t ldb) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::imatcopy(queue, detail::get_onemkl_transpose(trans), m, n,
-                                                   alpha, ab, lda, ldb));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void imatcopy(sycl::queue& queue, transpose trans, int64_t m, int64_t n, std::complex<double> alpha,
               sycl::buffer<std::complex<double>, 1>& ab, int64_t lda, int64_t ldb) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::imatcopy(queue, detail::get_onemkl_transpose(trans), m, n,
-                                                   alpha, ab, lda, ldb));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void omatadd(sycl::queue& queue, transpose transa, transpose transb, int64_t m, int64_t n,
              float alpha, sycl::buffer<float, 1>& a, int64_t lda, float beta,
              sycl::buffer<float, 1>& b, int64_t ldb, sycl::buffer<float, 1>& c, int64_t ldc) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::omatadd(queue, detail::get_onemkl_transpose(transa),
-                                                  detail::get_onemkl_transpose(transb), m, n, alpha,
-                                                  a, lda, beta, b, ldb, c, ldc));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void omatadd(sycl::queue& queue, transpose transa, transpose transb, int64_t m, int64_t n,
              double alpha, sycl::buffer<double, 1>& a, int64_t lda, double beta,
              sycl::buffer<double, 1>& b, int64_t ldb, sycl::buffer<double, 1>& c, int64_t ldc) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::omatadd(queue, detail::get_onemkl_transpose(transa),
-                                                  detail::get_onemkl_transpose(transb), m, n, alpha,
-                                                  a, lda, beta, b, ldb, c, ldc));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void omatadd(sycl::queue& queue, transpose transa, transpose transb, int64_t m, int64_t n,
              std::complex<float> alpha, sycl::buffer<std::complex<float>, 1>& a, int64_t lda,
              std::complex<float> beta, sycl::buffer<std::complex<float>, 1>& b, int64_t ldb,
              sycl::buffer<std::complex<float>, 1>& c, int64_t ldc) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::omatadd(queue, detail::get_onemkl_transpose(transa),
-                                                  detail::get_onemkl_transpose(transb), m, n, alpha,
-                                                  a, lda, beta, b, ldb, c, ldc));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 void omatadd(sycl::queue& queue, transpose transa, transpose transb, int64_t m, int64_t n,
              std::complex<double> alpha, sycl::buffer<std::complex<double>, 1>& a, int64_t lda,
              std::complex<double> beta, sycl::buffer<std::complex<double>, 1>& b, int64_t ldb,
              sycl::buffer<std::complex<double>, 1>& c, int64_t ldc) {
-    RETHROW_ONEMKL_EXCEPTIONS(blas_major::omatadd(queue, detail::get_onemkl_transpose(transa),
-                                                  detail::get_onemkl_transpose(transb), m, n, alpha,
-                                                  a, lda, beta, b, ldb, c, ldc));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("blas");
 }
 
 // USM APIs

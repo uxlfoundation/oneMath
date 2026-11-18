@@ -95,36 +95,12 @@ inline void common_spmv_optimize(sycl::queue& queue, transpose opA, const void* 
     spmv_descr->last_optimized_alg = alg;
 }
 
-void spmv_optimize(sycl::queue& queue, transpose opA, const void* alpha, matrix_view A_view,
-                   matrix_handle_t A_handle, dense_vector_handle_t x_handle, const void* beta,
-                   dense_vector_handle_t y_handle, spmv_alg alg, spmv_descr_t spmv_descr,
-                   sycl::buffer<std::uint8_t, 1> /*workspace*/) {
-    auto internal_A_handle = detail::get_internal_handle(A_handle);
-    if (!internal_A_handle->all_use_buffer()) {
-        detail::throw_incompatible_container(__func__);
-    }
-    common_spmv_optimize(queue, opA, alpha, A_view, A_handle, x_handle, beta, y_handle, alg,
-                         spmv_descr);
-    if (alg == spmv_alg::no_optimize_alg) {
-        return;
-    }
-    internal_A_handle->can_be_reset = false;
-    auto onemkl_uplo = detail::get_onemkl_uplo(A_view.uplo_view);
-    auto onemkl_opa = detail::get_onemkl_transpose(opA);
-    auto onemkl_diag = detail::get_onemkl_diag(A_view.diag_view);
-    if (A_view.type_view == matrix_descr::triangular) {
-        RETHROW_ONEMKL_EXCEPTIONS(oneapi::mkl::sparse::optimize_trmv(
-            queue, onemkl_uplo, onemkl_opa, onemkl_diag, internal_A_handle->backend_handle));
-    }
-    else if (A_view.type_view == matrix_descr::symmetric ||
-             A_view.type_view == matrix_descr::hermitian) {
-        // No optimize_symv currently
-        return;
-    }
-    else {
-        RETHROW_ONEMKL_EXCEPTIONS(oneapi::mkl::sparse::optimize_gemv(
-            queue, onemkl_opa, internal_A_handle->backend_handle));
-    }
+void spmv_optimize(sycl::queue& /*queue*/, transpose /*opA*/, const void* /*alpha*/,
+                   matrix_view /*A_view*/, matrix_handle_t /*A_handle*/,
+                   dense_vector_handle_t /*x_handle*/, const void* /*beta*/,
+                   dense_vector_handle_t /*y_handle*/, spmv_alg /*alg*/,
+                   spmv_descr_t /*spmv_descr*/, sycl::buffer<std::uint8_t, 1> /*workspace*/) {
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("sparse_blas");
 }
 
 sycl::event spmv_optimize(sycl::queue& queue, transpose opA, const void* alpha, matrix_view A_view,
@@ -133,9 +109,6 @@ sycl::event spmv_optimize(sycl::queue& queue, transpose opA, const void* alpha, 
                           spmv_descr_t spmv_descr, void* /*workspace*/,
                           const std::vector<sycl::event>& dependencies) {
     auto internal_A_handle = detail::get_internal_handle(A_handle);
-    if (internal_A_handle->all_use_buffer()) {
-        detail::throw_incompatible_container(__func__);
-    }
     common_spmv_optimize(queue, opA, alpha, A_view, A_handle, x_handle, beta, y_handle, alg,
                          spmv_descr);
     if (alg == spmv_alg::no_optimize_alg) {
@@ -176,45 +149,21 @@ sycl::event internal_spmv(sycl::queue& queue, transpose opA, const void* alpha, 
     auto onemkl_uplo = detail::get_onemkl_uplo(A_view.uplo_view);
     auto onemkl_opa = detail::get_onemkl_transpose(opA);
     auto onemkl_diag = detail::get_onemkl_diag(A_view.diag_view);
-    if (internal_A_handle->all_use_buffer()) {
-        auto x_buffer = x_handle->get_buffer<T>();
-        auto y_buffer = y_handle->get_buffer<T>();
-        if (A_view.type_view == matrix_descr::triangular) {
-            RETHROW_ONEMKL_EXCEPTIONS(
-                oneapi::mkl::sparse::trmv(queue, onemkl_uplo, onemkl_opa, onemkl_diag, host_alpha,
-                                          backend_handle, x_buffer, host_beta, y_buffer));
-        }
-        else if (A_view.type_view == matrix_descr::symmetric ||
-                 A_view.type_view == matrix_descr::hermitian) {
-            RETHROW_ONEMKL_EXCEPTIONS(oneapi::mkl::sparse::symv(
-                queue, onemkl_uplo, host_alpha, backend_handle, x_buffer, host_beta, y_buffer));
-        }
-        else {
-            RETHROW_ONEMKL_EXCEPTIONS(oneapi::mkl::sparse::gemv(
-                queue, onemkl_opa, host_alpha, backend_handle, x_buffer, host_beta, y_buffer));
-        }
-        // Dependencies are not used for buffers
-        return {};
+    auto x_usm = x_handle->get_usm_ptr<T>();
+    auto y_usm = y_handle->get_usm_ptr<T>();
+    if (A_view.type_view == matrix_descr::triangular) {
+        RETHROW_ONEMKL_EXCEPTIONS_RET(
+            oneapi::mkl::sparse::trmv(queue, onemkl_uplo, onemkl_opa, onemkl_diag, host_alpha,
+                                      backend_handle, x_usm, host_beta, y_usm, dependencies));
+    }
+    else if (A_view.type_view == matrix_descr::symmetric ||
+             A_view.type_view == matrix_descr::hermitian) {
+        RETHROW_ONEMKL_EXCEPTIONS_RET(oneapi::mkl::sparse::symv(
+            queue, onemkl_uplo, host_alpha, backend_handle, x_usm, host_beta, y_usm, dependencies));
     }
     else {
-        auto x_usm = x_handle->get_usm_ptr<T>();
-        auto y_usm = y_handle->get_usm_ptr<T>();
-        if (A_view.type_view == matrix_descr::triangular) {
-            RETHROW_ONEMKL_EXCEPTIONS_RET(
-                oneapi::mkl::sparse::trmv(queue, onemkl_uplo, onemkl_opa, onemkl_diag, host_alpha,
-                                          backend_handle, x_usm, host_beta, y_usm, dependencies));
-        }
-        else if (A_view.type_view == matrix_descr::symmetric ||
-                 A_view.type_view == matrix_descr::hermitian) {
-            RETHROW_ONEMKL_EXCEPTIONS_RET(
-                oneapi::mkl::sparse::symv(queue, onemkl_uplo, host_alpha, backend_handle, x_usm,
-                                          host_beta, y_usm, dependencies));
-        }
-        else {
-            RETHROW_ONEMKL_EXCEPTIONS_RET(
-                oneapi::mkl::sparse::gemv(queue, onemkl_opa, host_alpha, backend_handle, x_usm,
-                                          host_beta, y_usm, dependencies));
-        }
+        RETHROW_ONEMKL_EXCEPTIONS_RET(oneapi::mkl::sparse::gemv(
+            queue, onemkl_opa, host_alpha, backend_handle, x_usm, host_beta, y_usm, dependencies));
     }
 }
 

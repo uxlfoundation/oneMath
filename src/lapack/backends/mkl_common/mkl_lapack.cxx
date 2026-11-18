@@ -21,600 +21,476 @@ void gebrd(sycl::queue& queue, std::int64_t m, std::int64_t n, sycl::buffer<std:
            std::int64_t lda, sycl::buffer<float>& d, sycl::buffer<float>& e,
            sycl::buffer<std::complex<float>>& tauq, sycl::buffer<std::complex<float>>& taup,
            sycl::buffer<std::complex<float>>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::gebrd(
-        queue, m, n, a, lda, d, e, tauq, taup, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void gebrd(sycl::queue& queue, std::int64_t m, std::int64_t n, sycl::buffer<double>& a,
            std::int64_t lda, sycl::buffer<double>& d, sycl::buffer<double>& e,
            sycl::buffer<double>& tauq, sycl::buffer<double>& taup, sycl::buffer<double>& scratchpad,
            std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::gebrd(
-        queue, m, n, a, lda, d, e, tauq, taup, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void gebrd(sycl::queue& queue, std::int64_t m, std::int64_t n, sycl::buffer<float>& a,
            std::int64_t lda, sycl::buffer<float>& d, sycl::buffer<float>& e,
            sycl::buffer<float>& tauq, sycl::buffer<float>& taup, sycl::buffer<float>& scratchpad,
            std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::gebrd(
-        queue, m, n, a, lda, d, e, tauq, taup, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void gebrd(sycl::queue& queue, std::int64_t m, std::int64_t n,
            sycl::buffer<std::complex<double>>& a, std::int64_t lda, sycl::buffer<double>& d,
            sycl::buffer<double>& e, sycl::buffer<std::complex<double>>& tauq,
            sycl::buffer<std::complex<double>>& taup, sycl::buffer<std::complex<double>>& scratchpad,
            std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::gebrd(
-        queue, m, n, a, lda, d, e, tauq, taup, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void gerqf(sycl::queue& queue, std::int64_t m, std::int64_t n, sycl::buffer<float>& a,
            std::int64_t lda, sycl::buffer<float>& tau, sycl::buffer<float>& scratchpad,
            std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(
-        ::oneapi::mkl::lapack::gerqf(queue, m, n, a, lda, tau, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void gerqf(sycl::queue& queue, std::int64_t m, std::int64_t n, sycl::buffer<double>& a,
            std::int64_t lda, sycl::buffer<double>& tau, sycl::buffer<double>& scratchpad,
            std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(
-        ::oneapi::mkl::lapack::gerqf(queue, m, n, a, lda, tau, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void gerqf(sycl::queue& queue, std::int64_t m, std::int64_t n, sycl::buffer<std::complex<float>>& a,
            std::int64_t lda, sycl::buffer<std::complex<float>>& tau,
            sycl::buffer<std::complex<float>>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(
-        ::oneapi::mkl::lapack::gerqf(queue, m, n, a, lda, tau, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void gerqf(sycl::queue& queue, std::int64_t m, std::int64_t n,
            sycl::buffer<std::complex<double>>& a, std::int64_t lda,
            sycl::buffer<std::complex<double>>& tau, sycl::buffer<std::complex<double>>& scratchpad,
            std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(
-        ::oneapi::mkl::lapack::gerqf(queue, m, n, a, lda, tau, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void geqrf(sycl::queue& queue, std::int64_t m, std::int64_t n, sycl::buffer<std::complex<float>>& a,
            std::int64_t lda, sycl::buffer<std::complex<float>>& tau,
            sycl::buffer<std::complex<float>>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(
-        ::oneapi::mkl::lapack::geqrf(queue, m, n, a, lda, tau, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void geqrf(sycl::queue& queue, std::int64_t m, std::int64_t n, sycl::buffer<double>& a,
            std::int64_t lda, sycl::buffer<double>& tau, sycl::buffer<double>& scratchpad,
            std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(
-        ::oneapi::mkl::lapack::geqrf(queue, m, n, a, lda, tau, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void geqrf(sycl::queue& queue, std::int64_t m, std::int64_t n, sycl::buffer<float>& a,
            std::int64_t lda, sycl::buffer<float>& tau, sycl::buffer<float>& scratchpad,
            std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(
-        ::oneapi::mkl::lapack::geqrf(queue, m, n, a, lda, tau, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void geqrf(sycl::queue& queue, std::int64_t m, std::int64_t n,
            sycl::buffer<std::complex<double>>& a, std::int64_t lda,
            sycl::buffer<std::complex<double>>& tau, sycl::buffer<std::complex<double>>& scratchpad,
            std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(
-        ::oneapi::mkl::lapack::geqrf(queue, m, n, a, lda, tau, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void getrf(sycl::queue& queue, std::int64_t m, std::int64_t n, sycl::buffer<std::complex<float>>& a,
            std::int64_t lda, sycl::buffer<std::int64_t>& ipiv,
            sycl::buffer<std::complex<float>>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(
-        ::oneapi::mkl::lapack::getrf(queue, m, n, a, lda, ipiv, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void getrf(sycl::queue& queue, std::int64_t m, std::int64_t n, sycl::buffer<double>& a,
            std::int64_t lda, sycl::buffer<std::int64_t>& ipiv, sycl::buffer<double>& scratchpad,
            std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(
-        ::oneapi::mkl::lapack::getrf(queue, m, n, a, lda, ipiv, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void getrf(sycl::queue& queue, std::int64_t m, std::int64_t n, sycl::buffer<float>& a,
            std::int64_t lda, sycl::buffer<std::int64_t>& ipiv, sycl::buffer<float>& scratchpad,
            std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(
-        ::oneapi::mkl::lapack::getrf(queue, m, n, a, lda, ipiv, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void getrf(sycl::queue& queue, std::int64_t m, std::int64_t n,
            sycl::buffer<std::complex<double>>& a, std::int64_t lda,
            sycl::buffer<std::int64_t>& ipiv, sycl::buffer<std::complex<double>>& scratchpad,
            std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(
-        ::oneapi::mkl::lapack::getrf(queue, m, n, a, lda, ipiv, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void getri(sycl::queue& queue, std::int64_t n, sycl::buffer<std::complex<float>>& a,
            std::int64_t lda, sycl::buffer<std::int64_t>& ipiv,
            sycl::buffer<std::complex<float>>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(
-        ::oneapi::mkl::lapack::getri(queue, n, a, lda, ipiv, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void getri(sycl::queue& queue, std::int64_t n, sycl::buffer<double>& a, std::int64_t lda,
            sycl::buffer<std::int64_t>& ipiv, sycl::buffer<double>& scratchpad,
            std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(
-        ::oneapi::mkl::lapack::getri(queue, n, a, lda, ipiv, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void getri(sycl::queue& queue, std::int64_t n, sycl::buffer<float>& a, std::int64_t lda,
            sycl::buffer<std::int64_t>& ipiv, sycl::buffer<float>& scratchpad,
            std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(
-        ::oneapi::mkl::lapack::getri(queue, n, a, lda, ipiv, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void getri(sycl::queue& queue, std::int64_t n, sycl::buffer<std::complex<double>>& a,
            std::int64_t lda, sycl::buffer<std::int64_t>& ipiv,
            sycl::buffer<std::complex<double>>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(
-        ::oneapi::mkl::lapack::getri(queue, n, a, lda, ipiv, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void getrs(sycl::queue& queue, oneapi::math::transpose trans, std::int64_t n, std::int64_t nrhs,
            sycl::buffer<std::complex<float>>& a, std::int64_t lda, sycl::buffer<std::int64_t>& ipiv,
            sycl::buffer<std::complex<float>>& b, std::int64_t ldb,
            sycl::buffer<std::complex<float>>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(
-        ::oneapi::mkl::lapack::getrs(queue, detail::get_onemkl_transpose(trans), n, nrhs, a, lda,
-                                     ipiv, b, ldb, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void getrs(sycl::queue& queue, oneapi::math::transpose trans, std::int64_t n, std::int64_t nrhs,
            sycl::buffer<double>& a, std::int64_t lda, sycl::buffer<std::int64_t>& ipiv,
            sycl::buffer<double>& b, std::int64_t ldb, sycl::buffer<double>& scratchpad,
            std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(
-        ::oneapi::mkl::lapack::getrs(queue, detail::get_onemkl_transpose(trans), n, nrhs, a, lda,
-                                     ipiv, b, ldb, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void getrs(sycl::queue& queue, oneapi::math::transpose trans, std::int64_t n, std::int64_t nrhs,
            sycl::buffer<float>& a, std::int64_t lda, sycl::buffer<std::int64_t>& ipiv,
            sycl::buffer<float>& b, std::int64_t ldb, sycl::buffer<float>& scratchpad,
            std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(
-        ::oneapi::mkl::lapack::getrs(queue, detail::get_onemkl_transpose(trans), n, nrhs, a, lda,
-                                     ipiv, b, ldb, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void getrs(sycl::queue& queue, oneapi::math::transpose trans, std::int64_t n, std::int64_t nrhs,
            sycl::buffer<std::complex<double>>& a, std::int64_t lda,
            sycl::buffer<std::int64_t>& ipiv, sycl::buffer<std::complex<double>>& b,
            std::int64_t ldb, sycl::buffer<std::complex<double>>& scratchpad,
            std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(
-        ::oneapi::mkl::lapack::getrs(queue, detail::get_onemkl_transpose(trans), n, nrhs, a, lda,
-                                     ipiv, b, ldb, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void gesvd(sycl::queue& queue, oneapi::math::jobsvd jobu, oneapi::math::jobsvd jobvt,
            std::int64_t m, std::int64_t n, sycl::buffer<double>& a, std::int64_t lda,
            sycl::buffer<double>& s, sycl::buffer<double>& u, std::int64_t ldu,
            sycl::buffer<double>& vt, std::int64_t ldvt, sycl::buffer<double>& scratchpad,
            std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::gesvd(
-        queue, detail::get_onemkl_jobsvd(jobu), detail::get_onemkl_jobsvd(jobvt), m, n, a, lda, s,
-        u, ldu, vt, ldvt, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void gesvd(sycl::queue& queue, oneapi::math::jobsvd jobu, oneapi::math::jobsvd jobvt,
            std::int64_t m, std::int64_t n, sycl::buffer<float>& a, std::int64_t lda,
            sycl::buffer<float>& s, sycl::buffer<float>& u, std::int64_t ldu,
            sycl::buffer<float>& vt, std::int64_t ldvt, sycl::buffer<float>& scratchpad,
            std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::gesvd(
-        queue, detail::get_onemkl_jobsvd(jobu), detail::get_onemkl_jobsvd(jobvt), m, n, a, lda, s,
-        u, ldu, vt, ldvt, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void gesvd(sycl::queue& queue, oneapi::math::jobsvd jobu, oneapi::math::jobsvd jobvt,
            std::int64_t m, std::int64_t n, sycl::buffer<std::complex<float>>& a, std::int64_t lda,
            sycl::buffer<float>& s, sycl::buffer<std::complex<float>>& u, std::int64_t ldu,
            sycl::buffer<std::complex<float>>& vt, std::int64_t ldvt,
            sycl::buffer<std::complex<float>>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::gesvd(
-        queue, detail::get_onemkl_jobsvd(jobu), detail::get_onemkl_jobsvd(jobvt), m, n, a, lda, s,
-        u, ldu, vt, ldvt, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void gesvd(sycl::queue& queue, oneapi::math::jobsvd jobu, oneapi::math::jobsvd jobvt,
            std::int64_t m, std::int64_t n, sycl::buffer<std::complex<double>>& a, std::int64_t lda,
            sycl::buffer<double>& s, sycl::buffer<std::complex<double>>& u, std::int64_t ldu,
            sycl::buffer<std::complex<double>>& vt, std::int64_t ldvt,
            sycl::buffer<std::complex<double>>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::gesvd(
-        queue, detail::get_onemkl_jobsvd(jobu), detail::get_onemkl_jobsvd(jobvt), m, n, a, lda, s,
-        u, ldu, vt, ldvt, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void heevd(sycl::queue& queue, oneapi::math::job jobz, oneapi::math::uplo uplo, std::int64_t n,
            sycl::buffer<std::complex<float>>& a, std::int64_t lda, sycl::buffer<float>& w,
            sycl::buffer<std::complex<float>>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::heevd(
-        queue, detail::get_onemkl_job(jobz), detail::get_onemkl_uplo(uplo), n, a, lda, w,
-        scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void heevd(sycl::queue& queue, oneapi::math::job jobz, oneapi::math::uplo uplo, std::int64_t n,
            sycl::buffer<std::complex<double>>& a, std::int64_t lda, sycl::buffer<double>& w,
            sycl::buffer<std::complex<double>>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::heevd(
-        queue, detail::get_onemkl_job(jobz), detail::get_onemkl_uplo(uplo), n, a, lda, w,
-        scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void hegvd(sycl::queue& queue, std::int64_t itype, oneapi::math::job jobz, oneapi::math::uplo uplo,
            std::int64_t n, sycl::buffer<std::complex<float>>& a, std::int64_t lda,
            sycl::buffer<std::complex<float>>& b, std::int64_t ldb, sycl::buffer<float>& w,
            sycl::buffer<std::complex<float>>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::hegvd(
-        queue, itype, detail::get_onemkl_job(jobz), detail::get_onemkl_uplo(uplo), n, a, lda, b,
-        ldb, w, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void hegvd(sycl::queue& queue, std::int64_t itype, oneapi::math::job jobz, oneapi::math::uplo uplo,
            std::int64_t n, sycl::buffer<std::complex<double>>& a, std::int64_t lda,
            sycl::buffer<std::complex<double>>& b, std::int64_t ldb, sycl::buffer<double>& w,
            sycl::buffer<std::complex<double>>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::hegvd(
-        queue, itype, detail::get_onemkl_job(jobz), detail::get_onemkl_uplo(uplo), n, a, lda, b,
-        ldb, w, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void hetrd(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n,
            sycl::buffer<std::complex<float>>& a, std::int64_t lda, sycl::buffer<float>& d,
            sycl::buffer<float>& e, sycl::buffer<std::complex<float>>& tau,
            sycl::buffer<std::complex<float>>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::hetrd(
-        queue, detail::get_onemkl_uplo(uplo), n, a, lda, d, e, tau, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void hetrd(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n,
            sycl::buffer<std::complex<double>>& a, std::int64_t lda, sycl::buffer<double>& d,
            sycl::buffer<double>& e, sycl::buffer<std::complex<double>>& tau,
            sycl::buffer<std::complex<double>>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::hetrd(
-        queue, detail::get_onemkl_uplo(uplo), n, a, lda, d, e, tau, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void hetrf(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n,
            sycl::buffer<std::complex<float>>& a, std::int64_t lda, sycl::buffer<std::int64_t>& ipiv,
            sycl::buffer<std::complex<float>>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::hetrf(
-        queue, detail::get_onemkl_uplo(uplo), n, a, lda, ipiv, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void hetrf(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n,
            sycl::buffer<std::complex<double>>& a, std::int64_t lda,
            sycl::buffer<std::int64_t>& ipiv, sycl::buffer<std::complex<double>>& scratchpad,
            std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::hetrf(
-        queue, detail::get_onemkl_uplo(uplo), n, a, lda, ipiv, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void orgbr(sycl::queue& queue, oneapi::math::generate vec, std::int64_t m, std::int64_t n,
            std::int64_t k, sycl::buffer<float>& a, std::int64_t lda, sycl::buffer<float>& tau,
            sycl::buffer<float>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(
-        ::oneapi::mkl::lapack::orgbr(queue, detail::get_onemkl_generate(vec), m, n, k, a, lda, tau,
-                                     scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void orgbr(sycl::queue& queue, oneapi::math::generate vec, std::int64_t m, std::int64_t n,
            std::int64_t k, sycl::buffer<double>& a, std::int64_t lda, sycl::buffer<double>& tau,
            sycl::buffer<double>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(
-        ::oneapi::mkl::lapack::orgbr(queue, detail::get_onemkl_generate(vec), m, n, k, a, lda, tau,
-                                     scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void orgqr(sycl::queue& queue, std::int64_t m, std::int64_t n, std::int64_t k,
            sycl::buffer<double>& a, std::int64_t lda, sycl::buffer<double>& tau,
            sycl::buffer<double>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(
-        ::oneapi::mkl::lapack::orgqr(queue, m, n, k, a, lda, tau, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void orgqr(sycl::queue& queue, std::int64_t m, std::int64_t n, std::int64_t k,
            sycl::buffer<float>& a, std::int64_t lda, sycl::buffer<float>& tau,
            sycl::buffer<float>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(
-        ::oneapi::mkl::lapack::orgqr(queue, m, n, k, a, lda, tau, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void orgtr(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n, sycl::buffer<float>& a,
            std::int64_t lda, sycl::buffer<float>& tau, sycl::buffer<float>& scratchpad,
            std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::orgtr(
-        queue, detail::get_onemkl_uplo(uplo), n, a, lda, tau, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void orgtr(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n, sycl::buffer<double>& a,
            std::int64_t lda, sycl::buffer<double>& tau, sycl::buffer<double>& scratchpad,
            std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::orgtr(
-        queue, detail::get_onemkl_uplo(uplo), n, a, lda, tau, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void ormtr(sycl::queue& queue, oneapi::math::side side, oneapi::math::uplo uplo,
            oneapi::math::transpose trans, std::int64_t m, std::int64_t n, sycl::buffer<float>& a,
            std::int64_t lda, sycl::buffer<float>& tau, sycl::buffer<float>& c, std::int64_t ldc,
            sycl::buffer<float>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::ormtr(
-        queue, detail::get_onemkl_side(side), detail::get_onemkl_uplo(uplo),
-        detail::get_onemkl_transpose(trans), m, n, a, lda, tau, c, ldc, scratchpad,
-        scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void ormtr(sycl::queue& queue, oneapi::math::side side, oneapi::math::uplo uplo,
            oneapi::math::transpose trans, std::int64_t m, std::int64_t n, sycl::buffer<double>& a,
            std::int64_t lda, sycl::buffer<double>& tau, sycl::buffer<double>& c, std::int64_t ldc,
            sycl::buffer<double>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::ormtr(
-        queue, detail::get_onemkl_side(side), detail::get_onemkl_uplo(uplo),
-        detail::get_onemkl_transpose(trans), m, n, a, lda, tau, c, ldc, scratchpad,
-        scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void ormrq(sycl::queue& queue, oneapi::math::side side, oneapi::math::transpose trans,
            std::int64_t m, std::int64_t n, std::int64_t k, sycl::buffer<float>& a, std::int64_t lda,
            sycl::buffer<float>& tau, sycl::buffer<float>& c, std::int64_t ldc,
            sycl::buffer<float>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::ormrq(
-        queue, detail::get_onemkl_side(side), detail::get_onemkl_transpose(trans), m, n, k, a, lda,
-        tau, c, ldc, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void ormrq(sycl::queue& queue, oneapi::math::side side, oneapi::math::transpose trans,
            std::int64_t m, std::int64_t n, std::int64_t k, sycl::buffer<double>& a,
            std::int64_t lda, sycl::buffer<double>& tau, sycl::buffer<double>& c, std::int64_t ldc,
            sycl::buffer<double>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::ormrq(
-        queue, detail::get_onemkl_side(side), detail::get_onemkl_transpose(trans), m, n, k, a, lda,
-        tau, c, ldc, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void ormqr(sycl::queue& queue, oneapi::math::side side, oneapi::math::transpose trans,
            std::int64_t m, std::int64_t n, std::int64_t k, sycl::buffer<double>& a,
            std::int64_t lda, sycl::buffer<double>& tau, sycl::buffer<double>& c, std::int64_t ldc,
            sycl::buffer<double>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::ormqr(
-        queue, detail::get_onemkl_side(side), detail::get_onemkl_transpose(trans), m, n, k, a, lda,
-        tau, c, ldc, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void ormqr(sycl::queue& queue, oneapi::math::side side, oneapi::math::transpose trans,
            std::int64_t m, std::int64_t n, std::int64_t k, sycl::buffer<float>& a, std::int64_t lda,
            sycl::buffer<float>& tau, sycl::buffer<float>& c, std::int64_t ldc,
            sycl::buffer<float>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::ormqr(
-        queue, detail::get_onemkl_side(side), detail::get_onemkl_transpose(trans), m, n, k, a, lda,
-        tau, c, ldc, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void potrf(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n, sycl::buffer<float>& a,
            std::int64_t lda, sycl::buffer<float>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::potrf(
-        queue, detail::get_onemkl_uplo(uplo), n, a, lda, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void potrf(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n, sycl::buffer<double>& a,
            std::int64_t lda, sycl::buffer<double>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::potrf(
-        queue, detail::get_onemkl_uplo(uplo), n, a, lda, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void potrf(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n,
            sycl::buffer<std::complex<float>>& a, std::int64_t lda,
            sycl::buffer<std::complex<float>>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::potrf(
-        queue, detail::get_onemkl_uplo(uplo), n, a, lda, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void potrf(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n,
            sycl::buffer<std::complex<double>>& a, std::int64_t lda,
            sycl::buffer<std::complex<double>>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::potrf(
-        queue, detail::get_onemkl_uplo(uplo), n, a, lda, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void potri(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n, sycl::buffer<float>& a,
            std::int64_t lda, sycl::buffer<float>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::potri(
-        queue, detail::get_onemkl_uplo(uplo), n, a, lda, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void potri(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n, sycl::buffer<double>& a,
            std::int64_t lda, sycl::buffer<double>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::potri(
-        queue, detail::get_onemkl_uplo(uplo), n, a, lda, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void potri(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n,
            sycl::buffer<std::complex<float>>& a, std::int64_t lda,
            sycl::buffer<std::complex<float>>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::potri(
-        queue, detail::get_onemkl_uplo(uplo), n, a, lda, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void potri(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n,
            sycl::buffer<std::complex<double>>& a, std::int64_t lda,
            sycl::buffer<std::complex<double>>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::potri(
-        queue, detail::get_onemkl_uplo(uplo), n, a, lda, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void potrs(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n, std::int64_t nrhs,
            sycl::buffer<float>& a, std::int64_t lda, sycl::buffer<float>& b, std::int64_t ldb,
            sycl::buffer<float>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(
-        ::oneapi::mkl::lapack::potrs(queue, detail::get_onemkl_uplo(uplo), n, nrhs, a, lda, b, ldb,
-                                     scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void potrs(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n, std::int64_t nrhs,
            sycl::buffer<double>& a, std::int64_t lda, sycl::buffer<double>& b, std::int64_t ldb,
            sycl::buffer<double>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(
-        ::oneapi::mkl::lapack::potrs(queue, detail::get_onemkl_uplo(uplo), n, nrhs, a, lda, b, ldb,
-                                     scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void potrs(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n, std::int64_t nrhs,
            sycl::buffer<std::complex<float>>& a, std::int64_t lda,
            sycl::buffer<std::complex<float>>& b, std::int64_t ldb,
            sycl::buffer<std::complex<float>>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(
-        ::oneapi::mkl::lapack::potrs(queue, detail::get_onemkl_uplo(uplo), n, nrhs, a, lda, b, ldb,
-                                     scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void potrs(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n, std::int64_t nrhs,
            sycl::buffer<std::complex<double>>& a, std::int64_t lda,
            sycl::buffer<std::complex<double>>& b, std::int64_t ldb,
            sycl::buffer<std::complex<double>>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(
-        ::oneapi::mkl::lapack::potrs(queue, detail::get_onemkl_uplo(uplo), n, nrhs, a, lda, b, ldb,
-                                     scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void syevd(sycl::queue& queue, oneapi::math::job jobz, oneapi::math::uplo uplo, std::int64_t n,
            sycl::buffer<double>& a, std::int64_t lda, sycl::buffer<double>& w,
            sycl::buffer<double>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::syevd(
-        queue, detail::get_onemkl_job(jobz), detail::get_onemkl_uplo(uplo), n, a, lda, w,
-        scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void syevd(sycl::queue& queue, oneapi::math::job jobz, oneapi::math::uplo uplo, std::int64_t n,
            sycl::buffer<float>& a, std::int64_t lda, sycl::buffer<float>& w,
            sycl::buffer<float>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::syevd(
-        queue, detail::get_onemkl_job(jobz), detail::get_onemkl_uplo(uplo), n, a, lda, w,
-        scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void sygvd(sycl::queue& queue, std::int64_t itype, oneapi::math::job jobz, oneapi::math::uplo uplo,
            std::int64_t n, sycl::buffer<double>& a, std::int64_t lda, sycl::buffer<double>& b,
            std::int64_t ldb, sycl::buffer<double>& w, sycl::buffer<double>& scratchpad,
            std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::sygvd(
-        queue, itype, detail::get_onemkl_job(jobz), detail::get_onemkl_uplo(uplo), n, a, lda, b,
-        ldb, w, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void sygvd(sycl::queue& queue, std::int64_t itype, oneapi::math::job jobz, oneapi::math::uplo uplo,
            std::int64_t n, sycl::buffer<float>& a, std::int64_t lda, sycl::buffer<float>& b,
            std::int64_t ldb, sycl::buffer<float>& w, sycl::buffer<float>& scratchpad,
            std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::sygvd(
-        queue, itype, detail::get_onemkl_job(jobz), detail::get_onemkl_uplo(uplo), n, a, lda, b,
-        ldb, w, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void sytrd(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n, sycl::buffer<double>& a,
            std::int64_t lda, sycl::buffer<double>& d, sycl::buffer<double>& e,
            sycl::buffer<double>& tau, sycl::buffer<double>& scratchpad,
            std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::sytrd(
-        queue, detail::get_onemkl_uplo(uplo), n, a, lda, d, e, tau, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void sytrd(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n, sycl::buffer<float>& a,
            std::int64_t lda, sycl::buffer<float>& d, sycl::buffer<float>& e,
            sycl::buffer<float>& tau, sycl::buffer<float>& scratchpad,
            std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::sytrd(
-        queue, detail::get_onemkl_uplo(uplo), n, a, lda, d, e, tau, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void sytrf(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n, sycl::buffer<float>& a,
            std::int64_t lda, sycl::buffer<std::int64_t>& ipiv, sycl::buffer<float>& scratchpad,
            std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::sytrf(
-        queue, detail::get_onemkl_uplo(uplo), n, a, lda, ipiv, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void sytrf(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n, sycl::buffer<double>& a,
            std::int64_t lda, sycl::buffer<std::int64_t>& ipiv, sycl::buffer<double>& scratchpad,
            std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::sytrf(
-        queue, detail::get_onemkl_uplo(uplo), n, a, lda, ipiv, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void sytrf(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n,
            sycl::buffer<std::complex<float>>& a, std::int64_t lda, sycl::buffer<std::int64_t>& ipiv,
            sycl::buffer<std::complex<float>>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::sytrf(
-        queue, detail::get_onemkl_uplo(uplo), n, a, lda, ipiv, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void sytrf(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n,
            sycl::buffer<std::complex<double>>& a, std::int64_t lda,
            sycl::buffer<std::int64_t>& ipiv, sycl::buffer<std::complex<double>>& scratchpad,
            std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::sytrf(
-        queue, detail::get_onemkl_uplo(uplo), n, a, lda, ipiv, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void trtrs(sycl::queue& queue, oneapi::math::uplo uplo, oneapi::math::transpose trans,
            oneapi::math::diag diag, std::int64_t n, std::int64_t nrhs,
            sycl::buffer<std::complex<float>>& a, std::int64_t lda,
            sycl::buffer<std::complex<float>>& b, std::int64_t ldb,
            sycl::buffer<std::complex<float>>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::trtrs(
-        queue, detail::get_onemkl_uplo(uplo), detail::get_onemkl_transpose(trans),
-        detail::get_onemkl_diag(diag), n, nrhs, a, lda, b, ldb, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void trtrs(sycl::queue& queue, oneapi::math::uplo uplo, oneapi::math::transpose trans,
            oneapi::math::diag diag, std::int64_t n, std::int64_t nrhs, sycl::buffer<double>& a,
            std::int64_t lda, sycl::buffer<double>& b, std::int64_t ldb,
            sycl::buffer<double>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::trtrs(
-        queue, detail::get_onemkl_uplo(uplo), detail::get_onemkl_transpose(trans),
-        detail::get_onemkl_diag(diag), n, nrhs, a, lda, b, ldb, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void trtrs(sycl::queue& queue, oneapi::math::uplo uplo, oneapi::math::transpose trans,
            oneapi::math::diag diag, std::int64_t n, std::int64_t nrhs, sycl::buffer<float>& a,
            std::int64_t lda, sycl::buffer<float>& b, std::int64_t ldb,
            sycl::buffer<float>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::trtrs(
-        queue, detail::get_onemkl_uplo(uplo), detail::get_onemkl_transpose(trans),
-        detail::get_onemkl_diag(diag), n, nrhs, a, lda, b, ldb, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void trtrs(sycl::queue& queue, oneapi::math::uplo uplo, oneapi::math::transpose trans,
            oneapi::math::diag diag, std::int64_t n, std::int64_t nrhs,
            sycl::buffer<std::complex<double>>& a, std::int64_t lda,
            sycl::buffer<std::complex<double>>& b, std::int64_t ldb,
            sycl::buffer<std::complex<double>>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::trtrs(
-        queue, detail::get_onemkl_uplo(uplo), detail::get_onemkl_transpose(trans),
-        detail::get_onemkl_diag(diag), n, nrhs, a, lda, b, ldb, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void ungbr(sycl::queue& queue, oneapi::math::generate vec, std::int64_t m, std::int64_t n,
            std::int64_t k, sycl::buffer<std::complex<float>>& a, std::int64_t lda,
            sycl::buffer<std::complex<float>>& tau, sycl::buffer<std::complex<float>>& scratchpad,
            std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(
-        ::oneapi::mkl::lapack::ungbr(queue, detail::get_onemkl_generate(vec), m, n, k, a, lda, tau,
-                                     scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void ungbr(sycl::queue& queue, oneapi::math::generate vec, std::int64_t m, std::int64_t n,
            std::int64_t k, sycl::buffer<std::complex<double>>& a, std::int64_t lda,
            sycl::buffer<std::complex<double>>& tau, sycl::buffer<std::complex<double>>& scratchpad,
            std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(
-        ::oneapi::mkl::lapack::ungbr(queue, detail::get_onemkl_generate(vec), m, n, k, a, lda, tau,
-                                     scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void ungqr(sycl::queue& queue, std::int64_t m, std::int64_t n, std::int64_t k,
            sycl::buffer<std::complex<float>>& a, std::int64_t lda,
            sycl::buffer<std::complex<float>>& tau, sycl::buffer<std::complex<float>>& scratchpad,
            std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(
-        ::oneapi::mkl::lapack::ungqr(queue, m, n, k, a, lda, tau, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void ungqr(sycl::queue& queue, std::int64_t m, std::int64_t n, std::int64_t k,
            sycl::buffer<std::complex<double>>& a, std::int64_t lda,
            sycl::buffer<std::complex<double>>& tau, sycl::buffer<std::complex<double>>& scratchpad,
            std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(
-        ::oneapi::mkl::lapack::ungqr(queue, m, n, k, a, lda, tau, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void ungtr(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n,
            sycl::buffer<std::complex<float>>& a, std::int64_t lda,
            sycl::buffer<std::complex<float>>& tau, sycl::buffer<std::complex<float>>& scratchpad,
            std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::ungtr(
-        queue, detail::get_onemkl_uplo(uplo), n, a, lda, tau, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void ungtr(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n,
            sycl::buffer<std::complex<double>>& a, std::int64_t lda,
            sycl::buffer<std::complex<double>>& tau, sycl::buffer<std::complex<double>>& scratchpad,
            std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::ungtr(
-        queue, detail::get_onemkl_uplo(uplo), n, a, lda, tau, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void unmrq(sycl::queue& queue, oneapi::math::side side, oneapi::math::transpose trans,
            std::int64_t m, std::int64_t n, std::int64_t k, sycl::buffer<std::complex<float>>& a,
            std::int64_t lda, sycl::buffer<std::complex<float>>& tau,
            sycl::buffer<std::complex<float>>& c, std::int64_t ldc,
            sycl::buffer<std::complex<float>>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::unmrq(
-        queue, detail::get_onemkl_side(side), detail::get_onemkl_transpose(trans), m, n, k, a, lda,
-        tau, c, ldc, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void unmrq(sycl::queue& queue, oneapi::math::side side, oneapi::math::transpose trans,
            std::int64_t m, std::int64_t n, std::int64_t k, sycl::buffer<std::complex<double>>& a,
            std::int64_t lda, sycl::buffer<std::complex<double>>& tau,
            sycl::buffer<std::complex<double>>& c, std::int64_t ldc,
            sycl::buffer<std::complex<double>>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::unmrq(
-        queue, detail::get_onemkl_side(side), detail::get_onemkl_transpose(trans), m, n, k, a, lda,
-        tau, c, ldc, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void unmqr(sycl::queue& queue, oneapi::math::side side, oneapi::math::transpose trans,
            std::int64_t m, std::int64_t n, std::int64_t k, sycl::buffer<std::complex<float>>& a,
            std::int64_t lda, sycl::buffer<std::complex<float>>& tau,
            sycl::buffer<std::complex<float>>& c, std::int64_t ldc,
            sycl::buffer<std::complex<float>>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::unmqr(
-        queue, detail::get_onemkl_side(side), detail::get_onemkl_transpose(trans), m, n, k, a, lda,
-        tau, c, ldc, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void unmqr(sycl::queue& queue, oneapi::math::side side, oneapi::math::transpose trans,
            std::int64_t m, std::int64_t n, std::int64_t k, sycl::buffer<std::complex<double>>& a,
            std::int64_t lda, sycl::buffer<std::complex<double>>& tau,
            sycl::buffer<std::complex<double>>& c, std::int64_t ldc,
            sycl::buffer<std::complex<double>>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::unmqr(
-        queue, detail::get_onemkl_side(side), detail::get_onemkl_transpose(trans), m, n, k, a, lda,
-        tau, c, ldc, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void unmtr(sycl::queue& queue, oneapi::math::side side, oneapi::math::uplo uplo,
            oneapi::math::transpose trans, std::int64_t m, std::int64_t n,
@@ -622,10 +498,7 @@ void unmtr(sycl::queue& queue, oneapi::math::side side, oneapi::math::uplo uplo,
            sycl::buffer<std::complex<float>>& tau, sycl::buffer<std::complex<float>>& c,
            std::int64_t ldc, sycl::buffer<std::complex<float>>& scratchpad,
            std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::unmtr(
-        queue, detail::get_onemkl_side(side), detail::get_onemkl_uplo(uplo),
-        detail::get_onemkl_transpose(trans), m, n, a, lda, tau, c, ldc, scratchpad,
-        scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void unmtr(sycl::queue& queue, oneapi::math::side side, oneapi::math::uplo uplo,
            oneapi::math::transpose trans, std::int64_t m, std::int64_t n,
@@ -633,10 +506,7 @@ void unmtr(sycl::queue& queue, oneapi::math::side side, oneapi::math::uplo uplo,
            sycl::buffer<std::complex<double>>& tau, sycl::buffer<std::complex<double>>& c,
            std::int64_t ldc, sycl::buffer<std::complex<double>>& scratchpad,
            std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::unmtr(
-        queue, detail::get_onemkl_side(side), detail::get_onemkl_uplo(uplo),
-        detail::get_onemkl_transpose(trans), m, n, a, lda, tau, c, ldc, scratchpad,
-        scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 sycl::event gebrd(sycl::queue& queue, std::int64_t m, std::int64_t n, std::complex<float>* a,
                   std::int64_t lda, float* d, float* e, std::complex<float>* tauq,
@@ -1286,68 +1156,58 @@ void geqrf_batch(sycl::queue& queue, std::int64_t m, std::int64_t n, sycl::buffe
                  std::int64_t lda, std::int64_t stride_a, sycl::buffer<float>& tau,
                  std::int64_t stride_tau, std::int64_t batch_size, sycl::buffer<float>& scratchpad,
                  std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::geqrf_batch(
-        queue, m, n, a, lda, stride_a, tau, stride_tau, batch_size, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void geqrf_batch(sycl::queue& queue, std::int64_t m, std::int64_t n, sycl::buffer<double>& a,
                  std::int64_t lda, std::int64_t stride_a, sycl::buffer<double>& tau,
                  std::int64_t stride_tau, std::int64_t batch_size, sycl::buffer<double>& scratchpad,
                  std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::geqrf_batch(
-        queue, m, n, a, lda, stride_a, tau, stride_tau, batch_size, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void geqrf_batch(sycl::queue& queue, std::int64_t m, std::int64_t n,
                  sycl::buffer<std::complex<float>>& a, std::int64_t lda, std::int64_t stride_a,
                  sycl::buffer<std::complex<float>>& tau, std::int64_t stride_tau,
                  std::int64_t batch_size, sycl::buffer<std::complex<float>>& scratchpad,
                  std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::geqrf_batch(
-        queue, m, n, a, lda, stride_a, tau, stride_tau, batch_size, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void geqrf_batch(sycl::queue& queue, std::int64_t m, std::int64_t n,
                  sycl::buffer<std::complex<double>>& a, std::int64_t lda, std::int64_t stride_a,
                  sycl::buffer<std::complex<double>>& tau, std::int64_t stride_tau,
                  std::int64_t batch_size, sycl::buffer<std::complex<double>>& scratchpad,
                  std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::geqrf_batch(
-        queue, m, n, a, lda, stride_a, tau, stride_tau, batch_size, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void getri_batch(sycl::queue& queue, std::int64_t n, sycl::buffer<float>& a, std::int64_t lda,
                  std::int64_t stride_a, sycl::buffer<std::int64_t>& ipiv, std::int64_t stride_ipiv,
                  std::int64_t batch_size, sycl::buffer<float>& scratchpad,
                  std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::getri_batch(
-        queue, n, a, lda, stride_a, ipiv, stride_ipiv, batch_size, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void getri_batch(sycl::queue& queue, std::int64_t n, sycl::buffer<double>& a, std::int64_t lda,
                  std::int64_t stride_a, sycl::buffer<std::int64_t>& ipiv, std::int64_t stride_ipiv,
                  std::int64_t batch_size, sycl::buffer<double>& scratchpad,
                  std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::getri_batch(
-        queue, n, a, lda, stride_a, ipiv, stride_ipiv, batch_size, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void getri_batch(sycl::queue& queue, std::int64_t n, sycl::buffer<std::complex<float>>& a,
                  std::int64_t lda, std::int64_t stride_a, sycl::buffer<std::int64_t>& ipiv,
                  std::int64_t stride_ipiv, std::int64_t batch_size,
                  sycl::buffer<std::complex<float>>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::getri_batch(
-        queue, n, a, lda, stride_a, ipiv, stride_ipiv, batch_size, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void getri_batch(sycl::queue& queue, std::int64_t n, sycl::buffer<std::complex<double>>& a,
                  std::int64_t lda, std::int64_t stride_a, sycl::buffer<std::int64_t>& ipiv,
                  std::int64_t stride_ipiv, std::int64_t batch_size,
                  sycl::buffer<std::complex<double>>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::getri_batch(
-        queue, n, a, lda, stride_a, ipiv, stride_ipiv, batch_size, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void getrs_batch(sycl::queue& queue, oneapi::math::transpose trans, std::int64_t n,
                  std::int64_t nrhs, sycl::buffer<float>& a, std::int64_t lda, std::int64_t stride_a,
                  sycl::buffer<std::int64_t>& ipiv, std::int64_t stride_ipiv, sycl::buffer<float>& b,
                  std::int64_t ldb, std::int64_t stride_b, std::int64_t batch_size,
                  sycl::buffer<float>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::getrs_batch(
-        queue, detail::get_onemkl_transpose(trans), n, nrhs, a, lda, stride_a, ipiv, stride_ipiv, b,
-        ldb, stride_b, batch_size, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void getrs_batch(sycl::queue& queue, oneapi::math::transpose trans, std::int64_t n,
                  std::int64_t nrhs, sycl::buffer<double>& a, std::int64_t lda,
@@ -1355,9 +1215,7 @@ void getrs_batch(sycl::queue& queue, oneapi::math::transpose trans, std::int64_t
                  sycl::buffer<double>& b, std::int64_t ldb, std::int64_t stride_b,
                  std::int64_t batch_size, sycl::buffer<double>& scratchpad,
                  std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::getrs_batch(
-        queue, detail::get_onemkl_transpose(trans), n, nrhs, a, lda, stride_a, ipiv, stride_ipiv, b,
-        ldb, stride_b, batch_size, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void getrs_batch(sycl::queue& queue, oneapi::math::transpose trans, std::int64_t n,
                  std::int64_t nrhs, sycl::buffer<std::complex<float>>& a, std::int64_t lda,
@@ -1365,9 +1223,7 @@ void getrs_batch(sycl::queue& queue, oneapi::math::transpose trans, std::int64_t
                  sycl::buffer<std::complex<float>>& b, std::int64_t ldb, std::int64_t stride_b,
                  std::int64_t batch_size, sycl::buffer<std::complex<float>>& scratchpad,
                  std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::getrs_batch(
-        queue, detail::get_onemkl_transpose(trans), n, nrhs, a, lda, stride_a, ipiv, stride_ipiv, b,
-        ldb, stride_b, batch_size, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void getrs_batch(sycl::queue& queue, oneapi::math::transpose trans, std::int64_t n,
                  std::int64_t nrhs, sycl::buffer<std::complex<double>>& a, std::int64_t lda,
@@ -1375,141 +1231,111 @@ void getrs_batch(sycl::queue& queue, oneapi::math::transpose trans, std::int64_t
                  sycl::buffer<std::complex<double>>& b, std::int64_t ldb, std::int64_t stride_b,
                  std::int64_t batch_size, sycl::buffer<std::complex<double>>& scratchpad,
                  std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::getrs_batch(
-        queue, detail::get_onemkl_transpose(trans), n, nrhs, a, lda, stride_a, ipiv, stride_ipiv, b,
-        ldb, stride_b, batch_size, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void getrf_batch(sycl::queue& queue, std::int64_t m, std::int64_t n, sycl::buffer<float>& a,
                  std::int64_t lda, std::int64_t stride_a, sycl::buffer<std::int64_t>& ipiv,
                  std::int64_t stride_ipiv, std::int64_t batch_size, sycl::buffer<float>& scratchpad,
                  std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::getrf_batch(
-        queue, m, n, a, lda, stride_a, ipiv, stride_ipiv, batch_size, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void getrf_batch(sycl::queue& queue, std::int64_t m, std::int64_t n, sycl::buffer<double>& a,
                  std::int64_t lda, std::int64_t stride_a, sycl::buffer<std::int64_t>& ipiv,
                  std::int64_t stride_ipiv, std::int64_t batch_size,
                  sycl::buffer<double>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::getrf_batch(
-        queue, m, n, a, lda, stride_a, ipiv, stride_ipiv, batch_size, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void getrf_batch(sycl::queue& queue, std::int64_t m, std::int64_t n,
                  sycl::buffer<std::complex<float>>& a, std::int64_t lda, std::int64_t stride_a,
                  sycl::buffer<std::int64_t>& ipiv, std::int64_t stride_ipiv,
                  std::int64_t batch_size, sycl::buffer<std::complex<float>>& scratchpad,
                  std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::getrf_batch(
-        queue, m, n, a, lda, stride_a, ipiv, stride_ipiv, batch_size, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void getrf_batch(sycl::queue& queue, std::int64_t m, std::int64_t n,
                  sycl::buffer<std::complex<double>>& a, std::int64_t lda, std::int64_t stride_a,
                  sycl::buffer<std::int64_t>& ipiv, std::int64_t stride_ipiv,
                  std::int64_t batch_size, sycl::buffer<std::complex<double>>& scratchpad,
                  std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::getrf_batch(
-        queue, m, n, a, lda, stride_a, ipiv, stride_ipiv, batch_size, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void orgqr_batch(sycl::queue& queue, std::int64_t m, std::int64_t n, std::int64_t k,
                  sycl::buffer<float>& a, std::int64_t lda, std::int64_t stride_a,
                  sycl::buffer<float>& tau, std::int64_t stride_tau, std::int64_t batch_size,
                  sycl::buffer<float>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(
-        ::oneapi::mkl::lapack::orgqr_batch(queue, m, n, k, a, lda, stride_a, tau, stride_tau,
-                                           batch_size, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void orgqr_batch(sycl::queue& queue, std::int64_t m, std::int64_t n, std::int64_t k,
                  sycl::buffer<double>& a, std::int64_t lda, std::int64_t stride_a,
                  sycl::buffer<double>& tau, std::int64_t stride_tau, std::int64_t batch_size,
                  sycl::buffer<double>& scratchpad, std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(
-        ::oneapi::mkl::lapack::orgqr_batch(queue, m, n, k, a, lda, stride_a, tau, stride_tau,
-                                           batch_size, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void potrf_batch(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n,
                  sycl::buffer<float>& a, std::int64_t lda, std::int64_t stride_a,
                  std::int64_t batch_size, sycl::buffer<float>& scratchpad,
                  std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(
-        ::oneapi::mkl::lapack::potrf_batch(queue, detail::get_onemkl_uplo(uplo), n, a, lda,
-                                           stride_a, batch_size, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void potrf_batch(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n,
                  sycl::buffer<double>& a, std::int64_t lda, std::int64_t stride_a,
                  std::int64_t batch_size, sycl::buffer<double>& scratchpad,
                  std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(
-        ::oneapi::mkl::lapack::potrf_batch(queue, detail::get_onemkl_uplo(uplo), n, a, lda,
-                                           stride_a, batch_size, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void potrf_batch(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n,
                  sycl::buffer<std::complex<float>>& a, std::int64_t lda, std::int64_t stride_a,
                  std::int64_t batch_size, sycl::buffer<std::complex<float>>& scratchpad,
                  std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(
-        ::oneapi::mkl::lapack::potrf_batch(queue, detail::get_onemkl_uplo(uplo), n, a, lda,
-                                           stride_a, batch_size, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void potrf_batch(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n,
                  sycl::buffer<std::complex<double>>& a, std::int64_t lda, std::int64_t stride_a,
                  std::int64_t batch_size, sycl::buffer<std::complex<double>>& scratchpad,
                  std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(
-        ::oneapi::mkl::lapack::potrf_batch(queue, detail::get_onemkl_uplo(uplo), n, a, lda,
-                                           stride_a, batch_size, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void potrs_batch(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n, std::int64_t nrhs,
                  sycl::buffer<float>& a, std::int64_t lda, std::int64_t stride_a,
                  sycl::buffer<float>& b, std::int64_t ldb, std::int64_t stride_b,
                  std::int64_t batch_size, sycl::buffer<float>& scratchpad,
                  std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::potrs_batch(
-        queue, detail::get_onemkl_uplo(uplo), n, nrhs, a, lda, stride_a, b, ldb, stride_b,
-        batch_size, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void potrs_batch(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n, std::int64_t nrhs,
                  sycl::buffer<double>& a, std::int64_t lda, std::int64_t stride_a,
                  sycl::buffer<double>& b, std::int64_t ldb, std::int64_t stride_b,
                  std::int64_t batch_size, sycl::buffer<double>& scratchpad,
                  std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::potrs_batch(
-        queue, detail::get_onemkl_uplo(uplo), n, nrhs, a, lda, stride_a, b, ldb, stride_b,
-        batch_size, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void potrs_batch(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n, std::int64_t nrhs,
                  sycl::buffer<std::complex<float>>& a, std::int64_t lda, std::int64_t stride_a,
                  sycl::buffer<std::complex<float>>& b, std::int64_t ldb, std::int64_t stride_b,
                  std::int64_t batch_size, sycl::buffer<std::complex<float>>& scratchpad,
                  std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::potrs_batch(
-        queue, detail::get_onemkl_uplo(uplo), n, nrhs, a, lda, stride_a, b, ldb, stride_b,
-        batch_size, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void potrs_batch(sycl::queue& queue, oneapi::math::uplo uplo, std::int64_t n, std::int64_t nrhs,
                  sycl::buffer<std::complex<double>>& a, std::int64_t lda, std::int64_t stride_a,
                  sycl::buffer<std::complex<double>>& b, std::int64_t ldb, std::int64_t stride_b,
                  std::int64_t batch_size, sycl::buffer<std::complex<double>>& scratchpad,
                  std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(::oneapi::mkl::lapack::potrs_batch(
-        queue, detail::get_onemkl_uplo(uplo), n, nrhs, a, lda, stride_a, b, ldb, stride_b,
-        batch_size, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void ungqr_batch(sycl::queue& queue, std::int64_t m, std::int64_t n, std::int64_t k,
                  sycl::buffer<std::complex<float>>& a, std::int64_t lda, std::int64_t stride_a,
                  sycl::buffer<std::complex<float>>& tau, std::int64_t stride_tau,
                  std::int64_t batch_size, sycl::buffer<std::complex<float>>& scratchpad,
                  std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(
-        ::oneapi::mkl::lapack::ungqr_batch(queue, m, n, k, a, lda, stride_a, tau, stride_tau,
-                                           batch_size, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 void ungqr_batch(sycl::queue& queue, std::int64_t m, std::int64_t n, std::int64_t k,
                  sycl::buffer<std::complex<double>>& a, std::int64_t lda, std::int64_t stride_a,
                  sycl::buffer<std::complex<double>>& tau, std::int64_t stride_tau,
                  std::int64_t batch_size, sycl::buffer<std::complex<double>>& scratchpad,
                  std::int64_t scratchpad_size) {
-    RETHROW_ONEMKL_LAPACK_EXCEPTIONS(
-        ::oneapi::mkl::lapack::ungqr_batch(queue, m, n, k, a, lda, stride_a, tau, stride_tau,
-                                           batch_size, scratchpad, scratchpad_size));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("lapack");
 }
 sycl::event geqrf_batch(sycl::queue& queue, std::int64_t m, std::int64_t n, float* a,
                         std::int64_t lda, std::int64_t stride_a, float* tau,

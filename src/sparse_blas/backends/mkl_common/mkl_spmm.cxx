@@ -103,21 +103,12 @@ inline void common_spmm_optimize(sycl::queue& queue, transpose opA, transpose op
     spmm_descr->last_optimized_alg = alg;
 }
 
-void spmm_optimize(sycl::queue& queue, transpose opA, transpose opB, const void* alpha,
-                   matrix_view A_view, matrix_handle_t A_handle, dense_matrix_handle_t B_handle,
-                   const void* beta, dense_matrix_handle_t C_handle, spmm_alg alg,
-                   spmm_descr_t spmm_descr, sycl::buffer<std::uint8_t, 1> /*workspace*/) {
-    auto internal_A_handle = detail::get_internal_handle(A_handle);
-    if (!internal_A_handle->all_use_buffer()) {
-        detail::throw_incompatible_container(__func__);
-    }
-    common_spmm_optimize(queue, opA, opB, alpha, A_view, A_handle, B_handle, beta, C_handle, alg,
-                         spmm_descr);
-    if (alg == spmm_alg::no_optimize_alg) {
-        return;
-    }
-    internal_A_handle->can_be_reset = false;
-    // TODO: Add support for spmm_optimize once the Intel(R) oneMKL backends support it.
+void spmm_optimize(sycl::queue& /*queue*/, transpose /*opA*/, transpose /*opB*/,
+                   const void* /*alpha*/, matrix_view /*A_view*/, matrix_handle_t /*A_handle*/,
+                   dense_matrix_handle_t /*B_handle*/, const void* /*beta*/,
+                   dense_matrix_handle_t /*C_handle*/, spmm_alg /*alg*/,
+                   spmm_descr_t /*spmm_descr*/, sycl::buffer<std::uint8_t, 1> /*workspace*/) {
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("sparse_blas");
 }
 
 sycl::event spmm_optimize(sycl::queue& queue, transpose opA, transpose opB, const void* alpha,
@@ -126,9 +117,6 @@ sycl::event spmm_optimize(sycl::queue& queue, transpose opA, transpose opB, cons
                           dense_matrix_handle_t C_handle, spmm_alg alg, spmm_descr_t spmm_descr,
                           void* /*workspace*/, const std::vector<sycl::event>& dependencies) {
     auto internal_A_handle = detail::get_internal_handle(A_handle);
-    if (internal_A_handle->all_use_buffer()) {
-        detail::throw_incompatible_container(__func__);
-    }
     common_spmm_optimize(queue, opA, opB, alpha, A_view, A_handle, B_handle, beta, C_handle, alg,
                          spmm_descr);
     if (alg == spmm_alg::no_optimize_alg) {
@@ -158,20 +146,10 @@ sycl::event internal_spmm(sycl::queue& queue, transpose opA, transpose opB, cons
     auto columns = C_handle->num_cols;
     auto ldb = B_handle->ld;
     auto ldc = C_handle->ld;
-    if (internal_A_handle->all_use_buffer()) {
-        RETHROW_ONEMKL_EXCEPTIONS(
-            oneapi::mkl::sparse::gemm(queue, onemkl_layout, onemkl_opa, onemkl_opb, host_alpha,
-                                      internal_A_handle->backend_handle, B_handle->get_buffer<T>(),
-                                      columns, ldb, host_beta, C_handle->get_buffer<T>(), ldc));
-        // Dependencies are not used for buffers
-        return {};
-    }
-    else {
-        RETHROW_ONEMKL_EXCEPTIONS_RET(oneapi::mkl::sparse::gemm(
-            queue, onemkl_layout, onemkl_opa, onemkl_opb, host_alpha,
-            internal_A_handle->backend_handle, B_handle->get_usm_ptr<T>(), columns, ldb, host_beta,
-            C_handle->get_usm_ptr<T>(), ldc, dependencies));
-    }
+    RETHROW_ONEMKL_EXCEPTIONS_RET(oneapi::mkl::sparse::gemm(
+        queue, onemkl_layout, onemkl_opa, onemkl_opb, host_alpha, internal_A_handle->backend_handle,
+        B_handle->get_usm_ptr<T>(), columns, ldb, host_beta, C_handle->get_usm_ptr<T>(), ldc,
+        dependencies));
 }
 
 sycl::event spmm(sycl::queue& queue, transpose opA, transpose opB, const void* alpha,
