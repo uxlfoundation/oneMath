@@ -327,7 +327,9 @@ int test(device* dev, oneapi::math::layout layout, int64_t group_count) {
     // A float output accumulated from int8 inputs is rounded at the magnitude of the terms summed,
     // |alpha| * sum|a*b|, which k * 128 * 128 bounds from above. An entry whose sum cancels is far
     // smaller than that and so cannot meet any relative bound, so allow an absolute error of eps
-    // times the accumulated magnitude instead.
+    // times the accumulated magnitude instead. That model is for fp32 accumulation (cuBLAS, and
+    // the CBLAS reference these tests compare against). rocBLAS accumulates exactly in int32;
+    // against CBLAS the looser fp32 bound still applies.
     constexpr bool int8_to_float = std::is_same_v<Ta, std::int8_t> &&
                                    std::is_same_v<Tb, std::int8_t> && std::is_same_v<Tc, float> &&
                                    std::is_same_v<Ts, float>;
