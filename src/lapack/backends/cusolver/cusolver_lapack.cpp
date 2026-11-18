@@ -138,6 +138,53 @@ GEQRF_LAUNCHER(std::complex<double>, cusolverDnZgeqrf)
 
 #undef GEQRF_LAUNCHER
 
+#if ONEMATH_CUSOLVER_HAS_64BIT_PIVOTS
+
+template <typename T>
+void getrf(const char* func_name, sycl::queue& queue, std::int64_t m, std::int64_t n,
+           sycl::buffer<T>& a, std::int64_t lda, sycl::buffer<std::int64_t>& ipiv,
+           sycl::buffer<T>& scratchpad, std::int64_t scratchpad_size) {
+    using cuDataType = typename CudaEquivalentType<T>::Type;
+    sycl::buffer<int> devInfo{ 1 };
+
+    queue.submit([&](sycl::handler& cgh) {
+        auto a_acc = a.template get_access<sycl::access::mode::read_write>(cgh);
+        auto ipiv_acc = ipiv.template get_access<sycl::access::mode::write>(cgh);
+        auto devInfo_acc = devInfo.template get_access<sycl::access::mode::write>(cgh);
+        auto scratch_acc = scratchpad.template get_access<sycl::access::mode::write>(cgh);
+        onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+            auto handle = sc.get_handle(queue);
+            auto a_ = sc.get_mem<cuDataType*>(a_acc);
+            auto ipiv_ = sc.get_mem<std::int64_t*>(ipiv_acc);
+            auto devInfo_ = sc.get_mem<int*>(devInfo_acc);
+            auto scratch_ = sc.get_mem<cuDataType*>(scratch_acc);
+            CusolverDnParams params;
+            size_t device_bytes, host_bytes;
+            cusolver_xgetrf_buffer_size<T>(handle, params.get(), m, n, lda, &device_bytes,
+                                           &host_bytes);
+            cusolver_xgetrf<T>(func_name, handle, params.get(), m, n, a_, lda, ipiv_, scratch_,
+                               scratchpad_size * sizeof(T), host_bytes, devInfo_);
+        });
+    });
+    lapack_info_check(queue, devInfo, __func__, func_name);
+}
+
+#define GETRF_LAUNCHER(TYPE)                                                                       \
+    void getrf(sycl::queue& queue, std::int64_t m, std::int64_t n, sycl::buffer<TYPE>& a,          \
+               std::int64_t lda, sycl::buffer<std::int64_t>& ipiv, sycl::buffer<TYPE>& scratchpad, \
+               std::int64_t scratchpad_size) {                                                     \
+        getrf<TYPE>("cusolverDnXgetrf", queue, m, n, a, lda, ipiv, scratchpad, scratchpad_size);   \
+    }
+
+GETRF_LAUNCHER(float)
+GETRF_LAUNCHER(double)
+GETRF_LAUNCHER(std::complex<float>)
+GETRF_LAUNCHER(std::complex<double>)
+
+#undef GETRF_LAUNCHER
+
+#else // no 64-bit pivot API: factorise into a temporary 32-bit array and widen it
+
 template <typename Func, typename T>
 void getrf(const char* func_name, Func func, sycl::queue& queue, std::int64_t m, std::int64_t n,
            sycl::buffer<T>& a, std::int64_t lda, sycl::buffer<std::int64_t>& ipiv,
@@ -195,6 +242,8 @@ GETRF_LAUNCHER(std::complex<double>, cusolverDnZgetrf)
 
 #undef GETRF_LAUNCHER
 
+#endif // ONEMATH_CUSOLVER_HAS_64BIT_PIVOTS
+
 #define GETRI_LAUNCHER(TYPE)                                                                    \
     void getri(sycl::queue& queue, std::int64_t n, sycl::buffer<TYPE>& a, std::int64_t lda,     \
                sycl::buffer<std::int64_t>& ipiv, sycl::buffer<TYPE>& scratchpad,                \
@@ -209,7 +258,51 @@ GETRI_LAUNCHER(std::complex<double>)
 
 #undef GETRI_LAUNCHER
 
+#if ONEMATH_CUSOLVER_HAS_64BIT_PIVOTS
+
 // cusolverDnXgetrs does not use scratchpad memory
+template <typename T>
+inline void getrs(const char* func_name, sycl::queue& queue, oneapi::math::transpose trans,
+                  std::int64_t n, std::int64_t nrhs, sycl::buffer<T>& a, std::int64_t lda,
+                  sycl::buffer<std::int64_t>& ipiv, sycl::buffer<T>& b, std::int64_t ldb,
+                  sycl::buffer<T>& scratchpad, std::int64_t scratchpad_size) {
+    using cuDataType = typename CudaEquivalentType<T>::Type;
+
+    queue.submit([&](sycl::handler& cgh) {
+        auto a_acc = a.template get_access<sycl::access::mode::read>(cgh);
+        auto ipiv_acc = ipiv.template get_access<sycl::access::mode::read>(cgh);
+        auto b_acc = b.template get_access<sycl::access::mode::write>(cgh);
+        onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+            auto handle = sc.get_handle(queue);
+            auto a_ = sc.get_mem<cuDataType*>(a_acc);
+            auto ipiv_ = sc.get_mem<std::int64_t*>(ipiv_acc);
+            auto b_ = sc.get_mem<cuDataType*>(b_acc);
+            CusolverDnParams params;
+            cusolver_xgetrs<T>(func_name, handle, params.get(), get_cublas_operation(trans), n,
+                               nrhs, a_, lda, ipiv_, b_, ldb);
+        });
+    });
+}
+
+#define GETRS_LAUNCHER(TYPE)                                                                     \
+    void getrs(sycl::queue& queue, oneapi::math::transpose trans, std::int64_t n,                \
+               std::int64_t nrhs, sycl::buffer<TYPE>& a, std::int64_t lda,                       \
+               sycl::buffer<std::int64_t>& ipiv, sycl::buffer<TYPE>& b, std::int64_t ldb,        \
+               sycl::buffer<TYPE>& scratchpad, std::int64_t scratchpad_size) {                   \
+        getrs<TYPE>("cusolverDnXgetrs", queue, trans, n, nrhs, a, lda, ipiv, b, ldb, scratchpad, \
+                    scratchpad_size);                                                            \
+    }
+
+GETRS_LAUNCHER(float)
+GETRS_LAUNCHER(double)
+GETRS_LAUNCHER(std::complex<float>)
+GETRS_LAUNCHER(std::complex<double>)
+
+#undef GETRS_LAUNCHER
+
+#else // no 64-bit pivot API: narrow the pivots into a temporary 32-bit array
+
+// cusolverDn<t>getrs does not use scratchpad memory
 template <typename Func, typename T>
 inline void getrs(const char* func_name, Func func, sycl::queue& queue,
                   oneapi::math::transpose trans, std::int64_t n, std::int64_t nrhs,
@@ -264,6 +357,8 @@ GETRS_LAUNCHER(std::complex<float>, cusolverDnCgetrs)
 GETRS_LAUNCHER(std::complex<double>, cusolverDnZgetrs)
 
 #undef GETRS_LAUNCHER
+
+#endif // ONEMATH_CUSOLVER_HAS_64BIT_PIVOTS
 
 template <typename Func, typename T_A, typename T_B>
 inline void gesvd(const char* func_name, Func func, sycl::queue& queue, oneapi::math::jobsvd jobu,
@@ -921,10 +1016,11 @@ inline void sytrf(const char* func_name, Func func, sycl::queue& queue, oneapi::
     overflow_check(n, lda, scratchpad_size);
     sycl::buffer<int> devInfo{ 1 };
 
-    // cuSolver legacy api does not accept 64-bit ints.
-    // To get around the limitation.
-    // Create new buffer with 32-bit ints then copy over results
+    // cuSolver has no 64-bit pivot variant of sytrf, so a 32-bit array is unavoidable.
+    // The tail of the scratchpad is reserved for it (see sytrf_scratchpad_size); the buffer
+    // API can afford a separate temporary instead, as the SYCL runtime tracks the dependency.
     std::uint64_t ipiv_size = n;
+    std::int64_t cusolver_scratchpad_size = scratchpad_size - pivot32_scratchpad_size<T>(n);
     sycl::buffer<int, 1> ipiv32(sycl::range<1>{ ipiv_size });
 
     queue.submit([&](sycl::handler& cgh) {
@@ -940,7 +1036,8 @@ inline void sytrf(const char* func_name, Func func, sycl::queue& queue, oneapi::
             auto scratch_ = sc.get_mem<cuDataType*>(scratch_acc);
             cusolverStatus_t err;
             cusolver_native_named_func(func_name, func, err, handle, get_cublas_fill_mode(uplo), n,
-                                       a_, lda, ipiv32_, scratch_, scratchpad_size, devInfo_);
+                                       a_, lda, ipiv32_, scratch_, cusolver_scratchpad_size,
+                                       devInfo_);
         });
     });
 
@@ -1313,6 +1410,55 @@ GEQRF_LAUNCHER_USM(std::complex<double>, cusolverDnZgeqrf)
 
 #undef GEQRF_LAUNCHER_USM
 
+#if ONEMATH_CUSOLVER_HAS_64BIT_PIVOTS
+
+template <typename T>
+inline sycl::event getrf(const char* func_name, sycl::queue& queue, std::int64_t m, std::int64_t n,
+                         T* a, std::int64_t lda, std::int64_t* ipiv, T* scratchpad,
+                         std::int64_t scratchpad_size,
+                         const std::vector<sycl::event>& dependencies) {
+    using cuDataType = typename CudaEquivalentType<T>::Type;
+
+    int* devInfo = (int*)malloc_device(sizeof(int), queue);
+    auto done = queue.submit([&](sycl::handler& cgh) {
+        cgh.depends_on(dependencies);
+        onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+            auto handle = sc.get_handle(queue);
+            auto a_ = reinterpret_cast<cuDataType*>(a);
+            auto scratch_ = reinterpret_cast<cuDataType*>(scratchpad);
+            CusolverDnParams params;
+            size_t device_bytes, host_bytes;
+            cusolver_xgetrf_buffer_size<T>(handle, params.get(), m, n, lda, &device_bytes,
+                                           &host_bytes);
+            cusolver_xgetrf<T>(func_name, handle, params.get(), m, n, a_, lda, ipiv, scratch_,
+                               scratchpad_size * sizeof(T), host_bytes, devInfo);
+        });
+    });
+
+    // lapack_info_check calls queue.wait()
+    lapack_info_check(queue, devInfo, __func__, func_name);
+    free(devInfo, queue);
+    return done;
+}
+
+#define GETRF_LAUNCHER_USM(TYPE)                                                      \
+    sycl::event getrf(sycl::queue& queue, std::int64_t m, std::int64_t n, TYPE* a,    \
+                      std::int64_t lda, std::int64_t* ipiv, TYPE* scratchpad,         \
+                      std::int64_t scratchpad_size,                                   \
+                      const std::vector<sycl::event>& dependencies) {                 \
+        return getrf<TYPE>("cusolverDnXgetrf", queue, m, n, a, lda, ipiv, scratchpad, \
+                           scratchpad_size, dependencies);                            \
+    }
+
+GETRF_LAUNCHER_USM(float)
+GETRF_LAUNCHER_USM(double)
+GETRF_LAUNCHER_USM(std::complex<float>)
+GETRF_LAUNCHER_USM(std::complex<double>)
+
+#undef GETRF_LAUNCHER_USM
+
+#else // no 64-bit pivot API: factorise into a temporary 32-bit array and widen it
+
 template <typename Func, typename T>
 inline sycl::event getrf(const char* func_name, Func func, sycl::queue& queue, std::int64_t m,
                          std::int64_t n, T* a, std::int64_t lda, std::int64_t* ipiv, T* scratchpad,
@@ -1378,6 +1524,8 @@ GETRF_LAUNCHER_USM(std::complex<double>, cusolverDnZgetrf)
 
 #undef GETRF_LAUNCHER_USM
 
+#endif // ONEMATH_CUSOLVER_HAS_64BIT_PIVOTS
+
 #define GETRI_LAUNCHER_USM(TYPE)                                                               \
     sycl::event getri(sycl::queue& queue, std::int64_t n, TYPE* a, std::int64_t lda,           \
                       std::int64_t* ipiv, TYPE* scratchpad, std::int64_t scratchpad_size,      \
@@ -1393,7 +1541,49 @@ GETRI_LAUNCHER_USM(std::complex<double>)
 
 #undef GETRI_LAUNCHER_USM
 
+#if ONEMATH_CUSOLVER_HAS_64BIT_PIVOTS
+
 // cusolverDnXgetrs does not use scratchpad memory
+template <typename T>
+inline sycl::event getrs(const char* func_name, sycl::queue& queue, oneapi::math::transpose trans,
+                         std::int64_t n, std::int64_t nrhs, T* a, std::int64_t lda,
+                         std::int64_t* ipiv, T* b, std::int64_t ldb, T* scratchpad,
+                         std::int64_t scratchpad_size,
+                         const std::vector<sycl::event>& dependencies) {
+    using cuDataType = typename CudaEquivalentType<T>::Type;
+
+    return queue.submit([&](sycl::handler& cgh) {
+        cgh.depends_on(dependencies);
+        onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+            auto handle = sc.get_handle(queue);
+            auto a_ = reinterpret_cast<cuDataType*>(a);
+            auto b_ = reinterpret_cast<cuDataType*>(b);
+            CusolverDnParams params;
+            cusolver_xgetrs<T>(func_name, handle, params.get(), get_cublas_operation(trans), n,
+                               nrhs, a_, lda, ipiv, b_, ldb);
+        });
+    });
+}
+
+#define GETRS_LAUNCHER_USM(TYPE)                                                                 \
+    sycl::event getrs(sycl::queue& queue, oneapi::math::transpose trans, std::int64_t n,         \
+                      std::int64_t nrhs, TYPE* a, std::int64_t lda, std::int64_t* ipiv, TYPE* b, \
+                      std::int64_t ldb, TYPE* scratchpad, std::int64_t scratchpad_size,          \
+                      const std::vector<sycl::event>& dependencies) {                            \
+        return getrs<TYPE>("cusolverDnXgetrs", queue, trans, n, nrhs, a, lda, ipiv, b, ldb,      \
+                           scratchpad, scratchpad_size, dependencies);                           \
+    }
+
+GETRS_LAUNCHER_USM(float)
+GETRS_LAUNCHER_USM(double)
+GETRS_LAUNCHER_USM(std::complex<float>)
+GETRS_LAUNCHER_USM(std::complex<double>)
+
+#undef GETRS_LAUNCHER_USM
+
+#else // no 64-bit pivot API: narrow the pivots into a temporary 32-bit array
+
+// cusolverDn<t>getrs does not use scratchpad memory
 template <typename Func, typename T>
 inline sycl::event getrs(const char* func_name, Func func, sycl::queue& queue,
                          oneapi::math::transpose trans, std::int64_t n, std::int64_t nrhs, T* a,
@@ -1454,6 +1644,8 @@ GETRS_LAUNCHER_USM(std::complex<float>, cusolverDnCgetrs)
 GETRS_LAUNCHER_USM(std::complex<double>, cusolverDnZgetrs)
 
 #undef GETRS_LAUNCHER_USM
+
+#endif // ONEMATH_CUSOLVER_HAS_64BIT_PIVOTS
 
 template <typename Func, typename T_A, typename T_B>
 inline sycl::event gesvd(const char* func_name, Func func, sycl::queue& queue,
@@ -2153,11 +2345,13 @@ inline sycl::event sytrf(const char* func_name, Func func, sycl::queue& queue,
     overflow_check(n, lda, scratchpad_size);
     int* devInfo = (int*)malloc_device(sizeof(int), queue);
 
-    // cuSolver legacy api does not accept 64-bit ints.
-    // To get around the limitation.
-    // Allocate memory with 32-bit ints then copy over results
+    // cuSolver has no 64-bit pivot variant of sytrf, so a 32-bit array is unavoidable. It is
+    // carved out of the tail of the scratchpad (see sytrf_scratchpad_size), which avoids both
+    // a separate allocation and the host synchronisation that releasing it would require.
+    // This routine still blocks in lapack_info_check below.
     std::uint64_t ipiv_size = n;
-    int* ipiv32 = (int*)malloc_device(sizeof(int) * ipiv_size, queue);
+    std::int64_t cusolver_scratchpad_size = scratchpad_size - pivot32_scratchpad_size<T>(n);
+    int* ipiv32 = reinterpret_cast<int*>(scratchpad + cusolver_scratchpad_size);
 
     auto done = queue.submit([&](sycl::handler& cgh) {
         int64_t num_events = dependencies.size();
@@ -2172,7 +2366,8 @@ inline sycl::event sytrf(const char* func_name, Func func, sycl::queue& queue,
             auto devInfo_ = reinterpret_cast<int*>(devInfo);
             cusolverStatus_t err;
             cusolver_native_named_func(func_name, func, err, handle, get_cublas_fill_mode(uplo), n,
-                                       a_, lda, ipiv_, scratch_, scratchpad_size, devInfo_);
+                                       a_, lda, ipiv_, scratch_, cusolver_scratchpad_size,
+                                       devInfo_);
         });
     });
 
@@ -2183,10 +2378,6 @@ inline sycl::event sytrf(const char* func_name, Func func, sycl::queue& queue,
             ipiv[index] = static_cast<std::int64_t>(ipiv32[index]);
         });
     });
-
-    queue.wait();
-
-    free(ipiv32, queue);
 
     lapack_info_check(queue, devInfo, __func__, func_name);
     free(devInfo, queue);
@@ -2581,6 +2772,46 @@ GESVD_LAUNCHER_SCRATCH(std::complex<double>, cusolverDnZgesvd_bufferSize)
 
 #undef GESVD_LAUNCHER_SCRATCH
 
+#if ONEMATH_CUSOLVER_HAS_64BIT_PIVOTS
+
+template <typename T>
+inline void getrf_scratchpad_size(const char* func_name, sycl::queue& queue, std::int64_t m,
+                                  std::int64_t n, std::int64_t lda, size_t* device_bytes) {
+    queue
+        .submit([&](sycl::handler& cgh) {
+            onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+                auto handle = sc.get_handle(queue);
+                cusolverStatus_t err;
+                CusolverDnParams params;
+                size_t host_bytes;
+                CUSOLVER_ERROR_FUNC_T_SYNC(func_name, cusolverDnXgetrf_bufferSize, err, handle,
+                                           params.get(), m, n, CudaDataType<T>::Type, nullptr, lda,
+                                           CudaDataType<T>::Type, device_bytes, &host_bytes);
+            });
+        })
+        .wait();
+}
+
+// cusolverDnXgetrf sizes its device workspace in bytes, oneMath in elements of T.
+#define GETRF_LAUNCHER_SCRATCH(TYPE)                                                              \
+    template <>                                                                                   \
+    std::int64_t getrf_scratchpad_size<TYPE>(sycl::queue & queue, std::int64_t m, std::int64_t n, \
+                                             std::int64_t lda) {                                  \
+        size_t device_bytes;                                                                      \
+        getrf_scratchpad_size<TYPE>("cusolverDnXgetrf_bufferSize", queue, m, n, lda,              \
+                                    &device_bytes);                                               \
+        return (device_bytes + sizeof(TYPE) - 1) / sizeof(TYPE);                                  \
+    }
+
+GETRF_LAUNCHER_SCRATCH(float)
+GETRF_LAUNCHER_SCRATCH(double)
+GETRF_LAUNCHER_SCRATCH(std::complex<float>)
+GETRF_LAUNCHER_SCRATCH(std::complex<double>)
+
+#undef GETRF_LAUNCHER_SCRATCH
+
+#else // no 64-bit pivot API: size the legacy workspace instead
+
 template <typename Func>
 inline void getrf_scratchpad_size(const char* func_name, Func func, sycl::queue& queue,
                                   std::int64_t m, std::int64_t n, std::int64_t lda,
@@ -2614,11 +2845,14 @@ GETRF_LAUNCHER_SCRATCH(std::complex<double>, cusolverDnZgetrf_bufferSize)
 
 #undef GETRF_LAUNCHER_SCRATCH
 
+#endif // ONEMATH_CUSOLVER_HAS_64BIT_PIVOTS
+
+// The tail holds the 32-bit pivots that cublas<t>getriBatched requires
 #define GETRI_LAUNCHER_SCRATCH(TYPE)                                              \
     template <>                                                                   \
     std::int64_t getri_scratchpad_size<TYPE>(sycl::queue & queue, std::int64_t n, \
                                              std::int64_t lda) {                  \
-        return lda * n;                                                           \
+        return lda * n + pivot32_scratchpad_size<TYPE>(n);                        \
     }
 
 GETRI_LAUNCHER_SCRATCH(float)
@@ -3031,6 +3265,7 @@ inline void sytrf_scratchpad_size(const char* func_name, Func func, sycl::queue&
         .wait();
 }
 
+// The tail holds the 32-bit pivots that cusolverDn<t>sytrf requires
 #define SYTRF_LAUNCHER_SCRATCH(TYPE, CUSOLVER_ROUTINE)                                     \
     template <>                                                                            \
     std::int64_t sytrf_scratchpad_size<TYPE>(sycl::queue & queue, oneapi::math::uplo uplo, \
@@ -3038,7 +3273,7 @@ inline void sytrf_scratchpad_size(const char* func_name, Func func, sycl::queue&
         int scratch_size;                                                                  \
         sytrf_scratchpad_size(#CUSOLVER_ROUTINE, CUSOLVER_ROUTINE, queue, uplo, n, lda,    \
                               &scratch_size);                                              \
-        return scratch_size;                                                               \
+        return scratch_size + pivot32_scratchpad_size<TYPE>(n);                            \
     }
 
 SYTRF_LAUNCHER_SCRATCH(float, cusolverDnSsytrf_bufferSize)

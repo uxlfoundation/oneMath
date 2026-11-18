@@ -32,6 +32,8 @@
 #include <cusolverDn.h>
 #include <cuda.h>
 #include <complex>
+#include <cstdint>
+#include <vector>
 
 #include "oneapi/math/types.hpp"
 #include "runtime_support_helper.hpp"
@@ -288,6 +290,162 @@ struct CudaEquivalentType<std::complex<double>> {
     using Type = cuDoubleComplex;
 };
 
+/*converting T to the cudaDataType tag expected by the cuSOLVER 64-bit API*/
+template <typename T>
+struct CudaDataType;
+template <>
+struct CudaDataType<float> {
+    static constexpr cudaDataType Type = CUDA_R_32F;
+};
+template <>
+struct CudaDataType<double> {
+    static constexpr cudaDataType Type = CUDA_R_64F;
+};
+template <>
+struct CudaDataType<std::complex<float>> {
+    static constexpr cudaDataType Type = CUDA_C_32F;
+};
+template <>
+struct CudaDataType<std::complex<double>> {
+    static constexpr cudaDataType Type = CUDA_C_64F;
+};
+
+/* 64-bit pivot API */
+
+#if !defined(CUSOLVER_VERSION)
+#define ONEMATH_CUSOLVER_VERSION 0
+#else
+#define ONEMATH_CUSOLVER_VERSION CUSOLVER_VERSION
+#endif
+
+// cuSOLVER exposes getrf/getrs entry points taking int64_t pivots, which lets oneMath
+// hand the user's ipiv array straight through instead of converting it. They first
+// appeared in CUDA 11.0 (CUSOLVER_VERSION 10600) as cusolverDnGetrf/cusolverDnGetrs and
+// were renamed with an X prefix in CUDA 11.1 (11000); the old names are deprecated from
+// 11.1 and removed in CUDA 12. CUDA 10.x has no 64-bit pivot API at all.
+#define ONEMATH_CUSOLVER_HAS_64BIT_PIVOTS (ONEMATH_CUSOLVER_VERSION >= 10600)
+#define ONEMATH_CUSOLVER_HAS_X_NAMES      (ONEMATH_CUSOLVER_VERSION >= 11000)
+
+#if ONEMATH_CUSOLVER_HAS_64BIT_PIVOTS
+
+#if !ONEMATH_CUSOLVER_HAS_X_NAMES
+// CUDA 11.0 spelling. The pre-X getrf has no host workspace, so the wrapper reports a
+// host requirement of zero and drops the host buffer arguments.
+inline cusolverStatus_t cusolverDnXgetrf_bufferSize(cusolverDnHandle_t handle,
+                                                    cusolverDnParams_t params, int64_t m, int64_t n,
+                                                    cudaDataType dataTypeA, const void* A,
+                                                    int64_t lda, cudaDataType computeType,
+                                                    size_t* workspaceInBytesOnDevice,
+                                                    size_t* workspaceInBytesOnHost) {
+    *workspaceInBytesOnHost = 0;
+    return cusolverDnGetrf_bufferSize(handle, params, m, n, dataTypeA, A, lda, computeType,
+                                      workspaceInBytesOnDevice);
+}
+
+inline cusolverStatus_t cusolverDnXgetrf(cusolverDnHandle_t handle, cusolverDnParams_t params,
+                                         int64_t m, int64_t n, cudaDataType dataTypeA, void* A,
+                                         int64_t lda, int64_t* ipiv, cudaDataType computeType,
+                                         void* bufferOnDevice, size_t workspaceInBytesOnDevice,
+                                         void* bufferOnHost, size_t workspaceInBytesOnHost,
+                                         int* info) {
+    return cusolverDnGetrf(handle, params, m, n, dataTypeA, A, lda, ipiv, computeType,
+                           bufferOnDevice, workspaceInBytesOnDevice, info);
+}
+
+inline cusolverStatus_t cusolverDnXgetrs(cusolverDnHandle_t handle, cusolverDnParams_t params,
+                                         cublasOperation_t trans, int64_t n, int64_t nrhs,
+                                         cudaDataType dataTypeA, const void* A, int64_t lda,
+                                         const int64_t* ipiv, cudaDataType dataTypeB, void* B,
+                                         int64_t ldb, int* info) {
+    return cusolverDnGetrs(handle, params, trans, n, nrhs, dataTypeA, A, lda, ipiv, dataTypeB, B,
+                           ldb, info);
+}
+#endif // !ONEMATH_CUSOLVER_HAS_X_NAMES
+
+// Owns a cusolverDnParams_t for the duration of one call. Caching it across calls is a
+// possible follow-up, tracked together with the handle churn described in issue #298.
+class CusolverDnParams {
+public:
+    CusolverDnParams() {
+        cusolverStatus_t err;
+        CUSOLVER_ERROR_FUNC(cusolverDnCreateParams, err, &params_);
+    }
+    ~CusolverDnParams() {
+        cusolverDnDestroyParams(params_);
+    }
+    CusolverDnParams(const CusolverDnParams&) = delete;
+    CusolverDnParams& operator=(const CusolverDnParams&) = delete;
+
+    cusolverDnParams_t get() const {
+        return params_;
+    }
+
+private:
+    cusolverDnParams_t params_;
+};
+
+// Queries the workspace cusolverDnXgetrf needs for an m-by-n factorisation. The device part
+// is served by the oneMath scratchpad; the host part has no oneMath counterpart and is
+// reported separately so that call sites can provide it.
+template <typename T>
+inline void cusolver_xgetrf_buffer_size(cusolverDnHandle_t handle, cusolverDnParams_t params,
+                                        std::int64_t m, std::int64_t n, std::int64_t lda,
+                                        size_t* device_bytes, size_t* host_bytes) {
+    constexpr cudaDataType data_type = CudaDataType<T>::Type;
+    cusolverStatus_t err;
+    CUSOLVER_ERROR_FUNC(cusolverDnXgetrf_bufferSize, err, handle, params, m, n, data_type, nullptr,
+                        lda, data_type, device_bytes, host_bytes);
+}
+
+// Runs cusolverDnXgetrf with `device_workspace` (of `device_bytes` bytes) as the device
+// workspace. A non-zero host requirement is allocated here and the stream is synchronised
+// before the allocation goes out of scope, since oneMath has no host scratchpad to hold it.
+template <typename T>
+inline void cusolver_xgetrf(const char* func_name, cusolverDnHandle_t handle,
+                            cusolverDnParams_t params, std::int64_t m, std::int64_t n, void* a,
+                            std::int64_t lda, std::int64_t* ipiv, void* device_workspace,
+                            size_t device_bytes, size_t host_bytes, int* devinfo) {
+    constexpr cudaDataType data_type = CudaDataType<T>::Type;
+    cusolverStatus_t err;
+
+    if (host_bytes > 0) {
+        std::vector<char> host_workspace(host_bytes);
+        CUSOLVER_ERROR_FUNC_T_SYNC(func_name, cusolverDnXgetrf, err, handle, params, m, n,
+                                   data_type, a, lda, ipiv, data_type, device_workspace,
+                                   device_bytes, host_workspace.data(), host_bytes, devinfo)
+    }
+    else {
+        cusolver_native_named_func(func_name, cusolverDnXgetrf, err, handle, params, m, n,
+                                   data_type, a, lda, ipiv, data_type, device_workspace,
+                                   device_bytes, nullptr, size_t{ 0 }, devinfo);
+    }
+}
+
+// Runs cusolverDnXgetrs. It takes no workspace at all, so nothing else is needed here.
+template <typename T>
+inline void cusolver_xgetrs(const char* func_name, cusolverDnHandle_t handle,
+                            cusolverDnParams_t params, cublasOperation_t trans, std::int64_t n,
+                            std::int64_t nrhs, const void* a, std::int64_t lda,
+                            const std::int64_t* ipiv, void* b, std::int64_t ldb) {
+    constexpr cudaDataType data_type = CudaDataType<T>::Type;
+    cusolverStatus_t err;
+    cusolver_native_named_func(func_name, cusolverDnXgetrs, err, handle, params, trans, n, nrhs,
+                               data_type, a, lda, ipiv, data_type, b, ldb, nullptr);
+}
+
+#endif // ONEMATH_CUSOLVER_HAS_64BIT_PIVOTS
+
+// Number of T elements needed to store `count` 32-bit pivots. cuSOLVER's sytrf and cuBLAS'
+// getriBatched have no 64-bit pivot counterpart, so their pivot array is carved out of the
+// tail of the oneMath scratchpad rather than allocated separately. That removes the separate
+// allocation and the host synchronisation its release would otherwise need; routines that
+// also report info still synchronise in lapack_info_check. sizeof(T) is a multiple of 4 for
+// every supported type, so an offset expressed in T elements is always suitably aligned for int.
+template <typename T>
+inline std::int64_t pivot32_scratchpad_size(std::int64_t count) {
+    return (count * static_cast<std::int64_t>(sizeof(int)) + sizeof(T) - 1) / sizeof(T);
+}
+
 /* devinfo */
 
 inline void get_cusolver_devinfo(sycl::queue& queue, sycl::buffer<int>& devInfo,
@@ -300,7 +458,9 @@ inline void get_cusolver_devinfo(sycl::queue& queue, sycl::buffer<int>& devInfo,
 inline void get_cusolver_devinfo(sycl::queue& queue, const int* devInfo,
                                  std::vector<int>& dev_info_) {
     queue.wait();
-    queue.memcpy(dev_info_.data(), devInfo, sizeof(int));
+    // The copy must complete before dev_info_ is read: callers inspect it as soon as this
+    // returns and then release devInfo, both of which race with an outstanding copy.
+    queue.memcpy(dev_info_.data(), devInfo, sizeof(int) * dev_info_.size()).wait();
 }
 
 template <typename DEVINFO_T>
