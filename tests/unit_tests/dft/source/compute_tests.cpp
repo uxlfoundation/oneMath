@@ -17,7 +17,10 @@
 *
 **************************************************************************/
 
+#include <complex>
 #include <iostream>
+#include <numeric>
+#include <sstream>
 #include <vector>
 
 #if __has_include(<sycl/sycl.hpp>)
@@ -195,5 +198,48 @@ INSTANTIATE_TEST_SUITE_P(ComputeTestSuite, ComputeTests_real_real_out_of_place_R
                          testing::Combine(testing::ValuesIn(devices),
                                           testing::ValuesIn(test_params)),
                          DFTParamsPrint{});
+
+// ---------------------------------------------------------------------------
+// Regression tests for the test harness itself (test_common.hpp).
+//
+// `check_equal_strided` builds its default stride range with
+// `strides_arr.data() + sizes.size() + 1`. The previous spelling,
+// `&strides_arr[sizes.size() + 1]`, forms the one-past-end pointer via
+// `operator[]`, which is an out-of-range subscript for a 3-D transform
+// (index 4 into a `std::array<std::int64_t, 4>`) and aborts under
+// -D_GLIBCXX_ASSERTIONS.
+// ---------------------------------------------------------------------------
+class TestCommonStrides : public ::testing::TestWithParam<std::vector<std::int64_t>> {};
+
+TEST_P(TestCommonStrides, CheckEqualStridedDefaultStrides) {
+    const std::vector<std::int64_t> sizes = GetParam();
+    const auto n = static_cast<std::size_t>(
+        std::accumulate(sizes.begin(), sizes.end(), std::int64_t{ 1 }, std::multiplies<>{}));
+
+    std::vector<std::complex<float>> v(n, std::complex<float>{ 1.0f, 0.0f });
+    std::vector<std::complex<float>> v_ref(n, std::complex<float>{ 1.0f, 0.0f });
+    std::ostringstream out;
+
+    // Empty strides selects the default-stride path under test.
+    EXPECT_TRUE((check_equal_strided<false>(v, v_ref, sizes, {}, 1.0, 1.0, out))) << out.str();
+}
+
+TEST_P(TestCommonStrides, CheckEqualStridedConjugateEvenStrides) {
+    const std::vector<std::int64_t> sizes = GetParam();
+    const auto n = static_cast<std::size_t>(
+        std::accumulate(sizes.begin(), sizes.end(), std::int64_t{ 1 }, std::multiplies<>{}));
+
+    std::vector<std::complex<float>> v(n, std::complex<float>{ 1.0f, 0.0f });
+    std::vector<std::complex<float>> v_ref(n, std::complex<float>{ 1.0f, 0.0f });
+    std::ostringstream out;
+
+    EXPECT_TRUE((check_equal_strided<true>(v, v_ref, sizes, {}, 1.0, 1.0, out))) << out.str();
+}
+
+INSTANTIATE_TEST_SUITE_P(TestCommonStridesSuite, TestCommonStrides,
+                         testing::Values(std::vector<std::int64_t>{ 8 },
+                                         std::vector<std::int64_t>{ 4, 4 },
+                                         std::vector<std::int64_t>{ 2, 2, 2 },
+                                         std::vector<std::int64_t>{ 4, 4, 4 }));
 
 } // anonymous namespace

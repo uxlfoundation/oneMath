@@ -284,7 +284,9 @@ bool check_equal_strided(const vec1& v, const vec2& v_ref, std::vector<int64_t> 
         else {
             strides_arr = get_default_strides(sizes);
         }
-        strides = { &strides_arr[0], &strides_arr[sizes.size() + 1] };
+        // Use data() rather than &strides_arr[sizes.size() + 1], which is an out-of-range
+        // subscript for 3 dimensions.
+        strides = { strides_arr.data(), strides_arr.data() + sizes.size() + 1 };
     }
     using T = std::decay_t<decltype(v[0])>;
     std::int64_t size0 = sizes[0];

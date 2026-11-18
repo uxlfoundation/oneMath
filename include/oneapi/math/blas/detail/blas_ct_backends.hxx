@@ -464,6 +464,20 @@ static inline void gemm_batch(backend_selector<backend::BACKEND> selector, trans
 
 static inline void gemm_batch(backend_selector<backend::BACKEND> selector, transpose transa,
                               transpose transb, std::int64_t m, std::int64_t n, std::int64_t k,
+                              float alpha, sycl::buffer<bfloat16, 1>& a, std::int64_t lda,
+                              std::int64_t stride_a, sycl::buffer<bfloat16, 1>& b, std::int64_t ldb,
+                              std::int64_t stride_b, float beta, sycl::buffer<float, 1>& c,
+                              std::int64_t ldc, std::int64_t stride_c, std::int64_t batch_size);
+
+static inline void gemm_batch(backend_selector<backend::BACKEND> selector, transpose transa,
+                              transpose transb, std::int64_t m, std::int64_t n, std::int64_t k,
+                              float alpha, sycl::buffer<bfloat16, 1>& a, std::int64_t lda,
+                              std::int64_t stride_a, sycl::buffer<bfloat16, 1>& b, std::int64_t ldb,
+                              std::int64_t stride_b, float beta, sycl::buffer<bfloat16, 1>& c,
+                              std::int64_t ldc, std::int64_t stride_c, std::int64_t batch_size);
+
+static inline void gemm_batch(backend_selector<backend::BACKEND> selector, transpose transa,
+                              transpose transb, std::int64_t m, std::int64_t n, std::int64_t k,
                               float alpha, sycl::buffer<std::int8_t, 1>& a, std::int64_t lda,
                               std::int64_t stride_a, sycl::buffer<std::int8_t, 1>& b,
                               std::int64_t ldb, std::int64_t stride_b, float beta,
@@ -1857,6 +1871,22 @@ static inline sycl::event gemm_batch(backend_selector<backend::BACKEND> selector
 
 static inline sycl::event gemm_batch(backend_selector<backend::BACKEND> selector, transpose* transa,
                                      transpose* transb, std::int64_t* m, std::int64_t* n,
+                                     std::int64_t* k, float* alpha, const bfloat16** a,
+                                     std::int64_t* lda, const bfloat16** b, std::int64_t* ldb,
+                                     float* beta, float** c, std::int64_t* ldc,
+                                     std::int64_t group_count, std::int64_t* group_size,
+                                     const std::vector<sycl::event>& dependencies = {});
+
+static inline sycl::event gemm_batch(backend_selector<backend::BACKEND> selector, transpose* transa,
+                                     transpose* transb, std::int64_t* m, std::int64_t* n,
+                                     std::int64_t* k, float* alpha, const bfloat16** a,
+                                     std::int64_t* lda, const bfloat16** b, std::int64_t* ldb,
+                                     float* beta, bfloat16** c, std::int64_t* ldc,
+                                     std::int64_t group_count, std::int64_t* group_size,
+                                     const std::vector<sycl::event>& dependencies = {});
+
+static inline sycl::event gemm_batch(backend_selector<backend::BACKEND> selector, transpose* transa,
+                                     transpose* transb, std::int64_t* m, std::int64_t* n,
                                      std::int64_t* k, float* alpha, const std::int8_t** a,
                                      std::int64_t* lda, const std::int8_t** b, std::int64_t* ldb,
                                      float* beta, float** c, std::int64_t* ldc,
@@ -1919,6 +1949,24 @@ static inline sycl::event gemm_batch(backend_selector<backend::BACKEND> selector
                                      std::int64_t lda, std::int64_t stride_a, const sycl::half* b,
                                      std::int64_t ldb, std::int64_t stride_b, float beta, float* c,
                                      std::int64_t ldc, std::int64_t stride_c,
+                                     std::int64_t batch_size,
+                                     const std::vector<sycl::event>& dependencies = {});
+
+static inline sycl::event gemm_batch(backend_selector<backend::BACKEND> selector, transpose transa,
+                                     transpose transb, std::int64_t m, std::int64_t n,
+                                     std::int64_t k, float alpha, const bfloat16* a,
+                                     std::int64_t lda, std::int64_t stride_a, const bfloat16* b,
+                                     std::int64_t ldb, std::int64_t stride_b, float beta, float* c,
+                                     std::int64_t ldc, std::int64_t stride_c,
+                                     std::int64_t batch_size,
+                                     const std::vector<sycl::event>& dependencies = {});
+
+static inline sycl::event gemm_batch(backend_selector<backend::BACKEND> selector, transpose transa,
+                                     transpose transb, std::int64_t m, std::int64_t n,
+                                     std::int64_t k, float alpha, const bfloat16* a,
+                                     std::int64_t lda, std::int64_t stride_a, const bfloat16* b,
+                                     std::int64_t ldb, std::int64_t stride_b, float beta,
+                                     bfloat16* c, std::int64_t ldc, std::int64_t stride_c,
                                      std::int64_t batch_size,
                                      const std::vector<sycl::event>& dependencies = {});
 
@@ -2592,11 +2640,13 @@ static inline sycl::event iamax(backend_selector<backend::BACKEND> selector, std
 
 static inline sycl::event rotm(backend_selector<backend::BACKEND> selector, std::int64_t n,
                                float* x, std::int64_t incx, float* y, std::int64_t incy,
-                               float* param, const std::vector<sycl::event>& dependencies = {});
+                               const float* param,
+                               const std::vector<sycl::event>& dependencies = {});
 
 static inline sycl::event rotm(backend_selector<backend::BACKEND> selector, std::int64_t n,
                                double* x, std::int64_t incx, double* y, std::int64_t incy,
-                               double* param, const std::vector<sycl::event>& dependencies = {});
+                               const double* param,
+                               const std::vector<sycl::event>& dependencies = {});
 
 static inline sycl::event rotg(backend_selector<backend::BACKEND> selector, float* a, float* b,
                                float* c, float* s,
