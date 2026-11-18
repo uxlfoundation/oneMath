@@ -909,32 +909,167 @@ GETRI_BATCH_LAUNCHER_USM(std::complex<double>, cublasZgetriBatched)
 
 #undef GETRI_BATCH_LAUNCHER_USM
 
-sycl::event getri_batch(sycl::queue& queue, std::int64_t* n, float** a, std::int64_t* lda,
-                        std::int64_t** ipiv, std::int64_t group_count, std::int64_t* group_sizes,
-                        float* scratchpad, std::int64_t scratchpad_size,
+// cublas<t>getriBatched requires a uniform n and lda within a call, so one
+// call is issued per group. As for the strided batch, the inverses are
+// computed out of place into the scratchpad and copied back into a.
+template <typename Func, typename T>
+sycl::event getri_batch(const char* func_name, Func func, sycl::queue& queue, std::int64_t* n,
+                        T** a, std::int64_t* lda, std::int64_t** ipiv, std::int64_t group_count,
+                        std::int64_t* group_sizes, T* scratchpad, std::int64_t scratchpad_size,
                         const std::vector<sycl::event>& dependencies) {
-    throw unimplemented("lapack", "getri_batch");
+    using cuDataType = typename CudaEquivalentType<T>::Type;
+
+    int64_t batch_size = 0;
+    int64_t ipiv32_size = 0;
+    overflow_check(group_count, scratchpad_size);
+    for (int64_t group_id = 0; group_id < group_count; ++group_id) {
+        overflow_check(n[group_id], lda[group_id], group_sizes[group_id]);
+        batch_size += group_sizes[group_id];
+        ipiv32_size += n[group_id] * group_sizes[group_id];
+    }
+
+    // The batches of pointers can be device resident, so read them back before
+    // deriving the scratchpad and pivot pointers of every matrix from them
+    std::vector<T*> a_host(batch_size);
+    std::vector<std::int64_t*> ipiv_host(batch_size);
+    std::vector<T*> scratch_host(batch_size);
+    queue.memcpy(a_host.data(), a, sizeof(T*) * batch_size).wait();
+    queue.memcpy(ipiv_host.data(), ipiv, sizeof(std::int64_t*) * batch_size).wait();
+
+    int64_t global_id = 0;
+    int64_t scratch_offset = 0;
+    for (int64_t group_id = 0; group_id < group_count; ++group_id) {
+        for (int64_t local_id = 0; local_id < group_sizes[group_id]; ++local_id, ++global_id) {
+            scratch_host[global_id] = scratchpad + scratch_offset;
+            scratch_offset += lda[group_id] * n[group_id];
+        }
+    }
+
+    T** a_dev = (T**)malloc_device(sizeof(T*) * batch_size, queue);
+    T** scratch_dev = (T**)malloc_device(sizeof(T*) * batch_size, queue);
+    int* ipiv32 = (int*)malloc_device(sizeof(int) * ipiv32_size, queue);
+    int* devInfo = (int*)malloc_device(sizeof(int) * batch_size, queue);
+    auto free_temporaries = [&]() {
+        sycl::free(a_dev, queue);
+        sycl::free(scratch_dev, queue);
+        sycl::free(ipiv32, queue);
+        sycl::free(devInfo, queue);
+    };
+
+    auto done_cpy_a = queue.memcpy(a_dev, a_host.data(), sizeof(T*) * batch_size);
+    auto done_cpy_scratch = queue.memcpy(scratch_dev, scratch_host.data(), sizeof(T*) * batch_size);
+
+    // cublas expects the pivots of a group as a single array holding n
+    // contiguous pivots per matrix
+    std::vector<sycl::event> casting_dependencies;
+    casting_dependencies.reserve(batch_size);
+    global_id = 0;
+    int64_t ipiv_offset = 0;
+    for (int64_t group_id = 0; group_id < group_count; ++group_id) {
+        const int64_t ipiv_len = n[group_id];
+        for (int64_t local_id = 0; local_id < group_sizes[group_id];
+             ++local_id, ++global_id, ipiv_offset += ipiv_len) {
+            const std::int64_t* d_ipiv = ipiv_host[global_id];
+            int* d_ipiv32 = ipiv32 + ipiv_offset;
+            casting_dependencies.push_back(queue.submit([&](sycl::handler& cgh) {
+                cgh.depends_on(dependencies);
+                cgh.parallel_for(
+                    sycl::range<1>{ static_cast<size_t>(ipiv_len) },
+                    [=](sycl::id<1> index) { d_ipiv32[index] = static_cast<int>(d_ipiv[index]); });
+            }));
+        }
+    }
+
+    // getri_batched is contained within cublas, not cusolver. For this reason
+    // we need to use cublas types instead of cusolver types (as is needed for
+    // other lapack routines)
+    auto done = queue.submit([&](sycl::handler& cgh) {
+        using blas::cublas::cublas_error;
+
+        cgh.depends_on(dependencies);
+        cgh.depends_on(done_cpy_a);
+        cgh.depends_on(done_cpy_scratch);
+        cgh.depends_on(casting_dependencies);
+
+        onemath_cusolver_host_task(cgh, queue, [=](CusolverScopedContextHandler& sc) {
+            cublasStatus_t err;
+            cublasHandle_t cublas_handle;
+            CUBLAS_ERROR_FUNC(cublasCreate, err, &cublas_handle);
+            CUstream cu_stream = sycl::get_native<sycl::backend::ext_oneapi_cuda>(queue);
+            CUBLAS_ERROR_FUNC(cublasSetStream, err, cublas_handle, cu_stream);
+
+            auto** a_dev_ = reinterpret_cast<cuDataType**>(a_dev);
+            auto** scratch_dev_ = reinterpret_cast<cuDataType**>(scratch_dev);
+            int64_t offset = 0;
+            int64_t ipiv_offset = 0;
+
+            for (int64_t group_id = 0; group_id < group_count; ++group_id) {
+                blas::cublas::cublas_native_named_func(
+                    func_name, func, err, cublas_handle, (int)n[group_id], a_dev_ + offset,
+                    (int)lda[group_id], ipiv32 + ipiv_offset, scratch_dev_ + offset,
+                    (int)lda[group_id], devInfo + offset, (int)group_sizes[group_id]);
+                offset += group_sizes[group_id];
+                ipiv_offset += n[group_id] * group_sizes[group_id];
+            }
+        });
+    });
+
+    // The inverted matrices stored in the scratchpad need to be stored in a.
+    // Only the n x n part is copied back so that the padding of a is preserved
+    std::vector<sycl::event> copy_dependencies;
+    copy_dependencies.reserve(batch_size);
+    global_id = 0;
+    for (int64_t group_id = 0; group_id < group_count; ++group_id) {
+        const int64_t group_n = n[group_id];
+        const int64_t group_lda = lda[group_id];
+        for (int64_t local_id = 0; local_id < group_sizes[group_id]; ++local_id, ++global_id) {
+            T* a_matrix = a_host[global_id];
+            const T* scratch_matrix = scratch_host[global_id];
+            copy_dependencies.push_back(queue.submit([&](sycl::handler& cgh) {
+                cgh.depends_on(done);
+                cgh.parallel_for(
+                    sycl::range<2>{ static_cast<size_t>(group_n), static_cast<size_t>(group_n) },
+                    [=](sycl::id<2> index) {
+                        const int64_t offset = index[0] * group_lda + index[1];
+                        a_matrix[offset] = scratch_matrix[offset];
+                    });
+            }));
+        }
+    }
+
+    auto done_copy = queue.submit([&](sycl::handler& cgh) {
+        cgh.depends_on(copy_dependencies);
+        cgh.host_task([]() {});
+    });
+
+    // lapack_info_check_batch calls queue.wait()
+    try {
+        lapack_info_check_batch(queue, devInfo, __func__, func_name, batch_size);
+    }
+    catch (...) {
+        free_temporaries();
+        throw;
+    }
+    free_temporaries();
+
+    return done_copy;
 }
-sycl::event getri_batch(sycl::queue& queue, std::int64_t* n, double** a, std::int64_t* lda,
-                        std::int64_t** ipiv, std::int64_t group_count, std::int64_t* group_sizes,
-                        double* scratchpad, std::int64_t scratchpad_size,
-                        const std::vector<sycl::event>& dependencies) {
-    throw unimplemented("lapack", "getri_batch");
-}
-sycl::event getri_batch(sycl::queue& queue, std::int64_t* n, std::complex<float>** a,
-                        std::int64_t* lda, std::int64_t** ipiv, std::int64_t group_count,
-                        std::int64_t* group_sizes, std::complex<float>* scratchpad,
-                        std::int64_t scratchpad_size,
-                        const std::vector<sycl::event>& dependencies) {
-    throw unimplemented("lapack", "getri_batch");
-}
-sycl::event getri_batch(sycl::queue& queue, std::int64_t* n, std::complex<double>** a,
-                        std::int64_t* lda, std::int64_t** ipiv, std::int64_t group_count,
-                        std::int64_t* group_sizes, std::complex<double>* scratchpad,
-                        std::int64_t scratchpad_size,
-                        const std::vector<sycl::event>& dependencies) {
-    throw unimplemented("lapack", "getri_batch");
-}
+
+#define GETRI_GROUP_BATCH_LAUNCHER_USM(TYPE, CUBLAS_ROUTINE)                                     \
+    sycl::event getri_batch(                                                                     \
+        sycl::queue& queue, std::int64_t* n, TYPE** a, std::int64_t* lda, std::int64_t** ipiv,   \
+        std::int64_t group_count, std::int64_t* group_sizes, TYPE* scratchpad,                   \
+        std::int64_t scratchpad_size, const std::vector<sycl::event>& dependencies) {            \
+        return getri_batch(#CUBLAS_ROUTINE, CUBLAS_ROUTINE, queue, n, a, lda, ipiv, group_count, \
+                           group_sizes, scratchpad, scratchpad_size, dependencies);              \
+    }
+
+GETRI_GROUP_BATCH_LAUNCHER_USM(float, cublasSgetriBatched)
+GETRI_GROUP_BATCH_LAUNCHER_USM(double, cublasDgetriBatched)
+GETRI_GROUP_BATCH_LAUNCHER_USM(std::complex<float>, cublasCgetriBatched)
+GETRI_GROUP_BATCH_LAUNCHER_USM(std::complex<double>, cublasZgetriBatched)
+
+#undef GETRI_GROUP_BATCH_LAUNCHER_USM
 
 template <typename Func, typename T>
 inline sycl::event getrs_batch(const char* func_name, Func func, sycl::queue& queue,
@@ -1806,18 +1941,17 @@ GETRF_GROUP_LAUNCHER_SCRATCH(std::complex<double>, cusolverDnZgetrf_bufferSize)
 
 #undef GETRF_GROUP_LAUNCHER_SCRATCH
 
+// cublas<t>getriBatched inverts out of place, so the scratchpad has to hold
+// one output matrix for every matrix of the batch
 #define GETRI_GROUP_LAUNCHER_SCRATCH(TYPE)                                                      \
     template <>                                                                                 \
     std::int64_t getri_batch_scratchpad_size<TYPE>(sycl::queue & queue, std::int64_t* n,        \
                                                    std::int64_t* lda, std::int64_t group_count, \
                                                    std::int64_t* group_sizes) {                 \
-        std::int64_t max_scratch_sz = 0;                                                        \
-        for (auto group_id = 0; group_id < group_count; ++group_id) {                           \
-            auto scratch_sz = lda[group_id] * n[group_id];                                      \
-            if (scratch_sz > max_scratch_sz)                                                    \
-                max_scratch_sz = scratch_sz;                                                    \
-        }                                                                                       \
-        return max_scratch_sz;                                                                  \
+        std::int64_t scratch_sz = 0;                                                            \
+        for (std::int64_t group_id = 0; group_id < group_count; ++group_id)                     \
+            scratch_sz += group_sizes[group_id] * lda[group_id] * n[group_id];                  \
+        return scratch_sz;                                                                      \
     }
 
 GETRI_GROUP_LAUNCHER_SCRATCH(float)
