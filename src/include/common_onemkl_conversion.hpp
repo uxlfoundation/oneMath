@@ -190,4 +190,9 @@ inline auto get_onemkl_order(oneapi::math::order param) {
         RETHROW_ONEMKL_LAPACK_EXCEPTIONS(return EXPRESSION); \
     } while (0)
 
+// Intel(R) oneMKL SYCL API deprecated SYCL buffers support, only USM is supported
+#define THROW_ONEMKL_BUFFER_API_UNSUPPORTED(DOMAIN) \
+    throw oneapi::math::unimplemented(              \
+        DOMAIN, __func__, "for SYCL buffers, Intel(R) oneMKL supports only the USM API")
+
 #endif // _ONEMATH_SRC_INCLUDE_COMMON_ONEMKL_TYPES_CONVERSION_HPP_

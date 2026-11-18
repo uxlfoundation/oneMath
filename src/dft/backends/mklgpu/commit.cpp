@@ -144,12 +144,8 @@ public:
         }
     }
 
-    virtual void set_workspace(sycl::buffer<scalar_type>& buffer_workspace) override {
-        this->external_workspace_helper_.set_workspace_throw(*this, buffer_workspace);
-        RETHROW_ONEMKL_EXCEPTIONS(handle.first->set_workspace(buffer_workspace));
-        if (handle.first != handle.second) {
-            RETHROW_ONEMKL_EXCEPTIONS(handle.second->set_workspace(buffer_workspace));
-        }
+    virtual void set_workspace(sycl::buffer<scalar_type>& /*buffer_workspace*/) override {
+        THROW_ONEMKL_BUFFER_API_UNSUPPORTED("DFT");
     }
 
 #define BACKEND mklgpu

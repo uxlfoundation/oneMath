@@ -102,24 +102,12 @@ inline void common_spsv_optimize(sycl::queue& queue, transpose opA, const void* 
     spsv_descr->last_optimized_alg = alg;
 }
 
-void spsv_optimize(sycl::queue& queue, transpose opA, const void* alpha, matrix_view A_view,
-                   matrix_handle_t A_handle, dense_vector_handle_t x_handle,
-                   dense_vector_handle_t y_handle, spsv_alg alg, spsv_descr_t spsv_descr,
+void spsv_optimize(sycl::queue& /*queue*/, transpose /*opA*/, const void* /*alpha*/,
+                   matrix_view /*A_view*/, matrix_handle_t /*A_handle*/,
+                   dense_vector_handle_t /*x_handle*/, dense_vector_handle_t /*y_handle*/,
+                   spsv_alg /*alg*/, spsv_descr_t /*spsv_descr*/,
                    sycl::buffer<std::uint8_t, 1> /*workspace*/) {
-    auto internal_A_handle = detail::get_internal_handle(A_handle);
-    if (!internal_A_handle->all_use_buffer()) {
-        detail::throw_incompatible_container(__func__);
-    }
-    common_spsv_optimize(queue, opA, alpha, A_view, A_handle, x_handle, y_handle, alg, spsv_descr);
-    if (alg == spsv_alg::no_optimize_alg) {
-        return;
-    }
-    internal_A_handle->can_be_reset = false;
-    auto onemkl_uplo = detail::get_onemkl_uplo(A_view.uplo_view);
-    auto onemkl_opa = detail::get_onemkl_transpose(opA);
-    auto onemkl_diag = detail::get_onemkl_diag(A_view.diag_view);
-    RETHROW_ONEMKL_EXCEPTIONS(oneapi::mkl::sparse::optimize_trsv(
-        queue, onemkl_uplo, onemkl_opa, onemkl_diag, internal_A_handle->backend_handle));
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("sparse_blas");
 }
 
 sycl::event spsv_optimize(sycl::queue& queue, transpose opA, const void* alpha, matrix_view A_view,
@@ -127,9 +115,6 @@ sycl::event spsv_optimize(sycl::queue& queue, transpose opA, const void* alpha, 
                           dense_vector_handle_t y_handle, spsv_alg alg, spsv_descr_t spsv_descr,
                           void* /*workspace*/, const std::vector<sycl::event>& dependencies) {
     auto internal_A_handle = detail::get_internal_handle(A_handle);
-    if (internal_A_handle->all_use_buffer()) {
-        detail::throw_incompatible_container(__func__);
-    }
     common_spsv_optimize(queue, opA, alpha, A_view, A_handle, x_handle, y_handle, alg, spsv_descr);
     if (alg == spsv_alg::no_optimize_alg) {
         return detail::collapse_dependencies(queue, dependencies);
@@ -156,20 +141,9 @@ sycl::event internal_spsv(sycl::queue& queue, transpose opA, const void* alpha, 
     auto onemkl_uplo = detail::get_onemkl_uplo(A_view.uplo_view);
     auto onemkl_opa = detail::get_onemkl_transpose(opA);
     auto onemkl_diag = detail::get_onemkl_diag(A_view.diag_view);
-    if (internal_A_handle->all_use_buffer()) {
-        RETHROW_ONEMKL_EXCEPTIONS(
-            oneapi::mkl::sparse::trsv(queue, onemkl_uplo, onemkl_opa, onemkl_diag, host_alpha,
-                                      internal_A_handle->backend_handle, x_handle->get_buffer<T>(),
-                                      y_handle->get_buffer<T>()));
-        // Dependencies are not used for buffers
-        return {};
-    }
-    else {
-        RETHROW_ONEMKL_EXCEPTIONS_RET(
-            oneapi::mkl::sparse::trsv(queue, onemkl_uplo, onemkl_opa, onemkl_diag, host_alpha,
-                                      internal_A_handle->backend_handle, x_handle->get_usm_ptr<T>(),
-                                      y_handle->get_usm_ptr<T>(), dependencies));
-    }
+    RETHROW_ONEMKL_EXCEPTIONS_RET(oneapi::mkl::sparse::trsv(
+        queue, onemkl_uplo, onemkl_opa, onemkl_diag, host_alpha, internal_A_handle->backend_handle,
+        x_handle->get_usm_ptr<T>(), y_handle->get_usm_ptr<T>(), dependencies));
 }
 
 sycl::event spsv(sycl::queue& queue, transpose opA, const void* alpha, matrix_view A_view,

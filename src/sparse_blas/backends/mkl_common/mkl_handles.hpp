@@ -36,10 +36,6 @@ struct dense_vector_handle : public detail::generic_dense_vector_handle<void*> {
     template <typename T>
     dense_vector_handle(T* value_ptr, std::int64_t size)
             : detail::generic_dense_vector_handle<void*>(nullptr, value_ptr, size) {}
-
-    template <typename T>
-    dense_vector_handle(const sycl::buffer<T, 1> value_buffer, std::int64_t size)
-            : detail::generic_dense_vector_handle<void*>(nullptr, value_buffer, size) {}
 };
 
 struct dense_matrix_handle : public detail::generic_dense_matrix_handle<void*> {
@@ -48,12 +44,6 @@ struct dense_matrix_handle : public detail::generic_dense_matrix_handle<void*> {
                         layout dense_layout)
             : detail::generic_dense_matrix_handle<void*>(nullptr, value_ptr, num_rows, num_cols, ld,
                                                          dense_layout) {}
-
-    template <typename T>
-    dense_matrix_handle(const sycl::buffer<T, 1> value_buffer, std::int64_t num_rows,
-                        std::int64_t num_cols, std::int64_t ld, layout dense_layout)
-            : detail::generic_dense_matrix_handle<void*>(nullptr, value_buffer, num_rows, num_cols,
-                                                         ld, dense_layout) {}
 };
 
 } // namespace oneapi::math::sparse

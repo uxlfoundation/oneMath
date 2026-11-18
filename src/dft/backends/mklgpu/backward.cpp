@@ -85,11 +85,9 @@ inline auto expect_config(DescT& desc, const char* message) {
 
 //In-place transform
 template <typename descriptor_type>
-ONEMATH_EXPORT void compute_backward(descriptor_type& desc,
-                                     sycl::buffer<fwd<descriptor_type>, 1>& inout) {
-    detail::expect_config<dft::detail::config_param::PLACEMENT, dft::detail::config_value::INPLACE>(
-        desc, "Unexpected value for placement");
-    return detail::compute_backward(desc, inout);
+ONEMATH_EXPORT void compute_backward(descriptor_type& /*desc*/,
+                                     sycl::buffer<fwd<descriptor_type>, 1>& /*inout*/) {
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("DFT");
 }
 
 //In-place transform, using config_param::COMPLEX_STORAGE=config_value::REAL_REAL data format
@@ -104,13 +102,10 @@ ONEMATH_EXPORT void compute_backward(descriptor_type& /*desc*/,
 
 //Out-of-place transform
 template <typename descriptor_type>
-ONEMATH_EXPORT void compute_backward(descriptor_type& desc,
-                                     sycl::buffer<bwd<descriptor_type>, 1>& in,
-                                     sycl::buffer<fwd<descriptor_type>, 1>& out) {
-    detail::expect_config<dft::detail::config_param::PLACEMENT,
-                          dft::detail::config_value::NOT_INPLACE>(desc,
-                                                                  "Unexpected value for placement");
-    return detail::compute_backward(desc, in, out);
+ONEMATH_EXPORT void compute_backward(descriptor_type& /*desc*/,
+                                     sycl::buffer<bwd<descriptor_type>, 1>& /*in*/,
+                                     sycl::buffer<fwd<descriptor_type>, 1>& /*out*/) {
+    THROW_ONEMKL_BUFFER_API_UNSUPPORTED("DFT");
 }
 
 //Out-of-place transform, using config_param::COMPLEX_STORAGE=config_value::REAL_REAL data format

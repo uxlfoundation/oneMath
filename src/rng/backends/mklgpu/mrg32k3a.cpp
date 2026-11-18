@@ -59,122 +59,104 @@ public:
     virtual void generate(
         const oneapi::math::rng::uniform<float, oneapi::math::rng::uniform_method::standard>& distr,
         std::int64_t n, sycl::buffer<float, 1>& r) override {
-        RETHROW_ONEMKL_EXCEPTIONS(
-            oneapi::mkl::rng::generate(detail::get_onemkl_distribution(distr), engine_, n, r));
+        THROW_ONEMKL_BUFFER_API_UNSUPPORTED("rng");
     }
 
     virtual void generate(const oneapi::math::rng::uniform<
                               double, oneapi::math::rng::uniform_method::standard>& distr,
                           std::int64_t n, sycl::buffer<double, 1>& r) override {
-        RETHROW_ONEMKL_EXCEPTIONS(
-            oneapi::mkl::rng::generate(detail::get_onemkl_distribution(distr), engine_, n, r));
+        THROW_ONEMKL_BUFFER_API_UNSUPPORTED("rng");
     }
 
     virtual void generate(const oneapi::math::rng::uniform<
                               std::int32_t, oneapi::math::rng::uniform_method::standard>& distr,
                           std::int64_t n, sycl::buffer<std::int32_t, 1>& r) override {
-        RETHROW_ONEMKL_EXCEPTIONS(
-            oneapi::mkl::rng::generate(detail::get_onemkl_distribution(distr), engine_, n, r));
+        THROW_ONEMKL_BUFFER_API_UNSUPPORTED("rng");
     }
 
     virtual void generate(
         const oneapi::math::rng::uniform<float, oneapi::math::rng::uniform_method::accurate>& distr,
         std::int64_t n, sycl::buffer<float, 1>& r) override {
-        RETHROW_ONEMKL_EXCEPTIONS(
-            oneapi::mkl::rng::generate(detail::get_onemkl_distribution(distr), engine_, n, r));
+        THROW_ONEMKL_BUFFER_API_UNSUPPORTED("rng");
     }
 
     virtual void generate(const oneapi::math::rng::uniform<
                               double, oneapi::math::rng::uniform_method::accurate>& distr,
                           std::int64_t n, sycl::buffer<double, 1>& r) override {
-        RETHROW_ONEMKL_EXCEPTIONS(
-            oneapi::mkl::rng::generate(detail::get_onemkl_distribution(distr), engine_, n, r));
+        THROW_ONEMKL_BUFFER_API_UNSUPPORTED("rng");
     }
 
     virtual void generate(const oneapi::math::rng::gaussian<
                               float, oneapi::math::rng::gaussian_method::box_muller2>& distr,
                           std::int64_t n, sycl::buffer<float, 1>& r) override {
-        RETHROW_ONEMKL_EXCEPTIONS(
-            oneapi::mkl::rng::generate(detail::get_onemkl_distribution(distr), engine_, n, r));
+        THROW_ONEMKL_BUFFER_API_UNSUPPORTED("rng");
     }
 
     virtual void generate(const oneapi::math::rng::gaussian<
                               double, oneapi::math::rng::gaussian_method::box_muller2>& distr,
                           std::int64_t n, sycl::buffer<double, 1>& r) override {
-        RETHROW_ONEMKL_EXCEPTIONS(
-            oneapi::mkl::rng::generate(detail::get_onemkl_distribution(distr), engine_, n, r));
+        THROW_ONEMKL_BUFFER_API_UNSUPPORTED("rng");
     }
 
     virtual void generate(
         const oneapi::math::rng::gaussian<float, oneapi::math::rng::gaussian_method::icdf>& distr,
         std::int64_t n, sycl::buffer<float, 1>& r) override {
-        RETHROW_ONEMKL_EXCEPTIONS(
-            oneapi::mkl::rng::generate(detail::get_onemkl_distribution(distr), engine_, n, r));
+        THROW_ONEMKL_BUFFER_API_UNSUPPORTED("rng");
     }
 
     virtual void generate(
         const oneapi::math::rng::gaussian<double, oneapi::math::rng::gaussian_method::icdf>& distr,
         std::int64_t n, sycl::buffer<double, 1>& r) override {
-        RETHROW_ONEMKL_EXCEPTIONS(
-            oneapi::mkl::rng::generate(detail::get_onemkl_distribution(distr), engine_, n, r));
+        THROW_ONEMKL_BUFFER_API_UNSUPPORTED("rng");
     }
 
     virtual void generate(const oneapi::math::rng::lognormal<
                               float, oneapi::math::rng::lognormal_method::box_muller2>& distr,
                           std::int64_t n, sycl::buffer<float, 1>& r) override {
-        RETHROW_ONEMKL_EXCEPTIONS(
-            oneapi::mkl::rng::generate(detail::get_onemkl_distribution(distr), engine_, n, r));
+        THROW_ONEMKL_BUFFER_API_UNSUPPORTED("rng");
     }
 
     virtual void generate(const oneapi::math::rng::lognormal<
                               double, oneapi::math::rng::lognormal_method::box_muller2>& distr,
                           std::int64_t n, sycl::buffer<double, 1>& r) override {
-        RETHROW_ONEMKL_EXCEPTIONS(
-            oneapi::mkl::rng::generate(detail::get_onemkl_distribution(distr), engine_, n, r));
+        THROW_ONEMKL_BUFFER_API_UNSUPPORTED("rng");
     }
 
     virtual void generate(
         const oneapi::math::rng::lognormal<float, oneapi::math::rng::lognormal_method::icdf>& distr,
         std::int64_t n, sycl::buffer<float, 1>& r) override {
-        RETHROW_ONEMKL_EXCEPTIONS(
-            oneapi::mkl::rng::generate(detail::get_onemkl_distribution(distr), engine_, n, r));
+        THROW_ONEMKL_BUFFER_API_UNSUPPORTED("rng");
     }
 
     virtual void generate(const oneapi::math::rng::lognormal<
                               double, oneapi::math::rng::lognormal_method::icdf>& distr,
                           std::int64_t n, sycl::buffer<double, 1>& r) override {
-        RETHROW_ONEMKL_EXCEPTIONS(
-            oneapi::mkl::rng::generate(detail::get_onemkl_distribution(distr), engine_, n, r));
+        THROW_ONEMKL_BUFFER_API_UNSUPPORTED("rng");
     }
 
     virtual void generate(const bernoulli<std::int32_t, bernoulli_method::icdf>& distr,
                           std::int64_t n, sycl::buffer<std::int32_t, 1>& r) override {
-        RETHROW_ONEMKL_EXCEPTIONS(
-            oneapi::mkl::rng::generate(detail::get_onemkl_distribution(distr), engine_, n, r));
+        THROW_ONEMKL_BUFFER_API_UNSUPPORTED("rng");
     }
 
     virtual void generate(const bernoulli<std::uint32_t, bernoulli_method::icdf>& distr,
                           std::int64_t n, sycl::buffer<std::uint32_t, 1>& r) override {
-        RETHROW_ONEMKL_EXCEPTIONS(
-            oneapi::mkl::rng::generate(detail::get_onemkl_distribution(distr), engine_, n, r));
+        THROW_ONEMKL_BUFFER_API_UNSUPPORTED("rng");
     }
 
     virtual void generate(const poisson<std::int32_t, poisson_method::gaussian_icdf_based>& distr,
                           std::int64_t n, sycl::buffer<std::int32_t, 1>& r) override {
-        RETHROW_ONEMKL_EXCEPTIONS(
-            oneapi::mkl::rng::generate(detail::get_onemkl_distribution(distr), engine_, n, r));
+        THROW_ONEMKL_BUFFER_API_UNSUPPORTED("rng");
     }
 
     virtual void generate(const poisson<std::uint32_t, poisson_method::gaussian_icdf_based>& distr,
                           std::int64_t n, sycl::buffer<std::uint32_t, 1>& r) override {
-        RETHROW_ONEMKL_EXCEPTIONS(
-            oneapi::mkl::rng::generate(detail::get_onemkl_distribution(distr), engine_, n, r));
+        THROW_ONEMKL_BUFFER_API_UNSUPPORTED("rng");
     }
 
     virtual void generate(const bits<std::uint32_t>& /*distr*/, std::int64_t /*n*/,
                           sycl::buffer<std::uint32_t, 1>& /*r*/) override {
-        throw unimplemented("rng/mklgpu", "mrg32k3a::generate",
-                            "bits distribution is not supported");
+        THROW_ONEMKL_BUFFER_API_UNSUPPORTED("rng");
     }
 
     // USM APIs
