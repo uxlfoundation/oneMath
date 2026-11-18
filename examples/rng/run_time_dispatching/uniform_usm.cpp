@@ -92,7 +92,7 @@ void run_uniform_example(const sycl::device& dev) {
     std::vector<float> r(n);
 
     // Data preparation on selected device
-    float* dev_r = sycl::malloc_device<float>(n * sizeof(float), queue);
+    float* dev_r = sycl::malloc_device<float>(n, queue);
     if (!dev_r) {
         throw std::runtime_error("Failed to allocate USM memory.");
     }
