@@ -20,7 +20,7 @@
 #include "oneapi/math/dft/detail/mklgpu/onemath_dft_mklgpu.hpp"
 #include "dft/function_table.hpp"
 
-#define WRAPPER_VERSION 2
+#define WRAPPER_VERSION 3
 #define BACKEND         mklgpu
 
 extern "C" dft_function_table_t onemath_dft_table = {

@@ -1172,7 +1172,17 @@ void copy(const int* n, const std::complex<double>* x, const int* incx, std::com
 }
 
 template <typename fp, typename fp_res>
-static fp_res dot(const int* n, const fp* x, const int* incx, const fp* y, const int* incy);
+static fp_res dot(const int* n, const fp* x, const int* incx, const fp* y, const int* incy) {
+    float sum = 0.0f;
+    int ix = (*incx > 0) ? 0 : (1 - *n) * *incx;
+    int iy = (*incy > 0) ? 0 : (1 - *n) * *incy;
+    for (int i = 0; i < *n; i++) {
+        sum += static_cast<float>(x[ix]) * static_cast<float>(y[iy]);
+        ix += *incx;
+        iy += *incy;
+    }
+    return static_cast<fp_res>(sum);
+}
 
 template <>
 float dot(const int* n, const float* x, const int* incx, const float* y, const int* incy) {

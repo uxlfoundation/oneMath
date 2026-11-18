@@ -211,6 +211,17 @@ void dot(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n, sycl::
          sycl::buffer<double, 1>& result) {
     function_tables[{ libkey, queue }].column_major_dsdot_sycl(queue, n, x, incx, y, incy, result);
 }
+void dot(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
+         sycl::buffer<sycl::half, 1>& x, std::int64_t incx, sycl::buffer<sycl::half, 1>& y,
+         std::int64_t incy, sycl::buffer<sycl::half, 1>& result) {
+    function_tables[{ libkey, queue }].column_major_hdot_sycl(queue, n, x, incx, y, incy, result);
+}
+
+void dot(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
+         sycl::buffer<bfloat16, 1>& x, std::int64_t incx, sycl::buffer<bfloat16, 1>& y,
+         std::int64_t incy, sycl::buffer<bfloat16, 1>& result) {
+    function_tables[{ libkey, queue }].column_major_bfdot_sycl(queue, n, x, incx, y, incy, result);
+}
 
 void dotc(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
           sycl::buffer<std::complex<float>, 1>& x, std::int64_t incx,
@@ -2032,6 +2043,19 @@ sycl::event dot(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
                 std::int64_t incx, const float* y, std::int64_t incy, double* result,
                 const std::vector<sycl::event>& dependencies) {
     return function_tables[{ libkey, queue }].column_major_dsdot_usm_sycl(
+        queue, n, x, incx, y, incy, result, dependencies);
+}
+sycl::event dot(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
+                const sycl::half* x, std::int64_t incx, const sycl::half* y, std::int64_t incy,
+                sycl::half* result, const std::vector<sycl::event>& dependencies) {
+    return function_tables[{ libkey, queue }].column_major_hdot_usm_sycl(queue, n, x, incx, y, incy,
+                                                                         result, dependencies);
+}
+
+sycl::event dot(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n, const bfloat16* x,
+                std::int64_t incx, const bfloat16* y, std::int64_t incy, bfloat16* result,
+                const std::vector<sycl::event>& dependencies) {
+    return function_tables[{ libkey, queue }].column_major_bfdot_usm_sycl(
         queue, n, x, incx, y, incy, result, dependencies);
 }
 
@@ -4259,6 +4283,17 @@ void dot(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n, sycl::
          sycl::buffer<double, 1>& result) {
     function_tables[{ libkey, queue }].row_major_dsdot_sycl(queue, n, x, incx, y, incy, result);
 }
+void dot(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
+         sycl::buffer<sycl::half, 1>& x, std::int64_t incx, sycl::buffer<sycl::half, 1>& y,
+         std::int64_t incy, sycl::buffer<sycl::half, 1>& result) {
+    function_tables[{ libkey, queue }].row_major_hdot_sycl(queue, n, x, incx, y, incy, result);
+}
+
+void dot(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
+         sycl::buffer<bfloat16, 1>& x, std::int64_t incx, sycl::buffer<bfloat16, 1>& y,
+         std::int64_t incy, sycl::buffer<bfloat16, 1>& result) {
+    function_tables[{ libkey, queue }].row_major_bfdot_sycl(queue, n, x, incx, y, incy, result);
+}
 
 void dotc(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
           sycl::buffer<std::complex<float>, 1>& x, std::int64_t incx,
@@ -6080,6 +6115,19 @@ sycl::event dot(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
                 std::int64_t incx, const float* y, std::int64_t incy, double* result,
                 const std::vector<sycl::event>& dependencies) {
     return function_tables[{ libkey, queue }].row_major_dsdot_usm_sycl(queue, n, x, incx, y, incy,
+                                                                       result, dependencies);
+}
+sycl::event dot(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n,
+                const sycl::half* x, std::int64_t incx, const sycl::half* y, std::int64_t incy,
+                sycl::half* result, const std::vector<sycl::event>& dependencies) {
+    return function_tables[{ libkey, queue }].row_major_hdot_usm_sycl(queue, n, x, incx, y, incy,
+                                                                      result, dependencies);
+}
+
+sycl::event dot(oneapi::math::device libkey, sycl::queue& queue, std::int64_t n, const bfloat16* x,
+                std::int64_t incx, const bfloat16* y, std::int64_t incy, bfloat16* result,
+                const std::vector<sycl::event>& dependencies) {
+    return function_tables[{ libkey, queue }].row_major_bfdot_usm_sycl(queue, n, x, incx, y, incy,
                                                                        result, dependencies);
 }
 
