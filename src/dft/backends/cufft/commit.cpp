@@ -25,6 +25,7 @@
 
 #include <array>
 #include <algorithm>
+#include <iterator>
 #include <optional>
 
 #include "oneapi/math/exceptions.hpp"
@@ -160,9 +161,20 @@ public:
         offset_bwd_in = stride_vecs.offset_bwd_in;
         offset_bwd_out = stride_vecs.offset_bwd_out;
 
-        // cufft ignores the first value in inembed and onembed, so there is no harm in putting offset there
-        auto a_min = std::min_element(stride_vecs.vec_a.begin() + 1, stride_vecs.vec_a.end());
-        auto b_min = std::min_element(stride_vecs.vec_b.begin() + 1, stride_vecs.vec_b.end());
+        // cufft ignores the first value in inembed and onembed, so there is no harm in putting offset there.
+        // Find the dimension with the smallest stride (used as the cuFFT istride/ostride). When several
+        // dimensions share the smallest stride - which happens when a dimension has extent 1 and hence the
+        // same stride as its neighbour - prefer the innermost (last) dimension. Searching in reverse makes
+        // std::min_element resolve such ties to the highest index, avoiding a spurious dimension swap below
+        // that would otherwise reject valid transforms (e.g. shapes like {3,1}). See issue #631.
+        auto innermost_min = [](auto& v) {
+            return std::min_element(std::make_reverse_iterator(v.end()),
+                                    std::make_reverse_iterator(v.begin() + 1))
+                       .base() -
+                   1;
+        };
+        auto a_min = innermost_min(stride_vecs.vec_a);
+        auto b_min = innermost_min(stride_vecs.vec_b);
         if constexpr (dom == dft::domain::REAL) {
             if ((a_min != stride_vecs.vec_a.begin() + rank) ||
                 (b_min != stride_vecs.vec_b.begin() + rank)) {

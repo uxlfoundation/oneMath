@@ -109,12 +109,14 @@ std::vector<DFTParams> test_params{
     { shape{ 4, 3 }, i64{ 9 } },
     { shape{ 7, 8 }, i64{ 1 } },
     { shape{ 64, 5 }, i64{ 1 } },
+    { shape{ 3, 1 }, i64{ 1 } },
 
     { shape{ 2, 2, 2 }, i64{ 1 } },
     { shape{ 2, 2, 3 }, i64{ 2 } },
     { shape{ 2, 2, 2 }, i64{ 27 } },
     { shape{ 3, 7, 2 }, i64{ 1 } },
     { shape{ 8, 8, 9 }, i64{ 1 } },
+    { shape{ 2, 3, 1 }, i64{ 1 } },
 
     { shape{ 4, 3 }, shape{ 2, 3, 1 }, shape{ 2, 3, 1 }, i64{ 2 } },
     { shape{ 4, 3 }, shape{ 0, 4, 1 }, shape{ 0, 3, 1 }, i64{ 3 } },
@@ -145,12 +147,14 @@ std::vector<DFTParams> test_params_real_in_place{
     { shape{ 4, 3 }, i64{ 9 } },
     { shape{ 7, 8 }, i64{ 1 } },
     { shape{ 64, 5 }, i64{ 1 } },
+    { shape{ 3, 1 }, i64{ 1 } },
 
     { shape{ 2, 2, 2 }, i64{ 1 } },
     { shape{ 2, 2, 3 }, i64{ 2 } },
     { shape{ 2, 2, 2 }, i64{ 27 } },
     { shape{ 3, 7, 2 }, i64{ 1 } },
     { shape{ 8, 8, 9 }, i64{ 1 } },
+    { shape{ 2, 3, 1 }, i64{ 1 } },
 
     { shape{ 4, 3 }, shape{ 0, 4, 1 }, shape{ 0, 2, 1 }, i64{ 2 } },
     { shape{ 4, 3 }, shape{ 0, 6, 1 }, shape{ 0, 3, 1 }, i64{ 2 } },
