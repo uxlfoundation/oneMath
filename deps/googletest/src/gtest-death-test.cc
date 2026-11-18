@@ -32,6 +32,7 @@
 
 #include "gtest/gtest-death-test.h"
 
+#include <cstdint>
 #include <utility>
 
 #include "gtest/internal/gtest-port.h"

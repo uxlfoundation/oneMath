@@ -181,6 +181,12 @@ public:
         const std::size_t dimensions = config_values.dimensions.size();
 
         constexpr std::size_t max_supported_dims = 3;
+        if (dimensions > max_supported_dims) {
+            throw oneapi::math::unimplemented(
+                "DFT", __FUNCTION__,
+                "rocfft only supports up to " + std::to_string(max_supported_dims) +
+                    " dimensions, but " + std::to_string(dimensions) + " were given.");
+        }
         std::array<std::size_t, max_supported_dims> lengths;
         // rocfft does dimensions in the reverse order to oneMath
         std::copy(config_values.dimensions.crbegin(), config_values.dimensions.crend(),
@@ -236,8 +242,8 @@ public:
 
         auto func = __FUNCTION__;
         auto check_strides = [&](const auto& strides) {
-            for (int i = 1; i <= dimensions; i++) {
-                for (int j = 1; j <= dimensions; j++) {
+            for (std::size_t i = 1; i <= dimensions; i++) {
+                for (std::size_t j = 1; j <= dimensions; j++) {
                     std::int64_t cplx_dim = config_values.dimensions[j - 1];
                     std::int64_t real_dim = (dom == dft::domain::REAL && j == dimensions)
                                                 ? (cplx_dim / 2 + 1)
@@ -300,13 +306,15 @@ public:
         std::unique_ptr<rocfft_plan_description_t, decltype(description_destroy)>
             description_destroyer_bwd(plan_desc_bwd, description_destroy);
 
-        std::array<std::size_t, 3> stride_a_indices{ 0, 1, 2 };
-        std::sort(&stride_a_indices[0], &stride_a_indices[dimensions],
+        // Note: index with iterators rather than &array[dimensions], which is an
+        // out-of-range subscript when dimensions == max_supported_dims.
+        std::array<std::size_t, max_supported_dims> stride_a_indices{ 0, 1, 2 };
+        std::sort(stride_a_indices.begin(), stride_a_indices.begin() + dimensions,
                   [&](std::size_t a, std::size_t b) {
                       return stride_vecs.vec_a[a] < stride_vecs.vec_a[b];
                   });
-        std::array<std::size_t, 3> stride_b_indices{ 0, 1, 2 };
-        std::sort(&stride_b_indices[0], &stride_b_indices[dimensions],
+        std::array<std::size_t, max_supported_dims> stride_b_indices{ 0, 1, 2 };
+        std::sort(stride_b_indices.begin(), stride_b_indices.begin() + dimensions,
                   [&](std::size_t a, std::size_t b) {
                       return stride_vecs.vec_b[a] < stride_vecs.vec_b[b];
                   });
@@ -321,7 +329,7 @@ public:
         auto are_strides_smaller_than_lengths = [=](auto& svec, auto& sindices,
                                                     auto& domain_lengths) {
             return dimensions == 1 ||
-                   (domain_lengths[sindices[0]] <= svec[sindices[1]] &&
+                   (svec[sindices[0]] * domain_lengths[sindices[0]] <= svec[sindices[1]] &&
                     (dimensions == 2 ||
                      svec[sindices[1]] * domain_lengths[sindices[1]] <= svec[sindices[2]]));
         };
@@ -335,16 +343,19 @@ public:
         const bool vec_b_valid_as_bwd_domain =
             are_strides_smaller_than_lengths(stride_vecs.vec_b, stride_b_indices, lengths_cplx);
 
-        // Test if the stride vector being used as the fwd/bwd domain for each direction has valid strides for that use.
-        bool valid_forward = (stride_vecs.fwd_in == stride_vecs.vec_a &&
-                              vec_a_valid_as_fwd_domain && vec_b_valid_as_bwd_domain) ||
-                             (vec_b_valid_as_fwd_domain && vec_a_valid_as_bwd_domain);
-        bool valid_backward = (stride_vecs.bwd_in == stride_vecs.vec_a &&
-                               vec_a_valid_as_bwd_domain && vec_b_valid_as_fwd_domain) ||
-                              (vec_b_valid_as_bwd_domain && vec_a_valid_as_fwd_domain);
+        // Test if the stride vector being used as the fwd/bwd domain for each direction has
+        // valid strides for that use. The forward direction reads forward-domain data through
+        // vec_a (fwd_in) and writes backward-domain data through vec_b (fwd_out).
+        bool valid_forward = vec_a_valid_as_fwd_domain && vec_b_valid_as_bwd_domain;
+        // With FWD/BWD_STRIDES each vector describes one domain, so the backward direction has
+        // the same requirements. With INPUT/OUTPUT_STRIDES the domains swap: vec_a (bwd_in)
+        // describes backward-domain data and vec_b (bwd_out) forward-domain data.
+        bool valid_backward = stride_api_choice == dft::detail::stride_api::FB_STRIDES
+                                  ? valid_forward
+                                  : (vec_a_valid_as_bwd_domain && vec_b_valid_as_fwd_domain);
 
         if (!valid_forward && !valid_backward) {
-            throw math::exception("dft/backends/cufft", __FUNCTION__, "Invalid strides.");
+            throw math::exception("dft/backends/rocfft", __FUNCTION__, "Invalid strides.");
         }
 
         if (valid_forward) {

@@ -180,6 +180,9 @@ public:
         }
         const int a_stride = static_cast<int>(*a_min);
         const int b_stride = static_cast<int>(*b_min);
+        // Record the position of the smallest stride before erasing, since
+        // erase() invalidates a_min (and any iterator after it).
+        const auto a_min_pos = a_min - stride_vecs.vec_a.begin();
         stride_vecs.vec_a.erase(a_min);
         stride_vecs.vec_b.erase(b_min);
         int fwd_istride = a_stride;
@@ -188,9 +191,9 @@ public:
             stride_api_choice == dft::detail::stride_api::FB_STRIDES ? b_stride : a_stride;
         int bwd_ostride =
             stride_api_choice == dft::detail::stride_api::FB_STRIDES ? a_stride : b_stride;
-        if (a_min - stride_vecs.vec_a.begin() != rank) {
+        if (a_min_pos != rank) {
             // swap dimensions to have the last one have the smallest stride
-            std::swap(n_copy[a_min - stride_vecs.vec_a.begin() - 1], n_copy[rank - 1]);
+            std::swap(n_copy[a_min_pos - 1], n_copy[rank - 1]);
         }
         for (int i = 1; i < rank; i++) {
             if ((stride_vecs.vec_a[i] % a_stride != 0) || (stride_vecs.vec_b[i] % b_stride != 0)) {

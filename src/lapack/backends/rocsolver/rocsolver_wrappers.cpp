@@ -21,7 +21,7 @@
 #include "lapack/function_table.hpp"
 #include "oneapi/math/lapack/detail/rocsolver/onemath_lapack_rocsolver.hpp"
 
-#define WRAPPER_VERSION 1
+#define WRAPPER_VERSION 2
 
 extern "C" ONEMATH_EXPORT lapack_function_table_t onemath_lapack_table = {
     WRAPPER_VERSION,
