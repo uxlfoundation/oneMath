@@ -290,6 +290,16 @@ struct CudaEquivalentType<std::complex<double>> {
 
 /* devinfo */
 
+/* Allocates the device memory cuSOLVER writes its `devInfo` output to. A failed
+ * allocation must not be passed on to cuSOLVER as a null pointer, since that
+ * silently disables the routine's error reporting. */
+inline int* create_devinfo(sycl::queue& queue, const char* func_name, int dev_info_size = 1) {
+    int* devInfo = sycl::malloc_device<int>(dev_info_size, queue);
+    if (!devInfo)
+        throw oneapi::math::device_bad_alloc("lapack", func_name, queue.get_device());
+    return devInfo;
+}
+
 inline void get_cusolver_devinfo(sycl::queue& queue, sycl::buffer<int>& devInfo,
                                  std::vector<int>& dev_info_) {
     sycl::host_accessor<int, 1, sycl::access::mode::read> dev_info_acc{ devInfo };

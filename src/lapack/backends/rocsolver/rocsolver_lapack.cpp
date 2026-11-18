@@ -1273,7 +1273,7 @@ inline sycl::event getrf(const char* func_name, Func func, sycl::queue& queue, s
     std::uint64_t ipiv_size = std::min(n, m);
     int* ipiv32 = (int*)malloc_device(sizeof(int) * ipiv_size, queue);
 
-    int* devInfo = (int*)malloc_device(sizeof(int), queue);
+    int* devInfo = create_devinfo(queue, __func__);
     auto done = queue.submit([&](sycl::handler& cgh) {
         int64_t num_events = dependencies.size();
         for (int64_t i = 0; i < num_events; i++) {
@@ -1411,7 +1411,7 @@ inline sycl::event gesvd(const char* func_name, Func func, sycl::queue& queue,
     using rocmDataType_A = typename RocmEquivalentType<T_A>::Type;
     using rocmDataType_B = typename RocmEquivalentType<T_B>::Type;
     overflow_check(m, n, lda, ldu, ldvt, scratchpad_size);
-    int* devInfo = (int*)malloc_device(sizeof(int), queue);
+    int* devInfo = create_devinfo(queue, __func__);
     auto done = queue.submit([&](sycl::handler& cgh) {
         int64_t num_events = dependencies.size();
         for (int64_t i = 0; i < num_events; i++) {
@@ -1462,7 +1462,7 @@ inline sycl::event heevd(const char* func_name, Func func, sycl::queue& queue,
     using rocmDataType_A = typename RocmEquivalentType<T_A>::Type;
     using rocmDataType_B = typename RocmEquivalentType<T_B>::Type;
     overflow_check(n, lda, scratchpad_size);
-    int* devInfo = (int*)malloc_device(sizeof(int), queue);
+    int* devInfo = create_devinfo(queue, __func__);
     auto done = queue.submit([&](sycl::handler& cgh) {
         int64_t num_events = dependencies.size();
         for (int64_t i = 0; i < num_events; i++) {
@@ -1508,7 +1508,7 @@ inline sycl::event hegvd(const char* func_name, Func func, sycl::queue& queue, s
     using rocmDataType_A = typename RocmEquivalentType<T_A>::Type;
     using rocmDataType_B = typename RocmEquivalentType<T_B>::Type;
     overflow_check(n, lda, ldb, scratchpad_size);
-    int* devInfo = (int*)malloc_device(sizeof(int), queue);
+    int* devInfo = create_devinfo(queue, __func__);
     auto done = queue.submit([&](sycl::handler& cgh) {
         int64_t num_events = dependencies.size();
         for (int64_t i = 0; i < num_events; i++) {
@@ -1818,7 +1818,7 @@ inline sycl::event potrf(const char* func_name, Func func, sycl::queue& queue,
                          const std::vector<sycl::event>& dependencies) {
     using rocmDataType = typename RocmEquivalentType<T>::Type;
     overflow_check(n, lda, scratchpad_size);
-    int* devInfo = (int*)malloc_device(sizeof(int), queue);
+    int* devInfo = create_devinfo(queue, __func__);
     auto done = queue.submit([&](sycl::handler& cgh) {
         int64_t num_events = dependencies.size();
         for (int64_t i = 0; i < num_events; i++) {
@@ -1860,7 +1860,7 @@ inline sycl::event potri(const char* func_name, Func func, sycl::queue& queue,
                          const std::vector<sycl::event>& dependencies) {
     using rocmDataType = typename RocmEquivalentType<T>::Type;
     overflow_check(n, lda, scratchpad_size);
-    int* devInfo = (int*)malloc_device(sizeof(int), queue);
+    int* devInfo = create_devinfo(queue, __func__);
     auto done = queue.submit([&](sycl::handler& cgh) {
         int64_t num_events = dependencies.size();
         for (int64_t i = 0; i < num_events; i++) {
@@ -1944,7 +1944,7 @@ inline sycl::event syevd(const char* func_name, Func func, sycl::queue& queue,
                          const std::vector<sycl::event>& dependencies) {
     using rocmDataType = typename RocmEquivalentType<T>::Type;
     overflow_check(n, lda, scratchpad_size);
-    int* devInfo = (int*)malloc_device(sizeof(int), queue);
+    int* devInfo = create_devinfo(queue, __func__);
     auto done = queue.submit([&](sycl::handler& cgh) {
         int64_t num_events = dependencies.size();
         for (int64_t i = 0; i < num_events; i++) {
@@ -1989,7 +1989,7 @@ inline sycl::event sygvd(const char* func_name, Func func, sycl::queue& queue, s
                          const std::vector<sycl::event>& dependencies) {
     using rocmDataType = typename RocmEquivalentType<T>::Type;
     overflow_check(n, lda, ldb, scratchpad_size);
-    int* devInfo = (int*)malloc_device(sizeof(int), queue);
+    int* devInfo = create_devinfo(queue, __func__);
     auto done = queue.submit([&](sycl::handler& cgh) {
         int64_t num_events = dependencies.size();
         for (int64_t i = 0; i < num_events; i++) {
@@ -2074,7 +2074,7 @@ inline sycl::event sytrf(const char* func_name, Func func, sycl::queue& queue,
                          const std::vector<sycl::event>& dependencies) {
     using rocmDataType = typename RocmEquivalentType<T>::Type;
     overflow_check(n, lda, scratchpad_size);
-    int* devInfo = (int*)malloc_device(sizeof(int), queue);
+    int* devInfo = create_devinfo(queue, __func__);
 
     // rocsolver legacy api does not accept 64-bit ints.
     // To get around the limitation.

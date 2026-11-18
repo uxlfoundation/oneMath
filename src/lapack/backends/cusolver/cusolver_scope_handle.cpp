@@ -141,7 +141,13 @@ cusolverDnHandle_t CusolverScopedContextHandler::get_handle(const sycl::queue& q
 }
 
 CUstream CusolverScopedContextHandler::get_stream(const sycl::queue& queue) {
-    return sycl::get_native<sycl::backend::ext_oneapi_cuda>(queue);
+    // Return the CUDA stream backing the current host task / native command
+    // submission. When `ext_codeplay_enqueue_native_command` is used, the SYCL
+    // runtime tracks completion of the native command via this stream, so
+    // cuSOLVER work must be enqueued onto it (not the queue's default stream)
+    // to avoid the returned SYCL event signalling before the computation
+    // finishes. See uxlfoundation/oneMath#626.
+    return ih.get_native_queue<sycl::backend::ext_oneapi_cuda>();
 }
 sycl::context CusolverScopedContextHandler::get_context(const sycl::queue& queue) {
     return queue.get_context();

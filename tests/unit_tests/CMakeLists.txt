@@ -31,9 +31,7 @@ endif()
 if("lapack" IN_LIST TEST_TARGET_DOMAINS)
   find_package(LAPACKE)
   if(NOT LAPACKE_FOUND)
-    # TODO: add list of tests without Netlib dependency
-    message(WARNING "Netlib LAPACKE headers or libraries are not found, LAPACK unit tests will be skipped")
-    list(REMOVE_ITEM TEST_TARGET_DOMAINS "lapack")
+    message(WARNING "Netlib LAPACKE headers or libraries are not found, LAPACK unit tests comparing against a reference implementation will be skipped")
   endif()
 endif()
 
@@ -66,9 +64,7 @@ set(blas_TEST_LINK "")
 set(lapack_TEST_LIST
         lapack_source)
 
-if(LAPACKE_FOUND)
-  set(lapack_TEST_LINK "")
-endif()
+set(lapack_TEST_LINK "")
 
 # RNG config
 set(rng_TEST_LIST

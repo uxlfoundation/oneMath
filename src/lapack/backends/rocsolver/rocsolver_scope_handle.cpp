@@ -143,7 +143,10 @@ rocblas_handle RocsolverScopedContextHandler::get_handle(const sycl::queue& queu
 }
 
 hipStream_t RocsolverScopedContextHandler::get_stream(const sycl::queue& queue) {
-    return sycl::get_native<sycl::backend::ext_oneapi_hip>(queue);
+    // Return the HIP stream backing the current host task / native command
+    // submission, which is the stream the SYCL runtime records the submission's
+    // completion event on. Matches the cuBLAS and cuSOLVER backends.
+    return ih.get_native_queue<sycl::backend::ext_oneapi_hip>();
 }
 sycl::context RocsolverScopedContextHandler::get_context(const sycl::queue& queue) {
     return queue.get_context();

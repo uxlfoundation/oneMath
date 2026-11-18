@@ -150,12 +150,6 @@ public:
         throw rocsolver_error(std::string(#name) + std::string(" : "), err); \
     }
 
-#define ROCSOLVER_ERROR_FUNC_T(name, func, err, ...)                        \
-    err = func(__VA_ARGS__);                                                \
-    if (err != rocblas_status_success) {                                    \
-        throw rocsolver_error(std::string(name) + std::string(" : "), err); \
-    }
-
 #define ROCSOLVER_ERROR_FUNC_T_SYNC(name, func, err, handle, ...)            \
     err = func(handle, __VA_ARGS__);                                         \
     if (err != rocblas_status_success) {                                     \
@@ -166,14 +160,23 @@ public:
     hipError_t hip_err;                                                      \
     HIP_ERROR_FUNC(hipStreamSynchronize, hip_err, currentStreamId);
 
+/* rocSOLVER calls only enqueue work on the HIP stream of the surrounding host
+ * task or native command. A submission depending on that work may be scheduled
+ * on a different stream of the queue's stream pool without being ordered against
+ * this one, and then reads a computation that has not finished yet. Unlike
+ * getrf/potrf/..., the Householder routines have no `info` output either, so they
+ * do not get an implicit host-side wait from `lapack_info_check`. Waiting for the
+ * stream keeps the enqueued work complete once the call returns.
+ *
+ * The interop-handle stream is not sufficient on its own. On an Instinct MI100
+ * (gfx908), ROCm 7.1.1 (rocSOLVER 3.31.0) and DPC++ 7.1.0
+ * (clang 23.0.0git, llvm fbf7d1fd2cbf), repeated geqrf+orgqr still failed until
+ * this hipStreamSynchronize. See uxlfoundation/oneMath#626.
+ */
 template <class Func, class... Types>
 inline void rocsolver_native_named_func(const char* func_name, Func func, rocsolver_status err,
                                         rocsolver_handle handle, Types... args) {
-#ifdef SYCL_EXT_ONEAPI_ENQUEUE_NATIVE_COMMAND
-    ROCSOLVER_ERROR_FUNC_T(func_name, func, err, handle, args...)
-#else
     ROCSOLVER_ERROR_FUNC_T_SYNC(func_name, func, err, handle, args...)
-#endif
 };
 
 inline rocblas_eform get_rocsolver_itype(std::int64_t itype) {
@@ -256,6 +259,16 @@ struct RocmEquivalentType<std::complex<double>> {
 };
 
 /* devinfo */
+
+/* Allocates the device memory rocSOLVER writes its `devInfo` output to. A failed
+ * allocation must not be passed on to rocSOLVER as a null pointer, since that
+ * silently disables the routine's error reporting. */
+inline int* create_devinfo(sycl::queue& queue, const char* func_name, int dev_info_size = 1) {
+    int* devInfo = sycl::malloc_device<int>(dev_info_size, queue);
+    if (!devInfo)
+        throw oneapi::math::device_bad_alloc("lapack", func_name, queue.get_device());
+    return devInfo;
+}
 
 inline int get_rocsolver_devinfo(sycl::queue& queue, sycl::buffer<int>& devInfo) {
     sycl::host_accessor<int, 1, sycl::access::mode::read> dev_info_{ devInfo };
