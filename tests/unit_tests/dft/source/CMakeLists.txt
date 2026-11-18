@@ -17,7 +17,8 @@
 # SPDX-License-Identifier: Apache-2.0
 #===============================================================================
 
-set(DFT_SOURCES "compute_tests.cpp" "descriptor_tests.cpp" "workspace_external_tests.cpp")
+set(DFT_SOURCES "compute_tests.cpp" "descriptor_tests.cpp" "workspace_external_tests.cpp"
+    "rocfft_stride_validation_tests.cpp")
 
 include(WarningsUtils)
 
@@ -28,6 +29,7 @@ if (BUILD_SHARED_LIBS)
             PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../include
             PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../../include
             PUBLIC ${PROJECT_SOURCE_DIR}/include
+            PRIVATE ${PROJECT_SOURCE_DIR}/src
             PUBLIC ${PROJECT_SOURCE_DIR}/deps/googletest/include
             PUBLIC ${CMAKE_BINARY_DIR}/bin
             )
@@ -45,6 +47,7 @@ target_include_directories(dft_source_ct
         PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../include
         PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../../include
         PUBLIC ${PROJECT_SOURCE_DIR}/include
+        PRIVATE ${PROJECT_SOURCE_DIR}/src
         PUBLIC ${PROJECT_SOURCE_DIR}/deps/googletest/include
         PUBLIC ${CMAKE_BINARY_DIR}/bin
         )
