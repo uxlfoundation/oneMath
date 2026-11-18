@@ -59,7 +59,7 @@
 #include "oneapi/math/rng/detail/curand/onemath_rng_curand.hpp"
 #include "rng/function_table.hpp"
 
-#define WRAPPER_VERSION 2
+#define WRAPPER_VERSION 4
 
 extern "C" ONEMATH_EXPORT rng_function_table_t onemath_rng_table = {
     WRAPPER_VERSION, oneapi::math::rng::curand::create_philox4x32x10,

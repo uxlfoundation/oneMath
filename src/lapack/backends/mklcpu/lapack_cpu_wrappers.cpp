@@ -20,7 +20,7 @@
 #include "lapack/function_table.hpp"
 #include "oneapi/math/lapack/detail/mklcpu/onemath_lapack_mklcpu.hpp"
 
-#define WRAPPER_VERSION 2
+#define WRAPPER_VERSION 4
 
 extern "C" ONEMATH_EXPORT lapack_function_table_t onemath_lapack_table = {
     WRAPPER_VERSION,

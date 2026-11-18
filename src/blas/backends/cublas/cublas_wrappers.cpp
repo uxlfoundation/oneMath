@@ -19,7 +19,7 @@
 #include "blas/function_table.hpp"
 #include "oneapi/math/blas/detail/cublas/onemath_blas_cublas.hpp"
 
-#define WRAPPER_VERSION 2
+#define WRAPPER_VERSION 4
 
 extern "C" blas_function_table_t onemath_blas_table = {
     WRAPPER_VERSION,
@@ -170,6 +170,7 @@ extern "C" blas_function_table_t onemath_blas_table = {
     oneapi::math::blas::cublas::column_major::gemm,
     oneapi::math::blas::cublas::column_major::gemm,
     oneapi::math::blas::cublas::column_major::gemm,
+    oneapi::math::blas::cublas::column_major::gemm,
     oneapi::math::blas::cublas::column_major::hemm,
     oneapi::math::blas::cublas::column_major::hemm,
     oneapi::math::blas::cublas::column_major::herk,
@@ -413,6 +414,7 @@ extern "C" blas_function_table_t onemath_blas_table = {
     oneapi::math::blas::cublas::column_major::gemm,
     oneapi::math::blas::cublas::column_major::gemm,
     oneapi::math::blas::cublas::column_major::gemm,
+    oneapi::math::blas::cublas::column_major::gemm,
     oneapi::math::blas::cublas::column_major::hemm,
     oneapi::math::blas::cublas::column_major::hemm,
     oneapi::math::blas::cublas::column_major::herk,
@@ -666,6 +668,7 @@ extern "C" blas_function_table_t onemath_blas_table = {
     oneapi::math::blas::cublas::row_major::gemm,
     oneapi::math::blas::cublas::row_major::gemm,
     oneapi::math::blas::cublas::row_major::gemm,
+    oneapi::math::blas::cublas::row_major::gemm,
     oneapi::math::blas::cublas::row_major::hemm,
     oneapi::math::blas::cublas::row_major::hemm,
     oneapi::math::blas::cublas::row_major::herk,
@@ -902,6 +905,7 @@ extern "C" blas_function_table_t onemath_blas_table = {
     oneapi::math::blas::cublas::row_major::trsv,
     oneapi::math::blas::cublas::row_major::trsv,
     oneapi::math::blas::cublas::row_major::trsv,
+    oneapi::math::blas::cublas::row_major::gemm,
     oneapi::math::blas::cublas::row_major::gemm,
     oneapi::math::blas::cublas::row_major::gemm,
     oneapi::math::blas::cublas::row_major::gemm,

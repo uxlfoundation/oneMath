@@ -129,6 +129,39 @@ void gemm(sycl::queue& queue, transpose transa, transpose transb, int64_t m, int
     throw unimplemented("blas", "gemm", "for column_major layout");
 }
 
+void gemm(sycl::queue& queue, transpose transa, transpose transb, int64_t m, int64_t n, int64_t k,
+          float alpha, sycl::buffer<bfloat16, 1>& a, int64_t lda, sycl::buffer<bfloat16, 1>& b,
+          int64_t ldb, float beta, sycl::buffer<bfloat16, 1>& c, int64_t ldc) {
+#if CUDA_VERSION >= 11000
+    overflow_check(m, n, k, lda, ldb, ldc);
+    queue.submit([&](sycl::handler& cgh) {
+        auto a_acc = a.template get_access<sycl::access::mode::read>(cgh);
+        auto b_acc = b.template get_access<sycl::access::mode::read>(cgh);
+        auto c_acc = c.template get_access<sycl::access::mode::read_write>(cgh);
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
+            auto a_ = sc.get_mem<bfloat16*>(a_acc);
+            auto b_ = sc.get_mem<bfloat16*>(b_acc);
+            auto c_ = sc.get_mem<bfloat16*>(c_acc);
+            cublasStatus_t err;
+#ifdef SYCL_EXT_ONEAPI_ENQUEUE_NATIVE_COMMAND
+            CUBLAS_ERROR_FUNC(cublasGemmEx, err, handle, get_cublas_operation(transa),
+                              get_cublas_operation(transb), m, n, k, &alpha, a_, CUDA_R_16BF, lda,
+                              b_, CUDA_R_16BF, ldb, &beta, c_, CUDA_R_16BF, ldc, CUBLAS_COMPUTE_32F,
+                              CUBLAS_GEMM_DEFAULT);
+#else
+            CUBLAS_ERROR_FUNC_SYNC(cublasGemmEx, err, handle, get_cublas_operation(transa),
+                                   get_cublas_operation(transb), m, n, k, &alpha, a_, CUDA_R_16BF,
+                                   lda, b_, CUDA_R_16BF, ldb, &beta, c_, CUDA_R_16BF, ldc,
+                                   CUBLAS_COMPUTE_32F, CUBLAS_GEMM_DEFAULT);
+#endif
+        });
+    });
+#else
+    throw unimplemented("blas", "gemm", "bfloat16 requires CUDA 11 or newer");
+#endif
+}
+
 template <typename Func, typename T>
 inline void symm(const char* func_name, Func func, sycl::queue& queue, side left_right,
                  uplo upper_lower, int64_t m, int64_t n, T alpha, sycl::buffer<T, 1>& a,
@@ -537,6 +570,37 @@ sycl::event gemm(sycl::queue& queue, transpose transa, transpose transb, int64_t
     throw unimplemented("blas", "gemm", "for column_major layout");
 }
 
+sycl::event gemm(sycl::queue& queue, transpose transa, transpose transb, int64_t m, int64_t n,
+                 int64_t k, float alpha, const bfloat16* a, int64_t lda, const bfloat16* b,
+                 int64_t ldb, float beta, bfloat16* c, int64_t ldc,
+                 const std::vector<sycl::event>& dependencies) {
+#if CUDA_VERSION >= 11000
+    overflow_check(m, n, k, lda, ldb, ldc);
+    return queue.submit([&](sycl::handler& cgh) {
+        for (const auto& dependency : dependencies) {
+            cgh.depends_on(dependency);
+        }
+        onemath_cublas_host_task(cgh, [=](CublasScopedContextHandler& sc) {
+            auto handle = sc.get_handle();
+            cublasStatus_t err;
+#ifdef SYCL_EXT_ONEAPI_ENQUEUE_NATIVE_COMMAND
+            CUBLAS_ERROR_FUNC(cublasGemmEx, err, handle, get_cublas_operation(transa),
+                              get_cublas_operation(transb), m, n, k, &alpha, a, CUDA_R_16BF, lda, b,
+                              CUDA_R_16BF, ldb, &beta, c, CUDA_R_16BF, ldc, CUBLAS_COMPUTE_32F,
+                              CUBLAS_GEMM_DEFAULT);
+#else
+            CUBLAS_ERROR_FUNC_SYNC(cublasGemmEx, err, handle, get_cublas_operation(transa),
+                                   get_cublas_operation(transb), m, n, k, &alpha, a, CUDA_R_16BF,
+                                   lda, b, CUDA_R_16BF, ldb, &beta, c, CUDA_R_16BF, ldc,
+                                   CUBLAS_COMPUTE_32F, CUBLAS_GEMM_DEFAULT);
+#endif
+        });
+    });
+#else
+    throw unimplemented("blas", "gemm", "bfloat16 requires CUDA 11 or newer");
+#endif
+}
+
 template <typename Func, typename T>
 inline sycl::event symm(const char* func_name, Func func, sycl::queue& queue, side left_right,
                         uplo upper_lower, int64_t m, int64_t n, T alpha, const T* a, int64_t lda,
@@ -926,6 +990,12 @@ void gemm(sycl::queue& queue, transpose transa, transpose transb, int64_t m, int
     throw unimplemented("blas", "gemm", "for row_major layout");
 }
 
+void gemm(sycl::queue& queue, transpose transa, transpose transb, int64_t m, int64_t n, int64_t k,
+          float alpha, sycl::buffer<bfloat16, 1>& a, int64_t lda, sycl::buffer<bfloat16, 1>& b,
+          int64_t ldb, float beta, sycl::buffer<bfloat16, 1>& c, int64_t ldc) {
+    column_major::gemm(queue, transb, transa, n, m, k, alpha, b, ldb, a, lda, beta, c, ldc);
+}
+
 template <typename Func, typename T>
 inline void symm(const char* func_name, Func func, sycl::queue& queue, side left_right,
                  uplo upper_lower, int64_t m, int64_t n, T alpha, sycl::buffer<T, 1>& a,
@@ -1158,6 +1228,14 @@ sycl::event gemm(sycl::queue& queue, transpose transa, transpose transb, int64_t
                  int64_t ldb, float beta, float* c, int64_t ldc,
                  const std::vector<sycl::event>& dependencies) {
     throw unimplemented("blas", "gemm", "for row_major layout");
+}
+
+sycl::event gemm(sycl::queue& queue, transpose transa, transpose transb, int64_t m, int64_t n,
+                 int64_t k, float alpha, const bfloat16* a, int64_t lda, const bfloat16* b,
+                 int64_t ldb, float beta, bfloat16* c, int64_t ldc,
+                 const std::vector<sycl::event>& dependencies) {
+    return column_major::gemm(queue, transb, transa, n, m, k, alpha, b, ldb, a, lda, beta, c, ldc,
+                              dependencies);
 }
 
 template <typename Func, typename T>
