@@ -23,6 +23,8 @@
 #include <algorithm>
 
 #include <complex>
+#include <iostream>
+#include <limits>
 #include <stdexcept>
 #include <type_traits>
 
@@ -41,7 +43,33 @@ static sycl::half abs(sycl::half v) {
     else
         return v;
 }
+static sycl::ext::oneapi::bfloat16 abs(sycl::ext::oneapi::bfloat16 v) {
+    float f = static_cast<float>(v);
+    return sycl::ext::oneapi::bfloat16(f < 0.0f ? -f : f);
+}
 } // namespace std
+
+// Without SYCL_IMPLEMENTATION_INTEL, oneapi::math::bfloat16 is the library type rather
+// than sycl::ext::oneapi::bfloat16, so the tests supply the pieces that type lacks.
+#ifndef SYCL_IMPLEMENTATION_INTEL
+namespace oneapi {
+namespace math {
+inline std::ostream& operator<<(std::ostream& os, const bfloat16& value) {
+    return os << static_cast<float>(value);
+}
+} // namespace math
+} // namespace oneapi
+
+namespace std {
+template <>
+struct numeric_limits<oneapi::math::bfloat16> {
+    static constexpr bool is_specialized = true;
+    static oneapi::math::bfloat16 epsilon() {
+        return oneapi::math::bfloat16(0x1p-7f);
+    }
+};
+} // namespace std
+#endif
 
 // Complex helpers.
 template <typename T>
@@ -151,6 +179,11 @@ uint8_t rand_scalar() {
 template <>
 sycl::half rand_scalar() {
     return sycl::half(std::rand() % 32000) / sycl::half(32000) - sycl::half(0.5);
+}
+
+template <>
+oneapi::math::bfloat16 rand_scalar() {
+    return oneapi::math::bfloat16(float(std::rand() % 32000) / 32000.0f - 0.5f);
 }
 
 template <typename fp>
@@ -442,6 +475,29 @@ void rand_tbsv_matrix(vec& M, oneapi::math::layout layout, oneapi::math::uplo up
 // entries. The rounding error of an entry whose sum cancels is then set by the accumulation scale
 // rather than by the entry itself, and no relative bound can cover it. Such callers pass that
 // scale as abs_bound, which only ever widens the absolute part of the check.
+//
+// Compare bfloat16 in float. Rounding the absolute or relative error to bfloat16 can change a
+// pass/fail decision next to the tolerance. This matches the bfloat16 GEMM tests.
+inline bool check_equal(oneapi::math::bfloat16 x, oneapi::math::bfloat16 x_ref, int error_mag,
+                        double abs_bound = 0.0) {
+    constexpr float bfloat16_epsilon = 1.0f / 128.0f;
+    const float bound = error_mag * bfloat16_epsilon;
+    const float abs_limit = std::max(bound, static_cast<float>(abs_bound));
+    const float x_float = static_cast<float>(x);
+    const float x_ref_float = static_cast<float>(x_ref);
+    const float aerr = std::abs(x_float - x_ref_float);
+    const float rerr = aerr / std::abs(x_ref_float);
+    const bool ok = (rerr <= bound) || (aerr <= abs_limit);
+    if (!ok) {
+        std::cout << "relative error = " << rerr << " absolute error = " << aerr
+                  << " limit = " << bound;
+        if (abs_limit > bound)
+            std::cout << " absolute limit = " << abs_limit;
+        std::cout << std::endl;
+    }
+    return ok;
+}
+
 template <typename fp>
 typename std::enable_if<!std::is_integral<fp>::value, bool>::type check_equal(
     fp x, fp x_ref, int error_mag, double abs_bound = 0.0) {
