@@ -48,7 +48,8 @@ extern std::vector<sycl::device*> devices;
 namespace {
 
 template <typename fp>
-int test(device* dev, oneapi::math::layout layout, int64_t incx, int64_t incy, int64_t batch_size) {
+int test(device* dev, oneapi::math::layout layout, int64_t incx, int64_t incy, int64_t batch_size,
+         bool shared_x = false) {
     // Catch asynchronous exceptions.
     auto exception_handler = [](exception_list exceptions) {
         for (std::exception_ptr const& e : exceptions) {
@@ -97,14 +98,14 @@ int test(device* dev, oneapi::math::layout layout, int64_t incx, int64_t incy, i
     int y_len = inner_dimension(transa, m, n);
 
     int64_t stride_x, stride_y, stride_a;
-    stride_x = x_len * std::abs(incx);
+    stride_x = shared_x ? 0 : x_len * std::abs(incx);
     stride_y = y_len * std::abs(incy);
     stride_a = lda * std::max(m, n);
 
     auto ua = usm_allocator<fp, usm::alloc::shared, 64>(cxt, *dev);
     vector<fp, decltype(ua)> x(ua), y(ua), A(ua), y_ref(ua);
 
-    x.resize(stride_x * batch_size);
+    x.resize(std::max<int64_t>(stride_x * batch_size, x_len * std::abs(incx)));
     y.resize(stride_y * batch_size);
     A.resize(stride_a * batch_size);
 
@@ -117,6 +118,7 @@ int test(device* dev, oneapi::math::layout layout, int64_t incx, int64_t incy, i
     y_ref.resize(y.size());
     for (int i = 0; i < y.size(); i++)
         y_ref[i] = y[i];
+    const std::vector<fp> x_orig(x.begin(), x.end());
 
     // Call reference GEMV_BATCH_STRIDE.
     using fp_ref = typename ref_type_info<fp>::type;
@@ -189,6 +191,10 @@ int test(device* dev, oneapi::math::layout layout, int64_t incx, int64_t incy, i
     // Compare the results of reference implementation and DPC++ implementation.
 
     bool good = true;
+    if (!std::equal(x_orig.begin(), x_orig.end(), x.begin())) {
+        std::cout << "Error: GEMV_BATCH_STRIDE overwrote the input x\n";
+        good = false;
+    }
     for (i = 0; i < batch_size; i++) {
         good = good && check_equal_vector(&y[i * stride_y], &y_ref[i * stride_y], y_len, incy,
                                           std::max<int>(m, n), std::cout);
@@ -203,6 +209,8 @@ TEST_P(GemvBatchStrideUsmTests, RealSinglePrecision) {
     EXPECT_TRUEORSKIP(test<float>(std::get<0>(GetParam()), std::get<1>(GetParam()), 2, 3, 5));
     EXPECT_TRUEORSKIP(test<float>(std::get<0>(GetParam()), std::get<1>(GetParam()), -2, -3, 5));
     EXPECT_TRUEORSKIP(test<float>(std::get<0>(GetParam()), std::get<1>(GetParam()), 1, 1, 5));
+    EXPECT_TRUEORSKIP(test<float>(std::get<0>(GetParam()), std::get<1>(GetParam()), 2, 3, 5,
+                                  /*shared_x=*/true));
 }
 
 TEST_P(GemvBatchStrideUsmTests, RealDoublePrecision) {
@@ -211,22 +219,34 @@ TEST_P(GemvBatchStrideUsmTests, RealDoublePrecision) {
     EXPECT_TRUEORSKIP(test<double>(std::get<0>(GetParam()), std::get<1>(GetParam()), 2, 3, 5));
     EXPECT_TRUEORSKIP(test<double>(std::get<0>(GetParam()), std::get<1>(GetParam()), -2, -3, 5));
     EXPECT_TRUEORSKIP(test<double>(std::get<0>(GetParam()), std::get<1>(GetParam()), 1, 1, 5));
+    EXPECT_TRUEORSKIP(test<double>(std::get<0>(GetParam()), std::get<1>(GetParam()), 2, 3, 5,
+                                   /*shared_x=*/true));
 }
 
 TEST_P(GemvBatchStrideUsmTests, ComplexSinglePrecision) {
     EXPECT_TRUEORSKIP(
-        test<std::complex<float>>(std::get<0>(GetParam()), std::get<1>(GetParam()), 2, 3, 5);
-        test<std::complex<float>>(std::get<0>(GetParam()), std::get<1>(GetParam()), -2, -3, 5);
+        test<std::complex<float>>(std::get<0>(GetParam()), std::get<1>(GetParam()), 2, 3, 5));
+    EXPECT_TRUEORSKIP(
+        test<std::complex<float>>(std::get<0>(GetParam()), std::get<1>(GetParam()), -2, -3, 5));
+    EXPECT_TRUEORSKIP(
         test<std::complex<float>>(std::get<0>(GetParam()), std::get<1>(GetParam()), 1, 1, 5));
+    EXPECT_TRUEORSKIP(test<std::complex<float>>(std::get<0>(GetParam()), std::get<1>(GetParam()), 2,
+                                                3, 5,
+                                                /*shared_x=*/true));
 }
 
 TEST_P(GemvBatchStrideUsmTests, ComplexDoublePrecision) {
     CHECK_DOUBLE_ON_DEVICE(std::get<0>(GetParam()));
 
     EXPECT_TRUEORSKIP(
-        test<std::complex<double>>(std::get<0>(GetParam()), std::get<1>(GetParam()), 2, 3, 5);
-        test<std::complex<double>>(std::get<0>(GetParam()), std::get<1>(GetParam()), -2, -3, 5);
+        test<std::complex<double>>(std::get<0>(GetParam()), std::get<1>(GetParam()), 2, 3, 5));
+    EXPECT_TRUEORSKIP(
+        test<std::complex<double>>(std::get<0>(GetParam()), std::get<1>(GetParam()), -2, -3, 5));
+    EXPECT_TRUEORSKIP(
         test<std::complex<double>>(std::get<0>(GetParam()), std::get<1>(GetParam()), 1, 1, 5));
+    EXPECT_TRUEORSKIP(test<std::complex<double>>(std::get<0>(GetParam()), std::get<1>(GetParam()),
+                                                 2, 3, 5,
+                                                 /*shared_x=*/true));
 }
 
 INSTANTIATE_TEST_SUITE_P(GemvBatchStrideUsmTestSuite, GemvBatchStrideUsmTests,

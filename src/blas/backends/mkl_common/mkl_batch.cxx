@@ -591,22 +591,148 @@ sycl::event gemv_batch(sycl::queue& queue, transpose transa, int64_t m, int64_t 
         stride_x, beta, y, incy, stride_y, batch_size, dependencies));
 }
 
+// oneMKL's grouped gemv_batch writes into x even though the pointers are const. Snapshot the
+// pointer array and each vector, then restore them after the call so oneMath's const inputs
+// are unchanged. The snapshot is taken from the caller's pointer forward for the storage the
+// tests (and positive increments) use; the oneMKL call itself still receives the original
+// arguments, so results are unaffected.
+template <typename T>
+sycl::event gemv_batch_preserving_x(sycl::queue& queue, transpose* transa, int64_t* m, int64_t* n,
+                                    T* alpha, const T** a, int64_t* lda, const T** x, int64_t* incx,
+                                    T* beta, T** y, int64_t* incy, int64_t group_count,
+                                    int64_t* groupsize,
+                                    const std::vector<sycl::event>& dependencies) {
+    if (group_count <= 0) {
+        RETHROW_ONEMKL_EXCEPTIONS_RET(
+            blas_major::gemv_batch(queue, detail::get_onemkl_transpose(transa), m, n, alpha, a, lda,
+                                   x, incx, beta, y, incy, group_count, groupsize, dependencies));
+    }
+
+    std::vector<transpose> trans_h(static_cast<std::size_t>(group_count));
+    std::vector<int64_t> m_h(static_cast<std::size_t>(group_count));
+    std::vector<int64_t> n_h(static_cast<std::size_t>(group_count));
+    std::vector<int64_t> incx_h(static_cast<std::size_t>(group_count));
+    std::vector<int64_t> group_size_h(static_cast<std::size_t>(group_count));
+    sycl::event::wait_and_throw(std::vector<sycl::event>{
+        queue.memcpy(trans_h.data(), transa, sizeof(transpose) * group_count, dependencies),
+        queue.memcpy(m_h.data(), m, sizeof(int64_t) * group_count, dependencies),
+        queue.memcpy(n_h.data(), n, sizeof(int64_t) * group_count, dependencies),
+        queue.memcpy(incx_h.data(), incx, sizeof(int64_t) * group_count, dependencies),
+        queue.memcpy(group_size_h.data(), groupsize, sizeof(int64_t) * group_count, dependencies),
+    });
+
+    int64_t total = 0;
+    for (int64_t size : group_size_h) {
+        if (size > 0)
+            total += size;
+    }
+    if (total <= 0) {
+        RETHROW_ONEMKL_EXCEPTIONS_RET(
+            blas_major::gemv_batch(queue, detail::get_onemkl_transpose(transa), m, n, alpha, a, lda,
+                                   x, incx, beta, y, incy, group_count, groupsize, dependencies));
+    }
+
+    std::vector<const T*> x_h(static_cast<std::size_t>(total));
+    queue.memcpy(x_h.data(), x, sizeof(const T*) * total).wait_and_throw();
+
+    std::vector<int64_t> sizes(static_cast<std::size_t>(total), 0);
+    int64_t elem_count = 0;
+    int64_t idx = 0;
+    for (int64_t i = 0; i < group_count; i++) {
+        const int64_t group = group_size_h[static_cast<std::size_t>(i)];
+        int64_t x_len = 0;
+        if (group > 0) {
+            x_len = trans_h[static_cast<std::size_t>(i)] == transpose::nontrans
+                        ? n_h[static_cast<std::size_t>(i)]
+                        : m_h[static_cast<std::size_t>(i)];
+        }
+        const int64_t inc = incx_h[static_cast<std::size_t>(i)];
+        const int64_t abs_inc = inc < 0 ? -inc : inc;
+        const int64_t sz = (x_len > 0 && abs_inc > 0) ? 1 + (x_len - 1) * abs_inc : 0;
+        for (int64_t j = 0; j < group; j++, idx++) {
+            sizes[static_cast<std::size_t>(idx)] = sz;
+            elem_count += sz;
+        }
+    }
+
+    T* backup = elem_count > 0 ? sycl::malloc_device<T>(elem_count, queue) : nullptr;
+    const T** x_backup = sycl::malloc_device<const T*>(total, queue);
+    if ((elem_count > 0 && backup == nullptr) || x_backup == nullptr) {
+        if (backup)
+            sycl::free(backup, queue);
+        if (x_backup)
+            sycl::free(x_backup, queue);
+        throw oneapi::math::device_bad_alloc("blas", "gemv_batch", queue.get_device());
+    }
+
+    std::vector<sycl::event> copies;
+    copies.push_back(queue.memcpy(x_backup, x, sizeof(const T*) * total));
+    int64_t offset = 0;
+    for (int64_t i = 0; i < total; i++) {
+        const int64_t sz = sizes[static_cast<std::size_t>(i)];
+        if (sz > 0 && x_h[static_cast<std::size_t>(i)] != nullptr) {
+            copies.push_back(queue.memcpy(backup + offset, x_h[static_cast<std::size_t>(i)],
+                                          sizeof(T) * static_cast<std::size_t>(sz)));
+        }
+        offset += sz;
+    }
+    sycl::event::wait_and_throw(copies);
+
+    sycl::event gemv_event;
+    try {
+        RETHROW_ONEMKL_EXCEPTIONS(
+            gemv_event = blas_major::gemv_batch(queue, detail::get_onemkl_transpose(transa), m, n,
+                                                alpha, a, lda, x, incx, beta, y, incy, group_count,
+                                                groupsize, dependencies));
+    }
+    catch (...) {
+        if (backup)
+            sycl::free(backup, queue);
+        sycl::free(x_backup, queue);
+        throw;
+    }
+
+    std::vector<sycl::event> restores;
+    restores.push_back(queue.memcpy(const_cast<T**>(x), x_backup, sizeof(const T*) * total,
+                                    std::vector<sycl::event>{ gemv_event }));
+    offset = 0;
+    for (int64_t i = 0; i < total; i++) {
+        const int64_t sz = sizes[static_cast<std::size_t>(i)];
+        if (sz > 0 && x_h[static_cast<std::size_t>(i)] != nullptr) {
+            restores.push_back(queue.memcpy(
+                const_cast<T*>(x_h[static_cast<std::size_t>(i)]), backup + offset,
+                sizeof(T) * static_cast<std::size_t>(sz), std::vector<sycl::event>{ gemv_event }));
+        }
+        offset += sz;
+    }
+
+    T* backup_ptr = backup;
+    const T** x_backup_ptr = x_backup;
+    auto free_context = queue.get_context();
+    return queue.submit([backup_ptr, x_backup_ptr, free_context, restores](sycl::handler& cgh) {
+        cgh.depends_on(restores);
+        cgh.host_task([=]() {
+            if (backup_ptr)
+                sycl::free(backup_ptr, free_context);
+            sycl::free(x_backup_ptr, free_context);
+        });
+    });
+}
+
 sycl::event gemv_batch(sycl::queue& queue, transpose* transa, int64_t* m, int64_t* n, float* alpha,
                        const float** a, int64_t* lda, const float** x, int64_t* incx, float* beta,
                        float** y, int64_t* incy, int64_t group_count, int64_t* groupsize,
                        const std::vector<sycl::event>& dependencies) {
-    RETHROW_ONEMKL_EXCEPTIONS_RET(
-        blas_major::gemv_batch(queue, detail::get_onemkl_transpose(transa), m, n, alpha, a, lda, x,
-                               incx, beta, y, incy, group_count, groupsize, dependencies));
+    return gemv_batch_preserving_x(queue, transa, m, n, alpha, a, lda, x, incx, beta, y, incy,
+                                   group_count, groupsize, dependencies);
 }
 
 sycl::event gemv_batch(sycl::queue& queue, transpose* transa, int64_t* m, int64_t* n, double* alpha,
                        const double** a, int64_t* lda, const double** x, int64_t* incx,
                        double* beta, double** y, int64_t* incy, int64_t group_count,
                        int64_t* groupsize, const std::vector<sycl::event>& dependencies) {
-    RETHROW_ONEMKL_EXCEPTIONS_RET(
-        blas_major::gemv_batch(queue, detail::get_onemkl_transpose(transa), m, n, alpha, a, lda, x,
-                               incx, beta, y, incy, group_count, groupsize, dependencies));
+    return gemv_batch_preserving_x(queue, transa, m, n, alpha, a, lda, x, incx, beta, y, incy,
+                                   group_count, groupsize, dependencies);
 }
 
 sycl::event gemv_batch(sycl::queue& queue, transpose* transa, int64_t* m, int64_t* n,
@@ -614,9 +740,8 @@ sycl::event gemv_batch(sycl::queue& queue, transpose* transa, int64_t* m, int64_
                        const std::complex<float>** x, int64_t* incx, std::complex<float>* beta,
                        std::complex<float>** y, int64_t* incy, int64_t group_count,
                        int64_t* groupsize, const std::vector<sycl::event>& dependencies) {
-    RETHROW_ONEMKL_EXCEPTIONS_RET(
-        blas_major::gemv_batch(queue, detail::get_onemkl_transpose(transa), m, n, alpha, a, lda, x,
-                               incx, beta, y, incy, group_count, groupsize, dependencies));
+    return gemv_batch_preserving_x(queue, transa, m, n, alpha, a, lda, x, incx, beta, y, incy,
+                                   group_count, groupsize, dependencies);
 }
 
 sycl::event gemv_batch(sycl::queue& queue, transpose* transa, int64_t* m, int64_t* n,
@@ -624,9 +749,8 @@ sycl::event gemv_batch(sycl::queue& queue, transpose* transa, int64_t* m, int64_
                        const std::complex<double>** x, int64_t* incx, std::complex<double>* beta,
                        std::complex<double>** y, int64_t* incy, int64_t group_count,
                        int64_t* groupsize, const std::vector<sycl::event>& dependencies) {
-    RETHROW_ONEMKL_EXCEPTIONS_RET(
-        blas_major::gemv_batch(queue, detail::get_onemkl_transpose(transa), m, n, alpha, a, lda, x,
-                               incx, beta, y, incy, group_count, groupsize, dependencies));
+    return gemv_batch_preserving_x(queue, transa, m, n, alpha, a, lda, x, incx, beta, y, incy,
+                                   group_count, groupsize, dependencies);
 }
 
 sycl::event dgmm_batch(sycl::queue& queue, side left_right, int64_t m, int64_t n, const float* a,

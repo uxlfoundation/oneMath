@@ -147,6 +147,18 @@ int test(device* dev, oneapi::math::layout layout, int64_t group_count) {
         }
     }
 
+    // Inputs that must still hold these values after the call.
+    std::vector<oneapi::math::transpose> transa_orig(transa.begin(), transa.end());
+    std::vector<fp> alpha_orig(alpha.begin(), alpha.end()), beta_orig(beta.begin(), beta.end());
+    std::vector<std::vector<fp>> x_orig(total_batch_count);
+    idx = 0;
+    for (i = 0; i < group_count; i++) {
+        x_len = (transa[i] == oneapi::math::transpose::nontrans) ? n[i] : m[i];
+        size_x = 1 + (x_len - 1) * std::abs(incx[i]);
+        for (j = 0; j < group_size[i]; j++, idx++)
+            x_orig[idx].assign(x_array[idx], x_array[idx] + size_x);
+    }
+
     // Call reference GEMV_BATCH.
     using fp_ref = typename ref_type_info<fp>::type;
     int* m_ref = (int*)oneapi::math::aligned_alloc(64, sizeof(int) * group_count);
@@ -271,6 +283,19 @@ int test(device* dev, oneapi::math::layout layout, int64_t group_count) {
     }
 
     bool good = true;
+    idx = 0;
+    for (i = 0; i < group_count && good; i++) {
+        if (transa[i] != transa_orig[i] || alpha[i] != alpha_orig[i] || beta[i] != beta_orig[i]) {
+            std::cout << "Error: GEMV_BATCH overwrote an input parameter array\n";
+            good = false;
+        }
+        for (j = 0; j < group_size[i] && good; j++, idx++) {
+            if (!std::equal(x_orig[idx].begin(), x_orig[idx].end(), x_array[idx])) {
+                std::cout << "Error: GEMV_BATCH overwrote the input x\n";
+                good = false;
+            }
+        }
+    }
     // Compare the results of reference implementation and DPC++ implementation.
     idx = 0;
     for (i = 0; i < group_count; i++) {
