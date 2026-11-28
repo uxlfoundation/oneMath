@@ -16,6 +16,10 @@
 *  limitations under the License.
 *
 **************************************************************************/
+#include <cmath>
+#include <type_traits>
+#include <vector>
+
 #include "cublas_helper.hpp"
 #include "cublas_task.hpp"
 #include "oneapi/math/exceptions.hpp"
@@ -140,6 +144,39 @@ void dgmm_batch(sycl::queue& queue, side left_right, int64_t m, int64_t n,
     throw unimplemented("blas", "dgmm_batch", "for column_major layout");
 }
 
+// cuBLAS computes an int32 output only with CUBLAS_COMPUTE_32I, which takes int32 alpha and beta,
+// whereas oneMath specifies float scalars for the (int8, int8, int32, float) combination. A float
+// scalar converts exactly when it is integral and in the int32 range; any other value cannot be
+// passed to cuBLAS and is reported as unimplemented.
+template <typename Tc, typename Ts>
+using cublas_scalar_t = std::conditional_t<std::is_same_v<Tc, std::int32_t>, std::int32_t, Ts>;
+
+template <typename Tc, typename Ts>
+inline cublas_scalar_t<Tc, Ts> to_cublas_scalar(Ts scalar) {
+    if constexpr (std::is_same_v<Tc, std::int32_t>) {
+        if (!(scalar >= -2147483648.0f && scalar < 2147483648.0f) || scalar != std::floor(scalar)) {
+            throw unimplemented("blas", "gemm_batch",
+                                "int32 output requires integral alpha and beta in the int32 range");
+        }
+        return static_cast<std::int32_t>(scalar);
+    }
+    else {
+        return scalar;
+    }
+}
+
+// The compute type of cublasGemm*BatchedEx: the scalar's datatype, or CUBLAS_COMPUTE_32I for an
+// int32 output.
+template <typename Tc, typename Ts>
+inline auto get_cublas_compute_type() {
+    if constexpr (std::is_same_v<Tc, std::int32_t>) {
+        return CUBLAS_COMPUTE_32I;
+    }
+    else {
+        return get_cublas_datatype<typename CudaEquivalentType<Ts>::Type>();
+    }
+}
+
 template <typename Ta, typename Tb, typename Tc, typename Ts>
 inline void gemm_batch_impl(sycl::queue& queue, transpose transa, transpose transb, int64_t m,
                             int64_t n, int64_t k, Ts alpha, sycl::buffer<Ta, 1>& a, int64_t lda,
@@ -149,8 +186,9 @@ inline void gemm_batch_impl(sycl::queue& queue, transpose transa, transpose tran
     using cuTypeA = typename CudaEquivalentType<Ta>::Type;
     using cuTypeB = typename CudaEquivalentType<Tb>::Type;
     using cuTypeC = typename CudaEquivalentType<Tc>::Type;
-    using cuTypeS = typename CudaEquivalentType<Ts>::Type;
     overflow_check(m, n, k, lda, ldb, ldc, stride_a, stride_b, stride_c, batch_size);
+    const auto alpha_c = to_cublas_scalar<Tc>(alpha);
+    const auto beta_c = to_cublas_scalar<Tc>(beta);
 
     cublasGemmAlgo_t cublas_gemm_algo = CUBLAS_GEMM_DEFAULT;
     queue.submit([&](sycl::handler& cgh) {
@@ -170,17 +208,17 @@ inline void gemm_batch_impl(sycl::queue& queue, transpose transa, transpose tran
 #ifdef SYCL_EXT_ONEAPI_ENQUEUE_NATIVE_COMMAND
             CUBLAS_ERROR_FUNC_T("cublasGemmStridedBatchedEx", cublasGemmStridedBatchedEx, err,
                                 handle, get_cublas_operation(transa), get_cublas_operation(transb),
-                                m, n, k, &alpha, a_, get_cublas_datatype<cuTypeA>(), lda, stride_a,
-                                b_, get_cublas_datatype<cuTypeB>(), ldb, stride_b, &beta, c_,
-                                get_cublas_datatype<cuTypeC>(), ldc, stride_c, batch_size,
-                                get_cublas_datatype<cuTypeS>(), cublas_gemm_algo);
+                                m, n, k, &alpha_c, a_, get_cublas_datatype<cuTypeA>(), lda,
+                                stride_a, b_, get_cublas_datatype<cuTypeB>(), ldb, stride_b,
+                                &beta_c, c_, get_cublas_datatype<cuTypeC>(), ldc, stride_c,
+                                batch_size, get_cublas_compute_type<Tc, Ts>(), cublas_gemm_algo);
 #else
             CUBLAS_ERROR_FUNC_T_SYNC(
                 "cublasGemmStridedBatchedEx", cublasGemmStridedBatchedEx, err, handle,
-                get_cublas_operation(transa), get_cublas_operation(transb), m, n, k, &alpha, a_,
+                get_cublas_operation(transa), get_cublas_operation(transb), m, n, k, &alpha_c, a_,
                 get_cublas_datatype<cuTypeA>(), lda, stride_a, b_, get_cublas_datatype<cuTypeB>(),
-                ldb, stride_b, &beta, c_, get_cublas_datatype<cuTypeC>(), ldc, stride_c, batch_size,
-                get_cublas_datatype<cuTypeS>(), cublas_gemm_algo);
+                ldb, stride_b, &beta_c, c_, get_cublas_datatype<cuTypeC>(), ldc, stride_c, batch_size,
+                get_cublas_compute_type<Tc, Ts>(), cublas_gemm_algo);
 #endif
         });
     });
@@ -200,6 +238,7 @@ inline void gemm_batch_impl(sycl::queue& queue, transpose transa, transpose tran
 GEMM_STRIDED_BATCH_LAUNCHER(sycl::half, sycl::half, sycl::half, sycl::half)
 GEMM_STRIDED_BATCH_LAUNCHER(sycl::half, sycl::half, float, float)
 GEMM_STRIDED_BATCH_LAUNCHER(std::int8_t, std::int8_t, float, float)
+GEMM_STRIDED_BATCH_LAUNCHER(std::int8_t, std::int8_t, std::int32_t, float)
 GEMM_STRIDED_BATCH_LAUNCHER(float, float, float, float)
 GEMM_STRIDED_BATCH_LAUNCHER(double, double, double, double)
 GEMM_STRIDED_BATCH_LAUNCHER(std::complex<float>, std::complex<float>, std::complex<float>,
@@ -209,8 +248,6 @@ GEMM_STRIDED_BATCH_LAUNCHER(std::complex<double>, std::complex<double>, std::com
 
 #undef GEMM_STRIDED_BATCH_LAUNCHER
 
-// cuBLAS computes an int32 output only with CUBLAS_COMPUTE_32I, which requires int32 alpha and
-// beta, whereas oneMath specifies float scalars for this combination.
 #define GEMM_STRIDED_BATCH_LAUNCHER(TYPE_A, TYPE_B, TYPE_C, TYPE_S)                               \
     void gemm_batch(sycl::queue& queue, transpose transa, transpose transb, int64_t m, int64_t n, \
                     int64_t k, TYPE_S alpha, sycl::buffer<TYPE_A, 1>& a, int64_t lda,             \
@@ -223,7 +260,6 @@ GEMM_STRIDED_BATCH_LAUNCHER(std::complex<double>, std::complex<double>, std::com
                                 dtype_string<TYPE_C>() + "," + dtype_string<TYPE_S>() + ">");     \
     }
 
-GEMM_STRIDED_BATCH_LAUNCHER(std::int8_t, std::int8_t, std::int32_t, float)
 GEMM_STRIDED_BATCH_LAUNCHER(bfloat16, bfloat16, float, float)
 GEMM_STRIDED_BATCH_LAUNCHER(bfloat16, bfloat16, bfloat16, float)
 
@@ -623,8 +659,9 @@ inline sycl::event gemm_batch_strided_usm_impl(sycl::queue& queue, transpose tra
     using cuTypeA = typename CudaEquivalentType<Ta>::Type;
     using cuTypeB = typename CudaEquivalentType<Tb>::Type;
     using cuTypeC = typename CudaEquivalentType<Tc>::Type;
-    using cuTypeS = typename CudaEquivalentType<Ts>::Type;
     overflow_check(m, n, k, lda, ldb, ldc, stride_a, stride_b, stride_c, batch_size);
+    const auto alpha_c = to_cublas_scalar<Tc>(alpha);
+    const auto beta_c = to_cublas_scalar<Tc>(beta);
 
     cublasGemmAlgo_t cublas_gemm_algo = CUBLAS_GEMM_DEFAULT;
     auto done = queue.submit([&](sycl::handler& cgh) {
@@ -642,17 +679,17 @@ inline sycl::event gemm_batch_strided_usm_impl(sycl::queue& queue, transpose tra
 #ifdef SYCL_EXT_ONEAPI_ENQUEUE_NATIVE_COMMAND
             CUBLAS_ERROR_FUNC_T("cublasGemmStridedBatchedEx", cublasGemmStridedBatchedEx, err,
                                 handle, get_cublas_operation(transa), get_cublas_operation(transb),
-                                m, n, k, &alpha, a, get_cublas_datatype<cuTypeA>(), lda, stride_a,
-                                b, get_cublas_datatype<cuTypeB>(), ldb, stride_b, &beta, c,
+                                m, n, k, &alpha_c, a, get_cublas_datatype<cuTypeA>(), lda, stride_a,
+                                b, get_cublas_datatype<cuTypeB>(), ldb, stride_b, &beta_c, c,
                                 get_cublas_datatype<cuTypeC>(), ldc, stride_c, batch_size,
-                                get_cublas_datatype<cuTypeS>(), cublas_gemm_algo);
+                                get_cublas_compute_type<Tc, Ts>(), cublas_gemm_algo);
 #else
             CUBLAS_ERROR_FUNC_T_SYNC(
                 "cublasGemmStridedBatchedEx", cublasGemmStridedBatchedEx, err, handle,
-                get_cublas_operation(transa), get_cublas_operation(transb), m, n, k, &alpha, a,
+                get_cublas_operation(transa), get_cublas_operation(transb), m, n, k, &alpha_c, a,
                 get_cublas_datatype<cuTypeA>(), lda, stride_a, b, get_cublas_datatype<cuTypeB>(),
-                ldb, stride_b, &beta, c, get_cublas_datatype<cuTypeC>(), ldc, stride_c, batch_size,
-                get_cublas_datatype<cuTypeS>(), cublas_gemm_algo);
+                ldb, stride_b, &beta_c, c, get_cublas_datatype<cuTypeC>(), ldc, stride_c, batch_size,
+                get_cublas_compute_type<Tc, Ts>(), cublas_gemm_algo);
 #endif
         });
     });
@@ -673,6 +710,7 @@ inline sycl::event gemm_batch_strided_usm_impl(sycl::queue& queue, transpose tra
 GEMM_STRIDED_BATCH_LAUNCHER_USM(sycl::half, sycl::half, sycl::half, sycl::half)
 GEMM_STRIDED_BATCH_LAUNCHER_USM(sycl::half, sycl::half, float, float)
 GEMM_STRIDED_BATCH_LAUNCHER_USM(std::int8_t, std::int8_t, float, float)
+GEMM_STRIDED_BATCH_LAUNCHER_USM(std::int8_t, std::int8_t, std::int32_t, float)
 GEMM_STRIDED_BATCH_LAUNCHER_USM(float, float, float, float)
 GEMM_STRIDED_BATCH_LAUNCHER_USM(double, double, double, double)
 GEMM_STRIDED_BATCH_LAUNCHER_USM(std::complex<float>, std::complex<float>, std::complex<float>,
@@ -694,7 +732,6 @@ GEMM_STRIDED_BATCH_LAUNCHER_USM(std::complex<double>, std::complex<double>, std:
                                 dtype_string<TYPE_C>() + "," + dtype_string<TYPE_S>() + ">");  \
     }
 
-GEMM_STRIDED_BATCH_LAUNCHER_USM(std::int8_t, std::int8_t, std::int32_t, float)
 GEMM_STRIDED_BATCH_LAUNCHER_USM(bfloat16, bfloat16, float, float)
 GEMM_STRIDED_BATCH_LAUNCHER_USM(bfloat16, bfloat16, bfloat16, float)
 
@@ -709,9 +746,13 @@ inline sycl::event gemm_batch_usm_impl(sycl::queue& queue, transpose* transa, tr
     using cuTypeA = typename CudaEquivalentType<Ta>::Type;
     using cuTypeB = typename CudaEquivalentType<Tb>::Type;
     using cuTypeC = typename CudaEquivalentType<Tc>::Type;
-    using cuTypeS = typename CudaEquivalentType<Ts>::Type;
     for (int64_t i = 0; i < group_count; i++) {
         overflow_check(m[i], n[i], k[i], lda[i], ldb[i], ldc[i], group_size[i]);
+    }
+    std::vector<cublas_scalar_t<Tc, Ts>> alpha_c(group_count), beta_c(group_count);
+    for (int64_t i = 0; i < group_count; i++) {
+        alpha_c[i] = to_cublas_scalar<Tc>(alpha[i]);
+        beta_c[i] = to_cublas_scalar<Tc>(beta[i]);
     }
 
     cublasGemmAlgo_t cublas_gemm_algo = CUBLAS_GEMM_DEFAULT;
@@ -733,20 +774,20 @@ inline sycl::event gemm_batch_usm_impl(sycl::queue& queue, transpose* transa, tr
                 CUBLAS_ERROR_FUNC_T(
                     "cublasGemmBatchedEx", cublasGemmBatchedEx, err, handle,
                     get_cublas_operation(transa[i]), get_cublas_operation(transb[i]), (int)m[i],
-                    (int)n[i], (int)k[i], &alpha[i], (const void* const*)(a + offset),
+                    (int)n[i], (int)k[i], &alpha_c[i], (const void* const*)(a + offset),
                     get_cublas_datatype<cuTypeA>(), (int)lda[i], (const void* const*)(b + offset),
-                    get_cublas_datatype<cuTypeB>(), (int)ldb[i], &beta[i],
+                    get_cublas_datatype<cuTypeB>(), (int)ldb[i], &beta_c[i],
                     (void* const*)(c + offset), get_cublas_datatype<cuTypeC>(), (int)ldc[i],
-                    (int)group_size[i], get_cublas_datatype<cuTypeS>(), cublas_gemm_algo);
+                    (int)group_size[i], get_cublas_compute_type<Tc, Ts>(), cublas_gemm_algo);
 #else
                 CUBLAS_ERROR_FUNC_T_SYNC(
                     "cublasGemmBatchedEx", cublasGemmBatchedEx, err, handle,
                     get_cublas_operation(transa[i]), get_cublas_operation(transb[i]), (int)m[i],
-                    (int)n[i], (int)k[i], &alpha[i], (const void *const *)(a + offset),
+                    (int)n[i], (int)k[i], &alpha_c[i], (const void *const *)(a + offset),
                     get_cublas_datatype<cuTypeA>(), (int)lda[i], (const void *const *)(b + offset),
-                    get_cublas_datatype<cuTypeB>(), (int)ldb[i], &beta[i],
+                    get_cublas_datatype<cuTypeB>(), (int)ldb[i], &beta_c[i],
                     (void *const *)(c + offset), get_cublas_datatype<cuTypeC>(), (int)ldc[i],
-                    (int)group_size[i], get_cublas_datatype<cuTypeS>(), cublas_gemm_algo);
+                    (int)group_size[i], get_cublas_compute_type<Tc, Ts>(), cublas_gemm_algo);
 #endif
                 offset += group_size[i];
             }
@@ -768,6 +809,7 @@ inline sycl::event gemm_batch_usm_impl(sycl::queue& queue, transpose* transa, tr
 GEMM_BATCH_LAUNCHER_USM(sycl::half, sycl::half, sycl::half, sycl::half)
 GEMM_BATCH_LAUNCHER_USM(sycl::half, sycl::half, float, float)
 GEMM_BATCH_LAUNCHER_USM(std::int8_t, std::int8_t, float, float)
+GEMM_BATCH_LAUNCHER_USM(std::int8_t, std::int8_t, std::int32_t, float)
 GEMM_BATCH_LAUNCHER_USM(float, float, float, float)
 GEMM_BATCH_LAUNCHER_USM(double, double, double, double)
 GEMM_BATCH_LAUNCHER_USM(std::complex<float>, std::complex<float>, std::complex<float>,
@@ -789,7 +831,6 @@ GEMM_BATCH_LAUNCHER_USM(std::complex<double>, std::complex<double>, std::complex
                                 dtype_string<TYPE_C>() + "," + dtype_string<TYPE_S>() + ">");      \
     }
 
-GEMM_BATCH_LAUNCHER_USM(std::int8_t, std::int8_t, std::int32_t, float)
 GEMM_BATCH_LAUNCHER_USM(bfloat16, bfloat16, float, float)
 GEMM_BATCH_LAUNCHER_USM(bfloat16, bfloat16, bfloat16, float)
 
