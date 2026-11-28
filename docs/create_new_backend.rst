@@ -366,7 +366,7 @@ Here is the list of files that should be created/updated to integrate the new wr
         +       PUBLIC ONEMATH::NEWLIB::NEWLIB
             )
 
-Now you can build the backend library for ``newlib`` to make sure the third-party library integration was completed successfully (for more information, see `Build with cmake <../README.md#building-with-cmake>`_)
+Now you can build the backend library for ``newlib`` to make sure the third-party library integration was completed successfully (for more information, see `Building the Project with DPC++ <https://oneapi-src.github.io/oneMKL/building_the_project_with_dpcpp.html>`_)
 
 .. code-block:: bash
 
@@ -463,7 +463,7 @@ Update the following files to enable the new third-party library for unit tests:
      +      devices.push_back(sycl::device(sycl::host_selector()));
      +  #endif
 
-Now you can build and run functional testing for enabled third-party libraries (for more information see `Build with cmake <../README.md#building-with-cmake>`_).
+Now you can build and run functional testing for enabled third-party libraries (for more information see `Building the Project with DPC++ <https://oneapi-src.github.io/oneMKL/building_the_project_with_dpcpp.html>`_).
 
 .. code-block:: bash
 
