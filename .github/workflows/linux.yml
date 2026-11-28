@@ -1,0 +1,113 @@
+name: Build tests with hipSYCL
+
+on: [push, pull_request]
+
+jobs:
+  test-with-hipsycl:
+    name: Run tests with hipSYCL
+    strategy:
+      matrix:
+        clang_version: [13]
+        rocm_version: ['5.1.1']
+        cuda_version: ['11.6']
+        os: [ubuntu-20.04, ubuntu-18.04]
+    runs-on: ${{matrix.os}}
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
+    - name: install ROCm
+      run: |
+        sudo apt install libnuma-dev cmake unzip
+        wget -q -O - https://repo.radeon.com/rocm/rocm.gpg.key | sudo apt-key add -
+        echo 'deb [arch=amd64] https://repo.radeon.com/rocm/apt/${{matrix.rocm_version}}/ ubuntu main' | sudo tee /etc/apt/sources.list.d/rocm.list
+        sudo apt update
+        sudo apt install rocm-dev rocblas
+    - name: install LLVM
+      run: |
+        wget https://apt.llvm.org/llvm.sh
+        chmod +x llvm.sh
+        sudo ./llvm.sh ${{matrix.clang_version}}
+        sudo apt install libclang-${{matrix.clang_version}}-dev clang-tools-${{matrix.clang_version}} libomp-${{matrix.clang_version}}-dev
+    - name: install boost from apt
+      if: matrix.os == 'ubuntu-20.04'
+      run: |
+        sudo apt update
+        sudo apt install libboost-all-dev
+    - name: install boost from source
+      if: matrix.os == 'ubuntu-18.04'
+      run: |
+        cd
+        wget -q https://boostorg.jfrog.io/artifactory/main/release/1.70.0/source/boost_1_70_0.zip
+        unzip boost_1_70_0.zip
+        cd boost_1_70_0
+        ./bootstrap.sh --prefix=/usr
+        ./b2
+        sudo ./b2 install -j4
+    - name: install CUDA
+      run: |
+        cd
+        wget https://developer.download.nvidia.com/compute/cuda/11.6.0/local_installers/cuda_11.6.0_510.39.01_linux.run
+        sudo sh cuda_11.6.0_510.39.01_linux.run --override --silent --toolkit
+        cd
+    - name: test CUDA and cuBLAS
+      run: |
+         /usr/local/cuda/bin/nvcc --version
+         cat /usr/local/cuda/version.json
+         cat /usr/local/cuda/include/cublas.h | grep CUBLAS
+    - name: build hipSYCL
+      run: |
+        cd
+        git clone https://github.com/illuhad/hipSYCL.git
+        cd hipSYCL
+        mkdir build && cd build
+        cmake -DCMAKE_CXX_COMPILER=/usr/bin/clang++-${{matrix.clang_version}} \
+              -DCLANG_EXECUTABLE_PATH=/usr/bin/clang++-${{matrix.clang_version}} \
+              -DLLVM_DIR=/usr/lib/llvm-${{matrix.clang_version}}/cmake \
+              -DWITH_CUDA_BACKEND=ON \
+              -DWITH_ROCM_BACKEND=OFF \
+              -DWITH_LEVEL_ZERO_BACKEND=OFF \
+              -DCMAKE_INSTALL_PREFIX=/opt/hipSYCL \
+              -DROCM_PATH=/opt/rocm-${{matrix.rocm_version}} \
+              -DCUDA_PATH=/usr/local/cuda-${{matrix.cuda_version}} ..
+        make -j2 install
+    - name: install LAPACK (for CBLAS)
+      run: |
+        cd
+        git clone https://github.com/Reference-LAPACK/lapack.git
+        cd lapack
+        mkdir build && cd build
+        cmake -DCMAKE_INSTALL_LIBDIR=/opt/lapack -DBUILD_SHARED_LIBS=ON -DCBLAS=ON ..
+        sudo cmake --build . -j --target install
+    - name: clone and build oneMKL
+      env:
+        rocblas_DIR: /opt/rocm-${{matrix.rocm_version}}/lib/cmake/rocblas/
+        hip_DIR: /opt/rocm-${{matrix.rocm_version}}/lib/cmake/hip/
+        AMDDeviceLibs_DIR: /opt/rocm-${{matrix.rocm_version}}/lib/cmake/AMDDeviceLibs/
+        amd_comgr_DIR: /opt/rocm-${{matrix.rocm_version}}/lib/cmake/amd_comgr/
+        hsa-runtime64_DIR: /opt/rocm-${{matrix.rocm_version}}/lib/cmake/hsa-runtime64/
+      run: |
+        cd
+        git clone https://github.com/oneapi-src/oneMKL.git
+        cd oneMKL
+        mkdir build
+        cd build
+        cmake \
+              -DCMAKE_CXX_COMPILER=/usr/bin/clang++-${{matrix.clang_version}} \
+              -DCMAKE_C_COMPILER=/usr/bin/clang-${{matrix.clang_version}} \
+              -DCUDA_CUDA_LIBRARY=/usr/local/cuda-11.6/lib64/stubs/libcuda.so \
+              -DCUDA_PATH=/usr/local/cuda-${{matrix.cuda_version}} \
+              -DENABLE_CUBLAS_BACKEND=True \
+              -DENABLE_CURAND_BACKEND=False \
+              -DENABLE_CUSOLVER_BACKEND=False \
+              -DENABLE_MKLGPU_BACKEND=False \
+              -DENABLE_MKLCPU_BACKEND=False \
+              -DENABLE_NETLIB_BACKEND=False \
+              -DENABLE_ROCBLAS_BACKEND=False \
+              -DTARGET_DOMAINS=blas \
+              -DHIPSYCL_TARGETS=omp\;cuda:sm_61\
+              -DONEMKL_SYCL_IMPLEMENTATION=hipSYCL \
+              -DREF_BLAS_ROOT=/opt/lapack/ ..
+        cmake --build . -j2
+        ctest
+        cmake --install . --prefix /usr
