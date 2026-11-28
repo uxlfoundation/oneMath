@@ -47,7 +47,11 @@ extern std::vector<sycl::device*> devices;
 
 namespace {
 
-template <typename Ta, typename Tb, typename Tc, typename Ts>
+// RestrictedInt32 selects inputs that a backend limited to the hardware int32 GEMM can run: alpha
+// and beta are small integers (the (int8, int8, int32, float) combination takes float scalars, but
+// cuBLAS takes int32 scalars for its int32 output), and m, n and k are multiples of 32 (cuBLAS
+// rejects some unaligned shapes of this combination with CUBLAS_STATUS_NOT_SUPPORTED).
+template <typename Ta, typename Tb, typename Tc, typename Ts, bool RestrictedInt32 = false>
 int test(device* dev, oneapi::math::layout layout, int64_t group_count) {
     // Catch asynchronous exceptions.
     auto exception_handler = [](exception_list exceptions) {
@@ -101,11 +105,20 @@ int test(device* dev, oneapi::math::layout layout, int64_t group_count) {
         m[i] = 1 + std::rand() % 500;
         n[i] = 1 + std::rand() % 500;
         k[i] = 1 + std::rand() % 500;
+        if constexpr (RestrictedInt32) {
+            m[i] = (m[i] + 31) / 32 * 32;
+            n[i] = (n[i] + 31) / 32 * 32;
+            k[i] = (k[i] + 31) / 32 * 32;
+        }
         lda[i] = std::max(m[i], k[i]);
         ldb[i] = std::max(n[i], k[i]);
         ldc[i] = std::max(m[i], n[i]);
         alpha[i] = rand_scalar<Ts>();
         beta[i] = rand_scalar<Ts>();
+        if constexpr (RestrictedInt32) {
+            alpha[i] = Ts(std::rand() % 5 - 2);
+            beta[i] = Ts(std::rand() % 5 - 2);
+        }
         if ((std::is_same<Ts, std::complex<float>>::value) ||
             (std::is_same<Ts, std::complex<double>>::value)) {
             tmp = std::rand() % 3;
@@ -415,6 +428,11 @@ TEST_P(GemmBatchUsmTests, Int8Int8SinglePrecision) {
 
 TEST_P(GemmBatchUsmTests, Int8Int8Int32Precision) {
     EXPECT_TRUEORSKIP((test<std::int8_t, std::int8_t, std::int32_t, float>(
+        std::get<0>(GetParam()), std::get<1>(GetParam()), 5)));
+}
+
+TEST_P(GemmBatchUsmTests, Int8Int8Int32RestrictedInputs) {
+    EXPECT_TRUEORSKIP((test<std::int8_t, std::int8_t, std::int32_t, float, true>(
         std::get<0>(GetParam()), std::get<1>(GetParam()), 5)));
 }
 
