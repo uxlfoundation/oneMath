@@ -19,6 +19,10 @@
 *
 **************************************************************************/
 
+#include <cmath>
+#include <type_traits>
+#include <vector>
+
 #include "rocblas_helper.hpp"
 #include "rocblas_task.hpp"
 
@@ -227,6 +231,38 @@ DGMM_STRIDED_BATCH_LAUNCHER(std::complex<double>, rocblas_zdgmm_strided_batched)
 
 #undef DGMM_STRIDED_BATCH_LAUNCHER
 
+// rocBLAS computes an int32 output only with the int32 compute type, which takes int32 alpha and
+// beta, whereas oneMath specifies float scalars for the (int8, int8, int32, float) combination. A
+// float scalar converts exactly when it is integral and in the int32 range; any other value cannot
+// be passed to rocBLAS and is reported as unimplemented.
+template <typename Tc, typename Ts>
+using rocblas_scalar_t = std::conditional_t<std::is_same_v<Tc, std::int32_t>, std::int32_t, Ts>;
+
+template <typename Tc, typename Ts>
+inline rocblas_scalar_t<Tc, Ts> to_rocblas_scalar(Ts scalar) {
+    if constexpr (std::is_same_v<Tc, std::int32_t>) {
+        if (!(scalar >= -2147483648.0f && scalar < 2147483648.0f) || scalar != std::floor(scalar)) {
+            throw unimplemented("blas", "gemm_batch",
+                                "int32 output requires integral alpha and beta in the int32 range");
+        }
+        return static_cast<std::int32_t>(scalar);
+    }
+    else {
+        return scalar;
+    }
+}
+
+// The compute type of rocblas_gemm_*batched_ex: the scalar's datatype, or int32 for an int32 output.
+template <typename Tc, typename Ts>
+inline rocblas_datatype get_rocblas_compute_type() {
+    if constexpr (std::is_same_v<Tc, std::int32_t>) {
+        return rocblas_datatype_i32_r;
+    }
+    else {
+        return get_rocblas_datatype<typename RocEquivalentType<Ts>::Type>();
+    }
+}
+
 template <typename Ta, typename Tb, typename Tc, typename Ts>
 inline void gemm_batch_impl(sycl::queue& queue, transpose transa, transpose transb, int64_t m,
                             int64_t n, int64_t k, Ts alpha, sycl::buffer<Ta, 1>& a, int64_t lda,
@@ -236,8 +272,9 @@ inline void gemm_batch_impl(sycl::queue& queue, transpose transa, transpose tran
     using rocTypeA = typename RocEquivalentType<Ta>::Type;
     using rocTypeB = typename RocEquivalentType<Tb>::Type;
     using rocTypeC = typename RocEquivalentType<Tc>::Type;
-    using rocTypeS = typename RocEquivalentType<Ts>::Type;
     overflow_check(m, n, k, lda, ldb, ldc, stridea, strideb, stridec, batch_size);
+    const auto alpha_c = to_rocblas_scalar<Tc>(alpha);
+    const auto beta_c = to_rocblas_scalar<Tc>(beta);
 
     int32_t solution_index = 0;
     rocblas_gemm_flags flags = rocblas_gemm_flags_none;
@@ -255,11 +292,11 @@ inline void gemm_batch_impl(sycl::queue& queue, transpose transa, transpose tran
             rocblas_status err;
             rocblas_native_func(rocblas_gemm_strided_batched_ex, err, handle,
                                 get_rocblas_operation(transa), get_rocblas_operation(transb), m, n,
-                                k, &alpha, a_, get_rocblas_datatype<rocTypeA>(), lda, stridea, b_,
-                                get_rocblas_datatype<rocTypeB>(), ldb, strideb, &beta, c_,
+                                k, &alpha_c, a_, get_rocblas_datatype<rocTypeA>(), lda, stridea, b_,
+                                get_rocblas_datatype<rocTypeB>(), ldb, strideb, &beta_c, c_,
                                 get_rocblas_datatype<rocTypeC>(), ldc, stridec, c_,
                                 get_rocblas_datatype<rocTypeC>(), ldc, stridec, batch_size,
-                                get_rocblas_datatype<rocTypeS>(), rocblas_gemm_algo_standard,
+                                get_rocblas_compute_type<Tc, Ts>(), rocblas_gemm_algo_standard,
                                 solution_index, flags);
         });
     });
@@ -283,6 +320,7 @@ GEMM_STRIDED_BATCH_LAUNCHER(std::complex<float>, std::complex<float>, std::compl
 GEMM_STRIDED_BATCH_LAUNCHER(std::complex<double>, std::complex<double>, std::complex<double>,
                             std::complex<double>)
 GEMM_STRIDED_BATCH_LAUNCHER(sycl::half, sycl::half, float, float)
+GEMM_STRIDED_BATCH_LAUNCHER(std::int8_t, std::int8_t, std::int32_t, float)
 GEMM_STRIDED_BATCH_LAUNCHER(bfloat16, bfloat16, float, float)
 GEMM_STRIDED_BATCH_LAUNCHER(bfloat16, bfloat16, bfloat16, float)
 
@@ -301,7 +339,6 @@ GEMM_STRIDED_BATCH_LAUNCHER(bfloat16, bfloat16, bfloat16, float)
     }
 
 GEMM_STRIDED_BATCH_LAUNCHER(std::int8_t, std::int8_t, float, float)
-GEMM_STRIDED_BATCH_LAUNCHER(std::int8_t, std::int8_t, std::int32_t, float)
 
 #undef GEMM_STRIDED_BATCH_LAUNCHER
 
@@ -859,8 +896,9 @@ inline sycl::event gemm_batch_strided_usm_impl(sycl::queue& queue, transpose tra
     using rocTypeA = typename RocEquivalentType<Ta>::Type;
     using rocTypeB = typename RocEquivalentType<Tb>::Type;
     using rocTypeC = typename RocEquivalentType<Tc>::Type;
-    using rocTypeS = typename RocEquivalentType<Ts>::Type;
     overflow_check(m, n, k, lda, ldb, ldc, stridea, strideb, stridec, batch_size);
+    const auto alpha_c = to_rocblas_scalar<Tc>(alpha);
+    const auto beta_c = to_rocblas_scalar<Tc>(beta);
 
     int32_t solution_index = 0;
     rocblas_gemm_flags flags = rocblas_gemm_flags_none;
@@ -875,11 +913,11 @@ inline sycl::event gemm_batch_strided_usm_impl(sycl::queue& queue, transpose tra
             rocblas_status err;
             rocblas_native_func(rocblas_gemm_strided_batched_ex, err, handle,
                                 get_rocblas_operation(transa), get_rocblas_operation(transb), m, n,
-                                k, &alpha, a_, get_rocblas_datatype<rocTypeA>(), lda, stridea, b_,
-                                get_rocblas_datatype<rocTypeB>(), ldb, strideb, &beta, c_,
+                                k, &alpha_c, a_, get_rocblas_datatype<rocTypeA>(), lda, stridea, b_,
+                                get_rocblas_datatype<rocTypeB>(), ldb, strideb, &beta_c, c_,
                                 get_rocblas_datatype<rocTypeC>(), ldc, stridec, c_,
                                 get_rocblas_datatype<rocTypeC>(), ldc, stridec, batch_size,
-                                get_rocblas_datatype<rocTypeS>(), rocblas_gemm_algo_standard,
+                                get_rocblas_compute_type<Tc, Ts>(), rocblas_gemm_algo_standard,
                                 solution_index, flags);
         });
     });
@@ -906,6 +944,7 @@ GEMM_STRIDED_BATCH_LAUNCHER_USM(std::complex<float>, std::complex<float>, std::c
 GEMM_STRIDED_BATCH_LAUNCHER_USM(std::complex<double>, std::complex<double>, std::complex<double>,
                                 std::complex<double>)
 GEMM_STRIDED_BATCH_LAUNCHER_USM(sycl::half, sycl::half, float, float)
+GEMM_STRIDED_BATCH_LAUNCHER_USM(std::int8_t, std::int8_t, std::int32_t, float)
 GEMM_STRIDED_BATCH_LAUNCHER_USM(bfloat16, bfloat16, float, float)
 GEMM_STRIDED_BATCH_LAUNCHER_USM(bfloat16, bfloat16, bfloat16, float)
 
@@ -924,7 +963,6 @@ GEMM_STRIDED_BATCH_LAUNCHER_USM(bfloat16, bfloat16, bfloat16, float)
     }
 
 GEMM_STRIDED_BATCH_LAUNCHER_USM(std::int8_t, std::int8_t, float, float)
-GEMM_STRIDED_BATCH_LAUNCHER_USM(std::int8_t, std::int8_t, std::int32_t, float)
 
 #undef GEMM_STRIDED_BATCH_LAUNCHER_USM
 
@@ -937,9 +975,13 @@ inline sycl::event gemm_batch_usm_impl(sycl::queue& queue, transpose* transa, tr
     using rocTypeA = typename RocEquivalentType<Ta>::Type;
     using rocTypeB = typename RocEquivalentType<Tb>::Type;
     using rocTypeC = typename RocEquivalentType<Tc>::Type;
-    using rocTypeS = typename RocEquivalentType<Ts>::Type;
     for (int64_t i = 0; i < group_count; i++) {
         overflow_check(m[i], n[i], k[i], lda[i], ldb[i], ldc[i], group_size[i]);
+    }
+    std::vector<rocblas_scalar_t<Tc, Ts>> alpha_c(group_count), beta_c(group_count);
+    for (int64_t i = 0; i < group_count; i++) {
+        alpha_c[i] = to_rocblas_scalar<Tc>(alpha[i]);
+        beta_c[i] = to_rocblas_scalar<Tc>(beta[i]);
     }
 
     int32_t solution_index = 0;
@@ -957,12 +999,12 @@ inline sycl::event gemm_batch_usm_impl(sycl::queue& queue, transpose* transa, tr
                 auto** c_ = reinterpret_cast<rocTypeC**>(c);
                 rocblas_native_func(
                     rocblas_gemm_batched_ex, err, handle, get_rocblas_operation(transa[i]),
-                    get_rocblas_operation(transb[i]), (int)m[i], (int)n[i], (int)k[i], &alpha[i],
+                    get_rocblas_operation(transb[i]), (int)m[i], (int)n[i], (int)k[i], &alpha_c[i],
                     a_ + offset, get_rocblas_datatype<rocTypeA>(), (int)lda[i], b_ + offset,
-                    get_rocblas_datatype<rocTypeB>(), (int)ldb[i], &beta[i], c_ + offset,
+                    get_rocblas_datatype<rocTypeB>(), (int)ldb[i], &beta_c[i], c_ + offset,
                     get_rocblas_datatype<rocTypeC>(), (int)ldc[i], c_ + offset,
                     get_rocblas_datatype<rocTypeC>(), (int)ldc[i], (int)group_size[i],
-                    get_rocblas_datatype<rocTypeS>(), rocblas_gemm_algo_standard, solution_index,
+                    get_rocblas_compute_type<Tc, Ts>(), rocblas_gemm_algo_standard, solution_index,
                     flags);
                 offset += group_size[i];
             }
@@ -990,6 +1032,7 @@ GEMM_BATCH_LAUNCHER_USM(std::complex<float>, std::complex<float>, std::complex<f
 GEMM_BATCH_LAUNCHER_USM(std::complex<double>, std::complex<double>, std::complex<double>,
                         std::complex<double>)
 GEMM_BATCH_LAUNCHER_USM(sycl::half, sycl::half, float, float)
+GEMM_BATCH_LAUNCHER_USM(std::int8_t, std::int8_t, std::int32_t, float)
 GEMM_BATCH_LAUNCHER_USM(bfloat16, bfloat16, float, float)
 GEMM_BATCH_LAUNCHER_USM(bfloat16, bfloat16, bfloat16, float)
 
@@ -1008,7 +1051,6 @@ GEMM_BATCH_LAUNCHER_USM(bfloat16, bfloat16, bfloat16, float)
     }
 
 GEMM_BATCH_LAUNCHER_USM(std::int8_t, std::int8_t, float, float)
-GEMM_BATCH_LAUNCHER_USM(std::int8_t, std::int8_t, std::int32_t, float)
 
 #undef GEMM_BATCH_LAUNCHER_USM
 
